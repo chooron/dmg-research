@@ -1,0 +1,24 @@
+[project]
+name = "causal-delta-model"
+version = "0.1.0"
+description = "Autonomous pretraining research swarm"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "dmg>=1.4.0",
+    "numpy>=2.2.6",
+    "omegaconf>=2.3.0",
+    "torch==2.9.1",
+    "tqdm>=4.0.0",
+    "triton>=3.5.1",
+]
+
+[tool.uv.sources]
+torch = [
+    { index = "pytorch-cu128" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true

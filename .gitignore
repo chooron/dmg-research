@@ -1,0 +1,22 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Results file
+results.tsv
+
+data
+
+*.md
+
+!README.md
+
+outputs
+.claude
