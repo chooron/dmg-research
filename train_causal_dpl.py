@@ -229,7 +229,7 @@ def main():
     mode = config['mode']
 
     if 'train' in mode:
-        log.info("Starting IRM training...")
+        log.info("Starting fixed-epoch causal training...")
         trainer.train()
         log.info(f"Training complete. Model saved to {config['model_dir']}")
 

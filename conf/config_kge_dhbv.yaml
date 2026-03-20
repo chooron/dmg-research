@@ -14,7 +14,7 @@ model_dir: ./outputs/kge_baseline/
 ## Training --------------------------#
 train:
   start_time: 1980/10/01
-  end_time: 2005/09/30
+  end_time: 2010/09/30
   target: [streamflow]
   optimizer:
     name: Adam
@@ -28,15 +28,7 @@ train:
   batch_size: 100
   epochs: 100
   start_epoch: 0
-  save_epoch: 5
-
-
-## Validation ------------------------#
-val:
-  start_time: 2005/10/01
-  end_time: 2010/09/30
-  batch_size: 25
-
+  save_epoch: 10
 
 ## Test ------------------------------#
 test:

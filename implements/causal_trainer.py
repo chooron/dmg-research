@@ -15,7 +15,6 @@ import torch
 
 from dmg.core.utils.utils import save_outputs, save_train_state
 from dmg.trainers.trainer import Trainer
-from dmg.models.criterion.kge_batch_loss import KgeBatchLoss
 
 from implements.causal_dpl_model import CausalDplModel
 from implements.gnann_splitter import GnannEnvironmentSplitter
@@ -81,8 +80,6 @@ class CausalTrainer(Trainer):
             scheduler=scheduler,
             **kwargs,
         )
-        self._val_loss_func = KgeBatchLoss(config, device=config['device'])
-
         causal_cfg     = config.get('causal', {})
         basin_ids      = self._load_basin_ids(causal_cfg['basin_ids_path'])
         self.splitter  = GnannEnvironmentSplitter(
@@ -91,14 +88,6 @@ class CausalTrainer(Trainer):
             use_groups    = causal_cfg.get('use_groups', True),
             holdout_group = causal_cfg.get('holdout_group', None),
         )
-
-        # Early stopping state
-        es_cfg = config.get('early_stopping', {})
-        self.es_patience  = es_cfg.get('patience', 0)   # 0 = disabled
-        self.es_min_delta = es_cfg.get('min_delta', 0.0)
-        self._es_best     = float('inf')
-        self._es_counter  = 0
-        self._es_stopped  = False
 
         if train_dataset is not None:
             self.env_train_datasets = self.splitter.split_dataset(train_dataset)
@@ -127,30 +116,8 @@ class CausalTrainer(Trainer):
         return np.loadtxt(path, dtype=int)
 
     # ------------------------------------------------------------------
-    def _val_loss(self) -> float:
-        """Compute mean KGE loss on the validation dataset."""
-        if self.eval_dataset is None:
-            return float('inf')
-        self.model.eval()
-        n_samples = self.eval_dataset['xc_nn_norm'].shape[1]
-        batch_size = self.config['val']['batch_size']
-        batch_start = np.arange(0, n_samples, batch_size)
-        batch_end = np.append(batch_start[1:], n_samples)
-        total_loss = 0.0
-        with torch.no_grad():
-            for s, e in zip(batch_start, batch_end):
-                sample = self.sampler.get_validation_sample(
-                    self.eval_dataset, int(s), int(e),
-                )
-                pred = self.model(sample, eval=True)
-                y_pred = pred['streamflow'].squeeze(-1)
-                y_obs = sample['target'][-y_pred.shape[0]:, :, 0]
-                total_loss += self._val_loss_func(y_pred=y_pred, y_obs=y_obs).item()
-        self.model.train()
-        return total_loss / len(batch_start)
-
     def train(self) -> None:
-        """Train with optional early stopping based on validation loss."""
+        """Train for a fixed number of epochs without validation-based early stopping."""
         from dmg.core.data.data import create_training_grid
         self.is_in_train = True
         n_samples, n_minibatch, n_timesteps = create_training_grid(
@@ -160,22 +127,6 @@ class CausalTrainer(Trainer):
 
         for epoch in range(self.start_epoch, self.epochs + 1):
             self.train_one_epoch(epoch, n_samples, n_minibatch, n_timesteps)
-
-            if self.es_patience > 0:
-                val_loss = self._val_loss()
-                if val_loss < self._es_best - self.es_min_delta:
-                    self._es_best = val_loss
-                    self._es_counter = 0
-                else:
-                    self._es_counter += 1
-                    log.info(
-                        f"Early stopping counter: {self._es_counter}/{self.es_patience} "
-                        f"(val_loss={val_loss:.6f}, best={self._es_best:.6f})"
-                    )
-                    if self._es_counter >= self.es_patience:
-                        log.info(f"Early stopping triggered at epoch {epoch}.")
-                        self._es_stopped = True
-                        break
 
         self.exp_logger.finalize()
 
@@ -198,7 +149,7 @@ class CausalTrainer(Trainer):
             )
             env_samples = self._sample_envs(n_timesteps)
 
-            predictions, env_pairs = self.model(
+            _, env_pairs = self.model(
                 dataset_sample, env_datasets=env_samples,
             )
 
