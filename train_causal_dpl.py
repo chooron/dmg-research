@@ -71,6 +71,80 @@ def parse_args():
     return p.parse_args()
 
 
+def _get_penalty_warmup_epochs(config: dict) -> int:
+    loss_name = config['train']['loss_function']['name']
+    if loss_name == 'IRMKgeBatchLoss':
+        return int(config.get('irm_warmup_epochs', 0) or 0)
+    if loss_name == 'VRExKgeBatchLoss':
+        return int(config.get('vrex_warmup_epochs', 0) or 0)
+    return 0
+
+
+
+def _build_optimizer_and_scheduler(config: dict, model: torch.nn.Module):
+    optimizer_name = config['train'].get('optimizer', {}).get('name', 'Adam')
+    if optimizer_name != 'Adam':
+        raise ValueError(f"Unsupported optimizer '{optimizer_name}'. Only Adam is supported.")
+
+    optimizer = torch.optim.Adam(
+        model.parameters(),
+        lr=config['train']['lr'],
+    )
+
+    lr_cfg = config['train'].get('lr_scheduler', {})
+    scheduler_name = lr_cfg.get('name', 'CosineAnnealingLR') if isinstance(lr_cfg, dict) else lr_cfg
+    if scheduler_name != 'CosineAnnealingLR':
+        log.info("Skipping custom scheduler wiring for unsupported scheduler '%s'.", scheduler_name)
+        return optimizer, None
+
+    total_epochs = int(config['train']['epochs'])
+    warm_epochs = _get_penalty_warmup_epochs(config)
+    eta_min = lr_cfg.get('eta_min', 1e-5) if isinstance(lr_cfg, dict) else 1e-5
+
+    if 0 < warm_epochs < total_epochs and (warm_epochs / total_epochs) >= 0.05:
+        start_factor = (
+            lr_cfg.get('warmup_start_factor', 0.1) if isinstance(lr_cfg, dict) else 0.1
+        )
+        scheduler = torch.optim.lr_scheduler.SequentialLR(
+            optimizer,
+            schedulers=[
+                torch.optim.lr_scheduler.LinearLR(
+                    optimizer,
+                    start_factor=start_factor,
+                    end_factor=1.0,
+                    total_iters=warm_epochs,
+                ),
+                torch.optim.lr_scheduler.CosineAnnealingLR(
+                    optimizer,
+                    T_max=max(total_epochs - warm_epochs, 1),
+                    eta_min=eta_min,
+                ),
+            ],
+            milestones=[warm_epochs],
+        )
+        log.info(
+            "Using LinearLR + CosineAnnealingLR (%d warmup epochs, %d cosine epochs).",
+            warm_epochs,
+            total_epochs - warm_epochs,
+        )
+        return optimizer, scheduler
+
+    if warm_epochs > 0:
+        log.info(
+            "Penalty warmup is short (%d/%d epochs); keeping plain CosineAnnealingLR.",
+            warm_epochs,
+            total_epochs,
+        )
+
+    t_max = lr_cfg.get('T_max', total_epochs) if isinstance(lr_cfg, dict) else total_epochs
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+        optimizer,
+        T_max=t_max,
+        eta_min=eta_min,
+    )
+    return optimizer, scheduler
+
+
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
@@ -78,18 +152,29 @@ def parse_args():
 def main():
     args = parse_args()
 
-    # 1. Load config
-    config = initialize_config(OmegaConf.load(args.config))
+    # 1. Load config and apply CLI overrides before interpolation resolves.
+    raw_config = OmegaConf.load(args.config)
+    original_epochs = raw_config['train']['epochs']
 
-    # Apply CLI overrides
     if args.mode:
-        config['mode'] = args.mode
+        raw_config['mode'] = args.mode
     if args.holdout is not None:
-        config.setdefault('causal', {})['holdout_group'] = args.holdout
+        if raw_config.get('causal') is None:
+            raw_config['causal'] = {}
+        raw_config['causal']['holdout_group'] = args.holdout
     if args.lambda_irm is not None:
-        config['lambda_irm'] = args.lambda_irm
+        raw_config['lambda_irm'] = args.lambda_irm
     if args.epochs is not None:
-        config['train']['epochs'] = args.epochs
+        raw_config['train']['epochs'] = args.epochs
+        lr_cfg = raw_config['train'].get('lr_scheduler')
+        if (
+            isinstance(lr_cfg, dict)
+            and lr_cfg.get('name') == 'CosineAnnealingLR'
+            and ('T_max' not in lr_cfg or lr_cfg.get('T_max') == original_epochs)
+        ):
+            lr_cfg['T_max'] = args.epochs
+
+    config = initialize_config(raw_config)
 
     # Validate causal config block
     causal_cfg = config.get('causal', {})
@@ -101,7 +186,12 @@ def main():
             )
 
     holdout_group = causal_cfg.get('holdout_group')
-    log.info(f"Mode: {config['mode']}  |  Holdout group: {holdout_group}")
+    log.info(
+        "Mode: %s  |  Holdout group: %s  |  Model dir: %s",
+        config['mode'],
+        holdout_group,
+        config['model_dir'],
+    )
     # Flatten lr_scheduler dict to name string only for print_config, then restore
     lr_sched = config['train'].get('lr_scheduler')
     if isinstance(lr_sched, dict):
@@ -121,6 +211,7 @@ def main():
     model = build_causal_dpl(config)
     model = model.to(config['device'])
     log.info(f"Model device: {config['device']}")
+    optimizer, scheduler = _build_optimizer_and_scheduler(config, model)
 
     # 4. Build trainer
     trainer = CausalTrainer(
@@ -128,6 +219,8 @@ def main():
         model=model,
         train_dataset=data_loader.train_dataset,
         eval_dataset=data_loader.eval_dataset,
+        optimizer=optimizer,
+        scheduler=scheduler,
         write_out=True,
         verbose=False,
     )
