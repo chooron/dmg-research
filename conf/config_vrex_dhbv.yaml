@@ -10,7 +10,10 @@ data_loader: HydroLoader
 data_sampler: HydroSampler
 trainer: CausalTrainer
 
-model_dir: ./outputs/vrex_dhbv_group${causal.holdout_group}/
+output_dir: ./outputs/vrex_dhbv_held_out_${causal.holdout_cluster}_seed${seed}/
+model_dir: ${output_dir}model/
+plot_dir: ${output_dir}plot/
+sim_dir: ${output_dir}sim/
 
 
 ## Training --------------------------#
@@ -52,8 +55,7 @@ sim:
 causal:
   cluster_csv: ./data/gauge_cluster.csv
   basin_ids_path: ./data/gage_id.npy
-  use_groups: True
-  holdout_group: 1
+  holdout_cluster: A
 
 lambda_vrex: 100.0
 vrex_warmup_epochs: 10

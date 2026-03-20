@@ -1,17 +1,17 @@
 """
 train_causal_dpl.py
 -------------------
-Main entry point for Causal-dPL group-holdout cross-validation.
+Main entry point for Causal-dPL effective-cluster holdout cross-validation.
 
 Usage
 -----
     python train_causal_dpl.py --config conf/config_dhbv.yaml \
-                                --holdout 1          # hold out Group 1
+                                --holdout A          # hold out effective cluster A
                                 --mode train_test    # train + OOD eval
 
-    # Run all 4 group holdouts sequentially:
-    for g in 1 2 3 4; do
-        python train_causal_dpl.py --config conf/config_dhbv.yaml --holdout $g
+    # Run all 7 effective-cluster holdouts sequentially:
+    for c in A B C D E F G; do
+        python train_causal_dpl.py --config conf/config_dhbv.yaml --holdout $c
     done
 
 Config extensions (add to your yaml under a 'causal:' key)
@@ -19,8 +19,7 @@ Config extensions (add to your yaml under a 'causal:' key)
 causal:
   cluster_csv:    data/gauge_pos_cluster_climate.csv
   basin_ids_path: data/gage_id.txt          # or gage_id.npy
-  use_groups:     true                      # 4 coarse groups (vs 10 clusters)
-  holdout_group:  1                         # overridden by --holdout CLI arg
+  holdout_cluster: A                        # overridden by --holdout CLI arg
 
 lambda_irm:          100.0
 irm_warmup_epochs:   10
@@ -42,6 +41,7 @@ from omegaconf import OmegaConf
 from dmg.core.utils.utils import initialize_config
 
 from implements import build_causal_dpl, CausalTrainer
+from implements.gnann_splitter import GnannEnvironmentSplitter
 
 logging.basicConfig(
     level=logging.INFO,
@@ -59,15 +59,17 @@ def parse_args():
     p = argparse.ArgumentParser(description='Causal-dPL training / evaluation')
     p.add_argument('--config',   default='conf/config_irm_dhbv.yaml',
                    help='Path to dmg config yaml')
-    p.add_argument('--holdout',  type=int, default=None,
-                   help='Group to hold out for OOD eval (1-4). '
-                        'Overrides causal.holdout_group in config.')
+    p.add_argument('--holdout',  type=str, default=None,
+                   help='Effective cluster to hold out for OOD eval (A-G). '
+                        'Overrides causal.holdout_cluster in config.')
     p.add_argument('--mode',     default=None,
                    help='Override config mode: train | test | train_test')
     p.add_argument('--lambda-irm', type=float, default=None,
                    help='Override lambda_irm in config')
     p.add_argument('--epochs',   type=int, default=None,
                    help='Override train.epochs in config')
+    p.add_argument('--seed',     type=int, default=None,
+                   help='Override experiment seed')
     return p.parse_args()
 
 
@@ -145,6 +147,37 @@ def _build_optimizer_and_scheduler(config: dict, model: torch.nn.Module):
     return optimizer, scheduler
 
 
+def _load_basin_ids(path: str):
+    import numpy as np
+
+    if path.endswith('.npy'):
+        return np.load(path, allow_pickle=True).astype(int)
+    return np.loadtxt(path, dtype=int)
+
+
+def _log_effective_cluster_fold_sizes(causal_cfg: dict) -> None:
+    splitter = GnannEnvironmentSplitter(
+        cluster_csv=causal_cfg['cluster_csv'],
+        basin_ids=_load_basin_ids(causal_cfg['basin_ids_path']),
+        holdout_cluster=causal_cfg.get('holdout_cluster'),
+    )
+    if len(splitter.unassigned_indices) > 0:
+        log.info(
+            "Excluded %d basins without effective-cluster labels from leave-one-cluster splits.",
+            len(splitter.unassigned_indices),
+        )
+    for fold in splitter.fold_size_summary():
+        status = "OK" if fold['matches_expected'] else "MISMATCH"
+        log.info(
+            "Fold %s | test=%d | train=%d | train_envs=%d | %s",
+            fold['held_out_cluster'],
+            fold['test_basins'],
+            fold['train_basins'],
+            fold['train_environments'],
+            status,
+        )
+
+
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
@@ -161,7 +194,7 @@ def main():
     if args.holdout is not None:
         if raw_config.get('causal') is None:
             raw_config['causal'] = {}
-        raw_config['causal']['holdout_group'] = args.holdout
+        raw_config['causal']['holdout_cluster'] = args.holdout
     if args.lambda_irm is not None:
         raw_config['lambda_irm'] = args.lambda_irm
     if args.epochs is not None:
@@ -173,6 +206,8 @@ def main():
             and ('T_max' not in lr_cfg or lr_cfg.get('T_max') == original_epochs)
         ):
             lr_cfg['T_max'] = args.epochs
+    if args.seed is not None:
+        raw_config['seed'] = args.seed
 
     config = initialize_config(raw_config)
 
@@ -185,11 +220,12 @@ def main():
                 "Add a 'causal:' block to your yaml (see module docstring)."
             )
 
-    holdout_group = causal_cfg.get('holdout_group')
+    holdout_cluster = causal_cfg.get('holdout_cluster')
+    _log_effective_cluster_fold_sizes(causal_cfg)
     log.info(
-        "Mode: %s  |  Holdout group: %s  |  Model dir: %s",
+        "Mode: %s  |  Held-out effective cluster: %s  |  Model dir: %s",
         config['mode'],
-        holdout_group,
+        holdout_cluster,
         config['model_dir'],
     )
     # Flatten lr_scheduler dict to name string only for print_config, then restore
@@ -234,8 +270,8 @@ def main():
         log.info(f"Training complete. Model saved to {config['model_dir']}")
 
     if 'test' in mode or mode == 'train_test':
-        if holdout_group is not None:
-            log.info(f"Evaluating on held-out Group {holdout_group}...")
+        if holdout_cluster is not None:
+            log.info(f"Evaluating on held-out effective cluster {holdout_cluster}...")
             trainer.evaluate_holdout()
         else:
             log.info("Evaluating on full eval dataset (no holdout set)...")

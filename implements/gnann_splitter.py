@@ -1,4 +1,4 @@
-"""GnannEnvironmentSplitter — splits dataset by Gnann et al. climate clusters."""
+"""GnannEnvironmentSplitter — split basins by merged Gnann behavior clusters."""
 
 from __future__ import annotations
 
@@ -8,77 +8,106 @@ import numpy as np
 import torch
 from numpy.typing import NDArray
 
+# Original 10-cluster -> 7 effective-cluster mapping
+_CLUSTER_MERGE = {
+    0: "A",
+    1: "B",
+    2: "C",
+    3: "C",
+    4: "D",
+    5: "D",
+    6: "D",
+    7: "E",
+    8: "F",
+    9: "G",
+}
 
-# Gnann et al. 4-group mapping (0-indexed clusters)
-_CLUSTER_TO_GROUP = {
-    0: 1, 1: 1, 7: 1, 8: 1,   # Group 1: eastern low-seasonality
-    2: 2, 3: 2,                 # Group 2: western snowmelt
-    4: 3, 5: 3, 6: 3,           # Group 3: NW forested mountains
-    9: 4,                       # Group 4: Appalachian
+EFFECTIVE_CLUSTERS = ["A", "B", "C", "D", "E", "F", "G"]
+
+EXPECTED_TEST_BASIN_COUNTS = {
+    "A": 230,
+    "B": 101,
+    "C": 59,
+    "D": 50,
+    "E": 90,
+    "F": 61,
+    "G": 52,
 }
 
 
-class GnannEnvironmentSplitter:
-    """Split a dataset dict into per-environment sub-dicts using Gnann clusters.
+def normalize_held_out_cluster(held_out_cluster: Optional[str]) -> Optional[str]:
+    """Normalize and validate a held-out effective cluster label."""
+    if held_out_cluster is None:
+        return None
 
-    Parameters
-    ----------
-    cluster_csv : str
-        Path to ``gauge_pos_cluster_climate.csv`` (columns: ``gauge_index``,
-        ``gauge_cluster``).
-    basin_ids : array-like of int
-        Ordered list of basin IDs matching the basin dimension of the dataset.
-    use_groups : bool
-        If True (default), use the 4 coarse groups; otherwise use 10 fine clusters.
-    holdout_group : int or None
-        If set, this group is excluded from training environments (OOD test set).
-    """
+    normalized = str(held_out_cluster).strip().upper()
+    if normalized not in EFFECTIVE_CLUSTERS:
+        valid = ", ".join(EFFECTIVE_CLUSTERS)
+        raise ValueError(
+            f"Invalid held-out effective cluster '{held_out_cluster}'. "
+            f"Use one of: {valid}."
+        )
+    return normalized
+
+
+class GnannEnvironmentSplitter:
+    """Split datasets into per-environment subsets using 7 effective clusters."""
 
     def __init__(
         self,
         cluster_csv: str,
         basin_ids: NDArray,
-        use_groups: bool = True,
-        holdout_group: Optional[int] = None,
+        holdout_cluster: Optional[str] = None,
     ) -> None:
         import pandas as pd
-        df = pd.read_csv(cluster_csv)
+
+        df = pd.read_csv(cluster_csv).copy()
         df['gauge_index'] = df['gauge_index'].astype(int)
+        df['gauge_cluster'] = df['gauge_cluster'].astype(int)
+        df['effective_cluster'] = df['gauge_cluster'].map(_CLUSTER_MERGE)
 
-        self.use_groups    = use_groups
-        self.holdout_group = holdout_group
+        basin_ids = np.asarray(basin_ids, dtype=int)
+        holdout_cluster = normalize_held_out_cluster(holdout_cluster)
 
-        cluster_map = dict(zip(df['gauge_index'], df['gauge_cluster'].astype(int)))
-        basin_ids   = np.asarray(basin_ids, dtype=int)
+        raw_cluster_map = dict(zip(df['gauge_index'], df['gauge_cluster']))
+        effective_cluster_map = dict(zip(df['gauge_index'], df['effective_cluster']))
 
-        if use_groups:
-            env_labels = np.array(
-                [_CLUSTER_TO_GROUP.get(cluster_map.get(b, -1), -1) for b in basin_ids]
-            )
-        else:
-            env_labels = np.array([cluster_map.get(b, -1) for b in basin_ids])
+        raw_clusters = np.array([raw_cluster_map.get(b, -1) for b in basin_ids], dtype=int)
+        effective_clusters = np.array(
+            [effective_cluster_map.get(b, "") for b in basin_ids],
+            dtype=object,
+        )
+        missing_mask = effective_clusters == ""
 
-        self.env_labels = env_labels
-        self.basin_ids  = basin_ids
+        self.cluster_df = df
+        self.basin_ids = basin_ids
+        self.raw_clusters = raw_clusters
+        self.effective_clusters = effective_clusters
+        self.holdout_cluster = holdout_cluster
+        self.env_labels = effective_clusters
+        self.unassigned_indices = np.where(missing_mask)[0]
 
-        unique_envs = sorted(set(env_labels.tolist()) - {-1})
-        self.env_indices: dict[int, NDArray] = {
-            e: np.where(env_labels == e)[0] for e in unique_envs
+        self.env_indices: dict[str, NDArray] = {
+            cluster_id: np.where(effective_clusters == cluster_id)[0]
+            for cluster_id in EFFECTIVE_CLUSTERS
+            if np.any(effective_clusters == cluster_id)
         }
 
-        if holdout_group is not None and holdout_group in self.env_indices:
-            self.holdout_indices    = self.env_indices[holdout_group]
-            self.train_env_indices  = {
-                e: idx for e, idx in self.env_indices.items() if e != holdout_group
+        if holdout_cluster is not None and holdout_cluster in self.env_indices:
+            self.holdout_indices = self.env_indices[holdout_cluster]
+            self.train_env_indices = {
+                cluster_id: idx
+                for cluster_id, idx in self.env_indices.items()
+                if cluster_id != holdout_cluster
             }
         else:
-            self.holdout_indices   = np.array([], dtype=int)
+            self.holdout_indices = np.array([], dtype=int)
             self.train_env_indices = self.env_indices
 
     def split_dataset(
         self,
         dataset: dict[str, torch.Tensor],
-    ) -> dict[int, dict[str, torch.Tensor]]:
+    ) -> dict[str, dict[str, torch.Tensor]]:
         return {
             env_id: self._index_dataset(dataset, idx)
             for env_id, idx in self.train_env_indices.items()
@@ -91,6 +120,32 @@ class GnannEnvironmentSplitter:
         if len(self.holdout_indices) == 0:
             return dataset
         return self._index_dataset(dataset, self.holdout_indices)
+
+    def basin_metadata(self, idx: NDArray) -> dict[str, NDArray]:
+        """Return basin-aligned metadata for an index selection."""
+        return {
+            'basin_id': self.basin_ids[idx].copy(),
+            'gauge_cluster': self.raw_clusters[idx].copy(),
+            'effective_cluster': self.effective_clusters[idx].copy(),
+        }
+
+    def fold_size_summary(self) -> list[dict[str, int | str | bool]]:
+        """Return train/test basin counts for all 7 leave-one-cluster folds."""
+        total_basins = int(sum(len(idx) for idx in self.env_indices.values()))
+        summary: list[dict[str, int | str | bool]] = []
+        for cluster_id in EFFECTIVE_CLUSTERS:
+            test_basins = int(len(self.env_indices.get(cluster_id, np.array([], dtype=int))))
+            train_basins = total_basins - test_basins
+            summary.append(
+                {
+                    'held_out_cluster': cluster_id,
+                    'test_basins': test_basins,
+                    'train_basins': train_basins,
+                    'train_environments': len(EFFECTIVE_CLUSTERS) - 1,
+                    'matches_expected': test_basins == EXPECTED_TEST_BASIN_COUNTS[cluster_id],
+                }
+            )
+        return summary
 
     @staticmethod
     def _index_dataset(
