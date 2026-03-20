@@ -18,8 +18,8 @@ sim_dir: ${output_dir}sim/
 
 ## Training --------------------------#
 train:
-  start_time: 1980/10/01
-  end_time: 2010/09/30
+  start_time: 1989/10/01
+  end_time: 1999/09/30
   target: [streamflow]
   optimizer:
     name: Adam
@@ -38,8 +38,8 @@ train:
 
 ## Test ------------------------------#
 test:
-  start_time: 1980/10/01
-  end_time: 2010/09/30
+  start_time: 1989/10/01
+  end_time: 1999/09/30
   batch_size: 25
   test_epoch: 100
 

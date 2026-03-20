@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 import os
 import time
+from contextlib import nullcontext
 from typing import Any, Optional
 
 import numpy as np
@@ -87,6 +88,13 @@ class CausalTrainer(Trainer):
             basin_ids=basin_ids,
             holdout_cluster=causal_cfg.get('holdout_cluster', None),
         )
+        self.use_amp = self._should_use_amp(config)
+        self.amp_dtype = self._resolve_amp_dtype(config)
+        self.grad_scaler = (
+            torch.amp.GradScaler('cuda')
+            if self.use_amp and self.amp_dtype == torch.float16
+            else None
+        )
 
         if train_dataset is not None:
             self.env_train_datasets = self.splitter.split_dataset(train_dataset)
@@ -119,6 +127,32 @@ class CausalTrainer(Trainer):
             return np.load(path, allow_pickle=True).astype(int)
         return np.loadtxt(path, dtype=int)
 
+    @staticmethod
+    def _should_use_amp(config: dict[str, Any]) -> bool:
+        if not str(config['device']).startswith('cuda') or not torch.cuda.is_available():
+            return False
+        amp_cfg = config['train'].get('amp', None)
+        if amp_cfg is None:
+            return bool(getattr(torch.cuda, 'is_bf16_supported', lambda: False)())
+        return bool(amp_cfg)
+
+    @staticmethod
+    def _resolve_amp_dtype(config: dict[str, Any]) -> torch.dtype:
+        amp_dtype = str(config['train'].get('amp_dtype', 'bfloat16')).lower()
+        if amp_dtype in ('bf16', 'bfloat16'):
+            return torch.bfloat16
+        if amp_dtype in ('fp16', 'float16', 'half'):
+            return torch.float16
+        return torch.float32
+
+    def _autocast_context(self):
+        if not self.use_amp:
+            return nullcontext()
+        return torch.autocast(
+            device_type='cuda',
+            dtype=self.amp_dtype,
+        )
+
     # ------------------------------------------------------------------
     def train(self) -> None:
         """Train for a fixed number of epochs without validation-based early stopping."""
@@ -148,20 +182,21 @@ class CausalTrainer(Trainer):
         )
 
         for mb in prog_bar:
-            dataset_sample = self.sampler.get_training_sample(
-                self.train_dataset, n_samples, n_timesteps,
-            )
-            env_samples = self._sample_envs(n_timesteps)
+            with self._autocast_context():
+                loss_environments = self._sample_loss_environments(n_timesteps)
+                loss = self.loss_func(
+                    environments=loss_environments,
+                    current_epoch=epoch,
+                )
 
-            _, env_pairs = self.model(
-                dataset_sample, env_datasets=env_samples,
-            )
-            loss_environments = self._build_loss_environments(env_pairs, env_samples)
-
-            loss = self.loss_func(environments=loss_environments, current_epoch=epoch)
-            loss.backward()
-            self.optimizer.step()
-            self.optimizer.zero_grad()
+            if self.grad_scaler is not None:
+                self.grad_scaler.scale(loss).backward()
+                self.grad_scaler.step(self.optimizer)
+                self.grad_scaler.update()
+            else:
+                loss.backward()
+                self.optimizer.step()
+            self.optimizer.zero_grad(set_to_none=True)
             self.total_loss += loss.item()
 
         if self.use_scheduler:
@@ -188,29 +223,26 @@ class CausalTrainer(Trainer):
                 clear_prior=True,
             )
 
-    def _sample_envs(self, n_timesteps: int) -> list[dict[str, torch.Tensor]]:
-        env_samples = []
+    def _sample_loss_environments(self, n_timesteps: int) -> list[tuple]:
+        """Sample each training environment and keep only tensors needed for loss."""
+        environments = []
         for env_dataset in self.env_train_datasets.values():
             n_env = env_dataset['xc_nn_norm'].shape[1]
             if n_env == 0:
                 continue
-            env_samples.append(
-                self.sampler.get_training_sample(env_dataset, n_env, n_timesteps)
-            )
-        return env_samples
 
-    def _build_loss_environments(
-        self,
-        env_pairs: list[tuple[torch.Tensor, torch.Tensor]],
-        env_samples: list[dict[str, torch.Tensor]],
-    ) -> list[tuple]:
-        """Attach basin counts for VREx, keep IRM format unchanged."""
-        if isinstance(self.loss_func, VRExKgeBatchLoss):
-            return [
-                (y_pred_e, y_obs_e, int(env_sample['xc_nn_norm'].shape[1]))
-                for (y_pred_e, y_obs_e), env_sample in zip(env_pairs, env_samples)
-            ]
-        return env_pairs
+            env_sample = self.sampler.get_training_sample(env_dataset, n_env, n_timesteps)
+            env_params = self.model.nn_model(env_sample['xc_nn_norm'])
+            env_pred = self.model.phy_model(env_sample, env_params)
+            y_pred_e = env_pred['streamflow'].squeeze(-1)
+            y_obs_e = env_sample['target'][-y_pred_e.shape[0]:, :, 0]
+
+            if isinstance(self.loss_func, VRExKgeBatchLoss):
+                environments.append((y_pred_e, y_obs_e, int(n_env)))
+            else:
+                environments.append((y_pred_e, y_obs_e))
+
+        return environments
 
     # ------------------------------------------------------------------
     def evaluate_holdout(self) -> dict[str, float]:
@@ -232,7 +264,8 @@ class CausalTrainer(Trainer):
         with torch.no_grad():
             for s, e in zip(batch_start, batch_end):
                 sample = self.sampler.get_validation_sample(holdout_data, int(s), int(e))
-                pred = self.model(sample, eval=True)
+                with self._autocast_context():
+                    pred = self.model(sample, eval=True)
                 all_preds.append({k: v.detach().cpu() for k, v in pred.items()})
         self.model.train()
 

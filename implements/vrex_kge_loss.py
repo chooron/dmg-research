@@ -143,7 +143,8 @@ class VRExKgeBatchLoss(BaseCriterion):
         if effective_lambda == 0.0:
             penalty = torch.tensor(0.0, device=self.device)
         else:
-            penalty = effective_lambda * self._vrex_penalty(env_losses, env_sizes)
+            penalty_raw = self._vrex_penalty(env_losses, env_sizes)
+            penalty = effective_lambda * penalty_raw
 
         return erm_loss + penalty
 

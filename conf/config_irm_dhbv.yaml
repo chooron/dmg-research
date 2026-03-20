@@ -18,8 +18,8 @@ sim_dir: ${output_dir}sim/
 
 ## Training (训练流域 K-1 簇) ----------#
 train:
-  start_time: 1980/10/01
-  end_time: 2010/09/30
+  start_time: 1989/10/01
+  end_time: 1999/09/30
   target: [streamflow]
   optimizer:
     name: Adam
@@ -38,16 +38,16 @@ train:
 
 ## Test (留出簇全段评估 PUB) -----------#
 test:
-  start_time: 1980/10/01
-  end_time: 2010/09/30
-  batch_size: 25
+  start_time: 1989/10/01
+  end_time: 1999/09/30
+  batch_size: 100
   test_epoch: 100
 
 
 ## Simulation -------------------------#
 sim:
-  start_time: 1980/10/01
-  end_time: 2014/09/30
+  start_time: 1989/10/01
+  end_time: 1999/09/30
   batch_size: 25
 
 
@@ -102,8 +102,8 @@ model:
     attributes: []
 
   nn:
-    name: AnnModel
-    dropout: 0.4
+    name: MlpModel
+    dropout: 0.2
     hidden_size: 256
     forcings: [prcp, tmean, pet]
     attributes: [

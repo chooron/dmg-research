@@ -26,6 +26,7 @@ irm_warmup_epochs:   10
 """
 
 import argparse
+import copy
 import logging
 import os
 import sys
@@ -178,6 +179,13 @@ def _log_effective_cluster_fold_sizes(causal_cfg: dict) -> None:
         )
 
 
+def _build_loader_config(config: dict) -> dict:
+    """Keep full datasets on CPU; samplers move only active batches to GPU."""
+    loader_config = copy.deepcopy(config)
+    loader_config['device'] = 'cpu'
+    return loader_config
+
+
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
@@ -240,10 +248,14 @@ def main():
 
     # 2. Load data
     log.info("Loading datasets...")
-    data_loader = HydroLoader(config, test_split=True, overwrite=False)
+    data_loader = HydroLoader(
+        _build_loader_config(config),
+        test_split=True,
+        overwrite=False,
+    )
 
     # 3. Build model
-    log.info("Building CausalDplModel (HbvStatic + AnnModel)...")
+    log.info("Building CausalDplModel...")
     model = build_causal_dpl(config)
     model = model.to(config['device'])
     log.info(f"Model device: {config['device']}")

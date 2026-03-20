@@ -193,8 +193,8 @@ class HbvStatic(nn.Module):
 
         # Routing
         nsteps_full = Qs.shape[0]
-        a  = route['route_a'].unsqueeze(0).unsqueeze(-1).repeat(nsteps_full, 1, 1)
-        b  = route['route_b'].unsqueeze(0).unsqueeze(-1).repeat(nsteps_full, 1, 1)
+        a = route['route_a'].unsqueeze(0).unsqueeze(-1).expand(nsteps_full, -1, 1)
+        b = route['route_b'].unsqueeze(0).unsqueeze(-1).expand(nsteps_full, -1, 1)
         UH = uh_gamma(a, b, lenF=15)
         rf = Qs.unsqueeze(-1).permute(1, 2, 0)       # [B, 1, T]
         streamflow = uh_conv(rf, UH.permute(1, 2, 0)).permute(2, 0, 1)  # [T, B, 1]

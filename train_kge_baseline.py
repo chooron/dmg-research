@@ -11,10 +11,12 @@ Usage
 """
 
 import argparse
+import copy
 import logging
 import os
 import sys
 import time
+from contextlib import nullcontext
 
 import torch
 import tqdm
@@ -60,7 +62,9 @@ def main():
     set_randomseed(config['seed'])
 
     log.info("Loading data...")
-    data_loader = HydroLoader(config, test_split=False, overwrite=False)
+    loader_config = copy.deepcopy(config)
+    loader_config['device'] = 'cpu'
+    data_loader = HydroLoader(loader_config, test_split=False, overwrite=False)
     train_dataset = data_loader.train_dataset
 
     log.info("Building model...")
@@ -75,6 +79,15 @@ def main():
     )
     loss_func = KgeBatchLoss(config, device=config['device'])
     sampler   = HydroSampler(config)
+    use_amp = str(config['device']).startswith('cuda') and torch.cuda.is_available()
+    use_amp = use_amp and bool(getattr(torch.cuda, 'is_bf16_supported', lambda: False)())
+    amp_dtype = torch.bfloat16 if use_amp else torch.float32
+    grad_scaler = None
+
+    def autocast_context():
+        if not use_amp:
+            return nullcontext()
+        return torch.autocast(device_type='cuda', dtype=amp_dtype)
 
     n_samples, n_minibatch, n_timesteps = create_training_grid(
         train_dataset['xc_nn_norm'], config,
@@ -99,15 +112,20 @@ def main():
 
         for _ in prog_bar:
             sample = sampler.get_training_sample(train_dataset, n_samples, n_timesteps)
-            pred   = model(sample)
-            y_pred = pred['streamflow'].squeeze(-1)
-            warm_up = getattr(model.phy_model, 'warm_up', 0)
-            y_obs  = sample['target'][-y_pred.shape[0]:, :, 0]
+            with autocast_context():
+                pred = model(sample)
+                y_pred = pred['streamflow'].squeeze(-1)
+                y_obs = sample['target'][-y_pred.shape[0]:, :, 0]
+                loss = loss_func(y_pred=y_pred, y_obs=y_obs)
 
-            loss = loss_func(y_pred=y_pred, y_obs=y_obs)
-            loss.backward()
-            optimizer.step()
-            optimizer.zero_grad()
+            if grad_scaler is not None:
+                grad_scaler.scale(loss).backward()
+                grad_scaler.step(optimizer)
+                grad_scaler.update()
+            else:
+                loss.backward()
+                optimizer.step()
+            optimizer.zero_grad(set_to_none=True)
             total_loss += loss.item()
 
         scheduler.step()

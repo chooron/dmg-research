@@ -116,19 +116,18 @@ class IRMKgeBatchLoss(BaseCriterion):
             f"IRM requires >= 2 environments, got {len(environments)}."
         )
 
-        # Per-environment KGE losses (ERM term)
-        env_losses = [
-            self._kge_loss(y_pred_e, y_obs_e)
-            for y_pred_e, y_obs_e in environments
-        ]
-        erm_loss = torch.stack(env_losses).mean()
-
         # IRM penalty — zero during warmup for stable initialisation
         if current_epoch < self.irm_warmup_epochs:
+            env_losses = [
+                self._kge_loss(y_pred_e, y_obs_e)
+                for y_pred_e, y_obs_e in environments
+            ]
+            erm_loss = torch.stack(env_losses).mean()
             penalty = torch.tensor(0.0, device=self.device)
         else:
             effective_lambda = self.get_lambda(current_epoch)
-            penalty = effective_lambda * self._irm_penalty(environments)
+            erm_loss, irm_penalty = self._erm_and_irm_penalty(environments)
+            penalty = effective_lambda * irm_penalty
 
         return erm_loss + penalty
 
@@ -171,11 +170,11 @@ class IRMKgeBatchLoss(BaseCriterion):
         )
         return 1 - kge
 
-    def _irm_penalty(
+    def _erm_and_irm_penalty(
         self,
         environments: list[tuple[torch.Tensor, torch.Tensor]],
-    ) -> torch.Tensor:
-        """IRM invariance penalty via the dummy-scalar trick.
+    ) -> tuple[torch.Tensor, torch.Tensor]:
+        """Compute ERM and IRM penalty in one pass to reduce graph duplication.
 
         For each environment e:
             w_e  = scalar 1.0  (requires_grad=True, fresh each call)
@@ -195,10 +194,11 @@ class IRMKgeBatchLoss(BaseCriterion):
 
         Returns
         -------
-        torch.Tensor
-            Scalar IRM penalty (sum across environments).
+        tuple[torch.Tensor, torch.Tensor]
+            Mean ERM loss and summed IRM penalty across environments.
         """
         penalty = torch.tensor(0.0, device=self.device)
+        erm_loss = torch.tensor(0.0, device=self.device)
 
         for y_pred_e, y_obs_e in environments:
             # Fresh scalar per environment — NOT shared
@@ -217,9 +217,11 @@ class IRMKgeBatchLoss(BaseCriterion):
                 create_graph=True,
             )[0]
 
+            erm_loss = erm_loss + loss_e
             penalty = penalty + grad_e.pow(2).sum()
 
-        return penalty
+        erm_loss = erm_loss / len(environments)
+        return erm_loss, penalty
 
     # ------------------------------------------------------------------
     # Lambda schedule
