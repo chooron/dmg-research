@@ -90,6 +90,10 @@ class CausalTrainer(Trainer):
         )
         self.use_amp = self._should_use_amp(config)
         self.amp_dtype = self._resolve_amp_dtype(config)
+        self.use_amp, self.amp_dtype = self._normalize_amp_settings(
+            self.use_amp,
+            self.amp_dtype,
+        )
         self.grad_scaler = (
             torch.amp.GradScaler('cuda')
             if self.use_amp and self.amp_dtype == torch.float16
@@ -144,6 +148,33 @@ class CausalTrainer(Trainer):
         if amp_dtype in ('fp16', 'float16', 'half'):
             return torch.float16
         return torch.float32
+
+    @staticmethod
+    def _normalize_amp_settings(
+        use_amp: bool,
+        amp_dtype: torch.dtype,
+    ) -> tuple[bool, torch.dtype]:
+        if not use_amp:
+            return False, torch.float32
+
+        if not torch.cuda.is_available():
+            log.warning("AMP requested but CUDA is unavailable; disabling AMP.")
+            return False, torch.float32
+
+        if amp_dtype == torch.bfloat16 and not bool(
+            getattr(torch.cuda, 'is_bf16_supported', lambda: False)()
+        ):
+            log.warning(
+                "Requested bfloat16 AMP on %s, but native bf16 is unsupported; "
+                "falling back to float16.",
+                torch.cuda.get_device_name(0),
+            )
+            return True, torch.float16
+
+        if amp_dtype == torch.float32:
+            return False, torch.float32
+
+        return True, amp_dtype
 
     def _autocast_context(self):
         if not self.use_amp:

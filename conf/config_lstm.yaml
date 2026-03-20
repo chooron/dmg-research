@@ -41,6 +41,7 @@ train:
   start_time: 1999/10/01
   end_time: 2008/09/30
   target: [runoff]
+  amp: false
   optimizer:
     name: Adadelta
   lr: 1.0

@@ -16,6 +16,7 @@ train:
   start_time: 1980/10/01
   end_time: 2010/09/30
   target: [streamflow]
+  amp: false
   optimizer:
     name: Adam
   lr: 1e-3
