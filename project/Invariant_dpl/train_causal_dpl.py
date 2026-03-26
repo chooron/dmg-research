@@ -30,16 +30,19 @@ import copy
 import logging
 import os
 import sys
+from pathlib import Path
 
 import torch
-
-# Allow running from repo root
-sys.path.insert(0, os.path.dirname(__file__))
 
 from dmg.core.data.loaders import HydroLoader
 from dmg.core.utils import set_randomseed, print_config
 from omegaconf import OmegaConf
 from dmg.core.utils.utils import initialize_config
+
+PROJECT_DIR = Path(__file__).resolve().parent
+REPO_ROOT = PROJECT_DIR.parent.parent
+sys.path.insert(0, str(PROJECT_DIR))
+sys.path.insert(0, str(REPO_ROOT))
 
 from implements import build_causal_dpl, CausalTrainer
 from implements.gnann_splitter import GnannEnvironmentSplitter
@@ -50,6 +53,68 @@ logging.basicConfig(
     datefmt='%H:%M:%S',
 )
 log = logging.getLogger('train_causal_dpl')
+
+
+def _resolve_path(path_str: str) -> str:
+    path = Path(path_str)
+    if path.exists():
+        return str(path)
+
+    repo_path = REPO_ROOT / path_str
+    if repo_path.exists():
+        return str(repo_path)
+
+    project_path = PROJECT_DIR / path_str
+    if project_path.exists():
+        return str(project_path)
+
+    return str(path)
+
+
+def _preserve_trailing_separator(original: str, resolved: Path) -> str:
+    resolved_str = str(resolved)
+    if original.endswith(('/', '\\')):
+        return resolved_str.rstrip('/\\') + '/'
+    return resolved_str
+
+
+def _resolve_input_path(path_str: str, base_dir: Path = REPO_ROOT) -> str:
+    path = Path(path_str).expanduser()
+    if path.is_absolute():
+        return _preserve_trailing_separator(path_str, path)
+
+    candidates = [
+        Path.cwd() / path,
+        base_dir / path,
+        PROJECT_DIR / path,
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return _preserve_trailing_separator(path_str, candidate.resolve())
+
+    return _preserve_trailing_separator(path_str, (base_dir / path).resolve())
+
+
+def _resolve_output_path(path_str: str, base_dir: Path = PROJECT_DIR) -> str:
+    path = Path(path_str).expanduser()
+    if path.is_absolute():
+        return _preserve_trailing_separator(path_str, path)
+    return _preserve_trailing_separator(path_str, (base_dir / path).resolve())
+
+
+def _normalize_runtime_paths(raw_config) -> None:
+    observations_cfg = raw_config.get('observations')
+    if observations_cfg and observations_cfg.get('data_path'):
+        observations_cfg['data_path'] = _resolve_input_path(observations_cfg['data_path'])
+
+    causal_cfg = raw_config.get('causal')
+    if causal_cfg:
+        for key in ('cluster_csv', 'basin_ids_path'):
+            if causal_cfg.get(key):
+                causal_cfg[key] = _resolve_input_path(causal_cfg[key])
+
+    if raw_config.get('output_dir'):
+        raw_config['output_dir'] = _resolve_output_path(raw_config['output_dir'])
 
 
 # ---------------------------------------------------------------------------
@@ -71,6 +136,11 @@ def parse_args():
                    help='Override train.epochs in config')
     p.add_argument('--seed',     type=int, default=None,
                    help='Override experiment seed')
+    p.add_argument('--mc-samples', type=int, default=None,
+                   help='Override test.mc_samples in config')
+    p.add_argument('--mc-selection-metric', default=None,
+                   choices=('mse', 'rmse', 'loss', 'kge'),
+                   help='Override test.mc_selection_metric in config')
     return p.parse_args()
 
 
@@ -186,6 +256,139 @@ def _build_loader_config(config: dict) -> dict:
     return loader_config
 
 
+def _validate_mc_mlp_config(config: dict) -> None:
+    model_cfg = config['model']
+    phy_cfg = model_cfg.get('phy', {})
+    nn_cfg = model_cfg.get('nn', {})
+    nn_name = str(nn_cfg.get('name', ''))
+    if nn_name not in {'McMlpModel', 'McMlp', 'mc_mlp'}:
+        return
+
+    if nn_cfg.get('forcings'):
+        raise ValueError(
+            "McMlpModel is configured for static basin attributes only; "
+            "set model.nn.forcings to []."
+        )
+
+    output_activation = str(nn_cfg.get('output_activation', 'sigmoid')).lower()
+    if output_activation != 'sigmoid':
+        raise ValueError(
+            "McMlpModel must use output_activation='sigmoid' so HbvStatic can map "
+            "normalized parameters into physical ranges."
+        )
+
+    if int(phy_cfg.get('nmul', 1) or 1) != 1:
+        raise ValueError(
+            "This static-attribute McMlpModel setup expects model.phy.nmul == 1."
+        )
+
+    if not nn_cfg.get('attributes'):
+        raise ValueError(
+            "McMlpModel requires at least one static attribute in model.nn.attributes."
+        )
+
+
+def _run_model_preflight(
+    model: torch.nn.Module,
+    dataset: dict[str, torch.Tensor],
+    config: dict,
+) -> None:
+    if dataset is None:
+        raise ValueError("Training dataset is required for model preflight.")
+
+    if 'xc_nn_norm' not in dataset or 'x_phy' not in dataset:
+        raise KeyError("Preflight expects dataset keys 'xc_nn_norm' and 'x_phy'.")
+
+    xc_nn_norm = dataset['xc_nn_norm']
+    x_phy = dataset['x_phy']
+    if xc_nn_norm.ndim != 3:
+        raise ValueError(
+            f"xc_nn_norm must have shape [T, B, nx], got {tuple(xc_nn_norm.shape)}."
+        )
+    if x_phy.ndim != 3:
+        raise ValueError(
+            f"x_phy must have shape [T, B, n_forcings], got {tuple(x_phy.shape)}."
+        )
+
+    expected_nx = (
+        len(config['model']['nn'].get('forcings', []))
+        + len(config['model']['nn'].get('attributes', []))
+    )
+    if xc_nn_norm.shape[-1] != expected_nx:
+        raise ValueError(
+            "Dataset/config feature mismatch for xc_nn_norm: "
+            f"{xc_nn_norm.shape[-1]} vs expected {expected_nx}."
+        )
+
+    expected_forcings = len(config['model']['phy'].get('forcings', []))
+    if x_phy.shape[-1] != expected_forcings:
+        raise ValueError(
+            "Dataset/config forcing mismatch for x_phy: "
+            f"{x_phy.shape[-1]} vs expected {expected_forcings}."
+        )
+
+    sample_basin_count = min(2, xc_nn_norm.shape[1])
+    sample = {
+        'xc_nn_norm': xc_nn_norm[:, :sample_basin_count].to(config['device']),
+        'x_phy': x_phy[:, :sample_basin_count].to(config['device']),
+    }
+
+    was_training = model.training
+    model.eval()
+    try:
+        with torch.no_grad():
+            parameters = model.nn_model(sample['xc_nn_norm'])
+            expected_ny = model.phy_model.learnable_param_count
+
+            if parameters.ndim != 3:
+                raise ValueError(
+                    "NN output must have shape [T, B, ny] for the CausalDplModel/HbvStatic "
+                    f"interface, got {tuple(parameters.shape)}."
+                )
+            if parameters.shape[:2] != sample['xc_nn_norm'].shape[:2]:
+                raise ValueError(
+                    "NN output time/basin dimensions do not match xc_nn_norm: "
+                    f"{tuple(parameters.shape[:2])} vs {tuple(sample['xc_nn_norm'].shape[:2])}."
+                )
+            if parameters.shape[-1] != expected_ny:
+                raise ValueError(
+                    "NN output size does not match phy_model.learnable_param_count: "
+                    f"{parameters.shape[-1]} vs {expected_ny}."
+                )
+
+            if type(model.nn_model).__name__ == 'McMlpModel':
+                if not parameters.is_contiguous():
+                    raise ValueError("McMlpModel output must be contiguous.")
+                if not torch.allclose(parameters[0], parameters[-1]):
+                    raise ValueError(
+                        "McMlpModel output is expected to be basin-static and repeated across time."
+                    )
+
+            predictions = model(sample, eval=True)
+            if 'streamflow' not in predictions:
+                raise KeyError("Model prediction dictionary must contain 'streamflow'.")
+
+            streamflow = predictions['streamflow']
+            if streamflow.ndim != 3:
+                raise ValueError(
+                    f"streamflow must have shape [T_pred, B, 1], got {tuple(streamflow.shape)}."
+                )
+            if streamflow.shape[1] != sample_basin_count or streamflow.shape[2] != 1:
+                raise ValueError(
+                    "Unexpected streamflow output shape: "
+                    f"{tuple(streamflow.shape)} for basin count {sample_basin_count}."
+                )
+
+        log.info(
+            "Model preflight passed: xc_nn_norm %s -> parameters %s -> streamflow %s",
+            tuple(sample['xc_nn_norm'].shape),
+            tuple(parameters.shape),
+            tuple(streamflow.shape),
+        )
+    finally:
+        model.train(was_training)
+
+
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
@@ -194,7 +397,7 @@ def main():
     args = parse_args()
 
     # 1. Load config and apply CLI overrides before interpolation resolves.
-    raw_config = OmegaConf.load(args.config)
+    raw_config = OmegaConf.load(_resolve_path(args.config))
     original_epochs = raw_config['train']['epochs']
 
     if args.mode:
@@ -216,8 +419,15 @@ def main():
             lr_cfg['T_max'] = args.epochs
     if args.seed is not None:
         raw_config['seed'] = args.seed
+    if args.mc_samples is not None:
+        raw_config['test']['mc_samples'] = args.mc_samples
+    if args.mc_selection_metric is not None:
+        raw_config['test']['mc_selection_metric'] = args.mc_selection_metric
+
+    _normalize_runtime_paths(raw_config)
 
     config = initialize_config(raw_config)
+    _validate_mc_mlp_config(config)
 
     # Validate causal config block
     causal_cfg = config.get('causal', {})
@@ -259,6 +469,7 @@ def main():
     model = build_causal_dpl(config)
     model = model.to(config['device'])
     log.info(f"Model device: {config['device']}")
+    _run_model_preflight(model, data_loader.train_dataset, config)
     optimizer, scheduler = _build_optimizer_and_scheduler(config, model)
 
     # 4. Build trainer
@@ -279,7 +490,7 @@ def main():
     if 'train' in mode:
         log.info("Starting fixed-epoch causal training...")
         trainer.train()
-        log.info(f"Training complete. Model saved to {config['model_dir']}")
+        log.info(f"Training stage finished. Model dir: {config['model_dir']}")
 
     if 'test' in mode or mode == 'train_test':
         if holdout_cluster is not None:

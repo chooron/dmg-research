@@ -172,8 +172,10 @@ class HbvStatic(nn.Module):
 
         phy, route = self._unpack(parameters)
 
-        warm_up    = self.warm_up if self.warm_up_states else 0
-        pred_cutoff = 0 if self.warm_up_states else self.warm_up
+        warm_up = self.warm_up if self.warm_up_states else 0
+        # Warm-up runoff is still needed for routing, but should not be scored
+        # or trained against as part of the effective prediction window.
+        pred_cutoff = self.warm_up
 
         states = self._init_states(ngrid)
 

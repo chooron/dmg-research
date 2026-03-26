@@ -22,3 +22,7 @@ torch = [
 name = "pytorch-cu128"
 url = "https://download.pytorch.org/whl/cu128"
 explicit = true
+
+[tool.ruff.lint.per-file-ignores]
+"project/Invariant_dpl/*.py" = ["E402"]
+"project/Invariant_dpl/**/*.py" = ["E402"]
