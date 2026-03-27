@@ -58,6 +58,52 @@ def _resolve_path(path_str: str) -> str:
     return str(path)
 
 
+def _preserve_trailing_separator(original: str, resolved: Path) -> str:
+    resolved_str = str(resolved)
+    if original.endswith(("/", "\\")):
+        return resolved_str.rstrip("/\\") + "/"
+    return resolved_str
+
+
+def _resolve_input_path(path_str: str, base_dir: Path = REPO_ROOT) -> str:
+    path = Path(path_str).expanduser()
+    if path.is_absolute():
+        return _preserve_trailing_separator(path_str, path)
+
+    candidates = [
+        Path.cwd() / path,
+        base_dir / path,
+        PROJECT_DIR / path,
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return _preserve_trailing_separator(path_str, candidate.resolve())
+
+    return _preserve_trailing_separator(path_str, (base_dir / path).resolve())
+
+
+def _resolve_output_path(path_str: str, base_dir: Path = PROJECT_DIR) -> str:
+    path = Path(path_str).expanduser()
+    if path.is_absolute():
+        return _preserve_trailing_separator(path_str, path)
+    return _preserve_trailing_separator(path_str, (base_dir / path).resolve())
+
+
+def _normalize_runtime_paths(raw_config: Any) -> None:
+    observations_cfg = raw_config.get("observations")
+    if observations_cfg and observations_cfg.get("data_path"):
+        observations_cfg["data_path"] = _resolve_input_path(observations_cfg["data_path"])
+
+    causal_cfg = raw_config.get("causal")
+    if causal_cfg:
+        for key in ("cluster_csv", "basin_ids_path"):
+            if causal_cfg.get(key):
+                causal_cfg[key] = _resolve_input_path(causal_cfg[key])
+
+    if raw_config.get("output_dir"):
+        raw_config["output_dir"] = _resolve_output_path(raw_config["output_dir"])
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -283,6 +329,8 @@ def main() -> None:
     if args.device is not None:
         raw_config["device"] = args.device
 
+    _normalize_runtime_paths(raw_config)
+
     config = initialize_config(raw_config)
     set_randomseed(int(config["seed"]))
 
@@ -320,7 +368,11 @@ def main() -> None:
 
     mc_seed_base = int(args.mc_seed_base if args.mc_seed_base is not None else config["seed"])
     seeds = _mc_seeds(mc_seed_base, int(args.mc_samples))
-    output_dir = args.output_dir or os.path.join(config["output_dir"], "analysis")
+    output_dir = (
+        _resolve_output_path(args.output_dir)
+        if args.output_dir is not None
+        else os.path.join(config["output_dir"], "analysis")
+    )
     os.makedirs(output_dir, exist_ok=True)
 
     attr_df = _build_attribute_frame(
