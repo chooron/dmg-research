@@ -13,6 +13,8 @@
 # limitations under the License.
 
 
+from __future__ import annotations
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -117,15 +119,47 @@ class FastKANLayer(nn.Module):
 class FastKAN(nn.Module):
     def __init__(
         self,
-        layers_hidden: List[int],
+        layers_hidden: List[int] | dict[str, Any],
         grid_min: float = -2.,
         grid_max: float = 2.,
         num_grids: int = 8,
         use_base_update: bool = True,
         base_activation = F.silu,
         spline_weight_init_scale: float = 0.1,
+        nx: int | None = None,
+        ny: int | None = None,
     ) -> None:
         super().__init__()
+        self.name = 'FastKAN'
+        self.output_activation = 'identity'
+        self.static_pool = 'last'
+        self.dropout = nn.Dropout(0.0)
+
+        if isinstance(layers_hidden, dict):
+            config = layers_hidden
+            if nx is None or ny is None:
+                raise ValueError("FastKAN config initialization requires nx and ny.")
+
+            hidden_sizes = config.get('hidden_sizes')
+            if hidden_sizes is None:
+                hidden_size = int(config.get('hidden_size', 128))
+                hidden_layers = int(config.get('hidden_layers', 2))
+                hidden_sizes = [hidden_size] * hidden_layers
+
+            layers_hidden = [int(nx), *[int(v) for v in hidden_sizes], int(ny)]
+            grid_min = float(config.get('grid_min', grid_min))
+            grid_max = float(config.get('grid_max', grid_max))
+            num_grids = int(config.get('num_grids', num_grids))
+            use_base_update = bool(config.get('use_base_update', use_base_update))
+            spline_weight_init_scale = float(
+                config.get('spline_weight_init_scale', spline_weight_init_scale)
+            )
+            self.output_activation = str(
+                config.get('output_activation', 'sigmoid')
+            ).lower()
+            self.static_pool = str(config.get('static_pool', 'last')).lower()
+            self.dropout = nn.Dropout(float(config.get('dropout', 0.0)))
+
         self.layers = nn.ModuleList([
             FastKANLayer(
                 in_dim, out_dim,
@@ -138,10 +172,43 @@ class FastKAN(nn.Module):
             ) for in_dim, out_dim in zip(layers_hidden[:-1], layers_hidden[1:])
         ])
 
+    def _pool_static_input(self, x: torch.Tensor) -> tuple[torch.Tensor, int | None]:
+        if x.ndim == 2:
+            return x, None
+        if x.ndim != 3:
+            raise ValueError(
+                f"FastKAN expects a 2D or 3D tensor, got shape {tuple(x.shape)}."
+            )
+
+        nt = x.shape[0]
+        if self.static_pool == 'mean':
+            pooled = x.mean(dim=0)
+        else:
+            pooled = x[-1]
+        return pooled, nt
+
+    def _apply_output_activation(self, x: torch.Tensor) -> torch.Tensor:
+        if self.output_activation == 'sigmoid':
+            return torch.sigmoid(x)
+        if self.output_activation == 'softplus':
+            return F.softplus(x)
+        if self.output_activation in {'identity', 'none'}:
+            return x
+        raise ValueError(
+            f"Unsupported output activation '{self.output_activation}'. "
+            "Expected one of: sigmoid, softplus, identity."
+        )
+
     def forward(self, x):
-        for layer in self.layers:
+        x, nt = self._pool_static_input(x)
+        for layer_idx, layer in enumerate(self.layers):
             x = layer(x)
-        return x
+            if layer_idx < len(self.layers) - 1:
+                x = self.dropout(x)
+        x = self._apply_output_activation(x)
+        if nt is None:
+            return x
+        return x.unsqueeze(0).repeat(nt, 1, 1).contiguous()
 
 
 class AttentionWithFastKANTransform(nn.Module):

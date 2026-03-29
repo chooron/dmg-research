@@ -4,10 +4,12 @@ Public API re-exported from submodules for backwards compatibility.
 """
 
 from models.hbv_static import HbvStatic
+from models.nns.fast_kan import FastKAN
 from implements.gnann_splitter import GnannEnvironmentSplitter
 from implements.causal_dpl_model import CausalDplModel
 from implements.causal_trainer import CausalTrainer
 from implements.baseline_trainer import BaselineTrainer
+from implements.param_learn_trainer import ParamLearnTrainer
 
 
 def build_causal_dpl(config: dict) -> CausalDplModel:
@@ -55,6 +57,24 @@ def build_causal_dpl(config: dict) -> CausalDplModel:
             nx=nx,
             ny=ny,
         )
+    elif nn_name in {'FastKAN', 'fast_kan', 'fastkan'}:
+        if nn_cfg.get('forcings'):
+            raise ValueError(
+                "FastKAN only supports static-basin inputs; set model.nn.forcings to []."
+            )
+        if (
+            type(phy_model).__name__ == 'HbvStatic'
+            and str(nn_cfg.get('output_activation', 'sigmoid')).lower() != 'sigmoid'
+        ):
+            raise ValueError(
+                "HbvStatic expects normalized parameters in [0, 1]; "
+                "use model.nn.output_activation='sigmoid' with FastKAN."
+            )
+        nn_model = FastKAN(
+            nn_cfg,
+            nx=nx,
+            ny=ny,
+        )
     else:
         raise ValueError(f"Unsupported nn model '{nn_name}'.")
 
@@ -72,5 +92,6 @@ __all__ = [
     'CausalDplModel',
     'CausalTrainer',
     'BaselineTrainer',
+    'ParamLearnTrainer',
     'build_causal_dpl',
 ]
