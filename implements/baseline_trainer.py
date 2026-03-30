@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import time
 
-import tqdm
-
 from implements.causal_trainer import CausalTrainer
 
 
@@ -18,11 +16,10 @@ class BaselineTrainer(CausalTrainer):
         self.total_loss = 0.0
         self.model.train()
 
-        prog_bar = tqdm.tqdm(
+        prog_bar = self._progress(
             range(1, n_minibatch + 1),
             desc=f"Epoch {epoch}/{self.epochs}",
             leave=False,
-            dynamic_ncols=True,
         )
 
         for _ in prog_bar:

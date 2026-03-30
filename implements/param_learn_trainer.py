@@ -8,7 +8,6 @@ import time
 from typing import Any, Optional
 
 import pandas as pd
-import tqdm
 
 import torch
 
@@ -125,11 +124,10 @@ class ParamLearnTrainer(CausalTrainer):
         self.total_loss = 0.0
         self.model.train()
 
-        prog_bar = tqdm.tqdm(
+        prog_bar = self._progress(
             range(1, n_minibatch + 1),
             desc=f"Epoch {epoch}/{self.epochs}",
             leave=False,
-            dynamic_ncols=True,
         )
 
         for _ in prog_bar:

@@ -6,6 +6,7 @@ import json
 import logging
 import os
 import re
+import sys
 import time
 from contextlib import nullcontext
 from typing import Any, Optional
@@ -37,6 +38,19 @@ _MODEL_CHECKPOINT_RE = re.compile(r'model_epoch(\d+)\.pt$')
 _TRAINER_STATE_RE = re.compile(r'trainer_state_ep(\d+)\.pt$')
 
 log = logging.getLogger(__name__)
+
+
+def _parse_env_bool(name: str) -> Optional[bool]:
+    value = os.environ.get(name)
+    if value is None:
+        return None
+
+    normalized = value.strip().lower()
+    if normalized in {'1', 'true', 'yes', 'on'}:
+        return True
+    if normalized in {'0', 'false', 'no', 'off'}:
+        return False
+    return None
 
 
 class CausalTrainer(Trainer):
@@ -337,6 +351,27 @@ class CausalTrainer(Trainer):
             dtype=self.amp_dtype,
         )
 
+    def _should_disable_progress(self) -> bool:
+        env_override = _parse_env_bool('TQDM_DISABLE')
+        if env_override is not None:
+            return env_override
+
+        env_override = _parse_env_bool('DMG_DISABLE_TQDM')
+        if env_override is not None:
+            return env_override
+
+        return not sys.stderr.isatty()
+
+    def _progress(self, iterable, **kwargs):
+        disable = kwargs.pop('disable', self._should_disable_progress())
+        return tqdm.tqdm(
+            iterable,
+            disable=disable,
+            dynamic_ncols=not disable,
+            file=sys.stderr,
+            **kwargs,
+        )
+
     # ------------------------------------------------------------------
     def train(self) -> None:
         """Train for a fixed number of epochs without validation-based early stopping."""
@@ -370,11 +405,10 @@ class CausalTrainer(Trainer):
         self.current_epoch = epoch
         self.total_loss = 0.0
 
-        prog_bar = tqdm.tqdm(
+        prog_bar = self._progress(
             range(1, n_minibatch + 1),
             desc=f"Epoch {epoch}/{self.epochs}",
             leave=False,
-            dynamic_ncols=True,
         )
 
         for mb in prog_bar:
@@ -504,12 +538,11 @@ class CausalTrainer(Trainer):
         mc_raw_metrics = []
         mc_agg_metrics = []
 
-        eval_iter = tqdm.tqdm(
+        eval_iter = self._progress(
             enumerate(self._forward_mc_predictions(eval_data, seeds)),
             total=len(seeds),
             desc='MC eval',
             leave=False,
-            dynamic_ncols=True,
         )
         for pass_idx, batch_predictions in eval_iter:
             prediction = self._batch_data(batch_predictions, target_name).astype(
@@ -661,12 +694,11 @@ class CausalTrainer(Trainer):
         seeds: list[int],
     ) -> tuple[np.ndarray, np.ndarray]:
         score_matrix = None
-        ref_iter = tqdm.tqdm(
+        ref_iter = self._progress(
             enumerate(self._forward_mc_predictions(reference_data, seeds)),
             total=len(seeds),
             desc='MC ref',
             leave=False,
-            dynamic_ncols=True,
         )
         target_name = self.config['train']['target'][0]
         for pass_idx, batch_predictions in ref_iter:
