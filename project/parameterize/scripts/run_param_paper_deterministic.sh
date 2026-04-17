@@ -6,6 +6,8 @@ PROJECT_DIR=$(cd "${SCRIPT_DIR}/.." && pwd)
 
 CONFIG=${CONFIG:-${PROJECT_DIR}/conf/config_param_paper.yaml}
 MODE=${MODE:-train_test}
+DEVICE=${DEVICE:-cuda}
+GPU_ID=${GPU_ID:-0}
 EPOCHS=${EPOCHS:-}
 MC_SAMPLES=${MC_SAMPLES:-}
 SEEDS=(111 222 333)
@@ -16,7 +18,7 @@ pids=()
 for seed in "${SEEDS[@]}"; do
     echo "========================================"
     echo " paper-stack | variant=deterministic | seed=${seed}"
-    echo " config=${CONFIG} | mode=${MODE}"
+    echo " config=${CONFIG} | mode=${MODE} | device=${DEVICE} | gpu_id=${GPU_ID}"
     echo "========================================"
 
     extra_args=(
@@ -24,6 +26,8 @@ for seed in "${SEEDS[@]}"; do
         --variant deterministic
         --seed "${seed}"
         --mode "${MODE}"
+        --device "${DEVICE}"
+        --gpu-id "${GPU_ID}"
     )
     if [[ -n "${EPOCHS:-}" ]]; then
         extra_args+=(--epochs "${EPOCHS}")

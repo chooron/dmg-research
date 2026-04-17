@@ -26,6 +26,7 @@ from paper_variants import (
     validate_paper_config,
     write_run_metadata,
 )
+from runtime_overrides import apply_runtime_overrides
 from train_dmotpy import (
     _build_loader_config,
     _build_optimizer_and_scheduler,
@@ -69,6 +70,18 @@ def parse_args():
         help="Override config mode: train | test | train_test",
     )
     parser.add_argument(
+        "--device",
+        choices=["cpu", "cuda", "mps"],
+        default=None,
+        help="Override config device.",
+    )
+    parser.add_argument(
+        "--gpu-id",
+        type=int,
+        default=None,
+        help="Override config gpu_id when device=cuda.",
+    )
+    parser.add_argument(
         "--seed",
         type=int,
         default=None,
@@ -96,37 +109,10 @@ def parse_args():
     return parser.parse_args()
 
 
-def _apply_runtime_overrides(raw_config, args) -> None:
-    paper_cfg = raw_config.setdefault("paper", {})
-    if args.variant:
-        paper_cfg["variant"] = args.variant
-    if args.split:
-        paper_cfg["split"] = args.split
-    if args.mode:
-        raw_config["mode"] = args.mode
-    if args.seed is not None:
-        raw_config["seed"] = args.seed
-    if args.seeds is not None:
-        paper_cfg["seeds"] = args.seeds
-    if args.mc_samples is not None:
-        raw_config.setdefault("test", {})
-        raw_config["test"]["mc_samples"] = args.mc_samples
-    if args.epochs is not None:
-        original_epochs = raw_config["train"]["epochs"]
-        raw_config["train"]["epochs"] = args.epochs
-        lr_cfg = raw_config["train"].get("lr_scheduler")
-        if (
-            isinstance(lr_cfg, dict)
-            and lr_cfg.get("name") == "CosineAnnealingLR"
-            and ("T_max" not in lr_cfg or lr_cfg.get("T_max") == original_epochs)
-        ):
-            lr_cfg["T_max"] = args.epochs
-
-
 def main():
     args = parse_args()
     raw_config = OmegaConf.load(_resolve_path(args.config))
-    _apply_runtime_overrides(raw_config, args)
+    apply_runtime_overrides(raw_config, args)
     normalize_paper_config(raw_config)
     _normalize_runtime_paths(raw_config)
 
