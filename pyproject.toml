@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "dmg>=1.4.0",
+    "dmotpy>=0.1.0",
     "numpy>=2.2.6",
     "omegaconf>=2.3.0",
     "torch==2.9.1",

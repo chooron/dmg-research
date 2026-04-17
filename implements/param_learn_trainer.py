@@ -11,11 +11,10 @@ import pandas as pd
 
 import torch
 
-from dmg.models.criterion.kge_batch_loss import KgeBatchLoss
 from dmg.trainers.trainer import Trainer
 
 from implements.basin_utils import load_basin_ids, subset_dataset_by_basin_ids
-from implements.causal_trainer import CausalTrainer
+from implements.causal_trainer import CausalTrainer, _LOSS_REGISTRY
 
 log = logging.getLogger(__name__)
 
@@ -85,7 +84,7 @@ class ParamLearnTrainer(CausalTrainer):
             model=model,
             train_dataset=filtered_train_dataset,
             eval_dataset=filtered_eval_dataset,
-            loss_func=KgeBatchLoss(config, device=config["device"]),
+            loss_func=self._build_loss(config),
             optimizer=optimizer,
             scheduler=scheduler,
             **kwargs,
@@ -117,6 +116,16 @@ class ParamLearnTrainer(CausalTrainer):
             len(self.subset_basin_ids),
             subset_path,
         )
+
+    @staticmethod
+    def _build_loss(config: dict[str, Any]):
+        loss_name = config["train"]["loss_function"]["name"]
+        loss_cls = _LOSS_REGISTRY.get(loss_name)
+        if loss_cls is None:
+            raise ValueError(
+                f"Unknown loss '{loss_name}'. Available: {list(_LOSS_REGISTRY)}"
+            )
+        return loss_cls(config, device=config["device"])
 
     def train_one_epoch(self, epoch, n_samples, n_minibatch, n_timesteps) -> None:
         start_time = time.perf_counter()

@@ -1,71 +1,60 @@
-name: camels_dhbv_vrex
+name: camels_param_paper
 
-mode: train_test  # train, test, train_test
-
-seed: 111111
-device: cuda
+mode: train_test
+seed: 42
+device: cpu
 gpu_id: 0
 
 data_loader: HydroLoader
 data_sampler: HydroSampler
-trainer: CausalTrainer
+trainer: ParamLearnTrainer
 
-output_dir: ./outputs/vrex_dhbv_held_out_${causal.holdout_cluster}_seed${seed}/
+output_dir: ./outputs/${paper.variant}_seed${seed}/
 model_dir: ${output_dir}model/
 plot_dir: ${output_dir}plot/
 sim_dir: ${output_dir}sim/
 
+paper:
+  variant: mc_dropout
+  split: main
 
-## Training --------------------------#
+data:
+  basin_ids_path: ./data/531sub_id.txt
+  basin_ids_reference_path: ./data/gage_id.npy
+
 train:
-  start_time: 1989/10/01
-  end_time: 1999/09/30
+  start_time: 1989/01/01
+  end_time: 1998/12/31
   target: [streamflow]
   amp: false
   optimizer:
     name: Adam
   lr: 1e-3
   lr_scheduler:
-    name: CosineAnnealingLR
-    T_max: 100
-    eta_min: 1e-5
+    name: StepLR
+    step_size: 20
+    gamma: 0.5
   loss_function:
-    name: VRExKgeBatchLoss
+    name: HybridNseBatchLoss
   batch_size: 100
   epochs: 100
   start_epoch: 0
   save_epoch: 10
 
-
-## Test ------------------------------#
 test:
-  start_time: 1989/10/01
-  end_time: 1999/09/30
+  start_time: 1999/01/01
+  end_time: 2009/12/31
   batch_size: 25
   test_epoch: 100
   mc_dropout: true
   mc_samples: 100
   mc_selection_metric: mse
 
-
-## Simulation ------------------------#
 sim:
-  start_time: 1980/10/01
-  end_time: 2014/09/30
+  start_time: 1989/01/01
+  end_time: 2009/12/31
   batch_size: 25
 
-
-## Causal / VREx ---------------------#
-causal:
-  cluster_csv: ./data/gauge_cluster.csv
-  basin_ids_path: ./data/gage_id.npy
-  holdout_cluster: A
-
-lambda_vrex: 100.0
-vrex_warmup_epochs: 10
-
-
-## Observations ----------------------#
 observations:
   name: camels_671
   data_path: ./data/camels_dataset
@@ -87,8 +76,6 @@ observations:
     carbonate_rocks_frac, geol_porosity, geol_permeability,
   ]
 
-
-## Model -----------------------------#
 model:
   rho: 365
   warm_up: 365
@@ -109,6 +96,7 @@ model:
     name: McMlpModel
     dropout: 0.4
     hidden_size: 128
+    hidden_layers: 2
     output_activation: sigmoid
     static_pool: last
     forcings: []
@@ -125,3 +113,6 @@ model:
       geol_2nd_class, glim_2nd_class_frac,
       carbonate_rocks_frac, geol_porosity, geol_permeability,
     ]
+    distribution:
+      logstd_min: -5.0
+      logstd_max: 2.0

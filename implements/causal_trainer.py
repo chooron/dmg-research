@@ -24,7 +24,9 @@ from dmg.trainers.trainer import Trainer
 
 from implements.causal_dpl_model import CausalDplModel
 from implements.gnann_splitter import GnannEnvironmentSplitter
+from implements.hybrid_nse_batch_loss import HybridNseBatchLoss
 from implements.irm_kge_loss import IRMKgeBatchLoss
+from implements.log_nse_batch_loss import LogNseBatchLoss
 from implements.vrex_kge_loss import VRExKgeBatchLoss
 from dmg.models.criterion.kge_batch_loss import KgeBatchLoss
 
@@ -32,6 +34,8 @@ _LOSS_REGISTRY = {
     'IRMKgeBatchLoss':  IRMKgeBatchLoss,
     'VRExKgeBatchLoss': VRExKgeBatchLoss,
     'KgeBatchLoss': KgeBatchLoss,
+    'LogNseBatchLoss': LogNseBatchLoss,
+    'HybridNseBatchLoss': HybridNseBatchLoss,
 }
 
 _MODEL_CHECKPOINT_RE = re.compile(r'model_epoch(\d+)\.pt$')

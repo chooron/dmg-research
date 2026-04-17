@@ -14,9 +14,10 @@ results.tsv
 
 data
 
-*.md
+# *.md
 
 !README.md
 
 outputs
 .claude
+.omx/
