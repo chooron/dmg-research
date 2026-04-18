@@ -1,15 +1,20 @@
-"""Causal-dPL: IRM-augmented differentiable parameter learning for PUB.
+"""Causal-dPL: differentiable parameter learning helpers.
 
 Public API re-exported from submodules for backwards compatibility.
 """
 
+from __future__ import annotations
+
 from models.hbv_static import HbvStatic
 from models.nns.fast_kan import FastKAN
-from implements.gnann_splitter import GnannEnvironmentSplitter
-from implements.causal_dpl_model import CausalDplModel
-from implements.causal_trainer import CausalTrainer
-from implements.baseline_trainer import BaselineTrainer
-from implements.param_learn_trainer import ParamLearnTrainer
+
+_LAZY_EXPORTS = {
+    'GnannEnvironmentSplitter': ('implements.gnann_splitter', 'GnannEnvironmentSplitter'),
+    'CausalDplModel': ('implements.causal_dpl_model', 'CausalDplModel'),
+    'CausalTrainer': ('implements.causal_trainer', 'CausalTrainer'),
+    'BaselineTrainer': ('implements.baseline_trainer', 'BaselineTrainer'),
+    'ParamLearnTrainer': ('implements.param_learn_trainer', 'ParamLearnTrainer'),
+}
 
 
 def build_causal_dpl(config: dict) -> CausalDplModel:
@@ -17,6 +22,7 @@ def build_causal_dpl(config: dict) -> CausalDplModel:
     from dmg.models.neural_networks.ann import AnnModel
     from dmg.models.neural_networks.mlp import MlpModel
 
+    from implements.causal_dpl_model import CausalDplModel
     from models.nns.mc_mlp import McMlpModel
 
     phy_cfg = config['model']['phy']
@@ -84,6 +90,18 @@ def build_causal_dpl(config: dict) -> CausalDplModel:
         config=config,
         device=config['device'],
     )
+
+
+def __getattr__(name: str):
+    target = _LAZY_EXPORTS.get(name)
+    if target is None:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+    module_name, attr_name = target
+    module = __import__(module_name, fromlist=[attr_name])
+    value = getattr(module, attr_name)
+    globals()[name] = value
+    return value
 
 
 __all__ = [

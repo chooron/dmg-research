@@ -26,7 +26,6 @@ from implements.causal_dpl_model import CausalDplModel
 from implements.gnann_splitter import GnannEnvironmentSplitter
 from implements.hybrid_nse_batch_loss import HybridNseBatchLoss
 from implements.log_nse_batch_loss import LogNseBatchLoss
-from implements.vrex_kge_loss import VRExKgeBatchLoss
 from dmg.models.criterion.kge_batch_loss import KgeBatchLoss
 
 try:
@@ -34,8 +33,12 @@ try:
 except ModuleNotFoundError:
     IRMKgeBatchLoss = None
 
+try:
+    from implements.vrex_kge_loss import VRExKgeBatchLoss
+except ModuleNotFoundError:
+    VRExKgeBatchLoss = None
+
 _LOSS_REGISTRY = {
-    'VRExKgeBatchLoss': VRExKgeBatchLoss,
     'KgeBatchLoss': KgeBatchLoss,
     'LogNseBatchLoss': LogNseBatchLoss,
     'HybridNseBatchLoss': HybridNseBatchLoss,
@@ -43,6 +46,8 @@ _LOSS_REGISTRY = {
 
 if IRMKgeBatchLoss is not None:
     _LOSS_REGISTRY['IRMKgeBatchLoss'] = IRMKgeBatchLoss
+if VRExKgeBatchLoss is not None:
+    _LOSS_REGISTRY['VRExKgeBatchLoss'] = VRExKgeBatchLoss
 
 _MODEL_CHECKPOINT_RE = re.compile(r'model_epoch(\d+)\.pt$')
 _TRAINER_STATE_RE = re.compile(r'trainer_state_ep(\d+)\.pt$')
@@ -59,6 +64,12 @@ def _resolve_loss_class(loss_name: str):
         raise ValueError(
             "Loss 'IRMKgeBatchLoss' is configured, but "
             "'implements/irm_kge_loss.py' has been removed. "
+            "Update train.loss_function.name to a supported loss."
+        )
+    if loss_name == 'VRExKgeBatchLoss' and VRExKgeBatchLoss is None:
+        raise ValueError(
+            "Loss 'VRExKgeBatchLoss' is configured, but "
+            "'implements/vrex_kge_loss.py' has been removed. "
             "Update train.loss_function.name to a supported loss."
         )
 
@@ -481,7 +492,7 @@ class CausalTrainer(Trainer):
             y_pred_e = env_pred['streamflow'].squeeze(-1)
             y_obs_e = env_sample['target'][-y_pred_e.shape[0]:, :, 0]
 
-            if isinstance(self.loss_func, VRExKgeBatchLoss):
+            if VRExKgeBatchLoss is not None and isinstance(self.loss_func, VRExKgeBatchLoss):
                 environments.append((y_pred_e, y_obs_e, int(n_env)))
             else:
                 environments.append((y_pred_e, y_obs_e))

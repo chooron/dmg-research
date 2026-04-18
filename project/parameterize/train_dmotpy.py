@@ -1,4 +1,4 @@
-"""Train/test dmotpy hydrology models with Calibrate/Parameterize neural networks."""
+"""Train/test dmotpy hydrology models with FasterTrainer."""
 
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ from omegaconf import OmegaConf
 from dmotpy.models import HydrologyModel
 from dmotpy.neural_networks.calibrate import Calibrate
 from dmotpy.neural_networks.parameterize import Parameterize
-from dmotpy.trainers import CalTrainer, FasterTrainer
+from dmotpy.trainers import FasterTrainer
 
 PROJECT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = PROJECT_DIR.parent.parent
@@ -277,12 +277,6 @@ def parse_args():
         default=None,
         help="Override train.epochs in config",
     )
-    parser.add_argument(
-        "--trainer",
-        default=None,
-        choices=["CalTrainer", "FasterTrainer"],
-        help="Override trainer in config",
-    )
     return parser.parse_args()
 
 
@@ -309,9 +303,6 @@ def main():
             and ("T_max" not in lr_cfg or lr_cfg.get("T_max") == original_epochs)
         ):
             lr_cfg["T_max"] = args.epochs
-    if args.trainer:
-        raw_config["trainer"] = args.trainer
-
     _normalize_runtime_paths(raw_config)
     config = initialize_config(raw_config)
 
@@ -347,30 +338,15 @@ def main():
     train_dataset = _adapt_dataset_for_dmotpy(data_loader.train_dataset)
     eval_dataset = _adapt_dataset_for_dmotpy(data_loader.eval_dataset)
 
-    # Select trainer
-    trainer_name = config.get("trainer", "CalTrainer")
-    if trainer_name == "CalTrainer":
-        trainer = CalTrainer(
-            config=config,
-            model=model,
-            train_dataset=train_dataset,
-            eval_dataset=eval_dataset,
-            optimizer=optimizer,
-            scheduler=scheduler,
-            verbose=True,
-        )
-    elif trainer_name == "FasterTrainer":
-        trainer = FasterTrainer(
-            config=config,
-            model=model,
-            train_dataset=train_dataset,
-            eval_dataset=eval_dataset,
-            optimizer=optimizer,
-            scheduler=scheduler,
-            verbose=True,
-        )
-    else:
-        raise ValueError(f"Unknown trainer: {trainer_name}")
+    trainer = FasterTrainer(
+        config=config,
+        model=model,
+        train_dataset=train_dataset,
+        eval_dataset=eval_dataset,
+        optimizer=optimizer,
+        scheduler=scheduler,
+        verbose=True,
+    )
 
     mode = config["mode"]
     if "train" in mode:

@@ -24,7 +24,6 @@ sys.path.append(str(Path(__file__).parent.parent))
 import torch
 from dmotpy.models import HydrologyModel
 from dmotpy.neural_networks.calibrate import Calibrate
-from dmotpy.trainers import CalTrainer
 
 
 # ============================================================
@@ -168,7 +167,7 @@ def explain_training_flow():
     print("  2. 创建物理模型（dmotpy.HydrologyModel）")
     print("  3. 创建神经网络（dmotpy.Calibrate/Parameterize）")
     print("  4. 组合成可微模型")
-    print("  5. 创建训练器（dmotpy.CalTrainer/FasterTrainer）")
+    print("  5. 创建训练器（dmotpy.FasterTrainer）")
     print("  6. 调用 trainer.train() 开始训练")
     print("\n训练器自动处理：")
     print("  - 优化器初始化")
