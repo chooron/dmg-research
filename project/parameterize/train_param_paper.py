@@ -7,6 +7,8 @@ import logging
 import sys
 from pathlib import Path
 
+import torch
+
 PROJECT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = PROJECT_DIR.parent.parent
 INVARIANT_DIR = REPO_ROOT / "project" / "Invariant"
@@ -33,7 +35,6 @@ from train_dmotpy import (
     _normalize_runtime_paths,
     _resolve_path,
 )
-from train_causal_dpl import _run_model_preflight  # noqa: E402
 
 
 logging.basicConfig(
@@ -42,6 +43,38 @@ logging.basicConfig(
     datefmt="%H:%M:%S",
 )
 log = logging.getLogger("train_param_paper")
+
+
+def _run_model_preflight(model, train_dataset: dict, config: dict) -> None:
+    """Run a minimal forward pass to catch shape/device mismatches early."""
+    if train_dataset is None:
+        raise ValueError("train_dataset is required for paper-stack preflight.")
+
+    required_keys = ("xc_nn_norm", "x_phy")
+    missing = [key for key in required_keys if key not in train_dataset]
+    if missing:
+        raise ValueError(f"train_dataset missing required keys: {missing}")
+
+    sample = {}
+    for key in required_keys:
+        value = train_dataset[key]
+        if not torch.is_tensor(value):
+            raise TypeError(f"train_dataset['{key}'] must be a torch.Tensor.")
+        if value.ndim < 2:
+            raise ValueError(
+                f"train_dataset['{key}'] must be at least 2D, got {tuple(value.shape)}."
+            )
+
+        if value.ndim >= 3:
+            sample[key] = value[:, :1].to(config["device"])
+        else:
+            sample[key] = value[:1].to(config["device"])
+
+    with torch.no_grad():
+        predictions = model(sample, eval=True)
+
+    if not isinstance(predictions, dict) or "streamflow" not in predictions:
+        raise RuntimeError("Paper-stack preflight expected a prediction dict with 'streamflow'.")
 
 
 def parse_args():

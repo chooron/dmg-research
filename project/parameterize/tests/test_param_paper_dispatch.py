@@ -6,6 +6,7 @@ from unittest.mock import patch
 import torch
 
 from project.parameterize.paper_variants import build_paper_dpl
+from project.parameterize.train_param_paper import _run_model_preflight
 
 
 def _identity_compile(fn, *args, **kwargs):
@@ -74,6 +75,19 @@ class TestParamPaperDispatch(unittest.TestCase):
 
     def test_distributional_variant_dispatch(self) -> None:
         self._assert_model_runs("DistributionalParamModel")
+
+    def test_preflight_runs_on_minimal_training_sample(self) -> None:
+        with patch("torch.compile", _identity_compile):
+            model = build_paper_dpl(_make_config("DeterministicParamModel"))
+
+        _run_model_preflight(
+            model,
+            {
+                "xc_nn_norm": self.xc_nn_norm,
+                "x_phy": self.x_phy,
+            },
+            {"device": "cpu"},
+        )
 
 
 if __name__ == "__main__":
