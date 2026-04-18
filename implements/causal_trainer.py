@@ -25,23 +25,46 @@ from dmg.trainers.trainer import Trainer
 from implements.causal_dpl_model import CausalDplModel
 from implements.gnann_splitter import GnannEnvironmentSplitter
 from implements.hybrid_nse_batch_loss import HybridNseBatchLoss
-from implements.irm_kge_loss import IRMKgeBatchLoss
 from implements.log_nse_batch_loss import LogNseBatchLoss
 from implements.vrex_kge_loss import VRExKgeBatchLoss
 from dmg.models.criterion.kge_batch_loss import KgeBatchLoss
 
+try:
+    from implements.irm_kge_loss import IRMKgeBatchLoss
+except ModuleNotFoundError:
+    IRMKgeBatchLoss = None
+
 _LOSS_REGISTRY = {
-    'IRMKgeBatchLoss':  IRMKgeBatchLoss,
     'VRExKgeBatchLoss': VRExKgeBatchLoss,
     'KgeBatchLoss': KgeBatchLoss,
     'LogNseBatchLoss': LogNseBatchLoss,
     'HybridNseBatchLoss': HybridNseBatchLoss,
 }
 
+if IRMKgeBatchLoss is not None:
+    _LOSS_REGISTRY['IRMKgeBatchLoss'] = IRMKgeBatchLoss
+
 _MODEL_CHECKPOINT_RE = re.compile(r'model_epoch(\d+)\.pt$')
 _TRAINER_STATE_RE = re.compile(r'trainer_state_ep(\d+)\.pt$')
 
 log = logging.getLogger(__name__)
+
+
+def _resolve_loss_class(loss_name: str):
+    loss_cls = _LOSS_REGISTRY.get(loss_name)
+    if loss_cls is not None:
+        return loss_cls
+
+    if loss_name == 'IRMKgeBatchLoss' and IRMKgeBatchLoss is None:
+        raise ValueError(
+            "Loss 'IRMKgeBatchLoss' is configured, but "
+            "'implements/irm_kge_loss.py' has been removed. "
+            "Update train.loss_function.name to a supported loss."
+        )
+
+    raise ValueError(
+        f"Unknown loss '{loss_name}'. Available: {list(_LOSS_REGISTRY)}"
+    )
 
 
 def _parse_env_bool(name: str) -> Optional[bool]:
@@ -97,9 +120,7 @@ class CausalTrainer(Trainer):
                 eta_min=lr_cfg.get('eta_min', 1e-5),
             )
         loss_name = config['train']['loss_function']['name']
-        loss_cls = _LOSS_REGISTRY.get(loss_name)
-        if loss_cls is None:
-            raise ValueError(f"Unknown loss '{loss_name}'. Available: {list(_LOSS_REGISTRY)}")
+        loss_cls = _resolve_loss_class(loss_name)
         super().__init__(
             config,
             model=model,

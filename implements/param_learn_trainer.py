@@ -14,7 +14,7 @@ import torch
 from dmg.trainers.trainer import Trainer
 
 from implements.basin_utils import load_basin_ids, subset_dataset_by_basin_ids
-from implements.causal_trainer import CausalTrainer, _LOSS_REGISTRY
+from implements.causal_trainer import CausalTrainer, _resolve_loss_class
 
 log = logging.getLogger(__name__)
 
@@ -120,11 +120,7 @@ class ParamLearnTrainer(CausalTrainer):
     @staticmethod
     def _build_loss(config: dict[str, Any]):
         loss_name = config["train"]["loss_function"]["name"]
-        loss_cls = _LOSS_REGISTRY.get(loss_name)
-        if loss_cls is None:
-            raise ValueError(
-                f"Unknown loss '{loss_name}'. Available: {list(_LOSS_REGISTRY)}"
-            )
+        loss_cls = _resolve_loss_class(loss_name)
         return loss_cls(config, device=config["device"])
 
     def train_one_epoch(self, epoch, n_samples, n_minibatch, n_timesteps) -> None:
