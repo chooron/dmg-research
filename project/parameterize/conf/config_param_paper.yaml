@@ -7,7 +7,7 @@ gpu_id: 0
 
 data_loader: HydroLoader
 data_sampler: HydroSampler
-trainer: ParamLearnTrainer
+trainer: MyTrainer
 
 output_dir: ./outputs/${paper.variant}_seed${seed}/
 model_dir: ${output_dir}model/
@@ -94,7 +94,7 @@ model:
 
   nn:
     name: McMlpModel
-    dropout: 0.4
+    dropout: 0.2
     hidden_size: 128
     hidden_layers: 2
     output_activation: sigmoid

@@ -4,8 +4,7 @@ import unittest
 
 import torch
 
-from implements.hybrid_nse_batch_loss import HybridNseBatchLoss
-from implements.log_nse_batch_loss import LogNseBatchLoss
+from project.parameterize.implements.losses import HybridNseBatchLoss, LogNseBatchLoss
 
 
 def _base_config() -> dict:

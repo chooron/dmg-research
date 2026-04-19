@@ -22,11 +22,10 @@ from dmg.core.calc.metrics import Metrics
 from dmg.core.utils.utils import save_train_state
 from dmg.trainers.trainer import Trainer
 
-from implements.causal_dpl_model import CausalDplModel
 from implements.gnann_splitter import GnannEnvironmentSplitter
-from implements.hybrid_nse_batch_loss import HybridNseBatchLoss
-from implements.log_nse_batch_loss import LogNseBatchLoss
 from dmg.models.criterion.kge_batch_loss import KgeBatchLoss
+from project.parameterize.implements.losses import HybridNseBatchLoss, LogNseBatchLoss
+from project.parameterize.implements.my_dpl_model import MyDplModel as CausalDplModel
 
 try:
     from implements.irm_kge_loss import IRMKgeBatchLoss

@@ -5,8 +5,8 @@ from unittest.mock import patch
 
 import torch
 
-from implements.causal_dpl_model import CausalDplModel
-from models.hbv_static import HbvStatic
+from project.parameterize.implements.hbv_static import HbvStatic
+from project.parameterize.implements.my_dpl_model import MyDplModel
 from models.nns.fast_kan import FastKAN
 
 
@@ -82,9 +82,9 @@ class TestFastKanInterface(unittest.TestCase):
         self.assertEqual(predictions["streamflow"].shape, (self.nt - 2, self.nb, 1))
         self.assertFalse(bool(torch.isnan(predictions["streamflow"]).any()))
 
-    def test_causal_dpl_eval_path_accepts_fast_kan(self) -> None:
+    def test_my_dpl_eval_path_accepts_fast_kan(self) -> None:
         hbv = self._build_hbv()
-        model = CausalDplModel(
+        model = MyDplModel(
             phy_model=hbv,
             nn_model=self.fast_kan,
             config={},

@@ -1,32 +1,27 @@
-"""Causal-dPL: differentiable parameter learning helpers.
-
-Public API re-exported from submodules for backwards compatibility.
-"""
+"""Causal-dPL shared helpers outside the parameterize-local paper stack."""
 
 from __future__ import annotations
 
-from models.hbv_static import HbvStatic
 from models.nns.fast_kan import FastKAN
 
 _LAZY_EXPORTS = {
     'GnannEnvironmentSplitter': ('implements.gnann_splitter', 'GnannEnvironmentSplitter'),
-    'CausalDplModel': ('implements.causal_dpl_model', 'CausalDplModel'),
     'CausalTrainer': ('implements.causal_trainer', 'CausalTrainer'),
     'BaselineTrainer': ('implements.baseline_trainer', 'BaselineTrainer'),
-    'ParamLearnTrainer': ('implements.param_learn_trainer', 'ParamLearnTrainer'),
 }
 
 
-def build_causal_dpl(config: dict) -> CausalDplModel:
-    """Build a CausalDplModel from a config dict."""
+def build_causal_dpl(config: dict):
+    """Build a DPL model from a config dict."""
     from dmg.models.neural_networks.ann import AnnModel
     from dmg.models.neural_networks.mlp import MlpModel
-
-    from implements.causal_dpl_model import CausalDplModel
-    from models.nns.mc_mlp import McMlpModel
+    from project.parameterize.implements.hbv_static import HbvStatic
+    from project.parameterize.implements.mc_mlp import McMlpModel
+    from project.parameterize.implements.my_dpl_model import MyDplModel
 
     phy_cfg = config['model']['phy']
     nn_cfg = config['model']['nn']
+
     phy_model = HbvStatic(config=phy_cfg, device=config['device'])
     nx = len(nn_cfg['forcings']) + len(nn_cfg['attributes'])
     ny = phy_model.learnable_param_count
@@ -84,7 +79,7 @@ def build_causal_dpl(config: dict) -> CausalDplModel:
     else:
         raise ValueError(f"Unsupported nn model '{nn_name}'.")
 
-    return CausalDplModel(
+    return MyDplModel(
         phy_model=phy_model,
         nn_model=nn_model,
         config=config,
@@ -105,11 +100,8 @@ def __getattr__(name: str):
 
 
 __all__ = [
-    'HbvStatic',
     'GnannEnvironmentSplitter',
-    'CausalDplModel',
     'CausalTrainer',
     'BaselineTrainer',
-    'ParamLearnTrainer',
     'build_causal_dpl',
 ]

@@ -33,11 +33,13 @@ class TestParamPaperConfig(unittest.TestCase):
 
         normalize_paper_config(raw_config)
 
-        self.assertEqual(raw_config["trainer"], "ParamLearnTrainer")
+        self.assertEqual(raw_config["trainer"], "MyTrainer")
         self.assertEqual(raw_config["model"]["nn"]["name"], "DistributionalParamModel")
         self.assertFalse(raw_config["test"]["mc_dropout"])
         self.assertEqual(raw_config["test"]["mc_samples"], 1)
         self.assertEqual(raw_config["paper"]["seeds"], [42, 123])
+        self.assertEqual(raw_config["distribution"]["beta_kl"], 1e-3)
+        self.assertEqual(raw_config["distribution"]["kl_warmup_epochs"], 10)
 
     def test_normalize_mc_dropout_variant_preserves_mc_eval(self) -> None:
         raw_config = copy.deepcopy(_base_raw_config())

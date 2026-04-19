@@ -21,7 +21,7 @@ from dmg.core.utils import print_config, set_randomseed
 from dmg.core.utils.utils import initialize_config
 from omegaconf import OmegaConf
 
-from implements.param_learn_trainer import ParamLearnTrainer
+from project.parameterize.implements import build_paper_trainer
 from paper_variants import (
     build_paper_dpl,
     normalize_paper_config,
@@ -177,7 +177,7 @@ def main():
     _run_model_preflight(model, data_loader.train_dataset, config)
     optimizer, scheduler = _build_optimizer_and_scheduler(config, model)
 
-    trainer = ParamLearnTrainer(
+    trainer = build_paper_trainer(
         config=config,
         model=model,
         train_dataset=data_loader.train_dataset,

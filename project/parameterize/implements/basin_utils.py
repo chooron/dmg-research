@@ -1,4 +1,4 @@
-"""Utilities for loading basin ids and subsetting basin-major datasets."""
+"""Parameterize-local basin id helpers."""
 
 from __future__ import annotations
 
@@ -11,7 +11,6 @@ from numpy.typing import NDArray
 
 
 def load_basin_ids(path: str | Path) -> NDArray[np.int64]:
-    """Load basin ids from ``.npy``, plain-text numeric files, or Python-list txt."""
     basin_path = Path(path)
     if basin_path.suffix == ".npy":
         return np.load(basin_path, allow_pickle=True).astype(np.int64)
@@ -38,7 +37,6 @@ def basin_subset_indices(
     reference_basin_ids: NDArray[np.int64],
     subset_basin_ids: NDArray[np.int64],
 ) -> NDArray[np.int64]:
-    """Return indices into ``reference_basin_ids`` that match ``subset_basin_ids`` order."""
     reference = np.asarray(reference_basin_ids, dtype=np.int64).reshape(-1)
     subset = np.asarray(subset_basin_ids, dtype=np.int64).reshape(-1)
 
@@ -60,7 +58,6 @@ def subset_dataset_by_indices(
     dataset: dict[str, torch.Tensor | np.ndarray | object],
     basin_indices: NDArray[np.int64],
 ) -> dict[str, torch.Tensor | np.ndarray | object]:
-    """Subset a dataset whose basin dimension is axis 1 for 3D and axis 0 for 2D tensors."""
     out: dict[str, torch.Tensor | np.ndarray | object] = {}
     for key, value in dataset.items():
         if isinstance(value, (torch.Tensor, np.ndarray)):
@@ -80,7 +77,6 @@ def subset_dataset_by_basin_ids(
     reference_basin_ids: NDArray[np.int64],
     subset_basin_ids: NDArray[np.int64],
 ) -> tuple[dict[str, torch.Tensor | np.ndarray | object], NDArray[np.int64]]:
-    """Subset a basin-major dataset using explicit basin ids."""
     basin_indices = basin_subset_indices(reference_basin_ids, subset_basin_ids)
 
     basin_dim = None

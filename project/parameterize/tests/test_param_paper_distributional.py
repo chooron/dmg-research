@@ -4,7 +4,7 @@ import unittest
 
 import torch
 
-from project.parameterize.paper_variants import DistributionalParamModel
+from project.parameterize.implements.param_models import DistributionalParamModel
 
 
 class TestParamPaperDistributional(unittest.TestCase):
@@ -64,6 +64,12 @@ class TestParamPaperDistributional(unittest.TestCase):
         self.assertGreaterEqual(float(param_mean.detach().min()), 0.0)
         self.assertLessEqual(float(param_mean.detach().max()), 1.0)
         self.assertGreaterEqual(float(param_std.detach().min()), 0.0)
+
+    def test_distributional_model_exposes_scalar_kl_divergence(self) -> None:
+        kl = self.model.kl_divergence(self.x)
+        self.assertEqual(tuple(kl.shape), ())
+        self.assertTrue(torch.isfinite(kl))
+        self.assertGreaterEqual(float(kl.detach()), 0.0)
 
 
 if __name__ == "__main__":

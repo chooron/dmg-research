@@ -1,19 +1,4 @@
-"""Monte Carlo MLP for static basin attributes -> hydrologic parameters.
-
-Interface contract
-------------------
-- Input:
-  - ``[B, nx]`` for direct parameter prediction, or
-  - ``[T, B, nx]`` when called from ``CausalDplModel`` with ``xc_nn_norm``.
-- Output:
-  - ``[B, ny]`` for 2D inputs, or
-  - ``[T, B, ny]`` for 3D inputs.
-
-For the ``HbvStatic`` pathway, the 3D output shape is important because
-``CausalDplModel`` forwards the tensor directly into ``HbvStatic``, whose
-parameter unpacking logic expects ``[T, B, N_PHY * nmul + N_ROUTE]`` and reads
-the last timestep as the basin-static parameter vector.
-"""
+"""MC-dropout MLP for the parameterize paper stack."""
 
 from __future__ import annotations
 
@@ -31,12 +16,12 @@ class McMlpModel(nn.Module):
         super().__init__()
         self.nx = int(nx)
         self.ny = int(ny)
-        hidden_size = int(config.get('hidden_size', 128))
-        dropout = float(config.get('dropout', 0.1))
+        hidden_size = int(config.get("hidden_size", 128))
+        dropout = float(config.get("dropout", 0.1))
 
-        self.name = 'McMlpModel'
-        self.output_activation = str(config.get('output_activation', 'sigmoid')).lower()
-        self.static_pool = str(config.get('static_pool', 'last')).lower()
+        self.name = "McMlpModel"
+        self.output_activation = str(config.get("output_activation", "sigmoid")).lower()
+        self.static_pool = str(config.get("static_pool", "last")).lower()
 
         self.layers = nn.Sequential(
             nn.Linear(nx, hidden_size),
@@ -65,18 +50,15 @@ class McMlpModel(nn.Module):
             )
 
         nt = x.shape[0]
-        if self.static_pool == 'mean':
-            pooled = x.mean(dim=0)
-        else:
-            pooled = x[-1]
+        pooled = x.mean(dim=0) if self.static_pool == "mean" else x[-1]
         return pooled, nt
 
     def _apply_output_activation(self, x: torch.Tensor) -> torch.Tensor:
-        if self.output_activation == 'sigmoid':
+        if self.output_activation == "sigmoid":
             return torch.sigmoid(x)
-        if self.output_activation == 'softplus':
+        if self.output_activation == "softplus":
             return F.softplus(x)
-        if self.output_activation in {'identity', 'none'}:
+        if self.output_activation in {"identity", "none"}:
             return x
         raise ValueError(
             f"Unsupported output activation '{self.output_activation}'. "
@@ -85,13 +67,11 @@ class McMlpModel(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         pooled, nt = self._pool_static_input(x)
-        out = self.layers(pooled)
-        out = self._apply_output_activation(out)
+        out = self._apply_output_activation(self.layers(pooled))
         if out.shape[-1] != self.ny:
             raise RuntimeError(
                 f"McMlpModel produced {out.shape[-1]} outputs, expected {self.ny}."
             )
-
         if nt is None:
             return out
         return out.unsqueeze(0).repeat(nt, 1, 1).contiguous()

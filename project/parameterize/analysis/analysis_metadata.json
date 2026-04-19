@@ -1,0 +1,28 @@
+{
+  "outputs_dir": "/workspace/autoresearch/project/parameterize/outputs",
+  "analysis_dir": "/workspace/autoresearch/project/parameterize/analysis",
+  "stochastic_samples": 100,
+  "device": "cpu",
+  "variants": [
+    "deterministic",
+    "mc_dropout",
+    "distributional"
+  ],
+  "run_count": 9,
+  "parameter_names": [
+    "parBETA",
+    "parFC",
+    "parK0",
+    "parK1",
+    "parK2",
+    "parLP",
+    "parPERC",
+    "parUZL",
+    "parTT",
+    "parCFMAX",
+    "parCFR",
+    "parCWH",
+    "route_a",
+    "route_b"
+  ]
+}
