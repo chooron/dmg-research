@@ -37,7 +37,11 @@ class DistributionalParamTrainer(MyTrainer):
         epoch: int,
     ) -> dict[str, torch.Tensor]:
         _, y_pred, y_obs = self._forward_train_batch(dataset_sample)
-        loss_hydro = self.loss_func(y_pred=y_pred, y_obs=y_obs)
+        loss_hydro = self.loss_func(
+            y_pred=y_pred,
+            y_obs=y_obs,
+            sample_ids=dataset_sample.get("batch_sample"),
+        )
         param_model = self.model.nn_model
         if not isinstance(param_model, DistributionalParamModel):
             raise TypeError("DistributionalParamTrainer requires DistributionalParamModel.")

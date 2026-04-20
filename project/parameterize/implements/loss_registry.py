@@ -6,10 +6,11 @@ from typing import Any
 
 from dmg.models.criterion.kge_batch_loss import KgeBatchLoss
 
-from .losses import HybridNseBatchLoss, LogNseBatchLoss
+from .losses import HybridNseBatchLoss, LogNseBatchLoss, NseBatchLoss
 
 _LOSS_REGISTRY = {
     "KgeBatchLoss": KgeBatchLoss,
+    "NseBatchLoss": NseBatchLoss,
     "LogNseBatchLoss": LogNseBatchLoss,
     "HybridNseBatchLoss": HybridNseBatchLoss,
 }
@@ -22,6 +23,6 @@ def resolve_loss_class(loss_name: str):
     return loss_cls
 
 
-def build_loss_function(config: dict[str, Any]):
+def build_loss_function(config: dict[str, Any], **kwargs: Any):
     loss_name = config["train"]["loss_function"]["name"]
-    return resolve_loss_class(loss_name)(config, device=config["device"])
+    return resolve_loss_class(loss_name)(config, device=config["device"], **kwargs)

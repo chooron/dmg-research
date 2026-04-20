@@ -103,7 +103,10 @@ class MyTrainer(Trainer):
             model=model,
             train_dataset=filtered_train_dataset,
             eval_dataset=filtered_eval_dataset,
-            loss_func=build_loss_function(config),
+            loss_func=build_loss_function(
+                config,
+                y_obs=filtered_train_dataset["target"] if filtered_train_dataset is not None else None,
+            ),
             optimizer=optimizer,
             scheduler=scheduler,
             **kwargs,
@@ -314,7 +317,11 @@ class MyTrainer(Trainer):
         epoch: int,
     ) -> dict[str, torch.Tensor]:
         _, y_pred, y_obs = self._forward_train_batch(dataset_sample)
-        loss_hydro = self.loss_func(y_pred=y_pred, y_obs=y_obs)
+        loss_hydro = self.loss_func(
+            y_pred=y_pred,
+            y_obs=y_obs,
+            sample_ids=dataset_sample.get("batch_sample"),
+        )
         return {
             "loss_total": loss_hydro,
             "loss_hydro": loss_hydro.detach(),
