@@ -3,35 +3,35 @@
 ## Accuracy summary by method
 
        variant  basin_count_mean  basin_count_std  kge_mean_empirical_mean  kge_mean_empirical_std  kge_median_empirical_mean  kge_median_empirical_std  kge_std_empirical_mean  kge_std_empirical_std  share_kge_gt_0_mean  share_kge_gt_0_std  share_kge_gt_05_mean  share_kge_gt_05_std  kge_mean_mean  kge_mean_std  kge_median_mean  kge_median_std  kge_std_mean  kge_std_std  nse_mean_mean  nse_mean_std  nse_median_mean  nse_median_std  nse_std_mean  nse_std_std  rmse_mean_mean  rmse_mean_std  rmse_median_mean  rmse_median_std  rmse_std_mean  rmse_std_std  corr_mean_mean  corr_mean_std  corr_median_mean  corr_median_std  corr_std_mean  corr_std_std  mae_mean_mean  mae_mean_std  mae_median_mean  mae_median_std  mae_std_mean  mae_std_std  pbias_abs_mean_mean  pbias_abs_mean_std  pbias_abs_median_mean  pbias_abs_median_std  pbias_abs_std_mean  pbias_abs_std_std
- deterministic             531.0              0.0                 0.601990                0.002077                   0.679149                  0.002730                0.366579               0.015956             0.964846            0.002877              0.801004             0.004739       0.601990      0.002077         0.679149        0.002730      0.366579     0.015956       0.456618      0.010380         0.628761        0.005584      2.243730     0.266692        1.561057       0.003141          1.329060         0.003861       1.063652      0.000452        0.770688       0.001766          0.812763         0.000665       0.144960      0.000742       0.631636      0.000930         0.503126        0.000821      0.511347     0.001057            51.378094            0.088652              45.938955              0.359792           20.399808           0.491990
-distributional             531.0              0.0                 0.601909                0.004050                   0.679834                  0.003532                0.346003               0.017163             0.964846            0.003920              0.800377             0.003262       0.601909      0.004050         0.679834        0.003532      0.346003     0.017163       0.468732      0.017230         0.631496        0.002220      1.894446     0.274320        1.562014       0.002419          1.336120         0.004378       1.070568      0.006312        0.770666       0.001127          0.813064         0.000608       0.144687      0.002174       0.632583      0.001005         0.504654        0.000888      0.512468     0.001464            51.449911            0.035898              45.893246              0.190445           20.437815           0.179810
-    mc_dropout             531.0              0.0                 0.576062                0.009580                   0.655892                  0.013374                0.312718               0.006500             0.956058            0.002175              0.760201             0.009479       0.576062      0.009580         0.655892        0.013374      0.312718     0.006500       0.474239      0.010004         0.632370        0.011282      1.122585     0.124688        1.560904       0.013943          1.326274         0.027326       1.062956      0.001213        0.769067       0.004127          0.817126         0.005236       0.146448      0.001224       0.630951      0.003420         0.505327        0.002431      0.501121     0.001526            52.244822            0.113160              46.942134              0.272061           21.066695           0.393937
+ deterministic             531.0              0.0                 0.601306                0.003724                   0.679345                  0.004713                0.366275               0.007418             0.964218            0.004983              0.799749             0.002877       0.601306      0.003724         0.679345        0.004713      0.366275     0.007418       0.456389      0.007844         0.632597        0.001827      2.235421     0.106867        1.561713       0.004656          1.330215         0.005147       1.066736      0.006270        0.770542       0.001431          0.812285         0.000061       0.145778      0.001143       0.631346      0.001165         0.505339        0.001916      0.510627     0.000766            51.409133            0.161748              45.845270              0.435353           20.631676           0.339110
+distributional             531.0              0.0                 0.597989                0.001216                   0.677389                  0.003522                0.356169               0.015131             0.962963            0.001087              0.795982             0.005436       0.597989      0.001216         0.677389        0.003522      0.356169     0.015131       0.458674      0.008042         0.628319        0.003248      2.030368     0.288198        1.566124       0.002386          1.337444         0.004358       1.069022      0.003895        0.768450       0.001303          0.811666         0.000675       0.146376      0.002040       0.633726      0.000865         0.505355        0.003941      0.513019     0.001115            51.575673            0.084536              46.102481              0.245865           20.701600           0.013838
+    mc_dropout             531.0              0.0                 0.594616                0.007550                   0.670749                  0.009691                0.312617               0.007507             0.960452            0.000000              0.792216             0.002877       0.594616      0.007550         0.670749        0.009691      0.312617     0.007507       0.494425      0.009651         0.642538        0.007595      1.308886     0.136105        1.544238       0.008582          1.317673         0.004734       1.060664      0.000801        0.774756       0.002072          0.819603         0.003520       0.143673      0.002595       0.622933      0.001434         0.494630        0.004339      0.500622     0.000337            51.182441            0.044470              45.823610              0.161931           20.564123           0.195830
 
 ## Top attribute-parameter correlations
 
        variant     target         attribute parameter  spearman_rho  abs_rho
- deterministic param_mean        slope_mean   parBETA     -0.656515 0.656515
- deterministic param_mean         frac_snow   route_b      0.648275 0.648275
- deterministic param_mean soil_conductivity    parUZL      0.594432 0.594432
- deterministic param_mean          pet_mean  parCFMAX     -0.591349 0.591349
- deterministic param_mean        slope_mean    parCWH     -0.584376 0.584376
-    mc_dropout param_mean           aridity   parPERC     -0.704245 0.704245
-    mc_dropout param_mean            p_mean   parPERC      0.680761 0.680761
-    mc_dropout param_mean      low_prec_dur  parCFMAX     -0.654454 0.654454
-    mc_dropout param_mean           gvf_max     parK0      0.653797 0.653797
-    mc_dropout param_mean       frac_forest   parPERC      0.643122 0.643122
-    mc_dropout  param_std         frac_snow   route_b      0.607978 0.607978
-    mc_dropout  param_std     p_seasonality   parPERC     -0.601601 0.601601
-    mc_dropout  param_std        slope_mean     parK2     -0.592391 0.592391
-    mc_dropout  param_std           aridity     parK0      0.584890 0.584890
-    mc_dropout  param_std       frac_forest     parK0     -0.578190 0.578190
-distributional param_mean        slope_mean   parBETA     -0.663788 0.663788
-distributional param_mean         frac_snow   route_b      0.621250 0.621250
-distributional param_mean soil_conductivity    parUZL      0.591004 0.591004
-distributional param_mean       frac_forest     parTT      0.586353 0.586353
-distributional param_mean        slope_mean   parPERC      0.582398 0.582398
-distributional  param_std         clay_frac  parCFMAX     -0.576908 0.576908
-distributional  param_std          gvf_diff    parCFR      0.570618 0.570618
-distributional  param_std     high_prec_dur    parCFR     -0.569817 0.569817
-distributional  param_std       frac_forest     parTT      0.549229 0.549229
-distributional  param_std           aridity     parK0      0.548838 0.548838
+ deterministic param_mean        slope_mean   parBETA     -0.661574 0.661574
+ deterministic param_mean         frac_snow   route_b      0.641839 0.641839
+ deterministic param_mean          lai_diff     parK1      0.594953 0.594953
+ deterministic param_mean          pet_mean  parCFMAX     -0.593309 0.593309
+ deterministic param_mean           aridity   parPERC     -0.587997 0.587997
+    mc_dropout param_mean        slope_mean   parBETA     -0.643589 0.643589
+    mc_dropout param_mean         frac_snow   route_b      0.637872 0.637872
+    mc_dropout param_mean       frac_forest     parTT      0.632998 0.632998
+    mc_dropout param_mean      low_prec_dur  parCFMAX     -0.614850 0.614850
+    mc_dropout param_mean           aridity   parPERC     -0.606614 0.606614
+    mc_dropout  param_std         frac_snow   route_b      0.576461 0.576461
+    mc_dropout  param_std soil_conductivity    parUZL      0.561746 0.561746
+    mc_dropout  param_std         elev_mean     parK2     -0.560313 0.560313
+    mc_dropout  param_std        slope_mean   route_a     -0.556991 0.556991
+    mc_dropout  param_std         frac_snow     parK2     -0.538019 0.538019
+distributional param_mean         frac_snow    parCWH     -0.824499 0.824499
+distributional param_mean         frac_snow    parCFR     -0.723836 0.723836
+distributional param_mean        slope_mean   parBETA     -0.657297 0.657297
+distributional param_mean          pet_mean    parCWH      0.657096 0.657096
+distributional param_mean     low_prec_freq    parCWH      0.641807 0.641807
+distributional  param_std         frac_snow     parTT     -0.854014 0.854014
+distributional  param_std         frac_snow    parCWH     -0.835173 0.835173
+distributional  param_std         frac_snow  parCFMAX     -0.830952 0.830952
+distributional  param_std          pet_mean     parTT      0.690611 0.690611
+distributional  param_std           aridity   route_a      0.683974 0.683974

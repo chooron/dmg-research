@@ -21,3 +21,8 @@ data
 outputs
 .claude
 .omx/
+
+
+*.csv
+*.json
+*.png
