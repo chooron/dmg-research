@@ -128,6 +128,11 @@ def parse_args():
         help="Override paper.seeds list.",
     )
     parser.add_argument(
+        "--loss",
+        default=None,
+        help="Override train.loss_function.name in config.",
+    )
+    parser.add_argument(
         "--epochs",
         type=int,
         default=None,

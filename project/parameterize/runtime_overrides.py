@@ -17,6 +17,10 @@ def apply_runtime_overrides(raw_config, args) -> None:
         raw_config["seed"] = args.seed
     if args.seeds is not None:
         paper_cfg["seeds"] = args.seeds
+    if args.loss:
+        raw_config.setdefault("train", {})
+        raw_config["train"].setdefault("loss_function", {})
+        raw_config["train"]["loss_function"]["name"] = args.loss
     if args.mc_samples is not None:
         raw_config.setdefault("test", {})
         raw_config["test"]["mc_samples"] = args.mc_samples

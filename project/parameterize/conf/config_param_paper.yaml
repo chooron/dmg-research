@@ -1,5 +1,10 @@
 name: camels_param_paper
 
+defaults:
+  - _self_
+  - hydra: settings
+  - observations: camels_531
+
 mode: train_test
 seed: 42
 device: cpu
@@ -9,7 +14,7 @@ data_loader: HydroLoader
 data_sampler: HydroSampler
 trainer: MyTrainer
 
-output_dir: ./outputs/${paper.variant}/${train.loss_function.name}/seed_${seed}/
+output_dir: ./outputs/${paper.variant}-531/${train.loss_function.name}/seed_${seed}/
 model_dir: ${output_dir}model/
 plot_dir: ${output_dir}plot/
 sim_dir: ${output_dir}sim/
@@ -56,7 +61,7 @@ sim:
   batch_size: 25
 
 observations:
-  name: camels_671
+  name: camels_531
   data_path: ./data/camels_dataset
   start_time: 1980/10/01
   end_time: 2014/09/30
