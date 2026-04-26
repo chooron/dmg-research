@@ -4,9 +4,9 @@ set -euo pipefail
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 PROJECT_DIR=$(cd "${SCRIPT_DIR}/../.." && pwd)
 
-CONFIG=${CONFIG:-${PROJECT_DIR}/conf/config_dhbv_ablation_s4d_ln.yaml}
+CONFIG=${CONFIG:-${PROJECT_DIR}/conf/ablation/config_dhbv_ablation_s4d_ln.yaml}
 MODE=${MODE:-train_test}
-SEED=${SEED:-42}
+SEED=${SEED:-111}
 LOSS=${LOSS:-}
 TEST_EPOCH=${TEST_EPOCH:-100}
 

@@ -8,7 +8,7 @@ CONFIG=${CONFIG:-${PROJECT_DIR}/conf/config_dhbv_tcn.yaml}
 MODE=${MODE:-train_test}
 SEEDS=${SEEDS:-"111 222 333 444 555"}
 LOSS=${LOSS:-}
-TEST_EPOCH=${TEST_EPOCH:-7}
+TEST_EPOCH=${TEST_EPOCH:-100}
 GPU_ID=${GPU_ID:-0}
 PYTHON_BIN=${PYTHON_BIN:-python}
 
