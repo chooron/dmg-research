@@ -1,6 +1,7 @@
 import logging
 import os
 import re
+import sys
 import time
 from pathlib import Path
 from typing import Any, Optional
@@ -344,6 +345,13 @@ class MyTrainer(BaseTrainer):
         self.model.load_model(epoch=int(test_epoch))
         print(f"Loaded test checkpoint: {checkpoint_path}")
 
+    def _emit_progress(self, message: str) -> None:
+        """Emit progress even when the entry script does not configure logging."""
+        if log.hasHandlers() and log.isEnabledFor(logging.INFO):
+            log.info(message)
+        else:
+            print(message, flush=True)
+
     def train(self) -> None:
         """Train the model."""
         self.is_in_train = True
@@ -363,7 +371,22 @@ class MyTrainer(BaseTrainer):
             self.config,
         )
 
-        log.info(f"Training model: Beginning {self.start_epoch} of {self.epochs} epochs")
+        n_basins = self.train_dataset['xc_nn_norm'].shape[1]
+        optimizer_name = self.config['train']['optimizer']
+        lr = self.config['train']['learning_rate']
+        scheduler_name = self.config['delta_model']['nn_model'].get('lr_scheduler', 'None')
+        self._emit_progress(
+            f"[Train Start] epochs={self.epochs} | optimizer={optimizer_name} | "
+            f"lr={lr} | scheduler={scheduler_name} | n_basins={n_basins}"
+        )
+        self._emit_progress(
+            f"Training model: Beginning {self.start_epoch} of {self.epochs} epochs"
+        )
+        sys.stdout.flush()
+        sys.stderr.flush()
+
+        self._train_start_time = time.perf_counter()
+        self._final_loss = 0.0
 
         # Training loop
         for epoch in range(self.start_epoch, self.epochs + 1):
@@ -375,6 +398,12 @@ class MyTrainer(BaseTrainer):
             )
 
         self._save_final_checkpoint_if_needed()
+        total_time = time.perf_counter() - self._train_start_time
+        self._emit_progress(
+            f"[Train End] total_time={total_time:.1f}s | final_loss={self._final_loss:.4f}"
+        )
+        sys.stdout.flush()
+        sys.stderr.flush()
 
     def train_one_epoch(self, epoch, n_samples, n_minibatch, n_timesteps) -> None:
         """Train model for one epoch.
@@ -391,13 +420,12 @@ class MyTrainer(BaseTrainer):
             Number of timesteps in the training dataset.
         """
         start_time = time.perf_counter()
-        prog_str = f"Epoch {epoch}/{self.epochs}"
 
         self.current_epoch = epoch
         self.total_loss = 0.0
 
         # Iterate through epoch in minibatches.
-        for mb in tqdm.tqdm(range(1, n_minibatch + 1), desc=prog_str, leave=False, dynamic_ncols=True):
+        for mb in range(1, n_minibatch + 1):
             self.current_batch = mb
 
             dataset_sample = self.sampler.get_training_sample(
@@ -424,14 +452,10 @@ class MyTrainer(BaseTrainer):
 
             self.total_loss += loss.item()
 
-            if self.verbose:
-                tqdm.tqdm.write(f"Epoch {epoch}, batch {mb} | loss: {loss.item()}")
-
         if self.use_scheduler:
             self.scheduler.step()
 
-        if self.verbose:
-            log.info(f"\n ---- \n Epoch {epoch} total loss: {self.total_loss}")
+        self._final_loss = self.total_loss / max(n_minibatch, 1)
         self._log_epoch_stats(epoch, self.model.loss_dict, n_minibatch, start_time)
 
         # Save model and trainer states.
@@ -682,12 +706,21 @@ class MyTrainer(BaseTrainer):
         start_time
             Start time of the epoch.
         """
-        avg_loss_dict = {key: value / n_minibatch + 1 for key, value in loss_dict.items()}
-        loss = ", ".join(f"{key}: {value:.6f}" for key, value in avg_loss_dict.items())
-        elapsed = time.perf_counter() - start_time
-        mem_aloc = int(torch.cuda.memory_reserved(device=self.config['device']) * 0.000001)
+        log_interval = self.config['train'].get('log_interval', 1)
+        if epoch % log_interval != 0:
+            return
 
-        log.info(
-            f"Loss after epoch {epoch}: {loss} \n"
-            f"~ Runtime {elapsed:.2f} s, {mem_aloc} Mb reserved GPU memory",
+        avg_loss = getattr(self, '_final_loss', self.total_loss / max(n_minibatch, 1))
+        elapsed = time.perf_counter() - start_time
+        if torch.cuda.is_available() and str(self.config['device']).startswith('cuda'):
+            mem_aloc = int(torch.cuda.memory_reserved(device=self.config['device']) * 0.000001)
+        else:
+            mem_aloc = 0
+        lr = self.optimizer.param_groups[0]['lr']
+
+        self._emit_progress(
+            f"[Epoch {epoch:>4}/{self.epochs}] loss={avg_loss:.4f} | "
+            f"lr={lr:.2e} | time={elapsed:.1f}s | mem={mem_aloc}MB"
         )
+        sys.stdout.flush()
+        sys.stderr.flush()

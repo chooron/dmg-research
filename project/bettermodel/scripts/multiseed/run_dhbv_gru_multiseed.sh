@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+PROJECT_DIR=$(cd "${SCRIPT_DIR}/../.." && pwd)
+
+CONFIG=${CONFIG:-${PROJECT_DIR}/conf/config_dhbv_gru.yaml}
+MODE=${MODE:-train_test}
+SEEDS=${SEEDS:-"111 222 333 444 555"}
+LOSS=${LOSS:-}
+TEST_EPOCH=${TEST_EPOCH:-100}
+
+cd "${PROJECT_DIR}"
+
+pids=()
+labels=()
+
+for SEED in ${SEEDS}; do
+    ARGS=(
+        --config "${CONFIG}"
+        --mode "${MODE}"
+        --seed "${SEED}"
+        --test-epoch "${TEST_EPOCH}"
+    )
+
+    if [[ -n "${LOSS}" ]]; then
+        ARGS+=(--loss "${LOSS}")
+    fi
+
+    labels+=("seed=${SEED}")
+    echo "bettermodel multiseed | model=gru | mode=${MODE} | seed=${SEED} | test_epoch=${TEST_EPOCH}"
+    uv run python "${PROJECT_DIR}/run_experiment.py" "${ARGS[@]}" &
+    pids+=("$!")
+done
+
+status=0
+for i in "${!pids[@]}"; do
+    if ! wait "${pids[$i]}"; then
+        echo "failed: ${labels[$i]}" >&2
+        status=1
+    fi
+done
+
+exit "${status}"

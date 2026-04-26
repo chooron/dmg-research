@@ -19,6 +19,10 @@ for path in (REPO_ROOT, PROJECT_DIR):
 from project.bettermodel import load_config  # noqa: E402
 from project.bettermodel.implements.pub_trainer import PubTrainer  # noqa: E402
 from project.bettermodel.local_model_handler import LocalModelHandler  # noqa: E402
+from project.bettermodel.run_experiment import (  # noqa: E402
+    _loss_name,
+    _refresh_runtime_paths,
+)
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -82,6 +86,9 @@ def _override_loss(config: dict[str, Any], loss_name: str) -> None:
 
 
 def apply_runtime_overrides(config: dict[str, Any], args: argparse.Namespace) -> None:
+    old_seed = config.get("seed", config.get("random_seed"))
+    old_loss = _loss_name(config)
+
     config["trainer"] = "PubTrainer"
     if args.mode is not None:
         config["mode"] = args.mode
@@ -96,6 +103,7 @@ def apply_runtime_overrides(config: dict[str, Any], args: argparse.Namespace) ->
         config.setdefault("train", {})["epochs"] = args.epochs
     if args.loss is not None:
         _override_loss(config, args.loss)
+    _refresh_runtime_paths(config, old_seed=old_seed, old_loss=old_loss)
 
 
 def _build_data_loader(config: dict[str, Any]):

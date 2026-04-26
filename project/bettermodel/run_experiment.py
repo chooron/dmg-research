@@ -21,6 +21,16 @@ from project.bettermodel import load_config  # noqa: E402
 from project.bettermodel.implements.my_trainer import MyTrainer  # noqa: E402
 from project.bettermodel.local_model_handler import LocalModelHandler  # noqa: E402
 
+RUNTIME_PATH_KEYS = (
+    "output_dir",
+    "model_dir",
+    "plot_dir",
+    "sim_dir",
+    "save_path",
+    "model_path",
+    "out_path",
+)
+
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -82,7 +92,46 @@ def _override_loss(config: dict[str, Any], loss_name: str) -> None:
     config["train"]["loss_function"] = {"name": loss_name, "model": loss_name}
 
 
+def _loss_name(config: dict[str, Any]) -> str | None:
+    loss_config = config.get("loss_function") or config.get("train", {}).get("loss_function") or {}
+    if isinstance(loss_config, str):
+        return loss_config
+    return loss_config.get("name") or loss_config.get("model")
+
+
+def _replace_path_token(path: str, old: object, new: object, prefix: str = "") -> str:
+    if old is None or new is None or old == new:
+        return path
+    return path.replace(f"{prefix}{old}", f"{prefix}{new}")
+
+
+def _refresh_runtime_paths(
+    config: dict[str, Any],
+    *,
+    old_seed: object,
+    old_loss: object,
+) -> None:
+    """Keep resolved output aliases consistent after CLI overrides.
+
+    ``load_config`` resolves Hydra interpolations before argparse overrides are
+    applied, so paths containing ``${seed}`` or loss names need a second pass.
+    """
+    new_seed = config.get("seed")
+    new_loss = _loss_name(config)
+    for key in RUNTIME_PATH_KEYS:
+        value = config.get(key)
+        if not isinstance(value, str):
+            continue
+        value = _replace_path_token(value, old_seed, new_seed, prefix="seed_")
+        value = _replace_path_token(value, old_loss, new_loss)
+        config[key] = value
+        Path(value).mkdir(parents=True, exist_ok=True)
+
+
 def apply_runtime_overrides(config: dict[str, Any], args: argparse.Namespace) -> None:
+    old_seed = config.get("seed", config.get("random_seed"))
+    old_loss = _loss_name(config)
+
     config["trainer"] = "MyTrainer"
     if args.mode is not None:
         config["mode"] = args.mode
@@ -97,6 +146,7 @@ def apply_runtime_overrides(config: dict[str, Any], args: argparse.Namespace) ->
         config.setdefault("train", {})["epochs"] = args.epochs
     if args.loss is not None:
         _override_loss(config, args.loss)
+    _refresh_runtime_paths(config, old_seed=old_seed, old_loss=old_loss)
 
 
 def _build_data_loader(config: dict[str, Any]):
