@@ -44,6 +44,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Override config mode.",
     )
     parser.add_argument("--seed", type=int, default=None, help="Override random_seed.")
+    parser.add_argument("--gpu-id", type=int, default=None, help="Override gpu_id.")
     parser.add_argument(
         "--test-epoch",
         type=int,
@@ -138,6 +139,12 @@ def apply_runtime_overrides(config: dict[str, Any], args: argparse.Namespace) ->
     if args.seed is not None:
         config["seed"] = args.seed
         config["random_seed"] = args.seed
+    if args.gpu_id is not None:
+        config["gpu_id"] = args.gpu_id
+        if str(config.get("device", "")).startswith("cuda"):
+            config["device"] = f"cuda:{args.gpu_id}"
+            if torch.cuda.is_available():
+                torch.cuda.set_device(config["device"])
     if args.test_epoch is not None:
         config.setdefault("test", {})["test_epoch"] = args.test_epoch
     if args.start_epoch is not None:

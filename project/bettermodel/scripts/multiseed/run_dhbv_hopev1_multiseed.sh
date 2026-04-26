@@ -9,6 +9,8 @@ MODE=${MODE:-train_test}
 SEEDS=${SEEDS:-"111 222 333 444 555"}
 LOSS=${LOSS:-}
 TEST_EPOCH=${TEST_EPOCH:-100}
+GPU_ID=${GPU_ID:-0}
+PYTHON_BIN=${PYTHON_BIN:-python}
 
 cd "${PROJECT_DIR}"
 
@@ -21,6 +23,7 @@ for SEED in ${SEEDS}; do
         --mode "${MODE}"
         --seed "${SEED}"
         --test-epoch "${TEST_EPOCH}"
+        --gpu-id "${GPU_ID}"
     )
 
     if [[ -n "${LOSS}" ]]; then
@@ -28,8 +31,8 @@ for SEED in ${SEEDS}; do
     fi
 
     labels+=("seed=${SEED}")
-    echo "bettermodel multiseed | model=hopev1 | mode=${MODE} | seed=${SEED} | test_epoch=${TEST_EPOCH}"
-    uv run python "${PROJECT_DIR}/run_experiment.py" "${ARGS[@]}" &
+    echo "bettermodel multiseed | model=hopev1 | mode=${MODE} | seed=${SEED} | test_epoch=${TEST_EPOCH} | gpu_id=${GPU_ID}"
+    "${PYTHON_BIN}" "${PROJECT_DIR}/run_experiment.py" "${ARGS[@]}" &
     pids+=("$!")
 done
 
