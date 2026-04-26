@@ -131,7 +131,11 @@ def discover_runs(outputs_root: Path) -> list[RunSpec]:
                     meta_loss = loss_dir.name
                     meta_seed = seed
 
-                if meta_model != model_dir.name:
+                model_dir_variants = {model_dir.name}
+                if "-" in model_dir.name:
+                    model_dir_variants.add(model_dir.name.rsplit("-", maxsplit=1)[0])
+
+                if meta_model not in model_dir_variants:
                     raise ValueError(
                         f"Run metadata model '{meta_model}' does not match directory '{model_dir.name}'."
                     )
@@ -144,7 +148,7 @@ def discover_runs(outputs_root: Path) -> list[RunSpec]:
                         f"Run metadata seed '{meta_seed}' does not match directory '{seed_dir.name}'."
                     )
 
-                runs.append(RunSpec(model=model_dir.name, loss=loss_dir.name, seed=seed, run_dir=seed_dir))
+                runs.append(RunSpec(model=meta_model, loss=loss_dir.name, seed=seed, run_dir=seed_dir))
 
     if not runs:
         raise FileNotFoundError(f"No runs found under {outputs_root}.")

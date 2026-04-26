@@ -1,0 +1,37 @@
+figure:
+  panel_label_size_pt: 11.0
+  main_panel_label_size_pt: 9.5
+  axis_label_size_pt: 9.0
+  tick_label_size_pt: 8.0
+  heatmap_tick_label_size_pt: 7.4
+  legend_label_size_pt: 8.0
+  colorbar_label_size_pt: 8.0
+  colorbar_tick_size_pt: 7.5
+  table_text_size_pt: 7.8
+  annotation_size_pt: 8.0
+  conceptual_text_size_pt: 8.4
+  minimum_font_size_pt: 7.0
+  dpi: 600
+  grayscale_std_threshold: 12.0
+  grayscale_unique_threshold: 12
+  size_budget_mb:
+    png: 18.0
+    pdf: 5.0
+  correlation_vlim: 1.0
+  instability_vmax: 0.18
+  map_line_width: 0.14
+  ridge_line_width: 1.2
+  network_edge_width_min: 0.6
+  network_edge_width_max: 2.4
+  figure_dimensions_mm:
+    "01": [180, 145]
+    "02": [170, 135]
+    "03": [180, 170]
+    "04": [180, 155]
+    "05": [180, 145]
+    "06": [170, 140]
+    "07": [160, 130]
+    "08": [180, 175]
+    "09": [180, 145]
+    "10": [180, 175]
+    "11": [180, 120]

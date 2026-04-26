@@ -159,6 +159,23 @@ class TestFiguresPipeline(unittest.TestCase):
             runs = discover_runs(Path(tmp_dir))
             self.assertEqual(runs, [RunSpec(model="distributional", loss="HybridNseBatchLoss", seed=111, run_dir=seed_dir)])
 
+    def test_discover_runs_accepts_variant_directory_suffixes(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            seed_dir = Path(tmp_dir) / "mc_dropout-531" / "HybridNseBatchLoss" / "seed_222"
+            seed_dir.mkdir(parents=True)
+            (seed_dir / "run_meta.json").write_text(
+                json.dumps(
+                    {
+                        "paper_variant": "mc_dropout",
+                        "loss_name": "HybridNseBatchLoss",
+                        "seed": 222,
+                    }
+                ),
+                encoding="utf-8",
+            )
+            runs = discover_runs(Path(tmp_dir))
+            self.assertEqual(runs, [RunSpec(model="mc_dropout", loss="HybridNseBatchLoss", seed=222, run_dir=seed_dir)])
+
     def test_generate_all_figures_writes_all_outputs_and_manifest(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             data_dict = _synthetic_data_dict(tmp_dir)
@@ -175,4 +192,3 @@ class TestFiguresPipeline(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

@@ -31,6 +31,8 @@ def main() -> None:
         attribute_csv=args.attribute_csv,
     )
     print(outputs["report_path"])
+    if outputs.get("relationship_report_path"):
+        print(outputs["relationship_report_path"])
 
 
 if __name__ == "__main__":

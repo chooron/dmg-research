@@ -29,6 +29,7 @@ from project.parameterize.analysis.parameter_analysis import (
     summarize_seed_parameter_variance,
     write_parameter_outputs,
 )
+from project.parameterize.analysis.relationship_analysis import run_relationship_focus_analysis
 from project.parameterize.analysis.reporting import build_master_report
 
 
@@ -107,7 +108,7 @@ def run_correlation_analysis(
         aggregate_outputs=aggregate_outputs,
         output_dir=data["stability_output_dirs"]["correlation_summaries"],
     )
-    return corr_tables, seed_outputs, loss_outputs, aggregate_outputs, paths
+    return combined, corr_tables, seed_outputs, loss_outputs, aggregate_outputs, paths
 
 
 def run_all(
@@ -133,17 +134,32 @@ def run_all(
     metric_summary, metric_paths = run_metric_accuracy(data, metric_names=metric_names)
     parameter_paths = {}
     corr_paths = {}
+    relationship_paths = {}
     variance_long = None
     corr_tables = None
+    relationship_outputs = None
     report_path = None
+    relationship_report_path = None
 
     if "params_long" in data:
         variance_long, variance_summary, cross_loss_outputs, parameter_paths = run_parameter_seed_variance(data)
         if "attributes" in data:
-            corr_tables, seed_outputs, loss_outputs, aggregate_outputs, corr_paths = run_correlation_analysis(
+            corr_long, corr_tables, seed_outputs, loss_outputs, aggregate_outputs, corr_paths = run_correlation_analysis(
                 data,
                 corr_methods=corr_methods,
                 top_k=top_k,
+            )
+            relationship_outputs, relationship_paths = run_relationship_focus_analysis(
+                corr_long=corr_long,
+                params_long=data["params_long"],
+                attributes=data["attributes"],
+                output_dir=data["stability_output_dirs"]["correlation_summaries"],
+                reports_dir=data["stability_output_dirs"]["reports"],
+                seed_corr_summary=seed_outputs["correlation_seed_stability_summary"],
+                loss_corr_summary=loss_outputs["correlation_loss_stability_summary"],
+                parameter_variance_summary=variance_summary["seed_parameter_variance_by_model"],
+                top_k=min(3, top_k),
+                pairs_per_parameter=3,
             )
             report_path = build_master_report(
                 analysis_root=data["stability_analysis_root"],
@@ -154,13 +170,17 @@ def run_all(
                 loss_corr_summary=loss_outputs,
                 aggregate_corr_summary=aggregate_outputs,
             )
+            relationship_report_path = relationship_paths.get("relationship_focus_report")
     return {
         "data": data,
         "collect_paths": collect_paths,
         "metric_paths": metric_paths,
         "parameter_paths": parameter_paths,
         "correlation_paths": corr_paths,
+        "relationship_paths": relationship_paths,
         "report_path": report_path,
+        "relationship_report_path": relationship_report_path,
         "variance_long": variance_long,
         "corr_tables": corr_tables,
+        "relationship_outputs": relationship_outputs,
     }
