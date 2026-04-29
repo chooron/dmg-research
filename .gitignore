@@ -26,5 +26,5 @@ outputs
 *.csv
 *.json
 *.png
-
+*.npz
 .ruff_cache/

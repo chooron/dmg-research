@@ -4,7 +4,7 @@ set -euo pipefail
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 PROJECT_DIR=$(cd "${SCRIPT_DIR}/../.." && pwd)
 
-CONFIG=${CONFIG:-${PROJECT_DIR}/conf/config_dhbv_lstm.yaml}
+CONFIG=${CONFIG:-${PROJECT_DIR}/conf/config_dhbv_lstm_531.yaml}
 MODE=${MODE:-train_test}
 SEEDS=${SEEDS:-"111 222 333 444 555"}
 LOSS=${LOSS:-}

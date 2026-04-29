@@ -274,6 +274,26 @@ class S5DConvOnly(S5DAblationMlp):
     )
 
 
+class S5DConvBNSoftsign(S5DAblationMlp):
+    SPEC = AblationSpec(
+        name="S5D-ConvBN-Softsign",
+        add_conv=True,
+        norm="batch",
+        dynamic_activation="softsign",
+        purpose="add convolution to the BatchNorm + Softsign factorial branch",
+    )
+
+
+class S5DConvLNSigmoid(S5DAblationMlp):
+    SPEC = AblationSpec(
+        name="S5D-ConvLN-Sigmoid",
+        add_conv=True,
+        norm="layer",
+        dynamic_activation="sigmoid",
+        purpose="add convolution to the LayerNorm + Sigmoid factorial branch",
+    )
+
+
 class S5DFull(S5DAblationMlp):
     SPEC = AblationSpec(
         name="S5D-full",

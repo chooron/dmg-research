@@ -18,6 +18,8 @@ DEFAULT_CONFIGS = [
     "conf/config_dhbv_ablation_s4d_softsign.yaml",
     "conf/config_dhbv_ablation_s4d_ln_softsign.yaml",
     "conf/config_dhbv_ablation_s5d_conv_only.yaml",
+    "conf/config_dhbv_ablation_s5d_conv_bn_softsign.yaml",
+    "conf/config_dhbv_ablation_s5d_conv_ln_sigmoid.yaml",
     "conf/config_dhbv_ablation_s5d_full.yaml",
 ]
 

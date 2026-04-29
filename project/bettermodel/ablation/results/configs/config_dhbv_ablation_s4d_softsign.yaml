@@ -1,0 +1,10 @@
+defaults:
+  - config_dhbv_s5d_ablation_base
+  - _self_
+
+paper:
+  variant: dhbv_ablation_s4d_softsign
+
+delta_model:
+  nn_model:
+    model: S4DSoftsign

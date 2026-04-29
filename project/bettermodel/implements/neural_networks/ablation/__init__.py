@@ -3,6 +3,8 @@ from project.bettermodel.implements.neural_networks.ablation.s5d_components impo
     S4DLN,
     S4DLNSoftsign,
     S4DSoftsign,
+    S5DConvBNSoftsign,
+    S5DConvLNSigmoid,
     S5DConvOnly,
     S5DFull,
 )
@@ -13,5 +15,7 @@ __all__ = [
     "S4DSoftsign",
     "S4DLNSoftsign",
     "S5DConvOnly",
+    "S5DConvBNSoftsign",
+    "S5DConvLNSigmoid",
     "S5DFull",
 ]

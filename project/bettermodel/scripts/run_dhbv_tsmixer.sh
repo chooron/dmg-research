@@ -6,9 +6,9 @@ PROJECT_DIR=$(cd "${SCRIPT_DIR}/.." && pwd)
 
 CONFIG=${CONFIG:-${PROJECT_DIR}/conf/config_dhbv_tsmixer.yaml}
 MODE=${MODE:-train_test}
-SEED=${SEED:-42}
+SEED=${SEED:-111}
 LOSS=${LOSS:-}
-TEST_EPOCH=${TEST_EPOCH:-75}
+TEST_EPOCH=${TEST_EPOCH:-100}
 
 ARGS=(
     --config "${CONFIG}"
