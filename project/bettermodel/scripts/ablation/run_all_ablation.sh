@@ -14,6 +14,8 @@ SCRIPTS=(
     run_s4d_softsign.sh
     run_s4d_ln_softsign.sh
     run_s5d_conv_only.sh
+    run_s5d_conv_bn_softsign.sh
+    run_s5d_conv_ln_sigmoid.sh
     run_s5d_full.sh
 )
 
