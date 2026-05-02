@@ -134,6 +134,7 @@ TRAJECTORY_GROUPS = [
     ("LayerNorm + Softsign", ["S4D-LN-Softsign", "S5D-full"]),
 ]
 DEFAULT_TRAJECTORY_DAYS = 730
+DEFAULT_TREND_WINDOW_DAYS = 365
 
 
 def _set_wrr_style() -> None:
@@ -486,6 +487,92 @@ def _select_median_component_trajectory(param_tensor: np.ndarray) -> np.ndarray:
     return selected
 
 
+def _trend_window_length(n_time: int, *, preferred: int = DEFAULT_TREND_WINDOW_DAYS) -> int:
+    if n_time <= 1:
+        return 1
+    return max(1, min(preferred, n_time // 4 if n_time >= 4 else n_time // 2 or 1))
+
+
+def _build_parameter_reliability_summary(
+    variability_df: pd.DataFrame,
+    roughness_df: pd.DataFrame,
+    shift_df: pd.DataFrame,
+    trend_noise_df: pd.DataFrame,
+    saturation_df: pd.DataFrame,
+) -> pd.DataFrame:
+    keys = [
+        "variant",
+        "variant_key",
+        "basin_id",
+        "parameter",
+        "normalization",
+        "activation",
+        "add_conv",
+    ]
+    merged = variability_df.merge(roughness_df, on=keys, how="inner")
+    merged = merged.merge(shift_df, on=keys, how="inner")
+    merged = merged.merge(trend_noise_df, on=keys, how="inner")
+    merged = merged.merge(saturation_df, on=keys, how="inner")
+
+    summary = (
+        merged.groupby(
+            ["variant", "variant_key", "parameter", "normalization", "activation", "add_conv"],
+            as_index=False,
+        )
+        .agg(
+            n_basins=("basin_id", "nunique"),
+            mean_variability=("variability", "mean"),
+            median_variability=("variability", "median"),
+            mean_roughness=("roughness", "mean"),
+            median_roughness=("roughness", "median"),
+            mean_long_term_shift=("long_term_shift", "mean"),
+            median_long_term_shift=("long_term_shift", "median"),
+            mean_trend_to_noise_ratio=("trend_to_noise_ratio", "mean"),
+            median_trend_to_noise_ratio=("trend_to_noise_ratio", "median"),
+            mean_boundary_saturation_ratio=("boundary_saturation_ratio", "mean"),
+            median_boundary_saturation_ratio=("boundary_saturation_ratio", "median"),
+        )
+        .sort_values(["parameter", "variant"], key=lambda col: col.map({v: i for i, v in enumerate(VARIANT_ORDER)}) if col.name == "variant" else col)
+    )
+    return summary
+
+
+def _plot_parameter_metric_heatmap(
+    summary_df: pd.DataFrame,
+    *,
+    value_col: str,
+    title: str,
+    cbar_label: str,
+    output_path: Path,
+) -> None:
+    heatmap_df = summary_df.pivot_table(
+        index="variant",
+        columns="parameter",
+        values=value_col,
+        aggfunc="mean",
+    )
+    if heatmap_df.empty:
+        return
+
+    fig, ax = plt.subplots(figsize=(5.8, max(2.8, 0.42 * len(heatmap_df))))
+    sns.heatmap(
+        heatmap_df,
+        annot=True,
+        fmt=".4f",
+        cmap=sns.light_palette("#4C78A8", as_cmap=True),
+        linewidths=0.4,
+        linecolor="white",
+        cbar_kws={"label": cbar_label, "shrink": 0.78},
+        ax=ax,
+    )
+    ax.set_xlabel("HBV dynamic parameter")
+    ax.set_ylabel("")
+    ax.set_title(title)
+    fig.tight_layout()
+    fig.savefig(output_path, dpi=300)
+    plt.close(fig)
+
+
 def export_parameter_diagnostics(
     seed: int,
     test_epoch: int,
@@ -505,6 +592,8 @@ def export_parameter_diagnostics(
 
     variability_rows: list[dict[str, Any]] = []
     roughness_rows: list[dict[str, Any]] = []
+    shift_rows: list[dict[str, Any]] = []
+    trend_noise_rows: list[dict[str, Any]] = []
     saturation_rows: list[dict[str, Any]] = []
     selected_trajectories: dict[str, dict[str, Any]] = {}
     missing_rows: list[dict[str, Any]] = []
@@ -551,9 +640,14 @@ def export_parameter_diagnostics(
                     n_params=len(param_names),
                 ).detach().cpu().numpy()
                 diffs = np.diff(params, axis=0)
+                trend_window = _trend_window_length(params.shape[0])
 
                 variability = np.nanmedian(np.abs(diffs), axis=(0, 3))
                 roughness = np.nanmean(np.square(diffs), axis=(0, 3))
+                early = np.nanmean(params[:trend_window], axis=0)
+                late = np.nanmean(params[-trend_window:], axis=0)
+                long_term_shift = np.nanmedian(np.abs(late - early), axis=2)
+                trend_to_noise = long_term_shift / np.maximum(variability, 1e-6)
                 saturation = np.nanmean((params < 0.02) | (params > 0.98), axis=(0, 3))
 
                 for local_basin, basin_id in enumerate(basin_ids[start:end]):
@@ -569,6 +663,10 @@ def export_parameter_diagnostics(
                         }
                         variability_rows.append({**base, "variability": variability[local_basin, p_idx]})
                         roughness_rows.append({**base, "roughness": roughness[local_basin, p_idx]})
+                        shift_rows.append({**base, "long_term_shift": long_term_shift[local_basin, p_idx]})
+                        trend_noise_rows.append(
+                            {**base, "trend_to_noise_ratio": trend_to_noise[local_basin, p_idx]}
+                        )
                         saturation_rows.append({**base, "boundary_saturation_ratio": saturation[local_basin, p_idx]})
 
                 for absolute_idx in selected_indices:
@@ -593,14 +691,27 @@ def export_parameter_diagnostics(
 
     variability_df = pd.DataFrame(variability_rows)
     roughness_df = pd.DataFrame(roughness_rows)
+    shift_df = pd.DataFrame(shift_rows)
+    trend_noise_df = pd.DataFrame(trend_noise_rows)
     saturation_df = pd.DataFrame(saturation_rows)
     variability_df.to_csv(results_dir / "ablation_parameter_variability.csv", index=False)
     roughness_df.to_csv(results_dir / "ablation_parameter_roughness.csv", index=False)
+    shift_df.to_csv(results_dir / "ablation_parameter_long_term_shift.csv", index=False)
+    trend_noise_df.to_csv(results_dir / "ablation_parameter_trend_to_noise_ratio.csv", index=False)
     saturation_df.to_csv(results_dir / "ablation_boundary_saturation.csv", index=False)
     pd.DataFrame(missing_rows, columns=["variant", "missing", "reason"]).to_csv(
         results_dir / "missing_parameter_outputs.csv",
         index=False,
     )
+
+    reliability_summary_df = _build_parameter_reliability_summary(
+        variability_df,
+        roughness_df,
+        shift_df,
+        trend_noise_df,
+        saturation_df,
+    )
+    reliability_summary_df.to_csv(results_dir / "ablation_parameter_reliability_summary.csv", index=False)
 
     if not variability_df.empty:
         fig, ax = plt.subplots(figsize=(7.2, 3.2))
@@ -628,30 +739,41 @@ def export_parameter_diagnostics(
         fig.tight_layout()
         fig.savefig(results_dir / "ablation_parameter_variability_boxplot.png", dpi=300)
         plt.close(fig)
-
-        heatmap_df = variability_df.pivot_table(
-            index="variant",
-            columns="parameter",
-            values="variability",
-            aggfunc="mean",
+        _plot_parameter_metric_heatmap(
+            reliability_summary_df,
+            value_col="mean_variability",
+            title="Mean parameter variability",
+            cbar_label="Mean variability",
+            output_path=results_dir / "ablation_parameter_variability_heatmap.png",
         )
-        fig, ax = plt.subplots(figsize=(5.8, max(2.8, 0.42 * len(heatmap_df))))
-        sns.heatmap(
-            heatmap_df,
-            annot=True,
-            fmt=".4f",
-            cmap=sns.light_palette("#4C78A8", as_cmap=True),
-            linewidths=0.4,
-            linecolor="white",
-            cbar_kws={"label": "Mean variability", "shrink": 0.78},
-            ax=ax,
+        _plot_parameter_metric_heatmap(
+            reliability_summary_df,
+            value_col="mean_roughness",
+            title="Mean parameter roughness",
+            cbar_label="Mean roughness",
+            output_path=results_dir / "ablation_parameter_roughness_heatmap.png",
         )
-        ax.set_xlabel("HBV dynamic parameter")
-        ax.set_ylabel("")
-        ax.set_title("Mean parameter variability")
-        fig.tight_layout()
-        fig.savefig(results_dir / "ablation_parameter_variability_heatmap.png", dpi=300)
-        plt.close(fig)
+        _plot_parameter_metric_heatmap(
+            reliability_summary_df,
+            value_col="mean_long_term_shift",
+            title="Mean long-term parameter shift",
+            cbar_label="Mean |late - early|",
+            output_path=results_dir / "ablation_parameter_long_term_shift_heatmap.png",
+        )
+        _plot_parameter_metric_heatmap(
+            reliability_summary_df,
+            value_col="mean_trend_to_noise_ratio",
+            title="Mean trend-to-noise ratio",
+            cbar_label="Long-term shift / short-term variability",
+            output_path=results_dir / "ablation_parameter_trend_to_noise_ratio_heatmap.png",
+        )
+        _plot_parameter_metric_heatmap(
+            reliability_summary_df,
+            value_col="mean_boundary_saturation_ratio",
+            title="Mean boundary saturation ratio",
+            cbar_label="Boundary saturation ratio",
+            output_path=results_dir / "ablation_boundary_saturation_heatmap.png",
+        )
 
     if not saturation_df.empty:
         _plot_boundary_saturation_boxplot(saturation_df, results_dir)
@@ -859,9 +981,16 @@ def write_readme(seed: int, test_epoch: int, results_dir: Path) -> None:
             "- `ablation_performance_boxplot.png`",
             "- `ablation_parameter_variability.csv`",
             "- `ablation_parameter_roughness.csv`",
+            "- `ablation_parameter_long_term_shift.csv`",
+            "- `ablation_parameter_trend_to_noise_ratio.csv`",
+            "- `ablation_parameter_reliability_summary.csv`",
             "- `ablation_boundary_saturation.csv`",
             "- `ablation_parameter_variability_boxplot.png`",
             "- `ablation_parameter_variability_heatmap.png`",
+            "- `ablation_parameter_roughness_heatmap.png`",
+            "- `ablation_parameter_long_term_shift_heatmap.png`",
+            "- `ablation_parameter_trend_to_noise_ratio_heatmap.png`",
+            "- `ablation_boundary_saturation_heatmap.png`",
             "- `ablation_boundary_saturation_boxplot.png`",
             "- `parameter_trajectories/`",
             "- `configs/`",
@@ -869,7 +998,8 @@ def write_readme(seed: int, test_epoch: int, results_dir: Path) -> None:
             "## Interpretation Guardrail",
             "",
             "Small NSE/KGE differences should be reported as maintaining, reducing, or modestly improving skill.",
-            "The main diagnostic value is expected in the learned dynamic-parameter behavior, temporal variability, and boundary saturation ratios.",
+            "Primary interpretation should focus on parameter reliability by parameter: coherent long-term shift, low short-term noise, and low boundary saturation.",
+            "Predictive accuracy is secondary evidence rather than the sole ranking criterion in this controlled ablation.",
         ]
     )
     if missing:

@@ -6,7 +6,7 @@ PROJECT_DIR=$(cd "${SCRIPT_DIR}/../.." && pwd)
 
 CONFIG=${CONFIG:-${PROJECT_DIR}/conf/config_dhbv_ablation_s5d_conv_bn_softsign.yaml}
 MODE=${MODE:-train_test}
-SEED=${SEED:-111}
+SEED=${SEED:-222}
 LOSS=${LOSS:-}
 TEST_EPOCH=${TEST_EPOCH:-100}
 
