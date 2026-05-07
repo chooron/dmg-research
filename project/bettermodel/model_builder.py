@@ -35,6 +35,7 @@ NN_MODEL_MODULES: dict[str, str] = {
     "S4DLN": "project.bettermodel.implements.neural_networks.ablation",
     "S4DLNSoftsign": "project.bettermodel.implements.neural_networks.ablation",
     "S4DSoftsign": "project.bettermodel.implements.neural_networks.ablation",
+    "S5DConvBeforeBNSoftsign": "project.bettermodel.implements.neural_networks.ablation",
     "S5DConvBNSoftsign": "project.bettermodel.implements.neural_networks.ablation",
     "S5DConvLNSigmoid": "project.bettermodel.implements.neural_networks.ablation",
     "S5DConvOnly": "project.bettermodel.implements.neural_networks.ablation",

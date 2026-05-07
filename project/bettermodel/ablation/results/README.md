@@ -32,10 +32,15 @@ It is intended to compare component behavior, not to claim a robust accuracy gai
 - `ablation_boundary_saturation.csv`
 - `ablation_parameter_variability_boxplot.png`
 - `ablation_parameter_variability_heatmap.png`
+- `ablation_parameter_variability_heatmap.csv`
 - `ablation_parameter_roughness_heatmap.png`
+- `ablation_parameter_roughness_heatmap.csv`
 - `ablation_parameter_long_term_shift_heatmap.png`
+- `ablation_parameter_long_term_shift_heatmap.csv`
 - `ablation_parameter_trend_to_noise_ratio_heatmap.png`
+- `ablation_parameter_trend_to_noise_ratio_heatmap.csv`
 - `ablation_boundary_saturation_heatmap.png`
+- `ablation_boundary_saturation_heatmap.csv`
 - `ablation_boundary_saturation_boxplot.png`
 - `parameter_trajectories/`
 - `configs/`

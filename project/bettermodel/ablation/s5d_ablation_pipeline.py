@@ -115,6 +115,21 @@ VARIANTS = [
 ]
 
 VARIANT_ORDER = [variant.label for variant in VARIANTS]
+DISPLAY_LABELS = {
+    "S4D-baseline": "S4D-baseline",
+    "S4D-LN": "S4D-LN",
+    "S4D-Softsign": "S4D-Softsign",
+    "S4D-LN-Softsign": "S4D-LN-Softsign",
+    "S5D-ConvOnly": "S4D-Conv",
+    "S5D-ConvBN-Softsign": "S4D-Conv-Softsign",
+    "S5D-ConvLN-Sigmoid": "S4D-Conv-LN",
+    "S5D-full": "S5Dv1",
+}
+PARAMETER_DISPLAY_LABELS = {
+    "parBETA": r"$\beta$",
+    "parK0": r"$K_0$",
+    "parBETAET": r"$\gamma$",
+}
 VARIANT_PALETTE = {
     "S4D-baseline": "#4C78A8",
     "S4D-LN": "#72B7B2",
@@ -133,6 +148,21 @@ TRAJECTORY_GROUPS = [
     ("LayerNorm + Sigmoid", ["S4D-LN", "S5D-ConvLN-Sigmoid"]),
     ("LayerNorm + Softsign", ["S4D-LN-Softsign", "S5D-full"]),
 ]
+ACTIVATION_FAMILY_CENTERS = {"Sigmoid": 0.0, "Softsign": 1.0}
+ACTIVATION_FAMILY_OFFSETS = {
+    "Sigmoid": {
+        "S4D-baseline": -0.27,
+        "S4D-LN": -0.09,
+        "S5D-ConvOnly": 0.09,
+        "S5D-ConvLN-Sigmoid": 0.27,
+    },
+    "Softsign": {
+        "S4D-Softsign": -0.27,
+        "S4D-LN-Softsign": -0.09,
+        "S5D-ConvBN-Softsign": 0.09,
+        "S5D-full": 0.27,
+    },
+}
 DEFAULT_TRAJECTORY_DAYS = 730
 DEFAULT_TREND_WINDOW_DAYS = 365
 
@@ -166,6 +196,14 @@ def _finish_axis(ax: plt.Axes, *, grid_axis: str = "y") -> None:
     ax.grid(True, axis=grid_axis, linewidth=0.5, alpha=0.6)
     ax.tick_params(which="both", direction="in")
     sns.despine(ax=ax, trim=True)
+
+
+def _display_label(label: str) -> str:
+    return DISPLAY_LABELS.get(label, label)
+
+
+def _display_parameter_label(label: str) -> str:
+    return PARAMETER_DISPLAY_LABELS.get(label, label)
 
 
 def _runtime_args(seed: int, mode: str, test_epoch: int) -> SimpleNamespace:
@@ -408,8 +446,11 @@ def collect_performance(seed: int, test_epoch: int, results_dir: Path) -> None:
         ax.set_title("Predictive performance")
         ax.set_ylim(bottom=min(-0.5, float(np.nanpercentile(long_df["value"], 1)) - 0.05), top=1.02)
         ax.tick_params(axis="x", rotation=28)
-        for label in ax.get_xticklabels():
-            label.set_horizontalalignment("right")
+        ax.set_xticklabels(
+            [_display_label(label) for label in VARIANT_ORDER],
+            rotation=28,
+            ha="right",
+        )
         _finish_axis(ax)
         ax.legend(title="", ncol=2, loc="lower left", bbox_to_anchor=(0.0, 1.01), borderaxespad=0)
         fig.tight_layout()
@@ -495,6 +536,7 @@ def _trend_window_length(n_time: int, *, preferred: int = DEFAULT_TREND_WINDOW_D
 
 def _build_parameter_reliability_summary(
     variability_df: pd.DataFrame,
+    temporal_iqr_df: pd.DataFrame,
     roughness_df: pd.DataFrame,
     shift_df: pd.DataFrame,
     trend_noise_df: pd.DataFrame,
@@ -510,6 +552,7 @@ def _build_parameter_reliability_summary(
         "add_conv",
     ]
     merged = variability_df.merge(roughness_df, on=keys, how="inner")
+    merged = merged.merge(temporal_iqr_df, on=keys, how="inner")
     merged = merged.merge(shift_df, on=keys, how="inner")
     merged = merged.merge(trend_noise_df, on=keys, how="inner")
     merged = merged.merge(saturation_df, on=keys, how="inner")
@@ -523,6 +566,8 @@ def _build_parameter_reliability_summary(
             n_basins=("basin_id", "nunique"),
             mean_variability=("variability", "mean"),
             median_variability=("variability", "median"),
+            mean_temporal_iqr=("temporal_iqr", "mean"),
+            median_temporal_iqr=("temporal_iqr", "median"),
             mean_roughness=("roughness", "mean"),
             median_roughness=("roughness", "median"),
             mean_long_term_shift=("long_term_shift", "mean"),
@@ -554,6 +599,8 @@ def _plot_parameter_metric_heatmap(
     if heatmap_df.empty:
         return
 
+    heatmap_df.to_csv(output_path.with_suffix(".csv"))
+
     fig, ax = plt.subplots(figsize=(5.8, max(2.8, 0.42 * len(heatmap_df))))
     sns.heatmap(
         heatmap_df,
@@ -571,6 +618,49 @@ def _plot_parameter_metric_heatmap(
     fig.tight_layout()
     fig.savefig(output_path, dpi=300)
     plt.close(fig)
+
+
+def _draw_activation_family_boxplot(
+    ax: plt.Axes,
+    df: pd.DataFrame,
+    *,
+    value_col: str,
+    y_label: str,
+    title: str,
+) -> tuple[list[Any], list[str]]:
+    handles = []
+    labels = []
+    for activation, offsets in ACTIVATION_FAMILY_OFFSETS.items():
+        for variant, offset in offsets.items():
+            values = df.loc[df["variant"].eq(variant), value_col].dropna()
+            if values.empty:
+                continue
+            position = ACTIVATION_FAMILY_CENTERS[activation] + offset
+            parts = ax.boxplot(
+                values,
+                positions=[position],
+                widths=0.13,
+                patch_artist=True,
+                showfliers=False,
+                medianprops={"color": "0.1", "linewidth": 0.9},
+                whiskerprops={"color": "0.25", "linewidth": 0.7},
+                capprops={"color": "0.25", "linewidth": 0.7},
+                boxprops={"edgecolor": "0.25", "linewidth": 0.7},
+            )
+            color = VARIANT_PALETTE[variant]
+            parts["boxes"][0].set_facecolor(color)
+            parts["boxes"][0].set_alpha(0.78)
+            handles.append(parts["boxes"][0])
+            labels.append(_display_label(variant))
+
+    ax.set_xticks([ACTIVATION_FAMILY_CENTERS["Sigmoid"], ACTIVATION_FAMILY_CENTERS["Softsign"]])
+    ax.set_xticklabels(["Sigmoid-based", "Softsign-based"])
+    ax.set_xlim(-0.45, 1.45)
+    ax.set_xlabel("")
+    ax.set_ylabel(y_label)
+    ax.set_title(title)
+    _finish_axis(ax)
+    return handles, labels
 
 
 def export_parameter_diagnostics(
@@ -591,6 +681,7 @@ def export_parameter_diagnostics(
     npz_dir.mkdir(parents=True, exist_ok=True)
 
     variability_rows: list[dict[str, Any]] = []
+    temporal_iqr_rows: list[dict[str, Any]] = []
     roughness_rows: list[dict[str, Any]] = []
     shift_rows: list[dict[str, Any]] = []
     trend_noise_rows: list[dict[str, Any]] = []
@@ -643,6 +734,11 @@ def export_parameter_diagnostics(
                 trend_window = _trend_window_length(params.shape[0])
 
                 variability = np.nanmedian(np.abs(diffs), axis=(0, 3))
+                temporal_iqr = np.nanpercentile(params, 75, axis=(0, 3)) - np.nanpercentile(
+                    params,
+                    25,
+                    axis=(0, 3),
+                )
                 roughness = np.nanmean(np.square(diffs), axis=(0, 3))
                 early = np.nanmean(params[:trend_window], axis=0)
                 late = np.nanmean(params[-trend_window:], axis=0)
@@ -662,6 +758,9 @@ def export_parameter_diagnostics(
                             "add_conv": variant.add_conv,
                         }
                         variability_rows.append({**base, "variability": variability[local_basin, p_idx]})
+                        temporal_iqr_rows.append(
+                            {**base, "temporal_iqr": temporal_iqr[local_basin, p_idx]}
+                        )
                         roughness_rows.append({**base, "roughness": roughness[local_basin, p_idx]})
                         shift_rows.append({**base, "long_term_shift": long_term_shift[local_basin, p_idx]})
                         trend_noise_rows.append(
@@ -690,11 +789,13 @@ def export_parameter_diagnostics(
         )
 
     variability_df = pd.DataFrame(variability_rows)
+    temporal_iqr_df = pd.DataFrame(temporal_iqr_rows)
     roughness_df = pd.DataFrame(roughness_rows)
     shift_df = pd.DataFrame(shift_rows)
     trend_noise_df = pd.DataFrame(trend_noise_rows)
     saturation_df = pd.DataFrame(saturation_rows)
     variability_df.to_csv(results_dir / "ablation_parameter_variability.csv", index=False)
+    temporal_iqr_df.to_csv(results_dir / "ablation_parameter_temporal_iqr.csv", index=False)
     roughness_df.to_csv(results_dir / "ablation_parameter_roughness.csv", index=False)
     shift_df.to_csv(results_dir / "ablation_parameter_long_term_shift.csv", index=False)
     trend_noise_df.to_csv(results_dir / "ablation_parameter_trend_to_noise_ratio.csv", index=False)
@@ -706,6 +807,7 @@ def export_parameter_diagnostics(
 
     reliability_summary_df = _build_parameter_reliability_summary(
         variability_df,
+        temporal_iqr_df,
         roughness_df,
         shift_df,
         trend_noise_df,
@@ -714,30 +816,27 @@ def export_parameter_diagnostics(
     reliability_summary_df.to_csv(results_dir / "ablation_parameter_reliability_summary.csv", index=False)
 
     if not variability_df.empty:
-        fig, ax = plt.subplots(figsize=(7.2, 3.2))
-        sns.boxplot(
-            data=variability_df,
-            x="variant",
-            y="variability",
-            hue="variant",
-            order=VARIANT_ORDER,
-            hue_order=VARIANT_ORDER,
-            palette=VARIANT_PALETTE,
-            width=0.58,
-            linewidth=0.8,
-            fliersize=0,
-            legend=False,
-            ax=ax,
+        fig, ax = plt.subplots(figsize=(6.6, 3.3))
+        _draw_activation_family_boxplot(
+            ax,
+            variability_df,
+            value_col="variability",
+            y_label="Median |p[t+1] - p[t]|",
+            title="Temporal variability by activation family",
         )
-        ax.set_xlabel("")
-        ax.set_ylabel("Median |p[t+1] - p[t]|")
-        ax.set_title("Dynamic-parameter temporal variability")
-        ax.tick_params(axis="x", rotation=28)
-        for label in ax.get_xticklabels():
-            label.set_horizontalalignment("right")
-        _finish_axis(ax)
         fig.tight_layout()
         fig.savefig(results_dir / "ablation_parameter_variability_boxplot.png", dpi=300)
+        plt.close(fig)
+        fig, ax = plt.subplots(figsize=(6.6, 3.3))
+        _draw_activation_family_boxplot(
+            ax,
+            temporal_iqr_df,
+            value_col="temporal_iqr",
+            y_label="Temporal IQR",
+            title="Temporal IQR by activation family",
+        )
+        fig.tight_layout()
+        fig.savefig(results_dir / "ablation_parameter_temporal_iqr_boxplot.png", dpi=300)
         plt.close(fig)
         _plot_parameter_metric_heatmap(
             reliability_summary_df,
@@ -745,6 +844,13 @@ def export_parameter_diagnostics(
             title="Mean parameter variability",
             cbar_label="Mean variability",
             output_path=results_dir / "ablation_parameter_variability_heatmap.png",
+        )
+        _plot_parameter_metric_heatmap(
+            reliability_summary_df,
+            value_col="mean_temporal_iqr",
+            title="Mean temporal IQR",
+            cbar_label="Mean temporal IQR",
+            output_path=results_dir / "ablation_parameter_temporal_iqr_heatmap.png",
         )
         _plot_parameter_metric_heatmap(
             reliability_summary_df,
@@ -778,64 +884,63 @@ def export_parameter_diagnostics(
     if not saturation_df.empty:
         _plot_boundary_saturation_boxplot(saturation_df, results_dir)
 
+    if not variability_df.empty and not temporal_iqr_df.empty and not saturation_df.empty:
+        _plot_variability_saturation_boxplots(
+            variability_df,
+            temporal_iqr_df,
+            saturation_df,
+            results_dir,
+        )
+
     _plot_representative_trajectories(selected_trajectories, trajectories_dir, trajectory_days)
 
 
 def _plot_boundary_saturation_boxplot(saturation_df: pd.DataFrame, results_dir: Path) -> None:
     fig, ax = plt.subplots(figsize=(6.6, 3.3))
-    group_centers = {"Sigmoid": 0.0, "Softsign": 1.0}
-    group_offsets = {
-        "Sigmoid": {
-            "S4D-baseline": -0.27,
-            "S4D-LN": -0.09,
-            "S5D-ConvOnly": 0.09,
-            "S5D-ConvLN-Sigmoid": 0.27,
-        },
-        "Softsign": {
-            "S4D-Softsign": -0.27,
-            "S4D-LN-Softsign": -0.09,
-            "S5D-ConvBN-Softsign": 0.09,
-            "S5D-full": 0.27,
-        },
-    }
-    handles = []
-    labels = []
-    for activation, offsets in group_offsets.items():
-        for variant, offset in offsets.items():
-            values = saturation_df.loc[
-                saturation_df["variant"].eq(variant),
-                "boundary_saturation_ratio",
-            ].dropna()
-            if values.empty:
-                continue
-            position = group_centers[activation] + offset
-            parts = ax.boxplot(
-                values,
-                positions=[position],
-                widths=0.13,
-                patch_artist=True,
-                showfliers=False,
-                medianprops={"color": "0.1", "linewidth": 0.9},
-                whiskerprops={"color": "0.25", "linewidth": 0.7},
-                capprops={"color": "0.25", "linewidth": 0.7},
-                boxprops={"edgecolor": "0.25", "linewidth": 0.7},
-            )
-            color = VARIANT_PALETTE[variant]
-            parts["boxes"][0].set_facecolor(color)
-            parts["boxes"][0].set_alpha(0.78)
-            handles.append(parts["boxes"][0])
-            labels.append(variant)
-
-    ax.set_xticks([group_centers["Sigmoid"], group_centers["Softsign"]])
-    ax.set_xticklabels(["Sigmoid-based", "Softsign-based"])
-    ax.set_xlim(-0.45, 1.45)
-    ax.set_xlabel("")
-    ax.set_ylabel("Fraction p < 0.02 or p > 0.98")
-    ax.set_title("Boundary saturation by activation family")
-    _finish_axis(ax)
+    handles, labels = _draw_activation_family_boxplot(
+        ax,
+        saturation_df,
+        value_col="boundary_saturation_ratio",
+        y_label="Fraction p < 0.02 or p > 0.98",
+        title="Boundary saturation by activation family",
+    )
     ax.legend(handles, labels, title="", ncol=4, loc="upper center", bbox_to_anchor=(0.5, -0.18))
     fig.tight_layout()
     fig.savefig(results_dir / "ablation_boundary_saturation_boxplot.png", dpi=300)
+    plt.close(fig)
+
+
+def _plot_variability_saturation_boxplots(
+    variability_df: pd.DataFrame,
+    temporal_iqr_df: pd.DataFrame,
+    saturation_df: pd.DataFrame,
+    results_dir: Path,
+) -> None:
+    fig, axes = plt.subplots(3, 1, figsize=(7.2, 9.4))
+    handles, labels = _draw_activation_family_boxplot(
+        axes[0],
+        variability_df,
+        value_col="variability",
+        y_label="Median absolute day-to-day change",
+        title="",
+    )
+    _draw_activation_family_boxplot(
+        axes[1],
+        temporal_iqr_df,
+        value_col="temporal_iqr",
+        y_label="Temporal IQR",
+        title="",
+    )
+    _draw_activation_family_boxplot(
+        axes[2],
+        saturation_df,
+        value_col="boundary_saturation_ratio",
+        y_label="Boundary saturation ratio",
+        title="",
+    )
+    fig.legend(handles, labels, title="", ncol=4, loc="upper center", bbox_to_anchor=(0.5, 1.0))
+    fig.tight_layout(rect=(0, 0, 1, 0.95))
+    fig.savefig(results_dir / "ablation_variability_boundary_boxplots.png", dpi=300)
     plt.close(fig)
 
 
@@ -894,12 +999,12 @@ def _plot_representative_trajectories(
                         values,
                         linewidth=0.9,
                         color=VARIANT_PALETTE[variant_label],
-                        label=variant_label,
+                        label=_display_label(variant_label),
                     )
                 if p_idx == 0:
                     ax.set_title(group_name)
                 if group_idx == 0:
-                    ax.set_ylabel(param_name)
+                    ax.set_ylabel(_display_parameter_label(param_name))
                 ax.set_ylim(max(0.0, ymin - margin), min(1.0, ymax + margin))
                 ax.set_xlim(0, max(1, trajectory_days - 1))
                 _finish_axis(ax)
@@ -987,10 +1092,15 @@ def write_readme(seed: int, test_epoch: int, results_dir: Path) -> None:
             "- `ablation_boundary_saturation.csv`",
             "- `ablation_parameter_variability_boxplot.png`",
             "- `ablation_parameter_variability_heatmap.png`",
+            "- `ablation_parameter_variability_heatmap.csv`",
             "- `ablation_parameter_roughness_heatmap.png`",
+            "- `ablation_parameter_roughness_heatmap.csv`",
             "- `ablation_parameter_long_term_shift_heatmap.png`",
+            "- `ablation_parameter_long_term_shift_heatmap.csv`",
             "- `ablation_parameter_trend_to_noise_ratio_heatmap.png`",
+            "- `ablation_parameter_trend_to_noise_ratio_heatmap.csv`",
             "- `ablation_boundary_saturation_heatmap.png`",
+            "- `ablation_boundary_saturation_heatmap.csv`",
             "- `ablation_boundary_saturation_boxplot.png`",
             "- `parameter_trajectories/`",
             "- `configs/`",

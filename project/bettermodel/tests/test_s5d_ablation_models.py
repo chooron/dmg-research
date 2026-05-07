@@ -11,6 +11,7 @@ from project.bettermodel.implements.neural_networks.ablation import (
     S4DLN,
     S4DLNSoftsign,
     S4DSoftsign,
+    S5DConvBeforeBNSoftsign,
     S5DConvBNSoftsign,
     S5DConvLNSigmoid,
     S5DConvOnly,
@@ -49,6 +50,7 @@ class TestS5DAblationModels(unittest.TestCase):
             S4DSoftsign,
             S4DLNSoftsign,
             S5DConvOnly,
+            S5DConvBeforeBNSoftsign,
             S5DConvBNSoftsign,
             S5DConvLNSigmoid,
             S5DFull,
@@ -70,6 +72,7 @@ class TestS5DAblationModels(unittest.TestCase):
     def test_factorial_specs_cover_all_conv_branches(self) -> None:
         expected_specs = {
             S5DConvOnly: ("batch", "sigmoid", True),
+            S5DConvBeforeBNSoftsign: ("batch", "softsign", True),
             S5DConvBNSoftsign: ("batch", "softsign", True),
             S5DConvLNSigmoid: ("layer", "sigmoid", True),
             S5DFull: ("layer", "softsign", True),
@@ -80,6 +83,9 @@ class TestS5DAblationModels(unittest.TestCase):
                 self.assertEqual(cls.SPEC.norm, norm)
                 self.assertEqual(cls.SPEC.dynamic_activation, activation)
                 self.assertEqual(cls.SPEC.add_conv, add_conv)
+
+    def test_pre_s4d_conv_variant_uses_pre_conv_position(self) -> None:
+        self.assertEqual(S5DConvBeforeBNSoftsign.SPEC.conv_position, "pre")
 
     def test_diagnostics_save_trajectories_and_stats(self) -> None:
         params = np.linspace(0.0, 1.0, num=24, dtype=np.float32).reshape(4, 1, 3, 2)

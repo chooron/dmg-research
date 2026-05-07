@@ -9,6 +9,7 @@ import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from matplotlib.ticker import ScalarFormatter
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 if str(REPO_ROOT) not in sys.path:
@@ -29,10 +30,22 @@ from project.bettermodel.parameters.plot_multibasin_parameter_variability_two_me
     _set_plot_style,
 )
 
+OTHER_MODEL_ORDER = ("lstm", "timemixer", "tcn", "transformer")
+
+FIGURE_12_CAPTION = (
+    "Figure 12. Multi-basin summary of dynamic-parameter behavior for β, K0, and γ. "
+    "The three rows show short-term variability, roughness, and boundary saturation ratio, "
+    "respectively. Short-term variability characterizes day-to-day parameter changes, "
+    "roughness characterizes high-frequency fluctuations or spikes, and boundary saturation "
+    "ratio characterizes how often the normalized parameter is close to its lower or upper "
+    "bound. Each point represents one basin, and boxplots summarize the basin-wise "
+    "distributions across models."
+)
+
 
 def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Modify the current multi-basin summary figure into a 3x3 three-metric paper figure.",
+        description="Create the revised Figure 12 multi-basin summary figure with three reliability-oriented metrics.",
     )
     parser.add_argument("--script-path", default=str(Path(__file__).resolve()))
     parser.add_argument("--lstm-path", default=str(RESULTS_DIR / "lstm_seed111_normalized_dynamic_parameters.npz"))
@@ -43,8 +56,8 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("--timemixer-path", default=str(RESULTS_DIR / "timemixer_seed111_normalized_dynamic_parameters.npz"))
     parser.add_argument("--tcn-path", default=str(RESULTS_DIR / "tcn_seed111_normalized_dynamic_parameters.npz"))
     parser.add_argument("--output-dir", default=str(RESULTS_DIR))
-    parser.add_argument("--base-name", default="multibasin_parameter_summary_3metrics")
-    parser.add_argument("--point-alpha", type=float, default=0.55)
+    parser.add_argument("--base-name", default="figure12_variability_roughness_boundary")
+    parser.add_argument("--point-alpha", type=float, default=0.42)
     parser.add_argument("--box-width", type=float, default=0.40)
     parser.add_argument("--box-alpha", type=float, default=0.32)
     parser.add_argument("--boundary-eps", type=float, default=0.05)
@@ -67,20 +80,21 @@ def _median_abs_day_to_day_change(series: np.ndarray) -> tuple[float, int]:
     return float(np.nanmedian(diff)), int(cleaned.size)
 
 
-def _temporal_iqr(series: np.ndarray) -> tuple[float, int]:
+def _roughness(series: np.ndarray) -> tuple[float, int]:
     cleaned = series[np.isfinite(series)]
-    if cleaned.size == 0:
-        return float("nan"), 0
-    q75 = float(np.nanpercentile(cleaned, 75))
-    q25 = float(np.nanpercentile(cleaned, 25))
-    return q75 - q25, int(cleaned.size)
+    if cleaned.size < 2:
+        return float("nan"), int(cleaned.size)
+    diff = np.diff(cleaned)
+    if diff.size == 0:
+        return float("nan"), int(cleaned.size)
+    return float(np.nanmean(np.square(diff))), int(cleaned.size)
 
 
 def _boundary_saturation_ratio(series: np.ndarray, eps: float) -> tuple[float, int]:
     cleaned = series[np.isfinite(series)]
     if cleaned.size == 0:
         return float("nan"), 0
-    saturated = (cleaned < eps) | (cleaned > 1.0 - eps)
+    saturated = (cleaned <= eps) | (cleaned >= 1.0 - eps)
     return float(np.mean(saturated)), int(cleaned.size)
 
 
@@ -109,16 +123,16 @@ def _build_summary(payloads: list[dict[str, Any]], boundary_eps: float) -> pd.Da
             collapsed = _select_median_component_trajectory(tensor[:, basin_idx, selected_indices, :])
             for local_idx, (parameter, _) in enumerate(parameter_pairs):
                 series = collapsed[:, local_idx]
-                day_change, n_valid_steps = _median_abs_day_to_day_change(series)
-                temporal_iqr, _ = _temporal_iqr(series)
+                short_term_variability, n_valid_steps = _median_abs_day_to_day_change(series)
+                roughness, _ = _roughness(series)
                 boundary_ratio, _ = _boundary_saturation_ratio(series, boundary_eps)
                 rows.append(
                     {
                         "model": payload["model"],
                         "basin_id": int(basin_id),
                         "parameter": parameter,
-                        "median_abs_day_to_day_change": day_change,
-                        "temporal_iqr": temporal_iqr,
+                        "short_term_variability": short_term_variability,
+                        "roughness": roughness,
                         "boundary_saturation_ratio": boundary_ratio,
                         "n_valid_steps": n_valid_steps,
                         "source_npz": payload["path"].name,
@@ -128,10 +142,10 @@ def _build_summary(payloads: list[dict[str, Any]], boundary_eps: float) -> pd.Da
 
 
 def _metric_ylabel(metric: str) -> str:
-    if metric == "median_abs_day_to_day_change":
-        return "Median absolute day-to-day change"
-    if metric == "temporal_iqr":
-        return "Temporal IQR"
+    if metric == "short_term_variability":
+        return "Short-term variability"
+    if metric == "roughness":
+        return "Roughness"
     if metric == "boundary_saturation_ratio":
         return "Boundary saturation ratio"
     raise ValueError(f"Unknown metric: {metric}")
@@ -150,6 +164,7 @@ def _draw_panel(
     point_alpha: float,
     box_width: float,
     box_alpha: float,
+    xtick_fontsize: float,
 ) -> None:
     data = [
         panel_df.loc[panel_df["model"] == MODEL_LABELS[model_key], metric].dropna().values
@@ -185,7 +200,7 @@ def _draw_panel(
         ax.scatter(
             np.full(values.size, pos) + jitter,
             values,
-            s=7,
+            s=5,
             color=_darken_color(MODEL_COLORS[model_key]),
             alpha=point_alpha,
             linewidths=0,
@@ -196,14 +211,20 @@ def _draw_panel(
     if show_xticklabels:
         ax.set_xticklabels(
             [MODEL_DISPLAY_LABELS[model_key] for model_key in model_order],
-            fontsize=12,
+            fontsize=xtick_fontsize,
         )
     else:
         ax.set_xticklabels([])
         ax.tick_params(axis="x", bottom=False, labelbottom=False)
 
-    ax.set_ylabel(_metric_ylabel(metric) if show_ylabel else "", fontsize=12)
-    ax.tick_params(axis="y", labelsize=11)
+    ax.set_ylabel(_metric_ylabel(metric) if show_ylabel else "", fontsize=14)
+    ax.tick_params(axis="y", labelsize=13)
+    if metric == "roughness":
+        formatter = ScalarFormatter(useMathText=True)
+        formatter.set_scientific(True)
+        formatter.set_powerlimits((-2, 2))
+        ax.yaxis.set_major_formatter(formatter)
+        ax.yaxis.get_offset_text().set_size(10)
     ax.grid(axis="y", linestyle="--", alpha=0.35)
     ax.set_axisbelow(True)
     ax.margins(y=0.05)
@@ -214,7 +235,7 @@ def _draw_panel(
         transform=ax.transAxes,
         ha="left",
         va="top",
-        fontsize=13.5,
+        fontsize=16,
         bbox={
             "facecolor": "white",
             "edgecolor": "none",
@@ -233,16 +254,17 @@ def _plot_figure(
     point_alpha: float,
     box_width: float,
     box_alpha: float,
+    xtick_fontsize: float,
 ) -> None:
     fig, axes = plt.subplots(3, 3, figsize=(14.0, 10.0), constrained_layout=True)
 
     panels = [
-        ("median_abs_day_to_day_change", "parBETA", "(a)", 0, 0),
-        ("median_abs_day_to_day_change", "parK0", "(b)", 0, 1),
-        ("median_abs_day_to_day_change", "parBETAET", "(c)", 0, 2),
-        ("temporal_iqr", "parBETA", "(d)", 1, 0),
-        ("temporal_iqr", "parK0", "(e)", 1, 1),
-        ("temporal_iqr", "parBETAET", "(f)", 1, 2),
+        ("short_term_variability", "parBETA", "(a)", 0, 0),
+        ("short_term_variability", "parK0", "(b)", 0, 1),
+        ("short_term_variability", "parBETAET", "(c)", 0, 2),
+        ("roughness", "parBETA", "(d)", 1, 0),
+        ("roughness", "parK0", "(e)", 1, 1),
+        ("roughness", "parBETAET", "(f)", 1, 2),
         ("boundary_saturation_ratio", "parBETA", "(g)", 2, 0),
         ("boundary_saturation_ratio", "parK0", "(h)", 2, 1),
         ("boundary_saturation_ratio", "parBETAET", "(i)", 2, 2),
@@ -262,10 +284,15 @@ def _plot_figure(
             point_alpha=point_alpha,
             box_width=box_width,
             box_alpha=box_alpha,
+            xtick_fontsize=xtick_fontsize,
         )
 
     fig.savefig(output_base.with_suffix(".png"), dpi=300, bbox_inches="tight")
     plt.close(fig)
+
+
+def _write_caption(caption_path: Path) -> None:
+    caption_path.write_text(FIGURE_12_CAPTION + "\n", encoding="utf-8")
 
 
 def _print_report(
@@ -273,6 +300,7 @@ def _print_report(
     payloads: list[dict[str, Any]],
     summary_path: Path,
     output_bases: list[Path],
+    caption_path: Path,
     font_family: str,
     box_width: float,
     box_alpha: float,
@@ -294,8 +322,8 @@ def _print_report(
     print(counts.to_string(index=False))
 
     for column in [
-        "median_abs_day_to_day_change",
-        "temporal_iqr",
+        "short_term_variability",
+        "roughness",
         "boundary_saturation_ratio",
     ]:
         nan_count = int(summary_df[column].isna().sum())
@@ -304,9 +332,10 @@ def _print_report(
     print(
         "Readability optimization: "
         f"box width={box_width}, box alpha={box_alpha}, showfliers=False, "
-        "jitter points enabled, scatter zorder=4, smaller point size and darker point color."
+        "jitter points enabled, scatter zorder=4, smaller point size, darker point color, and increased transparency."
     )
     print(f"Summary CSV: {summary_path}")
+    print(f"Caption text: {caption_path}")
     figure_files = [str(output_base.with_suffix(".png")) for output_base in output_bases]
     print("Figure files: " + ", ".join(figure_files))
 
@@ -343,11 +372,13 @@ def main() -> None:
             "model",
             "basin_id",
             "parameter",
-            "median_abs_day_to_day_change",
-            "temporal_iqr",
+            "short_term_variability",
+            "roughness",
             "boundary_saturation_ratio",
         ]
     ].to_csv(summary_path, index=False)
+    caption_path = output_dir / f"{args.base_name}_caption.txt"
+    _write_caption(caption_path)
 
     output_bases: list[Path] = []
     if args.group in {"core", "both"}:
@@ -359,6 +390,7 @@ def main() -> None:
             point_alpha=args.point_alpha,
             box_width=args.box_width,
             box_alpha=args.box_alpha,
+            xtick_fontsize=14.0,
         )
         output_bases.append(output_base)
     if args.group in {"other", "both"}:
@@ -370,6 +402,7 @@ def main() -> None:
             point_alpha=args.point_alpha,
             box_width=args.box_width,
             box_alpha=args.box_alpha,
+            xtick_fontsize=13.5,
         )
         output_bases.append(output_base)
     _print_report(
@@ -377,6 +410,7 @@ def main() -> None:
         payloads,
         summary_path,
         output_bases,
+        caption_path,
         font_family,
         args.box_width,
         args.box_alpha,

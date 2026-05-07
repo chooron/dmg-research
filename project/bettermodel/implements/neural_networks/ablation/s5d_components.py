@@ -15,6 +15,7 @@ from project.bettermodel.implements.neural_networks.layers.hope import S4D
 class AblationSpec:
     name: str
     add_conv: bool
+    conv_position: str
     norm: str
     dynamic_activation: str
     purpose: str
@@ -63,6 +64,7 @@ class ComponentAblationS4D(nn.Module):
         dropout: float,
         n_layers: int,
         add_conv: bool,
+        conv_position: str,
         norm: str,
         conv_kernel_size: int = 5,
         cfg: dict | None = None,
@@ -70,13 +72,32 @@ class ComponentAblationS4D(nn.Module):
         super().__init__()
         self.norm_type = norm
         self.add_conv = add_conv
+        self.conv_position = conv_position
         self.encoder = nn.Linear(input_size, hidden_size)
         self.s4_layers = nn.ModuleList()
+        self.conv_layers = nn.ModuleList()
         self.norms = nn.ModuleList()
         self.dropouts = nn.ModuleList()
 
         s4d_cfg = dict(S4D_BENCHMARK_CFG if cfg is None else cfg)
         for _ in range(n_layers):
+            if add_conv and conv_position == "pre":
+                padding = conv_kernel_size // 2
+                self.conv_layers.append(
+                    nn.Sequential(
+                        nn.Conv1d(
+                            hidden_size,
+                            hidden_size,
+                            kernel_size=conv_kernel_size,
+                            padding=padding,
+                            groups=hidden_size,
+                            bias=False,
+                        ),
+                        nn.SiLU(),
+                    )
+                )
+            else:
+                self.conv_layers.append(nn.Identity())
             self.s4_layers.append(
                 S4D(
                     hidden_size,
@@ -102,7 +123,7 @@ class ComponentAblationS4D(nn.Module):
                 raise ValueError(f"Unsupported normalization type: {norm!r}")
             self.dropouts.append(nn.Dropout(dropout))
 
-        if add_conv:
+        if add_conv and conv_position == "post":
             padding = conv_kernel_size // 2
             self.conv = nn.Conv1d(
                 hidden_size,
@@ -121,12 +142,14 @@ class ComponentAblationS4D(nn.Module):
         x = self.encoder(x)
         x = x.transpose(-1, -2)
 
-        for layer, norm, dropout in zip(
+        for conv, layer, norm, dropout in zip(
+            self.conv_layers,
             self.s4_layers,
             self.norms,
             self.dropouts,
         ):
             z = x
+            z = conv(z)
             z, _ = layer(z)
             z = dropout(z)
             x = _apply_norm(norm, z + x, self.norm_type)
@@ -140,6 +163,7 @@ class S5DAblationMlp(nn.Module):
     SPEC = AblationSpec(
         name="abstract",
         add_conv=False,
+        conv_position="post",
         norm="batch",
         dynamic_activation="sigmoid",
         purpose="base class",
@@ -172,6 +196,7 @@ class S5DAblationMlp(nn.Module):
             dropout=dr1 or 0.0,
             n_layers=4,
             add_conv=self.SPEC.add_conv,
+            conv_position=self.SPEC.conv_position,
             norm=self.SPEC.norm,
         )
         self.ann = AnnModel(
@@ -228,6 +253,7 @@ class S4DBaseline(S5DAblationMlp):
     SPEC = AblationSpec(
         name="S4D-baseline",
         add_conv=False,
+        conv_position="post",
         norm="batch",
         dynamic_activation="sigmoid",
         purpose="original reference model",
@@ -238,6 +264,7 @@ class S4DLN(S5DAblationMlp):
     SPEC = AblationSpec(
         name="S4D-LN",
         add_conv=False,
+        conv_position="post",
         norm="layer",
         dynamic_activation="sigmoid",
         purpose="isolate normalization change only",
@@ -248,6 +275,7 @@ class S4DSoftsign(S5DAblationMlp):
     SPEC = AblationSpec(
         name="S4D-Softsign",
         add_conv=False,
+        conv_position="post",
         norm="batch",
         dynamic_activation="softsign",
         purpose="isolate activation change only",
@@ -258,6 +286,7 @@ class S4DLNSoftsign(S5DAblationMlp):
     SPEC = AblationSpec(
         name="S4D-LN-Softsign",
         add_conv=False,
+        conv_position="post",
         norm="layer",
         dynamic_activation="softsign",
         purpose="test normalization and activation without convolution",
@@ -268,6 +297,7 @@ class S5DConvOnly(S5DAblationMlp):
     SPEC = AblationSpec(
         name="S5D-ConvOnly",
         add_conv=True,
+        conv_position="post",
         norm="batch",
         dynamic_activation="sigmoid",
         purpose="isolate convolution under original normalization and activation",
@@ -278,6 +308,7 @@ class S5DConvBNSoftsign(S5DAblationMlp):
     SPEC = AblationSpec(
         name="S5D-ConvBN-Softsign",
         add_conv=True,
+        conv_position="post",
         norm="batch",
         dynamic_activation="softsign",
         purpose="add convolution to the BatchNorm + Softsign factorial branch",
@@ -288,9 +319,21 @@ class S5DConvLNSigmoid(S5DAblationMlp):
     SPEC = AblationSpec(
         name="S5D-ConvLN-Sigmoid",
         add_conv=True,
+        conv_position="post",
         norm="layer",
         dynamic_activation="sigmoid",
         purpose="add convolution to the LayerNorm + Sigmoid factorial branch",
+    )
+
+
+class S5DConvBeforeBNSoftsign(S5DAblationMlp):
+    SPEC = AblationSpec(
+        name="S5D-ConvBeforeBN-Softsign",
+        add_conv=True,
+        conv_position="pre",
+        norm="batch",
+        dynamic_activation="softsign",
+        purpose="test HopeV3-style pre-S4D convolution with BatchNorm and Softsign output",
     )
 
 
@@ -298,6 +341,7 @@ class S5DFull(S5DAblationMlp):
     SPEC = AblationSpec(
         name="S5D-full",
         add_conv=True,
+        conv_position="post",
         norm="layer",
         dynamic_activation="softsign",
         purpose="final proposed S5D configuration",
