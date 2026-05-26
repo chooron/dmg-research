@@ -97,10 +97,28 @@ wheels = [
 ]
 
 [[package]]
+name = "captum"
+version = "0.9.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "matplotlib" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "numpy", version = "2.4.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "packaging" },
+    { name = "torch" },
+    { name = "tqdm" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f7/9e/f31758e20c3d2b42b05420936b75f663e7aeae9ba63b84aee5cad1b044a3/captum-0.9.0.tar.gz", hash = "sha256:e4868e22b68224f1a5355d2b7966803c021cf9fe5d893f51f587b4002a666b54", size = 363381, upload-time = "2026-04-17T06:11:39.577Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/01/75/c99571fee171bb9d34d3e1df5fdb16d57e2c4c15339eb220e6e6e4539f1c/captum-0.9.0-py3-none-any.whl", hash = "sha256:cda38e1d42c37591d71560bb2f5813ac4cae8d8543afac45279c7efd5945997e", size = 455196, upload-time = "2026-04-17T06:11:38.229Z" },
+]
+
+[[package]]
 name = "causal-delta-model"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "captum" },
     { name = "dmg" },
     { name = "dmotpy" },
     { name = "einops" },
@@ -123,6 +141,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "captum", specifier = ">=0.9.0" },
     { name = "dmg", specifier = ">=1.4.0" },
     { name = "dmotpy", specifier = ">=0.1.0" },
     { name = "einops", specifier = ">=0.8.2" },

@@ -28,3 +28,8 @@ outputs
 *.png
 *.npz
 .ruff_cache/
+
+.devcontainer/
+
+output/
+*.md

@@ -1,0 +1,43 @@
+Figure 4 spatial robustness revised report
+
+Input files used:
+- Basin metadata/groups: /workspace/autoresearch/project/parameterize/manuscript/analysis/figure4/data/basin_group_assignment_531.csv
+- Relationship stability summary: /workspace/autoresearch/project/parameterize/manuscript/analysis/figure4/data/figure4_panel_b_data.csv
+- Top-5 overlap summary: /workspace/autoresearch/project/parameterize/manuscript/analysis/figure4/data/figure4_panel_c_data.csv
+- Parameter table: /workspace/autoresearch/project/parameterize/outputs/analysis/stability_stats/tables/params_long.csv
+- Map outline: /workspace/autoresearch/data/camels_loc/s_18mr25.shp
+
+Basin counts by hydroclimatic stratum:
+- G1: Humid-steep; n=92
+- G2: Low-snow humid-lowland; n=95
+- G3: Arid-lowland; n=93
+- G4: Arid-seasonal; n=51
+- G5: Low-snow arid-steep; n=68
+- G6: Snow arid-steep; n=60
+- G7: Snow humid-steep; n=72
+
+Run inclusion:
+- Runs included for panels (d) and (e): 45 model/loss/seed combinations.
+- Complete runs after model/loss/seed/basin/parameter aggregation: 45/45.
+- Seeds: 111, 222, 333, 444, 555.
+- Losses: HybridNseBatchLoss, LogNseBatchLoss, NseBatchLoss.
+- Panels (d) and (e) used all losses pooled across basins, seeds, and losses.
+- Panel (d) cells show median normalized parameter value by parameter, stratum, and formulation.
+- Panel (e) cells show within-group IQR of normalized parameter value by parameter, stratum, and formulation.
+- Parameter values were normalized with HBV search bounds and clipped to [0, 1] for display; clipped values: 689.
+- Aggregated parameter rows used for panels (d) and (e): 334530 from 535248 raw rows.
+
+Missing data and filtering decisions:
+- Basin group rows: 531 unique basins.
+- Basins represented in panel (d): 531 unique basins.
+- Missing panel (d) basins: none.
+- Groups in panel (b): G1, G2, G3, G4, G5, G6, G7; missing: none.
+- Groups in panel (c): G1, G2, G3, G4, G5, G6, G7; missing: none.
+- Incomplete runs: none.
+- Revised panel (d/e) parameter values saved to: /workspace/autoresearch/project/parameterize/manuscript/analysis/figure4/data/figure4_panel_d_parameter_values_revised.csv.
+- Revised panel (d/e) heatmap summary saved to: /workspace/autoresearch/project/parameterize/manuscript/analysis/figure4/data/figure4_panel_de_heatmap_summary_revised.csv.
+
+Output files:
+- /workspace/autoresearch/project/parameterize/manuscript/figures/main/Fig04_spatial_robustness_revised.png
+- /workspace/autoresearch/project/parameterize/manuscript/figures/main/Fig04_spatial_robustness_revised.pdf
+- /workspace/autoresearch/project/parameterize/manuscript/plots/plot_fig04_spatial_robustness.py

@@ -1,0 +1,31 @@
+2026-05-12 12:04:57,102 INFO Starting Figure 4 analysis.
+2026-05-12 12:05:00,726 INFO Loaded 334530 parameter rows, 35 numeric attributes, 531 attribute basins.
+2026-05-12 12:05:06,636 INFO Computed groupwise Spearman blocks 150/4410.
+2026-05-12 12:05:12,299 INFO Computed groupwise Spearman blocks 300/4410.
+2026-05-12 12:05:17,617 INFO Computed groupwise Spearman blocks 450/4410.
+2026-05-12 12:05:23,017 INFO Computed groupwise Spearman blocks 600/4410.
+2026-05-12 12:05:28,354 INFO Computed groupwise Spearman blocks 750/4410.
+2026-05-12 12:05:33,717 INFO Computed groupwise Spearman blocks 900/4410.
+2026-05-12 12:05:39,151 INFO Computed groupwise Spearman blocks 1050/4410.
+2026-05-12 12:05:44,566 INFO Computed groupwise Spearman blocks 1200/4410.
+2026-05-12 12:05:49,921 INFO Computed groupwise Spearman blocks 1350/4410.
+2026-05-12 12:05:55,461 INFO Computed groupwise Spearman blocks 1500/4410.
+2026-05-12 12:06:01,018 INFO Computed groupwise Spearman blocks 1650/4410.
+2026-05-12 12:06:06,299 INFO Computed groupwise Spearman blocks 1800/4410.
+2026-05-12 12:06:12,161 INFO Computed groupwise Spearman blocks 1950/4410.
+2026-05-12 12:06:19,013 INFO Computed groupwise Spearman blocks 2100/4410.
+2026-05-12 12:06:24,646 INFO Computed groupwise Spearman blocks 2250/4410.
+2026-05-12 12:06:30,080 INFO Computed groupwise Spearman blocks 2400/4410.
+2026-05-12 12:06:35,771 INFO Computed groupwise Spearman blocks 2550/4410.
+2026-05-12 12:06:41,361 INFO Computed groupwise Spearman blocks 2700/4410.
+2026-05-12 12:06:46,593 INFO Computed groupwise Spearman blocks 2850/4410.
+2026-05-12 12:06:52,343 INFO Computed groupwise Spearman blocks 3000/4410.
+2026-05-12 12:06:58,753 INFO Computed groupwise Spearman blocks 3150/4410.
+2026-05-12 12:07:05,328 INFO Computed groupwise Spearman blocks 3300/4410.
+2026-05-12 12:07:11,340 INFO Computed groupwise Spearman blocks 3450/4410.
+2026-05-12 12:07:17,522 INFO Computed groupwise Spearman blocks 3600/4410.
+2026-05-12 12:07:23,858 INFO Computed groupwise Spearman blocks 3750/4410.
+2026-05-12 12:07:30,496 INFO Computed groupwise Spearman blocks 3900/4410.
+2026-05-12 12:07:36,702 INFO Computed groupwise Spearman blocks 4050/4410.
+2026-05-12 12:07:42,420 INFO Computed groupwise Spearman blocks 4200/4410.
+2026-05-12 12:07:48,397 INFO Computed groupwise Spearman blocks 4350/4410.

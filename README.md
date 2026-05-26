@@ -75,6 +75,8 @@ Scripted examples:
 
 The project is currently organized around a full workflow from training to analysis to figure production.
 
+Zenodo DOI for the `parameterize` project archive: `10.5281/zenodo.20389200`.
+
 ### Current Model Variants
 
 `project/parameterize/paper_variants.py` currently maintains three paper-oriented parameter-learning variants:

@@ -1,0 +1,6 @@
+Figure 2 statistics preparation log
+Completed checkpoint-based parameter extraction for 45 *-531 runs.
+Generated deterministic single-point estimates and 100-sample mc_dropout/distributional parameter intervals.
+Initial full run completed all CSV outputs; report generation was rerun after replacing pandas.to_markdown dependency with local markdown rendering.
+Data directory: /workspace/autoresearch/project/parameterize/manuscript/analysis/figure2/data
+Report directory: /workspace/autoresearch/project/parameterize/manuscript/analysis/figure2/reports
