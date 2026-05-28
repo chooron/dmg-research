@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import copy
 from datetime import datetime, timedelta
+import os
 import sys
 from pathlib import Path
 from typing import Any
@@ -21,14 +22,14 @@ for path in (REPO_ROOT, PROJECT_DIR):
         sys.path.insert(0, path_str)
 
 from project.bettermodel.implements.my_trainer import MyTrainer  # noqa: E402
-from project.flexmopex import load_config  # noqa: E402
+from project.flexmopex import get_env_path, load_config  # noqa: E402
 from project.flexmopex.models.pub_trainer import PubTrainer  # noqa: E402  (local copy, avoids cartopy dep)
 from project.flexmopex.models.pub_sampler import PubSampler  # noqa: E402
 from project.flexmopex.local_model_handler import FlexMopexModelHandler  # noqa: E402
 from project.flexmopex.models.nse_aic_batch_loss import NseAicBatchLoss  # noqa: E402
 from project.flexmopex.models.nse_dyn_aic_batch_loss import NseDynAicBatchLoss  # noqa: E402
 
-BASIN_GROUPS_DIR = Path("/workspace/autoresearch/data/basin_groups")
+BASIN_GROUPS_DIR = get_env_path("BASIN_GROUPS_DIR")
 TOTAL_BASINS = 671
 
 
@@ -265,6 +266,15 @@ def _load_loro_basin_split(region_id: int) -> int:
     return 11 + region_id
 
 
+def _align_loro_eval_time(config: dict[str, Any]) -> None:
+    """Use the training period for LORO evaluation so the split is purely spatial."""
+    train_cfg = config["train"]
+    test_cfg = config.setdefault("test", {})
+    test_cfg["start_time"] = train_cfg["start_time"]
+    test_cfg["end_time"] = train_cfg["end_time"]
+    config["test_time"] = [train_cfg["start_time"], train_cfg["end_time"]]
+
+
 def apply_runtime_overrides(
     config: dict[str, Any],
     args: argparse.Namespace,
@@ -328,8 +338,7 @@ def apply_runtime_overrides(
         group_id = _load_loro_basin_split(region_id)
         config["loro_holdout_region"] = region_id
         config.setdefault("test", {})["test_group_id"] = group_id
-        # DATA_PATH env var required by PubSampler
-        import os
+        _align_loro_eval_time(config)
         os.environ.setdefault("DATA_PATH", str(BASIN_GROUPS_DIR.parent))
 
     # Build run_name
@@ -461,6 +470,11 @@ def run_loro_train(config: dict[str, Any], verbose: bool, *, preflight_only: boo
     sampler = PubSampler(config)
     n_train = len(sampler.train_indices)
     n_val = len(sampler.val_indices)
+    print(
+        "LORO temporal split: "
+        f"train={config['train']['start_time']}..{config['train']['end_time']}, "
+        f"eval={config['test']['start_time']}..{config['test']['end_time']}"
+    )
 
     trainer = PubTrainer(
         config,

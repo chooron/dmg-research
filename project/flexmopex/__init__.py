@@ -8,6 +8,7 @@ from typing import Any
 
 import hydra
 import torch
+from dotenv import load_dotenv
 from omegaconf import OmegaConf
 
 from dmg.core.utils import initialize_config
@@ -15,11 +16,26 @@ from dmg.core.utils import initialize_config
 log = logging.getLogger(__name__)
 PROJECT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = PROJECT_DIR.parent.parent
+DOTENV_PATH = PROJECT_DIR / ".env"
+load_dotenv(DOTENV_PATH, override=False)
 
 __all__ = [
+    'get_env_path',
     'load_config',
     'take_data_sample',
 ]
+
+
+def get_env_path(name: str, *, default: str | Path | None = None) -> Path:
+    """Return a path configured in flexmopex's .env file."""
+    path_value = os.getenv(name)
+    if path_value is None:
+        if default is None:
+            raise EnvironmentError(
+                f"Please set '{name}' in {DOTENV_PATH} or the process environment."
+            )
+        path_value = str(default)
+    return Path(path_value).expanduser()
 
 
 def _normalize_none_like(value: Any) -> Any:
@@ -41,6 +57,7 @@ def _resolve_input_path(path_str: str, *, base_dir: Path = REPO_ROOT) -> str:
     if path.is_absolute() and path.exists():
         return _preserve_trailing_separator(path_str, path)
 
+    data_dir = get_env_path("FLEXMOPEX_DATA_DIR", default=REPO_ROOT / "data")
     candidates = [
         Path.cwd() / path,
         base_dir / path,
@@ -49,6 +66,7 @@ def _resolve_input_path(path_str: str, *, base_dir: Path = REPO_ROOT) -> str:
     if "camels_data" in path_str or "camels_dataset" in path_str:
         candidates.extend(
             [
+                data_dir / "camels_dataset",
                 REPO_ROOT / "data/camels_dataset",
                 Path("/workspace/my_deltamodel/data/camels_data"),
             ]
@@ -56,6 +74,7 @@ def _resolve_input_path(path_str: str, *, base_dir: Path = REPO_ROOT) -> str:
     if path.name == "gage_id.npy":
         candidates.extend(
             [
+                data_dir / "gage_id.npy",
                 REPO_ROOT / "data/gage_id.npy",
                 Path("/workspace/my_deltamodel/data/gage_id.npy"),
                 Path("/workspace/my_deltamodel/data/camels_data/gage_id.npy"),

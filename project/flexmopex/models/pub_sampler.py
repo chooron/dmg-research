@@ -1,4 +1,3 @@
-import os  # <<< NEW: Import os for environment variables
 from typing import Optional, Tuple, Union
 
 import numpy as np
@@ -7,6 +6,7 @@ from numpy.typing import NDArray
 
 from dmg.core.data.data import random_index
 from dmg.core.data.samplers.base import BaseSampler
+from project.flexmopex import get_env_path
 
 
 class PubSampler(BaseSampler):
@@ -45,14 +45,9 @@ class PubSampler(BaseSampler):
         and defines the training set as all other available basins.
         Paths are read from environment variables.
         """
-        # 1. Get file paths from environment variables
-        groups_dir = os.path.join(os.getenv("DATA_PATH"), "basin_groups")
-        all_basins_file = os.path.join(os.getenv("DATA_PATH"), "gage_id.npy")
-
-        if not groups_dir or not all_basins_file:
-            raise EnvironmentError(
-                "Please set the 'BASIN_GROUPS_DIR' and 'GAGE_INFO' environment variables."
-            )
+        # 1. Get file paths from environment variables loaded from .env.
+        groups_dir = get_env_path("BASIN_GROUPS_DIR")
+        all_basins_file = get_env_path("GAGE_INFO")
 
         # 2. Get the test group ID from the config
         try:
@@ -65,8 +60,8 @@ class PubSampler(BaseSampler):
         id_to_index_map = {basin_id: i for i, basin_id in enumerate(all_basin_ids)}
 
         # 4. Load the basin IDs for the designated test group
-        test_group_file = os.path.join(groups_dir, f"group_{test_group_id}.npy")
-        if not os.path.exists(test_group_file):
+        test_group_file = groups_dir / f"group_{test_group_id}.npy"
+        if not test_group_file.exists():
             raise FileNotFoundError(f"Test group file not found: {test_group_file}")
 
         test_basin_ids = np.load(test_group_file)
@@ -94,25 +89,35 @@ class PubSampler(BaseSampler):
     def get_training_sample(
             self,
             dataset: dict[str, NDArray[np.float32]],
-            nt: int,
+            ngrid_train: Optional[int] = None,
+            nt: Optional[int] = None,
     ) -> dict[str, torch.Tensor]:
         """Generate a training batch from the training basins."""
+        if nt is None:
+            if ngrid_train is None:
+                raise TypeError("nt must be provided.")
+            nt = ngrid_train
         batch_size = self.config['train']['batch_size']
         n_train_basins = len(self.train_indices)
 
-        local_indices, i_t = random_index(n_train_basins, nt, (batch_size, self.rho), warm_up=self.warm_up)
+        local_indices, i_t = random_index(n_train_basins, nt, (batch_size, self.rho), warmup=self.warm_up)
         global_indices = self.train_indices[local_indices]
 
-        return {
+        sample = {
             'x_phy': self.select_subset(dataset['x_phy'], global_indices, i_t),
             'c_phy': dataset['c_phy'] if len(dataset['c_phy']) == 0 else dataset['c_phy'][global_indices],
             'c_nn': dataset['c_nn'][global_indices],
-            'c_nn_norm': dataset['c_nn_norm'][global_indices],
-            'x_nn_norm': self.select_subset(dataset['x_nn_norm'], global_indices, i_t, has_grad=False),
             'xc_nn_norm': self.select_subset(dataset['xc_nn_norm'], global_indices, i_t, has_grad=False),
             'target': self.select_subset(dataset['target'], global_indices, i_t)[self.warm_up:, :],
             'batch_sample': global_indices,
         }
+        if 'c_nn_norm' in dataset:
+            sample['c_nn_norm'] = dataset['c_nn_norm'][global_indices]
+        if 'x_nn_norm' in dataset:
+            sample['x_nn_norm'] = self.select_subset(dataset['x_nn_norm'], global_indices, i_t, has_grad=False)
+        if 'doy' in dataset:
+            sample['doy'] = self.select_subset(dataset['doy'], global_indices, i_t)
+        return sample
 
     def get_validation_sample(
             self,
@@ -137,7 +142,7 @@ class PubSampler(BaseSampler):
                 tensor = value[i_grid, :]
             else:
                 continue
-            validation_batch[key] = tensor
+            validation_batch[key] = tensor.float().to(self.device)
         return validation_batch
 
     def select_subset(

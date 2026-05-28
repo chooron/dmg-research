@@ -14,6 +14,7 @@ dependencies = [
     "omegaconf>=2.3.0",
     "pytorch-tcn>=1.2.3",
     "pytorch-tsmixer>=0.2.0",
+    "python-dotenv>=1.0.0",
     "scikit-learn>=1.7.1",
     "scipy>=1.15.3",
     "seaborn>=0.13.2",

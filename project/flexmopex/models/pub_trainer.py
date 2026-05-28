@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import logging
 import os
+import re
 import time
 from typing import Any, Optional
 
@@ -114,19 +115,26 @@ class PubTrainer:
         if not path or not os.path.isdir(path):
             self.start_epoch = 0
             return
+        state_files = []
         for file in os.listdir(path):
-            if "train_state" in file:
-                checkpoint = torch.load(os.path.join(path, file), weights_only=False)
-                self.optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
-                self.model.load_model(epoch=checkpoint["epoch"])
-                self.start_epoch = checkpoint["epoch"] + 1
-                print(f"Loaded checkpoint from epoch {checkpoint['epoch']}")
-                if self.scheduler and "scheduler_state_dict" in checkpoint:
-                    self.scheduler.load_state_dict(checkpoint["scheduler_state_dict"])
+            match = re.match(r"train(?:er)?_state_ep(\d+)\.pt$", file)
+            if match:
+                state_files.append((int(match.group(1)), file))
+        if state_files:
+            epoch, file = max(state_files)
+            checkpoint = torch.load(os.path.join(path, file), weights_only=False)
+            self.optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+            self.model.load_model(epoch=epoch)
+            self.start_epoch = epoch + 1
+            print(f"Loaded checkpoint from epoch {epoch}")
+            if self.scheduler and checkpoint.get("scheduler_state_dict") is not None:
+                self.scheduler.load_state_dict(checkpoint["scheduler_state_dict"])
+            if "random_state" in checkpoint:
                 torch.set_rng_state(checkpoint["random_state"])
-                if torch.cuda.is_available() and "cuda_random_state" in checkpoint:
-                    torch.cuda.set_rng_state_all(checkpoint["cuda_random_state"])
-                return
+            cuda_state = checkpoint.get("cuda_random_state", checkpoint.get("cuda_state"))
+            if torch.cuda.is_available() and cuda_state is not None:
+                torch.cuda.set_rng_state(cuda_state)
+            return
         self.start_epoch = 0
 
     # ------------------------------------------------------------------
@@ -180,7 +188,7 @@ class PubTrainer:
     def _save_train_state(self, epoch: int) -> None:
         from dmg.core.utils.utils import save_train_state  # safe: no cartopy dep
         save_train_state(
-            self.config,
+            self.config["model_path"],
             epoch=epoch,
             optimizer=self.optimizer,
             scheduler=self.scheduler,
@@ -214,22 +222,23 @@ class PubTrainer:
 
         self.predictions = self._concat_preds(all_preds)
 
-        observations = self.eval_dataset["target"]
+        observations = self.eval_dataset["target"][:, val_indices, :]
         save_outputs(self.config, [self.predictions], observations)
         self._calc_metrics(self.predictions, val_indices)
 
     def _get_val_sample(self, basin_idx: int) -> dict:
         """Get full time-series sample for one validation basin."""
         dataset = self.eval_dataset
+        device = self.config["device"]
         sample = {}
         for key, value in dataset.items():
             if isinstance(value, torch.Tensor):
                 if value.ndim == 3:
-                    sample[key] = value[:, [basin_idx], :]
+                    sample[key] = value[:, [basin_idx], :].to(device)
                 elif value.ndim == 2:
-                    sample[key] = value[[basin_idx], :]
+                    sample[key] = value[[basin_idx], :].to(device)
                 else:
-                    sample[key] = value
+                    sample[key] = value.to(device)
             else:
                 sample[key] = value
         return sample
@@ -240,7 +249,7 @@ class PubTrainer:
         for key in preds[0]:
             tensors = [p[key] for p in preds]
             dim = 1 if tensors[0].ndim == 3 else 0
-            result[key] = torch.cat(tensors, dim=dim).numpy()
+            result[key] = torch.cat(tensors, dim=dim)
         return result
 
     def _calc_metrics(self, predictions: dict, val_indices) -> None:
@@ -248,6 +257,8 @@ class PubTrainer:
 
         target_name = self.config["train"]["target"][0]
         preds = predictions[target_name]  # (T, N, 1) or (T, N)
+        if torch.is_tensor(preds):
+            preds = preds.cpu().numpy()
 
         warmup = self.config["delta_model"]["phy_model"]["warm_up"]
         obs = self.eval_dataset["target"][:, val_indices, :].cpu().numpy()
