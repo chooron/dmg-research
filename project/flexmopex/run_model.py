@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
+import numpy as np
 import torch
 from dmg.core.data.samplers.hydro_sampler import HydroSampler
 from dmg.core.utils import import_data_loader, set_randomseed
@@ -21,9 +22,14 @@ for path in (REPO_ROOT, PROJECT_DIR):
 
 from project.bettermodel.implements.my_trainer import MyTrainer  # noqa: E402
 from project.flexmopex import load_config  # noqa: E402
+from project.flexmopex.models.pub_trainer import PubTrainer  # noqa: E402  (local copy, avoids cartopy dep)
+from project.flexmopex.models.pub_sampler import PubSampler  # noqa: E402
 from project.flexmopex.local_model_handler import FlexMopexModelHandler  # noqa: E402
 from project.flexmopex.models.nse_aic_batch_loss import NseAicBatchLoss  # noqa: E402
 from project.flexmopex.models.nse_dyn_aic_batch_loss import NseDynAicBatchLoss  # noqa: E402
+
+BASIN_GROUPS_DIR = Path("/workspace/autoresearch/data/basin_groups")
+TOTAL_BASINS = 671
 
 
 RUNTIME_PATH_KEYS = (
@@ -61,6 +67,58 @@ class FlexMopexSampler(HydroSampler):
             warmup=self.warmup,
         )
         # Re-select all tensors with the same indices so doy stays aligned.
+        sample = {
+            "x_phy": self.select_subset(dataset["x_phy"], i_sample, i_t),
+            "c_phy": dataset["c_phy"][i_sample],
+            "c_nn": dataset["c_nn"][i_sample],
+            "xc_nn_norm": self.select_subset(
+                dataset["xc_nn_norm"],
+                i_sample,
+                i_t,
+                has_grad=False,
+            ),
+            "target": self.select_subset(dataset["target"], i_sample, i_t, warmup=0),
+            "batch_sample": i_sample,
+        }
+        if "doy" in dataset:
+            sample["doy"] = self.select_subset(dataset["doy"], i_sample, i_t)
+        return sample
+
+
+class FlexMopexPubSampler(FlexMopexSampler):
+    """FlexMopexSampler variant for PubTrainer (LORO): samples only from train basins."""
+
+    def __init__(self, config: dict[str, Any], val_indices: list[int]) -> None:
+        super().__init__(config)
+        self.val_indices = val_indices
+        # Build train indices = all basins except val_indices
+        val_set = set(val_indices)
+        self._train_basin_indices: list[int] = config.get(
+            "train_basin_indices",
+            [i for i in range(TOTAL_BASINS) if i not in val_set],
+        )
+
+    def get_training_sample(
+        self,
+        dataset: dict[str, torch.Tensor],
+        ngrid_train: int,
+        nt: int,
+    ) -> dict[str, torch.Tensor]:
+        # Override ngrid_train with number of actual train basins
+        n_train = len(self._train_basin_indices)
+        batch_size = self.config["train"]["batch_size"]
+        from dmg.core.data.data import random_index
+
+        i_sample_local, i_t = random_index(
+            n_train,
+            nt,
+            (batch_size, self.rho),
+            warmup=self.warmup,
+        )
+        # Map local train indices back to global basin indices
+        train_idx_tensor = torch.tensor(self._train_basin_indices, dtype=torch.long)
+        i_sample = train_idx_tensor[i_sample_local]
+
         sample = {
             "x_phy": self.select_subset(dataset["x_phy"], i_sample, i_t),
             "c_phy": dataset["c_phy"][i_sample],
@@ -128,6 +186,27 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=True,
         help="Enable verbose ModelHandler/trainer output.",
     )
+    parser.add_argument(
+        "--model-type",
+        choices=("base", "full", "flex"),
+        default="flex",
+        help=(
+            "Model type: 'base' = FixedWeightMopex(all weights=0), "
+            "'full' = FixedWeightMopex(all weights=1), "
+            "'flex' = LearnedWeightMopex (default)."
+        ),
+    )
+    parser.add_argument(
+        "--loro-holdout-region",
+        type=int,
+        default=None,
+        dest="loro_holdout_region",
+        help=(
+            "Leave-one-region-out holdout region index (0-6). "
+            "Loads holdout basin indices from basin_groups/group_{11+region}.npy. "
+            "Uses PubTrainer for LORO training."
+        ),
+    )
     return parser.parse_args(argv)
 
 
@@ -177,6 +256,15 @@ def _refresh_runtime_paths(config: dict[str, Any], output_dir: Path) -> None:
         Path(config[key]).mkdir(parents=True, exist_ok=True)
 
 
+def _load_loro_basin_split(region_id: int) -> int:
+    """Return the group_id for a LORO region (11 + region_id).
+
+    PubSampler uses config['test']['test_group_id'] to load the npy file and
+    builds train/val index splits internally via gage_id.npy.
+    """
+    return 11 + region_id
+
+
 def apply_runtime_overrides(
     config: dict[str, Any],
     args: argparse.Namespace,
@@ -213,8 +301,45 @@ def apply_runtime_overrides(
     if alpha is not None:
         config.setdefault("loss_function", {})["aic_alpha"] = alpha
 
+    # Apply --model-type overrides
+    model_type = args.model_type
+    if model_type == "base":
+        config.setdefault("delta_model", {}).setdefault("phy_model", {})["model"] = ["FixedWeightMopex"]
+        config["delta_model"]["phy_model"]["fixed_weights"] = {
+            "w_phen": 0.0,
+            "w_int": 0.0,
+            "w_snow": 0.0,
+            "w_sub": 0.0,
+        }
+    elif model_type == "full":
+        config.setdefault("delta_model", {}).setdefault("phy_model", {})["model"] = ["FixedWeightMopex"]
+        config["delta_model"]["phy_model"]["fixed_weights"] = {
+            "w_phen": 1.0,
+            "w_int": 1.0,
+            "w_snow": 1.0,
+            "w_sub": 1.0,
+        }
+    else:  # flex
+        config.setdefault("delta_model", {}).setdefault("phy_model", {})["model"] = ["LearnedWeightMopex"]
+
+    # Apply --loro-holdout-region overrides
+    region_id = args.loro_holdout_region
+    if region_id is not None:
+        group_id = _load_loro_basin_split(region_id)
+        config["loro_holdout_region"] = region_id
+        config.setdefault("test", {})["test_group_id"] = group_id
+        # DATA_PATH env var required by PubSampler
+        import os
+        os.environ.setdefault("DATA_PATH", str(BASIN_GROUPS_DIR.parent))
+
+    # Build run_name
     config_stem = Path(config_path).stem
-    run_name = args.run_name or f"{config_stem}/{_alpha_label(alpha)}/seed_{config['seed']}"
+    if args.run_name:
+        run_name = args.run_name
+    elif region_id is not None:
+        run_name = f"{config_stem}/{model_type}_region{region_id}/seed_{config['seed']}"
+    else:
+        run_name = f"{config_stem}/{model_type}_{_alpha_label(alpha)}/seed_{config['seed']}"
     _refresh_runtime_paths(config, Path(args.output_root) / run_name)
 
 
@@ -317,6 +442,53 @@ def run_train(config: dict[str, Any], verbose: bool, *, preflight_only: bool = F
     print(f"Training complete. Model saved to \n{config['model_path']}")
 
 
+def run_loro_train(config: dict[str, Any], verbose: bool, *, preflight_only: bool = False) -> None:
+    """LORO training using PubTrainer + PubSampler with LORO basin splits."""
+    config["mode"] = "train"
+    set_randomseed(config["random_seed"])
+
+    data_loader = _build_data_loader(config)
+    model = FlexMopexModelHandler(config, verbose=verbose)
+    loss_func = _build_loss(config, data_loader.train_dataset)
+
+    # Preflight check (uses all basins — just verifies forward/loss)
+    _run_model_preflight(model, loss_func, data_loader.train_dataset, config)
+    if preflight_only:
+        return
+
+    # PubSampler reads config['test']['test_group_id'] and DATA_PATH env var
+    # to build train/val index splits from basin IDs in group_XX.npy + gage_id.npy
+    sampler = PubSampler(config)
+    n_train = len(sampler.train_indices)
+    n_val = len(sampler.val_indices)
+
+    trainer = PubTrainer(
+        config,
+        model,
+        train_dataset=data_loader.train_dataset,
+        loss_func=loss_func,
+        verbose=verbose,
+    )
+    trainer.sampler = sampler
+    print(f"LORO training: {n_train} train basins, {n_val} holdout basins...")
+    trainer.train()
+    print(f"Training complete. Model saved to \n{config['model_path']}")
+
+    # Evaluate on holdout (val) basins
+    print("Evaluating on holdout basins...")
+    eval_trainer = PubTrainer(
+        config,
+        model,
+        train_dataset=data_loader.train_dataset,
+        eval_dataset=data_loader.eval_dataset,
+        loss_func=loss_func,
+        verbose=verbose,
+    )
+    eval_trainer.sampler = sampler
+    eval_trainer.evaluate()
+    print(f"Metrics and predictions saved to \n{config['out_path']}")
+
+
 def run_test(config: dict[str, Any], verbose: bool) -> None:
     config["mode"] = "test"
     set_randomseed(config["random_seed"])
@@ -343,6 +515,18 @@ def main(argv: list[str] | None = None) -> None:
     config = load_config(config_path)
     apply_runtime_overrides(config, args, config_path=config_path)
 
+    # LORO path: use PubTrainer
+    if args.loro_holdout_region is not None:
+        mode = config.get("mode", "train")
+        if mode in ("train", "train_test"):
+            run_loro_train(config, args.verbose, preflight_only=args.preflight_only)
+        elif mode == "test":
+            run_test(config, args.verbose)
+        else:
+            raise ValueError(f"Unsupported mode for LORO: {mode!r}")
+        return
+
+    # Standard path
     mode = config.get("mode", "train")
     if mode == "train_test":
         run_train(config, args.verbose, preflight_only=args.preflight_only)

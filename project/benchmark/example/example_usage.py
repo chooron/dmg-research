@@ -7,7 +7,7 @@ dmotpy 提供了 38+ 种水文模型实现，以及配套的神经网络和训�
 主要功能：
 1. 使用 HydrologyModel 构建物理模型
 2. 使用 Calibrate/Parameterize 神经网络学习模型参数
-3. 使用 FasterTrainer 进行模型训练
+3. 使用 CalTrainer/FasterTrainer 进行模型训练
 4. 与 dmg 框架无缝集成
 
 使用前准备：
@@ -18,6 +18,7 @@ dmotpy 提供了 38+ 种水文模型实现，以及配套的神经网络和训�
 
 import sys
 import torch
+import numpy as np
 from pathlib import Path
 
 # 添加项目路径（如果从源码运行）
@@ -26,7 +27,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 from dmotpy.models import HydrologyModel
 from dmotpy.neural_networks.calibrate import Calibrate
 from dmotpy.neural_networks.parameterize import Parameterize
-from dmotpy.trainers import FasterTrainer
+from dmotpy.trainers import CalTrainer, FasterTrainer
 
 # ============================================================
 # 第一部分：模型配置
@@ -255,7 +256,9 @@ def train_model(config, model, train_dataset):
     """
     使用 dmotpy 训练器训练模型。
 
-    dmotpy 当前使用 FasterTrainer 进行训练与评估。
+    dmotpy 提供两种训练器：
+    1. CalTrainer: 标准标定训练器
+    2. FasterTrainer: 优化训练器，支持 MC-Dropout
 
     训练器自动处理：
     - 优化器初始化（Adam, AdamW, Adadelta, RMSprop）
@@ -263,12 +266,21 @@ def train_model(config, model, train_dataset):
     - 模型保存和检查点管理
     - 训练日志记录
     """
-    trainer = FasterTrainer(
+    # 方法1: 使用 CalTrainer
+    trainer = CalTrainer(
         config=config,
         model=model,
         train_dataset=train_dataset,
         verbose=True,
     )
+
+    # 方法2: 使用 FasterTrainer（推荐用于大规模训练）
+    # trainer = FasterTrainer(
+    #     config=config,
+    #     model=model,
+    #     train_dataset=train_dataset,
+    #     verbose=True,
+    # )
 
     print(f"\n开始训练...")
     print(f"训练器: {type(trainer).__name__}")

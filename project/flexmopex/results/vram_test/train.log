@@ -1,0 +1,9 @@
+Preflight passed. loss=0.034878
+Training model...
+[Train Start] epochs=2 | optimizer=Adadelta | lr=1.0 | scheduler=None | n_basins=671
+Training model: Beginning 1 of 2 epochs
+[Epoch    1/2] loss=0.0204 | lr=1.00e+00 | time=93.5s | mem=79MB
+[Epoch    2/2] loss=0.0020 | lr=1.00e+00 | time=92.2s | mem=79MB
+[Train End] total_time=185.8s | final_loss=0.0020
+Training complete. Model saved to 
+/workspace/autoresearch/project/flexmopex/results/vram_test/model
