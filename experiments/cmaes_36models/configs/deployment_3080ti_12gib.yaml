@@ -1,0 +1,18 @@
+extends: full_run_10starts_300gen_warm1980_1981x5.yaml
+deployment:
+  target_gpu: NVIDIA GeForce RTX 3080 Ti
+  total_memory_gib: 12
+  results_root: /autodl-fs/data/dmotpy_cmaes36_full300_20260729/experiments/cmaes_36models
+  torchinductor_cache: /autodl-fs/data/dmotpy_cmaes36_full300_20260729/experiments/cmaes_36models/benchmarks/torchinductor_cache
+  execution:
+    # Model internals remain GPU-vectorized over basin × start × population.
+    # A second process is admitted only after the 10-start memory probe shows
+    # the combined reserved memory stays below the global safety limit.
+    queue_policy: memory_aware_two_worker_max
+    max_model_processes: 2
+    require_per_model_memory_probe: true
+    total_reserved_memory_limit_gib: 10.5
+    per_process_cuda_visible_devices: '0'
+    fallback_chunks: [531, 256, 128, 64]
+    compile_mode: default
+    use_ray: false

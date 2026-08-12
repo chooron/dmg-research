@@ -1,0 +1,33 @@
+global_seed: 20260729
+device: cuda
+objective: KGE
+selection_period: train_only
+warm_up: 365
+active: true
+separable: false
+full_covariance: true
+stdev_init: 0.10
+wide_restart_stdev: 0.25
+compile_modes: [eager, default, reduce-overhead]
+memory_limit_gib: 10.5
+memory_fraction_limit: 0.88
+checkpoint_every_generations: 10
+checkpoint_milestones: [25, 50, 100, 160, 200, 220]
+invalid_penalty: -1000000.0
+convergence:
+  improvement_window: 30
+  improvement_threshold: 0.0001
+  objective_range_window: 10
+  objective_range_threshold: 0.001
+  cross_start_gap: 0.01
+escalation:
+  continuation_multiplier: 1.8
+  restart_starts: 5
+  ipop_multiplier: 2
+  max_ipop_restarts: 1
+data:
+  basin_ids: data/531sub_id.txt
+  reference_ids: data/gage_id.npy
+  data_path: data/camels_dataset
+  train: {start_time: '1989-01-01', end_time: '1998-12-31'}
+  test: {start_time: '1999-01-01', end_time: '2009-12-31'}

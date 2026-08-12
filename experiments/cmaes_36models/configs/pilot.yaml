@@ -1,0 +1,4 @@
+extends: default.yaml
+stage: pilot
+pilot_basins: 32
+high_budget_audit_fraction: 0.20
