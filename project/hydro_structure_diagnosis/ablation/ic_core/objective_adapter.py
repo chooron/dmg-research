@@ -5,7 +5,7 @@ from typing import Any
 import numpy as np
 import torch
 
-from experiments.ic_xnes.gpu_kge import compute_kge_fp64_matrix_gpu
+from training.ic.gpu_kge import compute_kge_fp64_matrix_gpu
 
 
 class KGEObjective:
