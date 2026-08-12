@@ -177,7 +177,7 @@ def build_informative_kge_catalog(
 
 
 def compute_differentiable_kge(q_sim: torch.Tensor, q_obs: torch.Tensor, warmup_days: int = 365, eps: float = 1e-6):
-    """Compute differentiable 1 - KGE loss with eps_sq inside sqrt (matching hydro_structure_diagnosis)."""
+    """Compute differentiable 1 - KGE loss with eps_sq inside sqrt (matching hydrodiag)."""
     if q_obs.shape[0] == q_sim.shape[0] + warmup_days:
         q_obs = q_obs[warmup_days:]
     elif q_sim.shape[0] == q_obs.shape[0] + warmup_days:

@@ -1,0 +1,88 @@
+{
+  "_protocol": "dpl_camels_531_lite_v3_tgd2_dpl_audited",
+  "_note": "Copied Lite-v2 dPL protocol: random contiguous 730-day windows; first 365 days warm-up only, final 365 days KGE loss. Only TGD2 differs.",
+  "data_source": "camels_dataset_pickle",
+  "gage_ids_path": "/home/jingxin/code/dmg-research/data/gage_id.npy",
+  "dates_path": "/home/jingxin/code/dmg-research/data/camels_dates.npy",
+  "data_pkl_dataset": "/home/jingxin/code/dmg-research/data/camels_dataset",
+  "data_basin_ids": "/home/jingxin/code/dmg-research/data/531sub_id.txt",
+  "allow_evaluation_gap": true,
+  "output_dir": "results/dpl_camels_531_lite_v3_tgd2_dpl_audited/XAJ_TGD2/seed_2026",
+  "time_periods": {
+    "warmup": {
+      "start": "1980-10-01",
+      "end": "1981-09-30",
+      "days": 365
+    },
+    "calibration": {
+      "start": "1981-10-01",
+      "end": "1995-09-30",
+      "days": 5113
+    },
+    "evaluation": {
+      "start": "1995-10-01",
+      "end": "2010-09-30",
+      "days": 5479
+    }
+  },
+  "window": {
+    "warmup_days": 365,
+    "prediction_days": 365,
+    "stride_days": 365,
+    "drop_incomplete_tail": true
+  },
+  "sampling": {
+    "strategy": "balanced_valid_kge_windows",
+    "min_valid_points": 30,
+    "min_observation_std": 0.05,
+    "note": "Sample basins uniformly, then sample only informative calibration windows within each basin."
+  },
+  "network": {
+    "hidden_size": 256,
+    "hidden_sizes": [
+      256,
+      256,
+      256
+    ],
+    "depth": 3,
+    "dropout": 0.05,
+    "activation": "SiLU",
+    "normalization": "robust_median_iqr_clip5",
+    "output_epsilon": 0.0001,
+    "initialization": "physical_parameter_defaults",
+    "parameter_mapping": "sigmoid_to_physical_range_with_log_tgd2_residence_times",
+    "tgd_structure_version": "temperature_dependent_generic_delay2_v1"
+  },
+  "training": {
+    "epochs": 100,
+    "batch_size": 128,
+    "optimizer": "AdamW",
+    "lr": 0.001,
+    "weight_decay": 0.0001,
+    "grad_clip_norm": 1.0,
+    "scheduler": "cosine",
+    "min_lr": 0.0001,
+    "seed": 2026,
+    "validation_interval": 10,
+    "checkpoint_interval": 10
+  },
+  "runtime": {
+    "device": "cuda",
+    "forward_dtype": "float32",
+    "final_metric_dtype": "float64"
+  },
+  "model_name": "XAJ_TGD2",
+  "lite_mode": true,
+  "sampling_summary": {
+    "n_basins": 531,
+    "candidate_windows_per_basin": 4748,
+    "eligible_windows": 2393274,
+    "eligible_fraction": 0.9490645071873591,
+    "fallback_basins": 0,
+    "min_catalog_windows": 741,
+    "median_catalog_windows": 4749.0,
+    "max_catalog_windows": 4749,
+    "min_valid_points": 30,
+    "min_observation_std": 0.05
+  }
+}

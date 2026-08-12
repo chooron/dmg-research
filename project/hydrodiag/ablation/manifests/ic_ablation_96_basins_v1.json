@@ -1,0 +1,678 @@
+{
+  "version": "v1",
+  "description": "96 basin sample",
+  "basins": [
+    {
+      "basin_id": "14400000",
+      "stratum": "S1A1",
+      "selection_rank": 0,
+      "split": "A",
+      "is_ga_control": true
+    },
+    {
+      "basin_id": "12073500",
+      "stratum": "S1A1",
+      "selection_rank": 1,
+      "split": "A",
+      "is_ga_control": true
+    },
+    {
+      "basin_id": "12010000",
+      "stratum": "S1A1",
+      "selection_rank": 2,
+      "split": "A",
+      "is_ga_control": true
+    },
+    {
+      "basin_id": "02472000",
+      "stratum": "S1A1",
+      "selection_rank": 3,
+      "split": "B",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "03500240",
+      "stratum": "S1A1",
+      "selection_rank": 4,
+      "split": "B",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "14301000",
+      "stratum": "S1A1",
+      "selection_rank": 5,
+      "split": "B",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "02381600",
+      "stratum": "S1A1",
+      "selection_rank": 6,
+      "split": "C",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "11482500",
+      "stratum": "S1A1",
+      "selection_rank": 7,
+      "split": "C",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "11143000",
+      "stratum": "S1A2",
+      "selection_rank": 0,
+      "split": "A",
+      "is_ga_control": true
+    },
+    {
+      "basin_id": "02231000",
+      "stratum": "S1A2",
+      "selection_rank": 1,
+      "split": "A",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "02102908",
+      "stratum": "S1A2",
+      "selection_rank": 2,
+      "split": "A",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "02369800",
+      "stratum": "S1A2",
+      "selection_rank": 3,
+      "split": "B",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "02152100",
+      "stratum": "S1A2",
+      "selection_rank": 4,
+      "split": "B",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "02082950",
+      "stratum": "S1A2",
+      "selection_rank": 5,
+      "split": "B",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "02297155",
+      "stratum": "S1A2",
+      "selection_rank": 6,
+      "split": "C",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "02472500",
+      "stratum": "S1A2",
+      "selection_rank": 7,
+      "split": "C",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "10259000",
+      "stratum": "S1A3",
+      "selection_rank": 0,
+      "split": "A",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "08070200",
+      "stratum": "S1A3",
+      "selection_rank": 1,
+      "split": "A",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "09484600",
+      "stratum": "S1A3",
+      "selection_rank": 2,
+      "split": "A",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "08103900",
+      "stratum": "S1A3",
+      "selection_rank": 3,
+      "split": "B",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "02300700",
+      "stratum": "S1A3",
+      "selection_rank": 4,
+      "split": "B",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "11148900",
+      "stratum": "S1A3",
+      "selection_rank": 5,
+      "split": "B",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "08190000",
+      "stratum": "S1A3",
+      "selection_rank": 6,
+      "split": "C",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "11151300",
+      "stratum": "S1A3",
+      "selection_rank": 7,
+      "split": "C",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "12040500",
+      "stratum": "S2A1",
+      "selection_rank": 0,
+      "split": "A",
+      "is_ga_control": true
+    },
+    {
+      "basin_id": "01484100",
+      "stratum": "S2A1",
+      "selection_rank": 1,
+      "split": "A",
+      "is_ga_control": true
+    },
+    {
+      "basin_id": "12020000",
+      "stratum": "S2A1",
+      "selection_rank": 2,
+      "split": "A",
+      "is_ga_control": true
+    },
+    {
+      "basin_id": "03471500",
+      "stratum": "S2A1",
+      "selection_rank": 3,
+      "split": "B",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "14303200",
+      "stratum": "S2A1",
+      "selection_rank": 4,
+      "split": "B",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "03281500",
+      "stratum": "S2A1",
+      "selection_rank": 5,
+      "split": "B",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "12025700",
+      "stratum": "S2A1",
+      "selection_rank": 6,
+      "split": "C",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "01487000",
+      "stratum": "S2A1",
+      "selection_rank": 7,
+      "split": "C",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "01466500",
+      "stratum": "S2A2",
+      "selection_rank": 0,
+      "split": "A",
+      "is_ga_control": true
+    },
+    {
+      "basin_id": "06906800",
+      "stratum": "S2A2",
+      "selection_rank": 1,
+      "split": "A",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "02017500",
+      "stratum": "S2A2",
+      "selection_rank": 2,
+      "split": "A",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "02046000",
+      "stratum": "S2A2",
+      "selection_rank": 3,
+      "split": "B",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "02111500",
+      "stratum": "S2A2",
+      "selection_rank": 4,
+      "split": "B",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "03338780",
+      "stratum": "S2A2",
+      "selection_rank": 5,
+      "split": "C",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "03140000",
+      "stratum": "S2A2",
+      "selection_rank": 6,
+      "split": "C",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "07060710",
+      "stratum": "S2A2",
+      "selection_rank": 7,
+      "split": "C",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "09447800",
+      "stratum": "S2A3",
+      "selection_rank": 0,
+      "split": "A",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "02096846",
+      "stratum": "S2A3",
+      "selection_rank": 1,
+      "split": "A",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "05584500",
+      "stratum": "S2A3",
+      "selection_rank": 2,
+      "split": "A",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "06878000",
+      "stratum": "S2A3",
+      "selection_rank": 3,
+      "split": "B",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "09508300",
+      "stratum": "S2A3",
+      "selection_rank": 4,
+      "split": "B",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "03173000",
+      "stratum": "S2A3",
+      "selection_rank": 5,
+      "split": "C",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "02065500",
+      "stratum": "S2A3",
+      "selection_rank": 6,
+      "split": "C",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "07301410",
+      "stratum": "S2A3",
+      "selection_rank": 7,
+      "split": "C",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "12041200",
+      "stratum": "S3A1",
+      "selection_rank": 0,
+      "split": "A",
+      "is_ga_control": true
+    },
+    {
+      "basin_id": "01195100",
+      "stratum": "S3A1",
+      "selection_rank": 1,
+      "split": "A",
+      "is_ga_control": true
+    },
+    {
+      "basin_id": "03186500",
+      "stratum": "S3A1",
+      "selection_rank": 2,
+      "split": "A",
+      "is_ga_control": true
+    },
+    {
+      "basin_id": "12147500",
+      "stratum": "S3A1",
+      "selection_rank": 3,
+      "split": "B",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "03069500",
+      "stratum": "S3A1",
+      "selection_rank": 4,
+      "split": "B",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "01594950",
+      "stratum": "S3A1",
+      "selection_rank": 5,
+      "split": "C",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "01552000",
+      "stratum": "S3A1",
+      "selection_rank": 6,
+      "split": "C",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "01365000",
+      "stratum": "S3A1",
+      "selection_rank": 7,
+      "split": "C",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "03182500",
+      "stratum": "S3A2",
+      "selection_rank": 0,
+      "split": "A",
+      "is_ga_control": true
+    },
+    {
+      "basin_id": "05454000",
+      "stratum": "S3A2",
+      "selection_rank": 1,
+      "split": "A",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "14308990",
+      "stratum": "S3A2",
+      "selection_rank": 2,
+      "split": "A",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "04213000",
+      "stratum": "S3A2",
+      "selection_rank": 3,
+      "split": "B",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "04213075",
+      "stratum": "S3A2",
+      "selection_rank": 4,
+      "split": "B",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "01632000",
+      "stratum": "S3A2",
+      "selection_rank": 5,
+      "split": "C",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "03078000",
+      "stratum": "S3A2",
+      "selection_rank": 6,
+      "split": "C",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "05393500",
+      "stratum": "S3A2",
+      "selection_rank": 7,
+      "split": "C",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "09430600",
+      "stratum": "S3A3",
+      "selection_rank": 0,
+      "split": "A",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "05495000",
+      "stratum": "S3A3",
+      "selection_rank": 1,
+      "split": "A",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "04161580",
+      "stratum": "S3A3",
+      "selection_rank": 2,
+      "split": "B",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "05057200",
+      "stratum": "S3A3",
+      "selection_rank": 3,
+      "split": "B",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "11381500",
+      "stratum": "S3A3",
+      "selection_rank": 4,
+      "split": "B",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "06332515",
+      "stratum": "S3A3",
+      "selection_rank": 5,
+      "split": "C",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "04074950",
+      "stratum": "S3A3",
+      "selection_rank": 6,
+      "split": "C",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "06803530",
+      "stratum": "S3A3",
+      "selection_rank": 7,
+      "split": "C",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "12189500",
+      "stratum": "S4A1",
+      "selection_rank": 0,
+      "split": "A",
+      "is_ga_control": true
+    },
+    {
+      "basin_id": "01434025",
+      "stratum": "S4A1",
+      "selection_rank": 1,
+      "split": "A",
+      "is_ga_control": true
+    },
+    {
+      "basin_id": "01144000",
+      "stratum": "S4A1",
+      "selection_rank": 2,
+      "split": "B",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "12056500",
+      "stratum": "S4A1",
+      "selection_rank": 3,
+      "split": "B",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "12451000",
+      "stratum": "S4A1",
+      "selection_rank": 4,
+      "split": "B",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "12048000",
+      "stratum": "S4A1",
+      "selection_rank": 5,
+      "split": "C",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "01057000",
+      "stratum": "S4A1",
+      "selection_rank": 6,
+      "split": "C",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "14138900",
+      "stratum": "S4A1",
+      "selection_rank": 7,
+      "split": "C",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "11473900",
+      "stratum": "S4A2",
+      "selection_rank": 0,
+      "split": "A",
+      "is_ga_control": true
+    },
+    {
+      "basin_id": "06746095",
+      "stratum": "S4A2",
+      "selection_rank": 1,
+      "split": "A",
+      "is_ga_control": true
+    },
+    {
+      "basin_id": "14096850",
+      "stratum": "S4A2",
+      "selection_rank": 2,
+      "split": "B",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "11480390",
+      "stratum": "S4A2",
+      "selection_rank": 3,
+      "split": "B",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "11264500",
+      "stratum": "S4A2",
+      "selection_rank": 4,
+      "split": "B",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "06614800",
+      "stratum": "S4A2",
+      "selection_rank": 5,
+      "split": "C",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "04043050",
+      "stratum": "S4A2",
+      "selection_rank": 6,
+      "split": "C",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "01139800",
+      "stratum": "S4A2",
+      "selection_rank": 7,
+      "split": "C",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "13023000",
+      "stratum": "S4A3",
+      "selection_rank": 0,
+      "split": "A",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "09306242",
+      "stratum": "S4A3",
+      "selection_rank": 1,
+      "split": "A",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "09065500",
+      "stratum": "S4A3",
+      "selection_rank": 2,
+      "split": "B",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "06224000",
+      "stratum": "S4A3",
+      "selection_rank": 3,
+      "split": "B",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "09494000",
+      "stratum": "S4A3",
+      "selection_rank": 4,
+      "split": "B",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "13018300",
+      "stratum": "S4A3",
+      "selection_rank": 5,
+      "split": "C",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "09107000",
+      "stratum": "S4A3",
+      "selection_rank": 6,
+      "split": "C",
+      "is_ga_control": false
+    },
+    {
+      "basin_id": "09081600",
+      "stratum": "S4A3",
+      "selection_rank": 7,
+      "split": "C",
+      "is_ga_control": false
+    }
+  ]
+}

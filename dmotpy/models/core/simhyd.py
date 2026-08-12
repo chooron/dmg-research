@@ -1,7 +1,7 @@
 """Seven-parameter SIMHYD runoff generation without unit-hydrograph routing.
 
 This is the two-store formulation from
-``project/hydro_structure_diagnosis/models/simhyd.py`` with its optional PET
+``project/hydrodiag/models/simhyd.py`` with its optional PET
 multiplier fixed to one and its Gamma unit hydrograph removed.  It therefore
 keeps the fixed 7-parameter calibration contract while avoiding an additional
 routing model and its two parameters.

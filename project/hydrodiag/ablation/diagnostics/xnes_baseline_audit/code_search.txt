@@ -1,0 +1,28 @@
+/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/ablation/ic_core/runtime.py:86:        physical = normalized_to_physical(self.model_key, theta, clip=True)
+/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/ablation/ic_core/objective_adapter.py:12:    """Optimizer-neutral maximize KGE(Q) objective using target mm/day."""
+/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/ablation/ic_core/objective_adapter.py:14:    def __init__(self, *, min_samples: int = 30, invalid_fitness: float = -999.0):
+/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/ablation/ic_core/objective_adapter.py:16:        self.invalid_fitness = float(invalid_fitness)
+/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/ablation/ic_core/objective_adapter.py:34:        valid = torch.isfinite(fitness).reshape(simulation.shape[:2]) & (fitness.reshape(simulation.shape[:2]) > self.invalid_fitness)
+/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/ablation/ic_core/parameter_adapter.py:56:def normalized_to_physical(model_key: str, theta_01: Any, *, clip: bool = True):
+/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/ablation/ic_core/parameter_adapter.py:60:        value = theta_01.clamp(0.0, 1.0) if clip else theta_01
+/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/ablation/ic_core/parameter_adapter.py:71:    if clip:
+/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/ablation/ic_core/parameter_adapter.py:72:        value = np.clip(value, 0.0, 1.0)
+/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/ablation/ic_core/parameter_adapter.py:83:def physical_to_normalized(model_key: str, physical: Any, *, clip: bool = False):
+/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/ablation/ic_core/parameter_adapter.py:93:        return value.clamp(0.0, 1.0) if clip else value
+/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/ablation/ic_core/parameter_adapter.py:107:    return np.clip(normalized, 0.0, 1.0) if clip else normalized
+/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/ablation/optimizers/xnes.py:15:        self.best_fitness = -float('inf')
+/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/ablation/optimizers/xnes.py:63:        self.best_fitness = -float('inf')
+/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/ablation/optimizers/xnes.py:80:        if max_fit > self.best_fitness:
+/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/ablation/optimizers/xnes.py:81:            self.best_fitness = max_fit
+/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/ablation/optimizers/xnes.py:103:        return self.best_candidate, self.best_fitness
+/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/ablation/optimizers/xnes.py:108:            'best_fitness': self.best_fitness,
+/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/ablation/optimizers/xnes.py:124:        self.best_fitness = state['best_fitness']
+/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/ablation/optimizers/base.py:45:        """Return (best_candidate [dimension], best_fitness) seen so far."""
+/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/ablation/runners/run_xnes_ablation.py:350:                            clipped_candidates = np.clip(candidates, 0.0, 1.0)
+/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/ablation/runners/run_xnes_ablation.py:418:                best_cand_phys = normalized_to_physical(config["model_key"], best_cand_01, clip=True).squeeze().tolist()
+/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/ablation/runners/run_xnes_ablation.py:702:## 5. Train KGE results
+/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/ablation/runners/run_xnes_ablation.py:703:- **Median Best-of-3 KGE**: {med_kge:.4f}
+/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/ablation/runners/run_xnes_ablation.py:704:- **Mean Best-of-3 KGE**: {mean_kge:.4f}
+/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/ablation/runners/run_foundation_smoke.py:29:    return np.clip(theta, 0.05, 0.95)
+/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/ablation/runners/run_lite_gpu_validation.py:30:    return np.clip(theta, 0.05, 0.95)
+/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/ablation/runners/run_lite_gpu_validation.py:61:    # Keep the host-side orchestration deliberately small. Model forward and KGE

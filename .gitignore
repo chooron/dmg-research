@@ -64,9 +64,9 @@ releases/
 # --- Paper / manuscript generated artifacts (source scripts stay possible) ---
 manuscript/
 manuscriptv2/
-!project/hydro_structure_diagnosis/manuscript/
-project/hydro_structure_diagnosis/manuscript/*
-!project/hydro_structure_diagnosis/manuscript/scripts/
+!project/hydrodiag/manuscript/
+project/hydrodiag/manuscript/*
+!project/hydrodiag/manuscript/scripts/
 
 # --- Local LLM / agent tooling ---
 .pi-subagents/

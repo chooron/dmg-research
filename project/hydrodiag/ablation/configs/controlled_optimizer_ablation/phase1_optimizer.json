@@ -1,0 +1,60 @@
+{
+  "experiment_name": "controlled_optimizer_ablation_phase1",
+  "project_root": "/home/jingxin/code/dmg-research/project/hydrodiag",
+  "dataset_path": "/home/jingxin/code/dmg-research/data/camels_dataset",
+  "gage_ids_path": "/home/jingxin/code/dmg-research/data/gage_id.npy",
+  "dates_path": "/home/jingxin/code/dmg-research/data/camels_dates.npy",
+  "basin_list_path": "/home/jingxin/code/dmg-research/data/531sub_id.txt",
+  "output_root": "/home/jingxin/code/dmg-research/project/hydrodiag/outputs/ic_ablation",
+  "run_subdir": "controlled_optimizer_ablation/v1/phase1_optimizer",
+  "split": "A",
+  "n_basins": 32,
+  "model_key": "XAJ",
+  "optimizers": [
+    "XNES",
+    "CMAES"
+  ],
+  "population": 48,
+  "generations": 200,
+  "starts": 3,
+  "optimizer_seeds": [
+    101,
+    202,
+    303
+  ],
+  "stdev_init": 0.25,
+  "periods": {
+    "warmup": {
+      "start": "1988-01-01",
+      "end": "1988-12-31"
+    },
+    "train": {
+      "start": "1989-01-01",
+      "end": "1998-12-31"
+    },
+    "test": null
+  },
+  "compute_test_metric": false,
+  "forcing_dtype": "float32",
+  "model_dtype": "float32",
+  "metric_dtype": "float64",
+  "target_raw_unit": "ft3/s",
+  "target_model_unit": "mm/day",
+  "area": {
+    "field": "area_gages2",
+    "attribute_index": 11,
+    "unit": "km2",
+    "source_evidence": "training/dpl/run_dpl_model.py:87-91"
+  },
+  "device": "cuda",
+  "boundary_handling": "clip_0_1",
+  "batching": {
+    "basin_batch_size": 4
+  },
+  "objective": {
+    "name": "KGE(Q)",
+    "direction": "maximize",
+    "min_samples": 30,
+    "invalid_fitness": -999.0
+  }
+}

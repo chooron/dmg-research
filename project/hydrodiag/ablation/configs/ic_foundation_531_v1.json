@@ -1,0 +1,51 @@
+{
+  "experiment_name": "ic_foundation_531_v1",
+  "tgd_structure_version": "temperature_conditioned_input_routing_a_ks_v1",
+  "project_root": "/home/jingxin/code/dmg-research/project/hydrodiag",
+  "dataset_path": "/home/jingxin/code/dmg-research/data/camels_dataset",
+  "gage_ids_path": "/home/jingxin/code/dmg-research/data/gage_id.npy",
+  "dates_path": "/home/jingxin/code/dmg-research/data/camels_dates.npy",
+  "basin_list_path": "/home/jingxin/code/dmg-research/data/531sub_id.txt",
+  "output_root": "/home/jingxin/code/dmg-research/project/hydrodiag/outputs/ic_ablation/foundation_v1",
+  "model_keys": [
+    "XAJ", "XAJ_CN", "XAJ_PD", "XAJ_TGD",
+    "GR4J", "GR4J_CN", "GR4J_PD", "GR4J_TGD",
+    "SIMHYD", "SIMHYD_CN", "SIMHYD_PD", "SIMHYD_TGD", "HBV"
+  ],
+  "periods": {
+    "warmup": {"start": "1980-10-01", "end": "1981-09-30"},
+    "train": {"start": "1981-10-01", "end": "1995-09-30"},
+    "test": {"start": "1995-10-01", "end": "2010-09-30"}
+  },
+  "window": {
+    "warmup_days": 365,
+    "prediction_days": 365,
+    "stride_days": 365
+  },
+  "forcing_dtype": "float32",
+  "model_dtype": "float32",
+  "metric_dtype": "float64",
+  "model_variant": "lite",
+  "target_raw_unit": "ft3/s",
+  "target_model_unit": "mm/day",
+  "area": {
+    "field": "area_gages2",
+    "attribute_index": 11,
+    "unit": "km2",
+    "source_evidence": "training/dpl/run_dpl_model.py:87-91"
+  },
+  "device": "cuda",
+  "seed": 0,
+  "boundary_handling": "clip_0_1",
+  "save_test_metrics": false,
+  "batching": {
+    "basin_batch_size": 4,
+    "device_transfer": "per basin batch; CPU retains the complete selected bundle"
+  },
+  "objective": {
+    "name": "KGE(Q)",
+    "direction": "maximize",
+    "min_samples": 30,
+    "invalid_fitness": -999.0
+  }
+}
