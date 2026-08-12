@@ -416,6 +416,7 @@ class MyTrainer(BaseTrainer):
 
         self.current_epoch = epoch
         self.total_loss = 0.0
+        nonfinite_batches = 0
 
         # Iterate through epoch in minibatches.
         for mb in range(1, n_minibatch + 1):
@@ -430,7 +431,24 @@ class MyTrainer(BaseTrainer):
             # Forward pass through model.
             _ = self.model(dataset_sample)
             loss = self.model.calc_loss(dataset_sample)
+
+            # A rare basin/seed combination can produce a non-finite first
+            # forward or gradient.  Do not poison the optimizer state with a
+            # NaN update; skip that minibatch and continue the epoch.
+            if not torch.isfinite(loss).item():
+                nonfinite_batches += 1
+                self.optimizer.zero_grad(set_to_none=True)
+                continue
             loss.backward()
+
+            gradients_finite = all(
+                parameter.grad is None or torch.isfinite(parameter.grad).all().item()
+                for parameter in self.model.get_parameters()
+            )
+            if not gradients_finite:
+                nonfinite_batches += 1
+                self.optimizer.zero_grad(set_to_none=True)
+                continue
             
             # phy_model = self.model.model_dict['HbvTriton'].phy_model
             # if len(phy_model.grad_error_list) > 0:
@@ -444,6 +462,13 @@ class MyTrainer(BaseTrainer):
             self.optimizer.zero_grad()
 
             self.total_loss += loss.item()
+
+        if nonfinite_batches:
+            log.warning(
+                "Skipped %d non-finite minibatch update(s) in epoch %d",
+                nonfinite_batches,
+                epoch,
+            )
 
         if self.use_scheduler:
             self.scheduler.step()
