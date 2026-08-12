@@ -1,43 +1,46 @@
-# Orca repository configuration for dmg-research.
-# This file is intended to live at the repository root as `orca.yaml`.
+# dmg-research Orca worktree setup
 #
-# Current policy:
-# - Git worktrees isolate source code and task-local outputs.
-# - The primary checkout owns the large shared `data/` directory.
-# - New Orca worktrees receive a symlink to that shared data.
-# - results/outputs/checkpoints/logs are intentionally NOT shared here.
+# Shared across all Orca worktrees:
+#   - data/   -> primary checkout data/
+#   - .venv/  -> primary checkout .venv/
+#   - project/flexmopex/.env -> primary checkout local .env (only if it exists)
+#
+# NOT shared:
+#   - results/
+#   - outputs/
+#   - checkpoints/
+#   - logs/
+#   - tmp/
+#
+# This repository is fixed in WSL at /home/jingxin/code/dmg-research.
 
 scripts:
   setup: |
-    set -eu
+    set -e
 
-    PRIMARY_REPO="/home/jingxin/code/dmg-research"
-    SHARED_DATA="${PRIMARY_REPO}/data"
+    ROOT="/home/jingxin/code/dmg-research"
 
-    # Orca runs this setup hook from the newly-created worktree root.
-    # Do not overwrite a real data path if one already exists.
-    if [ -L "data" ]; then
-      current_target="$(readlink -f "data" 2>/dev/null || true)"
-      expected_target="$(readlink -f "${SHARED_DATA}" 2>/dev/null || true)"
+    echo "[orca] worktree: $(pwd)"
+    echo "[orca] shared root: ${ROOT}"
 
-      if [ -n "${expected_target}" ] && [ "${current_target}" = "${expected_target}" ]; then
-        echo "Orca setup: data/ already points to shared data."
-      else
-        echo "Orca setup: data/ is already a symlink to another location; leaving it unchanged." >&2
-      fi
-    elif [ -e "data" ]; then
-      echo "Orca setup: data/ already exists as a real file/directory; leaving it unchanged." >&2
-    elif [ -d "${SHARED_DATA}" ]; then
-      ln -s "${SHARED_DATA}" "data"
-      echo "Orca setup: linked data/ -> ${SHARED_DATA}"
-    else
-      echo "Orca setup: shared data directory not found: ${SHARED_DATA}" >&2
-      echo "Orca setup: worktree created without shared data; create/fix the primary data directory before running data-dependent tasks." >&2
+    # Shared research data
+    if [ ! -e data ] && [ ! -L data ]; then
+      ln -s "${ROOT}/data" data
     fi
 
-    # Intentionally do NOT symlink:
-    # - project/*/results
-    # - outputs / checkpoints / logs / downloads / tmp
-    # - project/flexmopex/.env
-    #
-    # Those are either task-local write targets or contain local credentials.
+    # Shared Python environment (including PyTorch/CUDA dependencies)
+    if [ ! -e .venv ] && [ ! -L .venv ]; then
+      ln -s "${ROOT}/.venv" .venv
+    fi
+
+    # Flex-MOPEX local environment file, if present in the primary checkout.
+    # The file remains gitignored and is not copied into Git.
+    if [ -f "${ROOT}/project/flexmopex/.env" ]; then
+      mkdir -p project/flexmopex
+      if [ ! -e project/flexmopex/.env ] && [ ! -L project/flexmopex/.env ]; then
+        ln -s "${ROOT}/project/flexmopex/.env" project/flexmopex/.env
+      fi
+    fi
+
+    echo "[orca] data  -> $(readlink -f data 2>/dev/null || echo missing)"
+    echo "[orca] .venv -> $(readlink -f .venv 2>/dev/null || echo missing)"
