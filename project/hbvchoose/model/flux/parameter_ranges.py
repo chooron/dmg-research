@@ -1,0 +1,55 @@
+"""Unified parameter ranges for all candidate formulas in the HBV MoE pool."""
+
+PARAMETER_RANGES = {
+    "HBV_BASE": {
+        "TT": {"range": [-2.5, 2.5], "source": "literature/common HBV range"},
+        "CFMAX": {"range": [1.0, 10.0], "source": "literature/common HBV range"},
+        "CFR": {"range": [0.0, 0.1], "source": "literature/common HBV range"},
+        "CWH": {"range": [0.0, 0.2], "source": "literature/common HBV range"},
+        "FC": {"range": [50.0, 500.0], "source": "literature/common HBV range"},
+        "LP": {"range": [0.3, 1.0], "source": "literature/common HBV range"},
+        "BETA": {"range": [1.0, 6.0], "source": "literature/common HBV range"},
+        "PERC": {"range": [0.0, 3.0], "source": "literature/common HBV range"},
+        "UZL": {"range": [0.0, 100.0], "source": "literature/common HBV range"},
+        "K0": {"range": [0.05, 0.5], "source": "literature/common HBV range"},
+        "K1": {"range": [0.01, 0.3], "source": "literature/common HBV range"},
+        "K2": {"range": [0.001, 0.1], "source": "literature/common HBV range"},
+        "MAXBAS": {"range": [1.0, 7.0], "source": "literature/common HBV range"},
+    },
+    "SNOW_EXT": {
+        "tau_T": {"range": [0.1, 2.0], "source": "recommended"},
+        "tau_M": {"range": [0.1, 3.0], "source": "recommended"},
+        "a_s": {"range": [0.0, 0.8], "source": "recommended"},
+        "phi_s": {"range": [120.0, 220.0], "source": "recommended"},
+        "M_M": {"range": [0.1, 3.0], "source": "recommended"},
+        "c_m": {"range": [0.01, 1.0], "source": "recommended"},
+    },
+    "RECHARGE_EXT": {
+        "beta_h": {"range": [2.0, 4.0], "source": "recommended, ablation-only parameter-regime expert"},
+        "beta_l": {"range": [0.5, 1.0], "source": "recommended, ablation-only parameter-regime expert"},
+        "a_r": {"range": [5.0, 15.0], "source": "recommended"},
+        "c_r": {"range": [0.4, 0.85], "source": "recommended"},
+        "b_v": {"range": [0.3, 1.5], "source": "recommended, XAJ/VIC-style variable contributing area"},
+    },
+    "AET_EXT": {
+        "tau_E": {"range": [0.01, 0.10], "source": "recommended"},
+        "CET": {"range": [0.0, 0.1], "source": "recommended"},
+        "gamma_E": {"range": [0.8, 1.8], "source": "recommended, extension-only"},
+        "s_w": {"range": [0.05, 0.25], "source": "recommended Feddes-style stress threshold"},
+        "s_o": {"range": [0.45, 0.85], "source": "recommended Feddes-style no-stress threshold"},
+    },
+    "RESPONSE_EXT": {
+        "tau_Q": {"range": [0.1, 5.0], "source": "recommended"},
+        "alpha_Q": {"range": [1.0, 3.0], "source": "recommended"},
+        "K": {"range": [0.001, 0.5], "source": "recommended from HBV K range"},
+        "K_f": {"range": [0.01, 0.5], "source": "recommended from HBV K range"},
+        "K_s": {"range": [0.001, 0.1], "source": "recommended from HBV K range"},
+        "p": {"range": [0.0, 1.0], "source": "recommended"},
+        "PART": {"range": [0.0, 1.0], "source": "recommended"},
+        "DELAY": {"range": [1.0, 30.0], "source": "recommended"},
+    },
+    "ROUTING_EXT": {
+        "route_a": {"range": [1.0, 5.0], "source": "recommended gamma routing"},
+        "route_b": {"range": [0.5, 5.0], "source": "recommended gamma routing"},
+    },
+}

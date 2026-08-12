@@ -1,0 +1,35 @@
+# 07 — Locked Gate Candidate Configuration
+# Generated from human adjudication 2026-07-07
+# Do not edit manually.  Source: 05_human_decision_form.csv
+
+gate:
+  moderate_low_flow:
+    primary_threshold_K: 1.5
+    primary_min_event_length: 5
+    sensitivity_min_event_length: 7
+
+basins:
+  excluded_from_pilot_training:
+    - 01047000   # also retained as diagnostic boundary
+    - 01134500   # also retained as failure evidence
+
+  diagnostic_boundary_cases:
+    - 01047000
+    - 01078000
+
+  suspected_B_failure_evidence_only:
+    - 01134500
+
+  not_suspected_B:
+    - 01078000
+
+reviews:
+  suspected_B:
+    required: true
+    scope: limited_evidence_packet_review
+    before_phase2_execution: true
+
+phase2:
+  design_allowed: true
+  execution_allowed: false
+  execution_blocked_by: suspected_B_review

@@ -1,3 +1,0 @@
-extends: default.yaml
-stage: full
-resume: true

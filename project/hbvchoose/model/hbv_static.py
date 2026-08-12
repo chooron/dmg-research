@@ -1,0 +1,410 @@
+"""HbvStatic — minimal, nmul-aware HBV with torch.compile'd step kernel."""
+
+from __future__ import annotations
+
+from typing import Any, Optional
+
+import torch
+import torch.nn as nn
+
+from hydrodl2.core.calc import change_param_range, uh_conv, uh_gamma
+
+
+def _hbv_step(
+    Pt: torch.Tensor,
+    Tt: torch.Tensor,
+    PETt: torch.Tensor,
+    SNOWPACK: torch.Tensor,
+    MELTWATER: torch.Tensor,
+    SM: torch.Tensor,
+    SUZ: torch.Tensor,
+    SLZ: torch.Tensor,
+    TT: torch.Tensor,
+    CFMAX: torch.Tensor,
+    CFR: torch.Tensor,
+    CWH: torch.Tensor,
+    FC: torch.Tensor,
+    BETA: torch.Tensor,
+    LP: torch.Tensor,
+    PERC: torch.Tensor,
+    UZL: torch.Tensor,
+    K0: torch.Tensor,
+    K1: torch.Tensor,
+    K2: torch.Tensor,
+    nz: float,
+):
+    RAIN = Pt * (Tt >= TT).float()
+    SNOW = Pt * (Tt < TT).float()
+    SNOWPACK = SNOWPACK + SNOW
+    melt = torch.clamp(CFMAX * (Tt - TT), min=0.0)
+    melt = torch.min(melt, SNOWPACK)
+    MELTWATER = MELTWATER + melt
+    SNOWPACK = SNOWPACK - melt
+    refreezing = torch.clamp(CFR * CFMAX * (TT - Tt), min=0.0)
+    refreezing = torch.min(refreezing, MELTWATER)
+    SNOWPACK = SNOWPACK + refreezing
+    MELTWATER = MELTWATER - refreezing
+    tosoil = torch.clamp(MELTWATER - CWH * SNOWPACK, min=0.0)
+    MELTWATER = MELTWATER - tosoil
+
+    soil_wetness = torch.clamp((SM / FC) ** BETA, 0.0, 1.0)
+    recharge = (RAIN + tosoil) * soil_wetness
+    SM = SM + RAIN + tosoil - recharge
+    excess = torch.clamp(SM - FC, min=0.0)
+    SM = SM - excess
+    evapfactor = torch.clamp(SM / (LP * FC), 0.0, 1.0)
+    ETact = torch.min(SM, PETt * evapfactor)
+    SM = torch.clamp(SM - ETact, min=nz)
+
+    SUZ = SUZ + recharge + excess
+    perc = torch.min(SUZ, PERC)
+    SUZ = SUZ - perc
+    Q0 = K0 * torch.clamp(SUZ - UZL, min=0.0)
+    SUZ = SUZ - Q0
+    Q1 = K1 * SUZ
+    SUZ = SUZ - Q1
+    SLZ = SLZ + perc
+    Q2 = K2 * SLZ
+    SLZ = SLZ - Q2
+
+    return Q0 + Q1 + Q2, SNOWPACK, MELTWATER, SM, SUZ, SLZ
+
+
+class HbvStatic(nn.Module):
+    """Minimal HBV 1.0 with static parameters and routing."""
+
+    parameter_bounds = {
+        "parBETA": [1.0, 6.0],
+        "parFC": [50.0, 500.0],
+        "parK0": [0.05, 0.5],
+        "parK1": [0.01, 0.3],
+        "parK2": [0.001, 0.1],
+        "parLP": [0.3, 1.0],
+        "parPERC": [0.0, 3.0],
+        "parUZL": [0.0, 100.0],
+        "parTT": [-2.5, 2.5],
+        "parCFMAX": [1.0, 10.0],
+        "parCFR": [0.0, 0.1],
+        "parCWH": [0.0, 0.2],
+    }
+    routing_parameter_bounds = {
+        "route_a": [1.0, 5.0],
+        "route_b": [0.5, 5.0],
+    }
+
+    N_PHY = len(parameter_bounds)
+    N_ROUTE = len(routing_parameter_bounds)
+    PARAMETER_NAMES = tuple(parameter_bounds)
+    ROUTING_PARAMETER_NAMES = tuple(routing_parameter_bounds)
+    ALL_PARAMETER_NAMES = PARAMETER_NAMES + ROUTING_PARAMETER_NAMES
+
+    def __init__(
+        self,
+        config: Optional[dict[str, Any]] = None,
+        device: Optional[torch.device] = None,
+    ) -> None:
+        super().__init__()
+        self.name = "HBV Static"
+        cfg = config or {}
+        self.warm_up = cfg.get("warm_up", 365)
+        self.warm_up_states = cfg.get("warm_up_states", True)
+        self.nearzero = cfg.get("nearzero", 1e-5)
+        self.nmul = cfg.get("nmul", 1)
+        self.use_compile = cfg.get("use_compile", True)
+        self.variables = cfg.get("forcings", ["prcp", "tmean", "pet"])
+        self.learnable_param_count = self.N_PHY * self.nmul + self.N_ROUTE
+        self.device = device or torch.device(
+            "cuda" if torch.cuda.is_available() else "cpu"
+        )
+        if self.use_compile:
+            try:
+                self._step = torch.compile(_hbv_step, fullgraph=True)
+            except Exception:
+                self._step = _hbv_step
+        else:
+            self._step = _hbv_step
+
+    def _init_states(self, ngrid: int) -> tuple:
+        s = torch.full((ngrid, self.nmul), 0.001, dtype=torch.float32, device=self.device)
+        return s, s.clone(), s.clone(), s.clone(), s.clone()
+
+    def _unpack(self, parameters: torch.Tensor):
+        _, basin_count = parameters.shape[:2]
+        p = parameters[-1, :, : self.N_PHY * self.nmul]
+        p = p.view(basin_count, self.N_PHY, self.nmul)
+
+        phy = {}
+        for idx, (name, bounds) in enumerate(self.parameter_bounds.items()):
+            phy[name] = change_param_range(p[:, idx, :], bounds)
+
+        r = parameters[-1, :, self.N_PHY * self.nmul :]
+        route = {}
+        for idx, (name, bounds) in enumerate(self.routing_parameter_bounds.items()):
+            route[name] = change_param_range(r[:, idx], bounds)
+        return phy, route
+
+    def _stack_physical_parameters(
+        self,
+        phy: dict[str, torch.Tensor],
+        route: dict[str, torch.Tensor],
+    ) -> torch.Tensor:
+        phy_parts = [phy[name].reshape(phy[name].shape[0], -1) for name in self.PARAMETER_NAMES]
+        route_parts = [route[name].unsqueeze(-1) for name in self.ROUTING_PARAMETER_NAMES]
+        return torch.cat([*phy_parts, *route_parts], dim=-1)
+
+    def physical_parameters_from_normalized(self, parameters: torch.Tensor) -> torch.Tensor:
+        """Return the physical-scale parameter tensor used by ``forward``.
+
+        The output order is the trained parameter order:
+        ``parBETA ... parCWH, route_a, route_b``.
+        """
+        phy, route = self._unpack(parameters)
+        return self._stack_physical_parameters(phy, route)
+
+    def _unpack_physical(self, physical_parameters: torch.Tensor):
+        if physical_parameters.ndim == 3:
+            physical = physical_parameters[-1]
+        elif physical_parameters.ndim == 2:
+            physical = physical_parameters
+        else:
+            raise ValueError(
+                "physical_parameters must have shape [B, P] or [T, B, P]. "
+                f"Got {tuple(physical_parameters.shape)}."
+            )
+
+        expected = self.N_PHY * self.nmul + self.N_ROUTE
+        if physical.shape[-1] != expected:
+            raise ValueError(
+                f"Expected {expected} physical parameters in the last dimension, "
+                f"got {physical.shape[-1]}."
+            )
+
+        basin_count = physical.shape[0]
+        p = physical[:, : self.N_PHY * self.nmul].view(basin_count, self.N_PHY, self.nmul)
+        phy = {
+            name: p[:, idx, :].clone()
+            for idx, name in enumerate(self.PARAMETER_NAMES)
+        }
+        route_start = self.N_PHY * self.nmul
+        route = {
+            name: physical[:, route_start + idx].clone()
+            for idx, name in enumerate(self.ROUTING_PARAMETER_NAMES)
+        }
+        return phy, route
+
+    def forward(
+        self,
+        x_dict: dict[str, torch.Tensor],
+        parameters: torch.Tensor,
+    ) -> dict[str, torch.Tensor]:
+        x = x_dict["x_phy"]
+        ngrid = x.shape[1]
+        phy, route = self._unpack(parameters)
+
+        warm_up = self.warm_up if self.warm_up_states else 0
+        pred_cutoff = self.warm_up
+        states = self._init_states(ngrid)
+
+        if warm_up > 0:
+            with torch.no_grad():
+                q_warm, states = self._step_loop(x[:warm_up], states, phy)
+        else:
+            q_warm = None
+
+        q_pred, _ = self._step_loop(x[warm_up:], states, phy)
+        qs = torch.cat([q_warm, q_pred], dim=0).mean(-1) if q_warm is not None else q_pred.mean(-1)
+
+        nsteps_full = qs.shape[0]
+        a = route["route_a"].unsqueeze(0).unsqueeze(-1).expand(nsteps_full, -1, 1)
+        b = route["route_b"].unsqueeze(0).unsqueeze(-1).expand(nsteps_full, -1, 1)
+        uh = uh_gamma(a, b, lenF=15)
+        rf = qs.unsqueeze(-1).permute(1, 2, 0)
+        streamflow = uh_conv(rf, uh.permute(1, 2, 0)).permute(2, 0, 1)
+
+        if pred_cutoff > 0:
+            streamflow = streamflow[pred_cutoff:]
+        return {"streamflow": streamflow}
+
+    def forward_from_physical(
+        self,
+        x_dict: dict[str, torch.Tensor],
+        physical_parameters: torch.Tensor,
+    ) -> dict[str, torch.Tensor]:
+        """Run the HBV forward path from physical-scale parameters directly.
+
+        This mirrors ``forward`` after the normalized-to-physical rescaling step
+        so that a physical parameter tensor extracted from the standard path
+        reproduces the same post-warm-up routed streamflow.
+        """
+        x = x_dict["x_phy"]
+        ngrid = x.shape[1]
+        phy, route = self._unpack_physical(physical_parameters)
+
+        warm_up = self.warm_up if self.warm_up_states else 0
+        pred_cutoff = self.warm_up
+        states = self._init_states(ngrid)
+
+        if warm_up > 0:
+            with torch.no_grad():
+                q_warm, states = self._step_loop(x[:warm_up], states, phy)
+        else:
+            q_warm = None
+
+        q_pred, _ = self._step_loop(x[warm_up:], states, phy)
+        qs = (
+            torch.cat([q_warm, q_pred], dim=0).mean(-1)
+            if q_warm is not None
+            else q_pred.mean(-1)
+        )
+
+        nsteps_full = qs.shape[0]
+        a = route["route_a"].unsqueeze(0).unsqueeze(-1).expand(nsteps_full, -1, 1)
+        b = route["route_b"].unsqueeze(0).unsqueeze(-1).expand(nsteps_full, -1, 1)
+        uh = uh_gamma(a, b, lenF=15)
+        rf = qs.unsqueeze(-1).permute(1, 2, 0)
+        streamflow = uh_conv(rf, uh.permute(1, 2, 0)).permute(2, 0, 1)
+
+        if pred_cutoff > 0:
+            streamflow = streamflow[pred_cutoff:]
+        return {"streamflow": streamflow}
+
+    def _step_loop(
+        self,
+        forcing: torch.Tensor,
+        states: tuple,
+        phy: dict,
+    ):
+        p = forcing[:, :, self.variables.index("prcp")]
+        t = forcing[:, :, self.variables.index("tmean")]
+        pet = forcing[:, :, self.variables.index("pet")]
+        nsteps, ngrid = p.shape
+        m = self.nmul
+
+        pm = p.unsqueeze(-1).expand(-1, -1, m)
+        tm = t.unsqueeze(-1).expand(-1, -1, m)
+        petm = pet.unsqueeze(-1).expand(-1, -1, m)
+
+        tt = phy["parTT"]
+        cfmax = phy["parCFMAX"]
+        cfr = phy["parCFR"]
+        cwh = phy["parCWH"]
+        fc = phy["parFC"]
+        beta = phy["parBETA"]
+        lp = phy["parLP"]
+        perc = phy["parPERC"]
+        uzl = phy["parUZL"]
+        k0 = phy["parK0"]
+        k1 = phy["parK1"]
+        k2 = phy["parK2"]
+
+        snowpack, meltwater, sm, suz, slz = states
+        qs = torch.zeros(nsteps, ngrid, m, device=self.device)
+        nz = self.nearzero
+
+        for step in range(nsteps):
+            qs[step], snowpack, meltwater, sm, suz, slz = self._step(
+                pm[step],
+                tm[step],
+                petm[step],
+                snowpack,
+                meltwater,
+                sm,
+                suz,
+                slz,
+                tt,
+                cfmax,
+                cfr,
+                cwh,
+                fc,
+                beta,
+                lp,
+                perc,
+                uzl,
+                k0,
+                k1,
+                k2,
+                nz,
+            )
+
+        return qs, (snowpack, meltwater, sm, suz, slz)
+
+    def _step_loop_with_traces(
+        self,
+        forcing: torch.Tensor,
+        states: tuple,
+        phy: dict,
+    ):
+        """Like _step_loop but also returns per-step state and flux traces."""
+        p = forcing[:, :, self.variables.index("prcp")]
+        t = forcing[:, :, self.variables.index("tmean")]
+        pet = forcing[:, :, self.variables.index("pet")]
+        nsteps, ngrid = p.shape
+        m = self.nmul
+
+        pm = p.unsqueeze(-1).expand(-1, -1, m)
+        tm = t.unsqueeze(-1).expand(-1, -1, m)
+        petm = pet.unsqueeze(-1).expand(-1, -1, m)
+
+        tt = phy["parTT"]; cfmax = phy["parCFMAX"]; cfr = phy["parCFR"]; cwh = phy["parCWH"]
+        fc = phy["parFC"]; beta = phy["parBETA"]; lp = phy["parLP"]; perc = phy["parPERC"]
+        uzl = phy["parUZL"]; k0 = phy["parK0"]; k1 = phy["parK1"]; k2 = phy["parK2"]
+
+        snowpack, meltwater, sm, suz, slz = states
+        qs = torch.zeros(nsteps, ngrid, m, device=self.device)
+        nz = self.nearzero
+
+        trace = {
+            "SP": torch.zeros(nsteps, ngrid, m, device=self.device),
+            "MW": torch.zeros(nsteps, ngrid, m, device=self.device),
+            "SM": torch.zeros(nsteps, ngrid, m, device=self.device),
+            "SUZ": torch.zeros(nsteps, ngrid, m, device=self.device),
+            "SLZ": torch.zeros(nsteps, ngrid, m, device=self.device),
+        }
+
+        for step in range(nsteps):
+            qs[step], snowpack, meltwater, sm, suz, slz = self._step(
+                pm[step], tm[step], petm[step], snowpack, meltwater, sm, suz, slz,
+                tt, cfmax, cfr, cwh, fc, beta, lp, perc, uzl, k0, k1, k2, nz)
+            trace["SP"][step] = snowpack
+            trace["MW"][step] = meltwater
+            trace["SM"][step] = sm
+            trace["SUZ"][step] = suz
+            trace["SLZ"][step] = slz
+
+        return qs, (snowpack, meltwater, sm, suz, slz), trace
+
+    def forward_with_traces(
+        self,
+        x_dict: dict[str, torch.Tensor],
+        parameters: torch.Tensor,
+    ):
+        """Forward with per-step state traces (debug helper for equivalence check)."""
+        x = x_dict["x_phy"]
+        ngrid = x.shape[1]
+        phy, route = self._unpack(parameters)
+
+        warm_up = self.warm_up if self.warm_up_states else 0
+        pred_cutoff = self.warm_up
+        states = self._init_states(ngrid)
+
+        if warm_up > 0:
+            with torch.no_grad():
+                q_warm, states = self._step_loop(x[:warm_up], states, phy)
+        else:
+            q_warm = None
+
+        q_pred, _, trace = self._step_loop_with_traces(x[warm_up:], states, phy)
+        qs = torch.cat([q_warm, q_pred], dim=0).mean(-1) if q_warm is not None else q_pred.mean(-1)
+
+        nsteps_full = qs.shape[0]
+        a = route["route_a"].unsqueeze(0).unsqueeze(-1).expand(nsteps_full, -1, 1)
+        b = route["route_b"].unsqueeze(0).unsqueeze(-1).expand(nsteps_full, -1, 1)
+        uh = uh_gamma(a, b, lenF=15)
+        rf = qs.unsqueeze(-1).permute(1, 2, 0)
+        streamflow = uh_conv(rf, uh.permute(1, 2, 0)).permute(2, 0, 1)
+
+        if pred_cutoff > 0:
+            streamflow = streamflow[pred_cutoff:]
+            for k in trace:
+                trace[k] = trace[k][pred_cutoff:]
+        return {"streamflow": streamflow, "trace": trace}

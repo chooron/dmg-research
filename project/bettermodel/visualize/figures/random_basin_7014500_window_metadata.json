@@ -1,0 +1,11 @@
+{
+  "font_used": "Times New Roman",
+  "basin_id": 7014500,
+  "basin_index": 398,
+  "start_index": 2700,
+  "end_index": 3065,
+  "window_days": 365,
+  "start_date": "2004-02-25",
+  "end_date": "2005-02-23",
+  "flow_dir": "/workspace/autoresearch/project/bettermodel/outputs/dhbv_lstm/camels_671/seed_111/test1995-2010_Ep100"
+}
