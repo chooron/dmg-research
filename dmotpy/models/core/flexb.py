@@ -49,39 +49,26 @@ def create_initial_state(
     return S1, S2, S3
 
 
-def flexb_step(
+def flexb_step_pre(
     P: torch.Tensor,
     T: torch.Tensor,
     PET: torch.Tensor,
-    # Parameters matching FLEXB_PARAMS_BOUNDS keys
     s1max: torch.Tensor,
     beta: torch.Tensor,
     d_split: torch.Tensor,
     percmax: torch.Tensor,
     lp: torch.Tensor,
-    nlagf: torch.Tensor,
-    nlags: torch.Tensor,
-    kf: torch.Tensor,
-    ks: torch.Tensor,
-    # State variables
     S1: torch.Tensor,
-    S2: torch.Tensor,
-    S3: torch.Tensor,
     nearzero: float = 1e-6,
-) -> Tuple[
-    torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor
-]:
-    """
-    Flex-B model single-step calculation.
+) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+    """Flex-B pre-UH step: unsaturated zone (S1).
 
-    Model reference:
-    Fenicia, F., McDonnell, J. J., & Savenije, H. H. G. (2008).
-    Learning from model improvement: On the contribution of complementary
-    data to process understanding. Water Resources Research, 44(6).
+    Returns:
+        flux_rf       -- fast runoff component (enters UH)
+        flux_slow_in  -- slow runoff component (percolation + slow split) (enters UH)
+        flux_eur      -- soil evaporation (passthrough to post)
+        S1_new        -- updated soil moisture store
     """
-
-    # UH parameters are unused (identity routing)
-    _ = (nlagf, nlags)
 
     # --- 1. Unsaturated Zone Processes (S1) ---
 
@@ -123,10 +110,34 @@ def flexb_step(
     S1_new = S1_tmp2 - flux_ps
     S1_new = torch.clamp(S1_new, min=nearzero)
 
-    # --- 2. Routing Processes (S2 and S3) ---
-    # Use unit hydrograph (half-triangle) to route fast and slow components.
-    flux_rfl = flux_rf
-    flux_rsl = flux_ps + flux_rs
+    flux_slow_in = flux_ps + flux_rs
+
+    return flux_rf, flux_slow_in, flux_eur, S1_new
+
+
+def flexb_step_post(
+    flux_rfl: torch.Tensor,
+    flux_rsl: torch.Tensor,
+    flux_eur: torch.Tensor,
+    S2: torch.Tensor,
+    S3: torch.Tensor,
+    kf: torch.Tensor,
+    ks: torch.Tensor,
+    nearzero: float = 1e-6,
+) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+    """Flex-B post-UH step: routing stores (S2 fast, S3 slow) and aggregation.
+
+    Args:
+        flux_rfl  -- fast inflow (UH-routed or direct)
+        flux_rsl  -- slow inflow (percolation + slow split, UH-routed or direct)
+        S2        -- fast routing store
+        S3        -- slow routing store
+        kf, ks    -- routing coefficients
+        flux_eur  -- soil evaporation (from pre)
+
+    Returns:
+        Qsim, Ea, S2_new, S3_new
+    """
 
     # Fast store process (S2)
     S2_tmp = S2 + flux_rfl
@@ -156,4 +167,47 @@ def flexb_step(
     Qsim = flux_qf + flux_qs
     Ea = flux_eur
 
+    return Qsim, Ea, S2_new, S3_new
+
+
+def flexb_step(
+    P: torch.Tensor,
+    T: torch.Tensor,
+    PET: torch.Tensor,
+    # Parameters matching FLEXB_PARAMS_BOUNDS keys
+    s1max: torch.Tensor,
+    beta: torch.Tensor,
+    d_split: torch.Tensor,
+    percmax: torch.Tensor,
+    lp: torch.Tensor,
+    nlagf: torch.Tensor,
+    nlags: torch.Tensor,
+    kf: torch.Tensor,
+    ks: torch.Tensor,
+    # State variables
+    S1: torch.Tensor,
+    S2: torch.Tensor,
+    S3: torch.Tensor,
+    nearzero: float = 1e-6,
+) -> Tuple[
+    torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor
+]:
+    """
+    Flex-B model single-step calculation.
+
+    Model reference:
+    Fenicia, F., McDonnell, J. J., & Savenije, H. H. G. (2008).
+    Learning from model improvement: On the contribution of complementary
+    data to process understanding. Water Resources Research, 44(6).
+    """
+
+    # UH parameters are unused (identity routing)
+    _ = (nlagf, nlags)
+
+    flux_rf, flux_slow_in, flux_eur, S1_new = flexb_step_pre(
+        P, T, PET, s1max, beta, d_split, percmax, lp, S1, nearzero,
+    )
+    Qsim, Ea, S2_new, S3_new = flexb_step_post(
+        flux_rf, flux_slow_in, flux_eur, S2, S3, kf, ks, nearzero,
+    )
     return Qsim, Ea, S1_new, S2_new, S3_new

@@ -22,8 +22,16 @@ class DplExp5(DplUHBase):
 
         scale_factor = 7.0 / d_base.unsqueeze(-1)
         scaled_t = t_idx * scale_factor
-        clamped_t = torch.clamp(scaled_t, max=7.0)
-        s_curve = 1.0 - torch.exp(-clamped_t)
+        exponential_cdf = 1.0 - torch.exp(-scaled_t)
+        # MARRMoT appends the omitted (7, inf) tail to the last active bin.
+        # Setting the cumulative curve to one at ceil(d_base) is the same
+        # operation and avoids the base class redistributing that tail over
+        # every preceding weight during normalization.
+        s_curve = torch.where(
+            t_idx >= d_base.unsqueeze(-1),
+            torch.ones_like(exponential_cdf),
+            exponential_cdf,
+        )
         s_curve_padded = F.pad(s_curve, (1, 0), value=0.0)
         weights = s_curve - s_curve_padded[..., :-1]
 

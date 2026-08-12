@@ -11,11 +11,22 @@ def interception_1(
 ) -> torch.Tensor:
     """
     Interception excess when maximum capacity is reached.
-    Formula: out = In * (1 - smooth_threshold_storage_logistic(S, Smax))
+    Formula: out = In * smooth_threshold_storage_logistic(S, Smax)
     """
     # sf returns ~1 when S > Smax
     sf = smooth_threshold_storage_logistic(S, Smax, nearzero=nearzero)
-    return incoming_flux * (1.0 - sf)
+    return incoming_flux * sf
+
+
+def interception_modhydrolog(
+    incoming_flux: torch.Tensor,
+    S: torch.Tensor,
+    Smax: torch.Tensor,
+    nearzero: float = 1e-6,
+) -> torch.Tensor:
+    """Hard capacity overflow used by the sequential ModHydrolog step."""
+    del incoming_flux, nearzero
+    return torch.minimum(F.relu(S - Smax), S)
 
 
 def interception_2(

@@ -1,10 +1,10 @@
 import torch
-import torch.nn.functional as F
 from typing import Tuple
 from ..flux.interception import interception_2
 from ..flux.evap import evap_1
 from ..flux.saturation import saturation_2
 from ..flux.baseflow import baseflow_1
+from ..flux.excess import excess_1
 
 # 参数取值范围字典 (基于 MARRMoT m_02_wetland_4p_1s)
 WETLAND_PARAMS_BOUNDS = {
@@ -54,30 +54,45 @@ def wetland_step(
     (FLEX-Topo)." Hydrology and Earth System Sciences, 14(12), 2681-2692.
     """
 
-    # 1. 降雨拦截 (Interception)
-    # flux_pe = interception_2(P, dw)
-    # flux_ei = P - flux_pe
+    # Fixed-priority daily explicit Euler split:
+    # interception excess -> saturation excess -> storage-capacity overflow
+    # -> ET -> linear baseflow.  Each later process sees the water left by the
+    # preceding process; no proportional multi-flux limiter is used.
+
+    # 1. Rainfall partitioning
     flux_pe = interception_2(P, dw, nearzero=nearzero)
-    flux_ei = F.relu(P - flux_pe)
+    flux_ei = P - flux_pe
 
-    # 2. 饱和超渗产流 - 基于原始 S1（flux_pe 是本步输入，尚未加入）
+    # 2. Saturation excess is evaluated from the beginning-of-step storage.
+    # saturation_2 has a tiny negative dry-end round-off tail because it uses
+    # (term + nearzero)**betaw, so enforce the physical [0, flux_pe] envelope.
     flux_qwsof = saturation_2(S1, swmax, betaw, flux_pe, nearzero=nearzero)
-    flux_qwsof = torch.minimum(flux_qwsof, flux_pe)
+    flux_qwsof = torch.clamp(
+        flux_qwsof,
+        min=torch.zeros_like(flux_qwsof),
+        max=flux_pe,
+    )
 
-    # 3. 顺序更新：加入 flux_pe，扣除 flux_qwsof
-    S1_curr = F.relu(S1 + flux_pe - flux_qwsof)
+    # 3. Add the retained input, then make any discrete capacity exceedance an
+    # explicit saturation-excess runoff flux.  This guarantees S1 <= swmax
+    # without an unaccounted state clamp.
+    S1_curr = S1 + flux_pe - flux_qwsof
+    flux_qwsof = flux_qwsof + excess_1(S1_curr, swmax, nearzero=nearzero)
+    S1_curr = S1 + flux_pe - flux_qwsof
 
-    # 4. 蒸发 - 基于更新后的 S1_curr
+    # 4. ET from the post-input, post-overflow storage. evap_1 already enforces
+    # 0 <= flux_ew <= S1_curr for non-negative PET, so no second limiter is
+    # needed.
     flux_ew = evap_1(S1_curr, PET, nearzero=nearzero)
-    flux_ew = torch.minimum(flux_ew, S1_curr)
     S1_curr = S1_curr - flux_ew
 
-    # 5. 底流 - 基于扣除蒸发后的 S1_curr
+    # 5. Linear baseflow from the ET-reduced storage. With kw in [0, 1],
+    # baseflow_1(kw, S1_curr) is already bounded by S1_curr.
     flux_qwgw = baseflow_1(kw, S1_curr, nearzero=nearzero)
-    flux_qwgw = torch.minimum(flux_qwgw, S1_curr)
 
-    # 6. 更新状态
-    S1_new = torch.clamp(S1_curr - flux_qwgw, min=nearzero)
+    # 6. Exact residual storage: do not floor it at nearzero, which would add
+    # unaccounted water during dry periods.
+    S1_new = S1_curr - flux_qwgw
 
     # 5. 变量聚合与返回
     # Ea = ei (拦截蒸发) + ew (土壤蒸发)

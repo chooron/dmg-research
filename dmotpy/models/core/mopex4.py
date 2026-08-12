@@ -2,21 +2,23 @@ import torch
 import torch.nn.functional as F
 from typing import Tuple
 
-from .mopex1 import (
-    evap_7,
-    saturation_1,
-    baseflow_1,
-    recharge_3,
-)
-from .mopex2 import (
-    snowfall_1,
-    rainfall_1,
-    melt_1,
+from ..flux.mopex import (
+    mopex_baseflow_1 as baseflow_1,
+    mopex_evap_7 as evap_7,
+    mopex_melt_1 as melt_1,
+    mopex_rainfall_1 as rainfall_1,
+    mopex_recharge_3 as recharge_3,
+    mopex_saturation_1 as saturation_1,
+    mopex_snowfall_1 as snowfall_1,
 )
 
 # ================================================================
 # 1. Parameter Configuration
-# 严格对应 MARRMoT MATLAB 原版参数语义
+# MOPEX4 基于 MARRMoT 原版结构。interception 恢复为仓库可追溯的原始
+# 季节余弦参数化（alpha + (1-alpha)*cos），与 MARRMoT m_32_mopex4 的
+# i_alpha / i_s 语义一致；其余参数语义与 MARRMoT 一致。
+# 过程顺序（interception-first、共享日 PET budget、net soil input）
+# 保持当前已修正并验证过的语义。
 # ================================================================
 
 MOPEX4_PARAMS_BOUNDS = {
@@ -45,6 +47,31 @@ MOPEX4_PARAMS_DESC = {
     "tc":      "Mean residence rate [d⁻¹], flux = tc * S",
 }
 
+MOPEX4_LIU_INTERCEPTION_NAMES = ("S_eff", "c")
+MOPEX4_LEGACY_INTERCEPTION_NAMES = ("alpha", "is_time")
+
+
+def validate_mopex4_parameter_schema(
+    parameter_names: tuple[str, ...] | list[str], *, legacy_f0: bool = False
+) -> None:
+    """Reject accidental reuse of the wrong MOPEX4 interception schema.
+
+    A raw vector has the same length in both formulations (10 parameters), so
+    callers that persist parameter names must persist and validate the schema
+    explicitly.  ``legacy_f0=True`` requests the original ``(alpha, is_time)``
+    schema (the current restored MOPEX4); ``legacy_f0=False`` requests the
+    Liu ``(S_eff, c)`` schema (retained for loading pre-restore checkpoints).
+    """
+    names = tuple(parameter_names)
+    expected_slots = MOPEX4_LEGACY_INTERCEPTION_NAMES if legacy_f0 else MOPEX4_LIU_INTERCEPTION_NAMES
+    actual_slots = (names[4], names[5]) if len(names) > 5 else ()
+    if actual_slots != expected_slots:
+        mode = "original alpha/is_time" if legacy_f0 else "Liu S_eff/c"
+        raise ValueError(
+            f"MOPEX4 parameter schema mismatch: expected {mode} slots "
+            f"{expected_slots}, got {actual_slots}. Explicit schema routing is required."
+        )
+
 
 def create_initial_state(
     n_grid: int, nmul: int, device: torch.device, nearzero: float = 1e-6
@@ -68,7 +95,7 @@ def create_initial_state(
 
 
 # ================================================================
-# 2. Interception Flux Function
+# 2. Interception Flux Function — original seasonal formulation
 # ================================================================
 
 def interception_4(
@@ -79,7 +106,8 @@ def interception_4(
     tmax: float = 365.25,
     nearzero: float = 1e-6,
 ) -> torch.Tensor:
-    """
+    """Original MOPEX4 interception kernel (restored from git HEAD / MARRMoT).
+
     MATLAB 原版：
         out = max(0, p1 + (1-p1)*cos(2π*(t*dt - p2)/tmax)) * In
         其中 p1=i_alpha, p2=i_s, t*dt≈doy, In=flux_pr
@@ -96,21 +124,18 @@ def interception_4(
         alpha 和 is_time 均通过余弦函数全程可导。
 
     参数：
-        flux_pr  - 到达冠层的降雨通量 [mm/d]
+        flux_pr  - 到达冠层的液态降雨通量 [mm/d]（snow/rain partition 之后）
         doy      - 当前儒略日 [d]，shape 与 flux_pr 一致
         alpha    - 平均截留比例 [-]，∈ [0,1]
         is_time  - 截留峰值时刻 [d]，∈ [1, 365]
         tmax     - 季节周期长度 [d]，默认 365.25
     """
-    # 季节性截留比例（余弦调制）
-    # 当 doy = is_time 时，cos=1，截留比例 = alpha + (1-alpha)*1 = 1（最大）
-    # 当 doy = is_time ± tmax/2 时，cos=-1，截留比例 = alpha - (1-alpha)（最小）
+    del nearzero  # preserved for call compatibility; unused in the original kernel
     rad          = 2.0 * torch.pi * (doy - is_time) / tmax
     interc_frac  = alpha + (1.0 - alpha) * torch.cos(rad)
 
-    # ✅ 梯度处理：softplus(x * beta) / beta ≈ relu(x)，但在 x=0 处光滑可导
+    # 梯度处理：softplus(x * beta) / beta ≈ relu(x)，但在 x=0 处光滑可导
     # beta=50 时与 relu 的最大偏差 < 0.014，实践中可忽略
-    # 等价简写（直接用大 beta 的 softplus）：
     interc_frac_pos = F.softplus(interc_frac * 50.0) / 50.0   # ≥ 0，光滑
 
     # 截留量同时受降雨量约束
@@ -126,14 +151,13 @@ def mopex4_step(
     P: torch.Tensor,
     T: torch.Tensor,
     PET: torch.Tensor,
-    doy: torch.Tensor,
     # Parameters — order matches MOPEX4_PARAMS_BOUNDS keys
     tcrit: torch.Tensor,     # tcrit
     ddf: torch.Tensor,       # ddf
     Sb1: torch.Tensor,       # s2max → 土壤水库容量
     tw: torch.Tensor,        # tw
-    alpha: torch.Tensor,     # alpha → i_alpha
-    is_time: torch.Tensor,   # is_time → i_s
+    alpha: torch.Tensor,     # alpha → i_alpha (mean interception fraction)
+    is_time: torch.Tensor,   # is_time → i_s (interception peak day-of-year)
     tu: torch.Tensor,        # tu
     Se: torch.Tensor,        # se
     Sb2: torch.Tensor,       # s3max → 地下水库容量
@@ -146,28 +170,58 @@ def mopex4_step(
     Sn: torch.Tensor,
     delta_t: float = 1.0,
     nearzero: float = 1e-6,
+    *,
+    doy: torch.Tensor = None,
+    phase_cos: torch.Tensor = None,
+    phase_sin: torch.Tensor = None,
 ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
     """
-    MOPEX-4 离散单步计算。
+    MOPEX-4 离散单步计算 — original interception formula with corrected
+    process order.
 
-    MATLAB ODE 对应关系：
-        dS1 = ps   - qn                                  (Sn：积雪)
-        dS2 = pr   + qn - et1 - i - q1f - qw            (S1：土壤，含截留项)
-        dS3 = qw   - et2 - q2f - q2u                    (S2：地下)
-        dS4 = q1f  + q2f - qf                            (Sc1：快速流)
-        dS5 = q2u  - qs                                  (Sc2：慢速流)
+    Interception uses the original seasonal cosine parameterization,
 
-    与 MOPEX-3 的唯一结构差异：
-        新增截留通量 flux_i = interception_4(i_alpha, i_s, doy, flux_pr)
-        flux_i 从 S2（土壤）中扣除，代表冠层截留后直接蒸发的水量，
-        不进入土壤参与后续产流计算。
+        frac   = alpha + (1 - alpha) * cos(2π*(doy - is_time)/tmax)
+        I_pot  = softplus(50*frac)/50 * Pr        (smooth lower clamp)
+        I      = min(I_pot, Pr, PET)
+
+    on the post-snow/rain-partition liquid rainfall ``Pr``.  ``alpha`` is the
+    mean interception fraction [-] and ``is_time`` the peak interception
+    day-of-year [d]; both are learnable.
+
+    PET semantics (corrected, frozen): interception-first shared daily PET
+    demand with the exact hard budget limiter,
+
+        I             = min(I_pot, PET)
+        PET_after_I   = PET - I
+        ET1           = evap_7(S1, Sb1, PET_after_I)
+        PET_after_ET1 = PET_after_I - ET1
+        ET2           = evap_7(S2, se*s3max, PET_after_ET1)
+
+    so ``I + ET1 + ET2 <= PET`` holds by construction (up to floating point
+    tolerance).  ``phase_cos``/``phase_sin`` are accepted for call
+    compatibility and unused; ``doy`` is consumed by the seasonal kernel.
+
+    Water path (corrected, frozen): interception is allocated first and
+    removed from the liquid rainfall *before* soil entry,
+
+        I       = min(I_pot, PET)
+        Pr_net  = Pr - I
+        soil    = Pr_net + qn        (net rainfall + snowmelt enters S1)
+        q1f     = saturation_1(soil, S1, Sb1)   (event input is net, not gross)
+
+    so interception is sourced exclusively from the current day's liquid
+    rainfall (``0 <= I <= Pr``) and is never deducted from snowmelt or from
+    pre-existing soil water after ET1.  This is the counterfactual
+    "original interception formula + corrected process order".
 
     离散化策略（顺序显式步进）：
         各通量按顺序从当前状态计算并立即更新，天然保证状态非负。
 
-    通量顺序（S1/土壤）：加入 pr+qn → 蒸发 et1 → 截留 i → 饱和径流 q1f → 下渗 qw
+    通量顺序（S1/土壤）：截留 I（直接从 Pr 扣除）→ 净雨 Pr_net + qn 进入土壤 → 蒸发 et1 → 饱和径流 q1f → 下渗 qw
     通量顺序（S2/地下）：加入 qw   → 地下溢流 q2f → 基流 q2u → 蒸发 et2
     """
+    del phase_cos, phase_sin  # unused in the restored forward
 
     # ── Guards ────────────────────────────────────────────────────
     Sn  = F.relu(Sn)
@@ -194,25 +248,30 @@ def mopex4_step(
     # ============================================================
     # Soil Bucket (S1 = MATLAB S2)
     # MATLAB: dS2 = pr + qn - et1 - i - q1f - qw
-    # 顺序：加入有效降水 → 蒸发 → 截留 → 饱和径流 → 下渗
+    # 顺序：截留 I（直接从 Pr 扣除）→ 净雨 Pr_net + qn 进入土壤 → 蒸发 et1 → 饱和径流 q1f → 下渗 qw
     # ============================================================
 
-    S1 = S1 + flux_pr + flux_qn
+    # Step 1: interception-first water path.
+    # I is allocated from the exact hard budget min(I_pot, PET) and removed
+    # from the liquid rainfall BEFORE it enters the soil bucket:
+    #     Pr -> I (evaporative loss) -> Pr_net = Pr - I -> soil input.
+    i_pot = interception_4(flux_pr, doy, alpha, is_time, nearzero=nearzero)
+    flux_i = torch.minimum(i_pot, PET)               # exact hard budget limiter
+    flux_pr_net = flux_pr - flux_i
+    pet_after_i = PET - flux_i
 
-    # Step 1：蒸发
-    # MATLAB: flux_et1 = evap_7(S2, s2max, Ep, dt)
-    flux_et1 = evap_7(S1, Sb1, PET, delta_t, nearzero)
+    soil_input = flux_pr_net + flux_qn
+    S1 = S1 + soil_input
+
+    # Step 2: ET1 consumes the remaining shared PET demand after I.
+    flux_et1 = evap_7(S1, Sb1, pet_after_i, delta_t, nearzero)
     flux_et1 = torch.minimum(flux_et1, S1)
     S1 = S1 - flux_et1
+    pet_remaining_after_et1 = pet_after_i - flux_et1
 
-    # Step 2：截留（冠层截留，季节余弦调制）
-    flux_i = interception_4(flux_pr, doy, alpha, is_time, nearzero=nearzero)
-    flux_i = torch.minimum(flux_i, S1)
-    S1 = S1 - flux_i
-
-    # Step 3：饱和径流
-    # MATLAB: flux_q1f = saturation_1(flux_pr+flux_qn, S2, s2max)
-    flux_q1f = saturation_1(flux_pr + flux_qn, S1, Sb1, nearzero=nearzero)
+    # Step 3：饱和径流（event input = net rainfall + snowmelt, not gross Pr + qn）
+    # MATLAB: flux_q1f = saturation_1(pr+qn, S2, s2max)
+    flux_q1f = saturation_1(soil_input, S1, Sb1, nearzero=nearzero)
     flux_q1f = torch.minimum(flux_q1f, S1)
     S1 = S1 - flux_q1f
 
@@ -240,10 +299,9 @@ def mopex4_step(
     flux_q2u = baseflow_1(tu, S2)         # min(tu*S2, S2) ≤ S2
     S2 = S2 - flux_q2u
 
-    # Step 3：蒸发
-    # MATLAB: flux_et2 = evap_7(S3, se*s3max, Ep, dt)
-    se_abs   = Se * Sb2                   # 有效蒸发容量 [mm]
-    flux_et2 = evap_7(S2, se_abs, PET, delta_t, nearzero)
+    # Step 3：蒸发（frozen path passes the remaining PET demand after I and ET1）
+    se_abs = Se * Sb2
+    flux_et2 = evap_7(S2, se_abs, pet_remaining_after_et1, delta_t, nearzero)
     flux_et2 = torch.minimum(flux_et2, S2)
     S2_new   = S2 - flux_et2              # S2_new ≥ 0 保证
 

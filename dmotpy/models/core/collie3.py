@@ -2,6 +2,7 @@ import torch
 import torch.nn.functional as F
 from typing import Tuple
 from ..flux.evap import evap_7, evap_3
+from ..flux.interflow import interflow_3
 from ..flux.saturation import saturation_1
 from ..flux.split import split_1
 
@@ -86,8 +87,7 @@ def collie3_step(
     # 3) Non-linear interflow: a * max(0, S1 - Sfc)^b  (MARRMoT collie3 formula)
     sfc_mm = fc * smax
     excess = F.relu(S1_tmp2 - sfc_mm)
-    flux_qss = a * (excess + nearzero).pow(b)
-    flux_qss = torch.minimum(flux_qss, excess)
+    flux_qss = interflow_3(a, b, excess, nearzero=nearzero)
     flux_qss = F.relu(flux_qss)
     S1_new = torch.clamp(S1_tmp2 - flux_qss, min=0.0)
 
@@ -97,8 +97,7 @@ def collie3_step(
 
     # 5) Groundwater store update and non-linear baseflow: a * S2^b
     S2_tmp = torch.clamp(S2 + flux_qsss, min=0.0)
-    flux_qsg = a * (S2_tmp + nearzero).pow(b)
-    flux_qsg = torch.minimum(flux_qsg, S2_tmp)
+    flux_qsg = interflow_3(a, b, S2_tmp, nearzero=nearzero)
     flux_qsg = F.relu(flux_qsg)
     S2_new = torch.clamp(S2_tmp - flux_qsg, min=0.0)
 

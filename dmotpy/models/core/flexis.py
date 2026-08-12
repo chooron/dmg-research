@@ -65,50 +65,37 @@ def create_initial_state(
     return S1, S2, S3, S4, S5
 
 
-def flexis_step(
+def flexis_step_pre(
     P: torch.Tensor,
     T: torch.Tensor,
     PET: torch.Tensor,
-    # Parameters matching FLEXIS_PARAMS_BOUNDS keys
     smax: torch.Tensor,
     beta: torch.Tensor,
     d_split: torch.Tensor,
     percmax: torch.Tensor,
     lp: torch.Tensor,
-    nlagf: torch.Tensor,
-    nlags: torch.Tensor,
-    kf: torch.Tensor,
-    ks: torch.Tensor,
     imax: torch.Tensor,
     tt: torch.Tensor,
     ddf: torch.Tensor,
-    # State variables
     S1: torch.Tensor,
     S2: torch.Tensor,
     S3: torch.Tensor,
-    S4: torch.Tensor,
-    S5: torch.Tensor,
     nearzero: float = 1e-6,
 ) -> Tuple[
-    torch.Tensor,
-    torch.Tensor,
-    torch.Tensor,
-    torch.Tensor,
-    torch.Tensor,
-    torch.Tensor,
-    torch.Tensor,
+    torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor,
+    torch.Tensor, torch.Tensor, torch.Tensor,
 ]:
-    """
-    Flex-IS model single-step calculation.
+    """Flex-IS pre-UH step: snow (S1), interception (S2), soil moisture (S3).
 
-    Model reference:
-    Fenicia, F., McDonnell, J. J., & Savenije, H. H. G. (2008). Learning from
-    model improvement: On the contribution of complementary data to process
-    understanding. Water Resources Research, 44(6).
+    Returns:
+        flux_rf   -- fast runoff component (enters UH)
+        flux_rsl  -- slow runoff component (slow split + percolation) (enters UH)
+        flux_ei   -- interception evaporation (passthrough to post)
+        flux_eur  -- soil evaporation (passthrough to post)
+        S1_new    -- updated snow store
+        S2_new    -- updated interception store
+        S3_new    -- updated soil moisture store
     """
-
-    # UH parameters are unused (identity routing)
-    _ = (nlagf, nlags)
 
     # --- 1. Snow Process (S1) ---
     # flux_ps: snowfall
@@ -181,12 +168,36 @@ def flexis_step(
     S3_new = S3_tmp2 - flux_rp
     S3_new = torch.clamp(S3_new, min=nearzero)
 
-    # --- 4. Routing Processes (S4 and S5) ---
-
-    # TODO: Unit hydrograph routing (route/uh_) not supported yet
-    # Fast inflow is rf, Slow inflow is rs + rp
-    flux_rfl = flux_rf
     flux_rsl = flux_rs + flux_rp
+
+    return flux_rf, flux_rsl, flux_ei, flux_eur, S1_new, S2_new, S3_new
+
+
+def flexis_step_post(
+    flux_rfl: torch.Tensor,
+    flux_rsl: torch.Tensor,
+    flux_ei: torch.Tensor,
+    flux_eur: torch.Tensor,
+    S4: torch.Tensor,
+    S5: torch.Tensor,
+    kf: torch.Tensor,
+    ks: torch.Tensor,
+    nearzero: float = 1e-6,
+) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+    """Flex-IS post-UH step: routing stores (S4 fast, S5 slow) and aggregation.
+
+    Args:
+        flux_rfl  -- fast inflow (UH-routed or direct)
+        flux_rsl  -- slow inflow (slow split + percolation, UH-routed or direct)
+        flux_ei   -- interception evaporation (from pre)
+        flux_eur  -- soil evaporation (from pre)
+        S4        -- fast routing store
+        S5        -- slow routing store
+        kf, ks    -- routing coefficients
+
+    Returns:
+        Qsim, Ea, S4_new, S5_new
+    """
 
     # S4: Fast Routing Store
     S4_tmp = S4 + flux_rfl
@@ -216,4 +227,59 @@ def flexis_step(
     Qsim = flux_qf + flux_qs
     Ea = flux_ei + flux_eur
 
+    return Qsim, Ea, S4_new, S5_new
+
+
+def flexis_step(
+    P: torch.Tensor,
+    T: torch.Tensor,
+    PET: torch.Tensor,
+    # Parameters matching FLEXIS_PARAMS_BOUNDS keys
+    smax: torch.Tensor,
+    beta: torch.Tensor,
+    d_split: torch.Tensor,
+    percmax: torch.Tensor,
+    lp: torch.Tensor,
+    nlagf: torch.Tensor,
+    nlags: torch.Tensor,
+    kf: torch.Tensor,
+    ks: torch.Tensor,
+    imax: torch.Tensor,
+    tt: torch.Tensor,
+    ddf: torch.Tensor,
+    # State variables
+    S1: torch.Tensor,
+    S2: torch.Tensor,
+    S3: torch.Tensor,
+    S4: torch.Tensor,
+    S5: torch.Tensor,
+    nearzero: float = 1e-6,
+) -> Tuple[
+    torch.Tensor,
+    torch.Tensor,
+    torch.Tensor,
+    torch.Tensor,
+    torch.Tensor,
+    torch.Tensor,
+    torch.Tensor,
+]:
+    """
+    Flex-IS model single-step calculation.
+
+    Model reference:
+    Fenicia, F., McDonnell, J. J., & Savenije, H. H. G. (2008). Learning from
+    model improvement: On the contribution of complementary data to process
+    understanding. Water Resources Research, 44(6).
+    """
+
+    # UH parameters are unused (identity routing)
+    _ = (nlagf, nlags)
+
+    flux_rf, flux_rsl, flux_ei, flux_eur, S1_new, S2_new, S3_new = flexis_step_pre(
+        P, T, PET, smax, beta, d_split, percmax, lp, imax, tt, ddf,
+        S1, S2, S3, nearzero,
+    )
+    Qsim, Ea, S4_new, S5_new = flexis_step_post(
+        flux_rf, flux_rsl, flux_ei, flux_eur, S4, S5, kf, ks, nearzero,
+    )
     return Qsim, Ea, S1_new, S2_new, S3_new, S4_new, S5_new

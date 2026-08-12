@@ -60,6 +60,8 @@ def hillslope_step(
     S1: torch.Tensor,
     S2: torch.Tensor,
     nearzero: float = 1e-6,
+    *,
+    return_routing_fluxes: bool = False,
 ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
     """
     Hillslope model (FLEX-Topo) single-step calculation.
@@ -141,4 +143,6 @@ def hillslope_step(
     Qsim = flux_qhsrf + flux_qhgw
     Ea = flux_ei + flux_ea
 
+    if return_routing_fluxes:
+        return Qsim, Ea, S1_new, S2_new, (flux_qses, flux_qhgw)
     return Qsim, Ea, S1_new, S2_new

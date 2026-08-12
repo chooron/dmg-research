@@ -1,6 +1,37 @@
+"""
+gsfb_smooth.py — Smooth differentiable variant of the GSFB model.
+
+This module implements a smooth approximation of the GSFB (Griffiths et al.)
+hydrological model using soft-capping helpers to replace all hard
+`torch.minimum` / `torch.clamp` flux constraints. The smooth variant is
+differentiable everywhere, which makes it compatible with gradient-based
+optimisation and Euler-substep first-order convergence analysis.
+
+IMPORTANT CAVEATS
+-----------------
+1. gsfb_smooth is NOT identical to the original MARRMoT GSFB formula.
+   Hard constraints become smooth approximations parameterised by ``tau``.
+2. The original GSFB structural caveat (non-differentiable flux caps) is
+   resolved here; the original ``models/core/gsfb.py`` is left **unchanged**.
+3. Do not compare gsfb_smooth against MARRMoT step-by-step daily outputs.
+
+Mathematical background
+-----------------------
+smooth_relu(x, τ)          = τ · softplus(x / τ)
+smooth_min(a, b, τ)        = −τ · logsumexp(−[a, b] / τ,  dim=0)
+smooth_cap_flux(q, avail, τ) = smooth_min(smooth_relu(q, τ),
+                                           smooth_relu(avail, τ), τ)
+
+As τ → 0 the functions converge to relu / minimum pointwise, but keep
+non-zero gradients everywhere.
+"""
+
 import torch
 import torch.nn.functional as F
 from typing import Tuple
+
+from ..flux.smooth import smooth_cap_flux, smooth_min, smooth_relu
+
 from ..flux.evap import evap_20
 from ..flux.saturation import saturation_1
 from ..flux.interflow import interflow_11
@@ -8,51 +39,60 @@ from ..flux.baseflow import baseflow_1, baseflow_9
 from ..flux.recharge import recharge_5
 
 
-# Parameter range dictionary (based on MARRMoT m_20_gsfb_8p_3s)
+# ---------------------------------------------------------------------------
+# Re-export parameter metadata identical to gsfb.py so registry code can
+# import from either location.
+# ---------------------------------------------------------------------------
 GSFB_PARAMS_BOUNDS = {
-    "c": [0.0, 1.0],  # Recharge time coefficient [d-1]
-    "ndc": [0.05, 0.95],  # Threshold fraction of Smax [-]
-    "smax": [1.0, 2000.0],  # Maximum soil moisture storage [mm]
-    "emax": [0.0, 20.0],  # Maximum evaporation flux [mm/d]
-    "frate": [0.0, 200.0],  # Maximum infiltration rate [mm/d]
-    "b": [0.0, 1.0],  # Fraction of subsurface flow that is baseflow [-]
-    "dpf": [0.0, 1.0],  # Baseflow time coefficient [d-1]
-    "sdrmax": [1.0, 300.0],  # Threshold before baseflow can occur [mm]
+    "c":      [0.0,   1.0],
+    "ndc":    [0.05,  0.95],
+    "smax":   [1.0,   2000.0],
+    "emax":   [0.0,   20.0],
+    "frate":  [0.0,   200.0],
+    "b":      [0.0,   1.0],
+    "dpf":    [0.0,   1.0],
+    "sdrmax": [1.0,   300.0],
 }
 
-# Parameter description dictionary
 GSFB_PARAMS_DESC = {
-    "c": "Recharge time coefficient [d-1]",
-    "ndc": "Threshold fraction of Smax [-]",
-    "smax": "Maximum soil moisture storage [mm]",
-    "emax": "Maximum evaporation flux [mm/d]",
-    "frate": "Maximum infiltration rate [mm/d]",
-    "b": "Fraction of subsurface flow that is baseflow [-]",
-    "dpf": "Baseflow time coefficient [d-1]",
+    "c":      "Recharge time coefficient [d-1]",
+    "ndc":    "Threshold fraction of Smax [-]",
+    "smax":   "Maximum soil moisture storage [mm]",
+    "emax":   "Maximum evaporation flux [mm/d]",
+    "frate":  "Maximum infiltration rate [mm/d]",
+    "b":      "Fraction of subsurface flow that is baseflow [-]",
+    "dpf":    "Baseflow time coefficient [d-1]",
     "sdrmax": "Threshold before baseflow can occur [mm]",
 }
 
 
+# ---------------------------------------------------------------------------
+# Smooth cap helpers
+# ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
+# State initialiser (identical to gsfb.py)
+# ---------------------------------------------------------------------------
+
 def create_initial_state(
     n_grid: int, nmul: int, device: torch.device, nearzero: float = 1e-6
 ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-    """
-    Create initial states for GSFB model.
-    S1: Soil moisture store
-    S2: Intermediate store
-    S3: Saturated zone store
-    """
+    """Create initial states S1, S2, S3 (soil moisture, intermediate, saturated zone)."""
     S1 = torch.zeros((n_grid, nmul), device=device) + nearzero
     S2 = torch.zeros((n_grid, nmul), device=device) + nearzero
     S3 = torch.zeros((n_grid, nmul), device=device) + nearzero
     return S1, S2, S3
 
 
+# ---------------------------------------------------------------------------
+# Main step function
+# ---------------------------------------------------------------------------
+
 def gsfb_step(
     P: torch.Tensor,
     T: torch.Tensor,
     PET: torch.Tensor,
-    # Parameters matching GSFB_PARAMS_BOUNDS keys
+    # Parameters — identical names/bounds to gsfb_step
     c: torch.Tensor,
     ndc: torch.Tensor,
     smax: torch.Tensor,
@@ -66,99 +106,115 @@ def gsfb_step(
     S2: torch.Tensor,
     S3: torch.Tensor,
     nearzero: float = 1e-6,
-) -> Tuple[
-    torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor
-]:
+    tau: float = 1e-3,
+) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
     """
-    GSFB model single-step calculation.
+    Smooth differentiable GSFB single-step calculation.
 
-    Model reference:
-    Nathan, R. J., & McMahon, T. A. (1990). SFB model part l . Validation of
-    fixed model parameters. Civil Eng. Trans., 157-161.
+    All hard ``torch.minimum`` / ``torch.clamp`` flux caps from the original
+    ``gsfb_step`` are replaced by ``smooth_cap_flux(q_pot, available, tau)``.
+    The flux functions themselves (recharge_5, saturation_1, evap_20,
+    interflow_11, baseflow_9, baseflow_1) are called with the same arguments.
+
+    Parameters
+    ----------
+    P, T, PET : forcing tensors (batch, nmul)
+    c … sdrmax : parameter tensors (batch, nmul) — same semantics as gsfb_step
+    S1, S2, S3 : state tensors (batch, nmul)
+    nearzero   : small positive constant for numerical safety
+    tau        : smoothness parameter (default 1e-3 mm/d).
+                 Smaller τ → closer to original hard caps.
+                 Larger τ → smoother but more biased.
+
+    Returns
+    -------
+    Qsim, Ea, S1_new, S2_new, S3_new
     """
 
-    # --- 1. Saturated zone to Soil moisture Recharge (S3 -> S1) ---
-    # Threshold for recharge (ndc * smax)
+    # ------------------------------------------------------------------
+    # 1. Saturated zone → Soil moisture recharge  (S3 → S1)
+    # ------------------------------------------------------------------
     threshold_s1 = ndc * smax
 
-    # flux_qdr: Recharge from S3 to S1
-    # recharge_5(c, threshold, S_source, S_receiver)
-    flux_qdr = recharge_5(c, threshold_s1, S3, S1, nearzero=nearzero)
-    flux_qdr = torch.minimum(flux_qdr, S3 - nearzero)
-    flux_qdr = F.relu(flux_qdr)
+    # Potential recharge from saturated zone
+    flux_qdr_pot = recharge_5(c, threshold_s1, S3, S1, nearzero=nearzero)
+    # Cap: flux_qdr ≤ S3 − ε  (keeps S3 > 0)
+    flux_qdr = smooth_cap_flux(flux_qdr_pot, S3 - nearzero, tau=tau)
 
-    # Interim update for S3
-    S3_tmp = S3 - flux_qdr
-    S3_tmp = torch.clamp(S3_tmp, min=nearzero)
+    # Interim S3 update
+    S3_tmp = torch.clamp(S3 - flux_qdr, min=nearzero)
 
-    # --- 2. Soil Moisture Store Processes (S1) ---
-    # Potential inflow to S1
+    # ------------------------------------------------------------------
+    # 2. Soil Moisture Store  (S1)
+    # ------------------------------------------------------------------
     S1_in = P + flux_qdr
 
-    # flux_qs: Saturation excess runoff (Fast process)
-    flux_qs = saturation_1(S1_in, S1, smax, nearzero=nearzero)
-    zeros = torch.zeros_like(flux_qs)
-    flux_qs = torch.clamp(flux_qs, min=zeros, max=S1_in)
+    # Saturation excess runoff
+    flux_qs_pot = saturation_1(S1_in, S1, smax, nearzero=nearzero)
+    # Cap: flux_qs ∈ [0, S1_in]
+    flux_qs = smooth_cap_flux(flux_qs_pot, S1_in, tau=tau)
 
-    # Update S1 for evaporation
-    S1_tmp = S1 + S1_in - flux_qs
-    S1_tmp = torch.clamp(S1_tmp, min=nearzero)
+    # S1 after runoff, before evaporation
+    S1_tmp = torch.clamp(S1 + S1_in - flux_qs, min=nearzero)
 
-    # flux_ea: Evaporation from S1
-    # evap_20(emax, ndc, S, Smax, Ep)
-    flux_ea = evap_20(emax, ndc, S1_tmp, smax, PET, nearzero=nearzero)
-    flux_ea = torch.minimum(flux_ea, S1_tmp - nearzero)
-    flux_ea = torch.minimum(flux_ea, PET)
-    flux_ea = F.relu(flux_ea)
+    # Evaporation from S1
+    flux_ea_pot = evap_20(emax, ndc, S1_tmp, smax, PET, nearzero=nearzero)
+    # Cap 1: flux_ea ≤ S1_tmp − ε
+    flux_ea = smooth_cap_flux(flux_ea_pot, S1_tmp - nearzero, tau=tau)
+    # Cap 2: flux_ea ≤ PET
+    flux_ea = smooth_cap_flux(flux_ea, PET, tau=tau)
 
-    # Update S1 for infiltration to S2
-    S1_tmp2 = S1_tmp - flux_ea
-    S1_tmp2 = torch.clamp(S1_tmp2, min=nearzero)
+    # S1 after evaporation, before infiltration
+    S1_tmp2 = torch.clamp(S1_tmp - flux_ea, min=nearzero)
 
-    # flux_f: Infiltration from S1 to S2
-    # interflow_11(frate, threshold, S)
-    flux_f = interflow_11(frate, threshold_s1, S1_tmp2, nearzero=nearzero)
-    flux_f = torch.minimum(flux_f, S1_tmp2 - nearzero)
-    flux_f = F.relu(flux_f)
+    # Infiltration from S1 to S2
+    flux_f_pot = interflow_11(frate, threshold_s1, S1_tmp2, nearzero=nearzero)
+    # Cap: flux_f ≤ S1_tmp2 − ε
+    flux_f = smooth_cap_flux(flux_f_pot, S1_tmp2 - nearzero, tau=tau)
 
-    # Final S1 update
-    S1_new = S1_tmp2 - flux_f
-    S1_new = torch.clamp(S1_new, min=nearzero)
+    S1_new = torch.clamp(S1_tmp2 - flux_f, min=nearzero)
 
-    # --- 3. Intermediate Store Processes (S2) ---
-    # Inflow to S2 is infiltration flux_f
-    S2_tmp_in = S2 + flux_f
-    S2_tmp_in = torch.clamp(S2_tmp_in, min=nearzero)
+    # ------------------------------------------------------------------
+    # 3. Intermediate Store  (S2)
+    # ------------------------------------------------------------------
+    S2_tmp_in = torch.clamp(S2 + flux_f, min=nearzero)
 
-    # flux_qb: Baseflow from S2 (Slow process 1)
-    # baseflow_9(coeff, threshold, S)
-    flux_qb = baseflow_9(b * dpf, sdrmax, S2_tmp_in, nearzero=nearzero)
-    flux_qb = torch.minimum(flux_qb, S2_tmp_in - nearzero)
-    flux_qb = F.relu(flux_qb)
+    # Baseflow from S2 (slow process 1)
+    flux_qb_pot = baseflow_9(b * dpf, sdrmax, S2_tmp_in, nearzero=nearzero)
+    # Cap: flux_qb ≤ S2_tmp_in − ε
+    flux_qb = smooth_cap_flux(flux_qb_pot, S2_tmp_in - nearzero, tau=tau)
 
-    # Update S2 for percolation to S3
-    S2_tmp_perc = S2_tmp_in - flux_qb
-    S2_tmp_perc = torch.clamp(S2_tmp_perc, min=nearzero)
+    S2_tmp_perc = torch.clamp(S2_tmp_in - flux_qb, min=nearzero)
 
-    # flux_dp: Percolation from S2 to S3 (Slow process 2)
-    # baseflow_1(coeff, S)
-    flux_dp = baseflow_1((1.0 - b) * dpf, S2_tmp_perc, nearzero=nearzero)
-    flux_dp = torch.minimum(flux_dp, S2_tmp_perc - nearzero)
-    flux_dp = F.relu(flux_dp)
+    # Percolation from S2 to S3 (slow process 2)
+    flux_dp_pot = baseflow_1((1.0 - b) * dpf, S2_tmp_perc, nearzero=nearzero)
+    # Cap: flux_dp ≤ S2_tmp_perc − ε
+    flux_dp = smooth_cap_flux(flux_dp_pot, S2_tmp_perc - nearzero, tau=tau)
 
-    # Final S2 update
-    S2_new = S2_tmp_perc - flux_dp
-    S2_new = torch.clamp(S2_new, min=nearzero)
+    S2_new = torch.clamp(S2_tmp_perc - flux_dp, min=nearzero)
 
-    # --- 4. Saturated Zone Store Update (S3) ---
-    # S3 receives percolation flux_dp
-    S3_new = S3_tmp + flux_dp
-    S3_new = torch.clamp(S3_new, min=nearzero)
+    # ------------------------------------------------------------------
+    # 4. Saturated Zone Store  (S3)
+    # ------------------------------------------------------------------
+    S3_new = torch.clamp(S3_tmp + flux_dp, min=nearzero)
 
-    # --- 5. Output Aggregation ---
-    # Qsim = qs (surface) + qb (baseflow)
-    # Ea = ea
+    # ------------------------------------------------------------------
+    # 5. Output
+    # ------------------------------------------------------------------
     Qsim = flux_qs + flux_qb
-    Ea = flux_ea
+    Ea   = flux_ea
 
     return Qsim, Ea, S1_new, S2_new, S3_new
+
+# Backward-compatibility aliases
+GSFB_PARAMS_BOUNDS = GSFB_PARAMS_BOUNDS
+gsfb_step = gsfb_step  # alias for tests that still reference old name
+
+
+# ---------------------------------------------------------------------------
+# Backward-compatibility aliases (pre-rename names). gsfb_smooth was renamed
+# to gsfb on 2026-06-25; these aliases keep older imports/tests working.
+# ---------------------------------------------------------------------------
+GSFB_SMOOTH_PARAMS_BOUNDS = GSFB_PARAMS_BOUNDS
+GSFB_SMOOTH_PARAMS_DESC = GSFB_PARAMS_DESC
+gsfb_smooth_step = gsfb_step

@@ -24,7 +24,20 @@ def evap_2(
     Evaporation at a scaled, plant-controlled rate.
     Constraints: f <= Ep, f <= S
     """
-    return torch.minimum(torch.minimum(p1 * S / (Smax + nearzero), Ep), S)
+    Smax_safe = torch.clamp(Smax, min=1.0)
+    ratio = torch.clamp(S / Smax_safe, max=1.0)
+    return torch.minimum(torch.minimum(p1 * ratio, Ep), S)
+
+
+def evap_ihacres_deficit(
+    S: torch.Tensor,
+    lp: torch.Tensor,
+    Ep: torch.Tensor,
+    nearzero: float = 1e-6,
+) -> torch.Tensor:
+    """Linear IHACRES evaporation decline based on moisture deficit."""
+    stress = torch.clamp(1.0 - S / (lp + nearzero), min=0.0, max=1.0)
+    return stress * Ep
 
 
 def evap_3(

@@ -68,11 +68,29 @@ def baseflow_6(
     """
     Baseflow 6: Quadratic outflow if storage threshold is exceeded
     """
-    q_quadratic = torch.minimum(S, p1 * S.pow(2))
+    # Preserve the original expression exactly for finite, ordinary storage,
+    # but keep the square inside the dtype's finite domain.  This avoids the
+    # ``0 * inf`` NaN at valid p1=0 without changing normal-case rounding.
+    finite_storage = torch.where(torch.isfinite(S), S, torch.zeros_like(S))
+    max_square_base = torch.sqrt(
+        torch.full_like(finite_storage, torch.finfo(S.dtype).max)
+    )
+    safe_storage = torch.clamp(finite_storage, min=-max_square_base, max=max_square_base)
+    q_quadratic = torch.minimum(safe_storage, p1 * safe_storage.pow(2))
 
     # sf returns ~1 when S > p2
-    sf = smooth_threshold_storage_logistic(S, p2, nearzero=nearzero)
-    return q_quadratic * (1.0 - sf)
+    sf = smooth_threshold_storage_logistic(safe_storage, p2, nearzero=nearzero)
+    return q_quadratic * sf
+
+
+def baseflow_tcm(
+    p1: torch.Tensor, p2: torch.Tensor, S: torch.Tensor, nearzero: float = 1e-6
+) -> torch.Tensor:
+    """TCM quadratic slow-flow reservoir with the model's 1/1000 scale."""
+    k2_scaled = p1 / 1000.0
+    q_unconstrained = k2_scaled * S.pow(2)
+    gate_open = smooth_threshold_storage_logistic(S, p2, nearzero=nearzero)
+    return q_unconstrained * gate_open
 
 
 def baseflow_7(

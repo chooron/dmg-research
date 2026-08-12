@@ -3,16 +3,15 @@ import torch.nn.functional as F
 from typing import Optional, Tuple
 
 # 假设核心组件已经存在，后续再补充具体实现
-from ..flux.evap import evap_1  # , evap_2
-
-# from ..flux.interception import interception_1
-# from ..flux.infiltration import infiltration_1, infiltration_2
+from ..flux.evap import evap_1, evap_2
+from ..flux.interception import interception_modhydrolog as interception_1
+from ..flux.infiltration import infiltration_1, infiltration_2
 from ..flux.interflow import interflow_1
 from ..flux.recharge import recharge_1
 from ..flux.saturation import saturation_1
 
-# from ..flux.depression import depression_1
-from ..flux.exchange import exchange_3  # exchange_1,
+from ..flux.depression import depression_1
+from ..flux.exchange import exchange_1, exchange_3
 from ..flux.baseflow import baseflow_1
 
 # 参数取值范围字典 (匹配 MATLAB m_36_modhydrolog_15p_5s)
@@ -55,50 +54,6 @@ MODHYDROLOG_PARAMS_DESC = {
     "k2": "Flow exchange parameter [d-1]",
     "k3": "Flow exchange parameter [d-1]",
 }
-# ==============================================================================
-# 1. 核心 Flux 函数 (Hard Logic / Numerical Safe Versions)
-# ==============================================================================
-def exchange_1(p1, p2, p3, S, fmax, nearzero=1e-6):
-    """[Safe] No sign(), safe exp."""
-    s_abs = torch.abs(S)
-    linear_part = p1 * S
-    arg = torch.clamp(-p3 * s_abs, min=-30.0, max=0.0)
-    exp_term = 1.0 - torch.exp(arg)
-    nonlinear_part = p2 * exp_term * (S / (s_abs + nearzero))
-    flow = linear_part + nonlinear_part
-    return torch.maximum(flow, -torch.abs(fmax))
-
-
-def infiltration_1(p1, p2, S, Smax, fin, nearzero=1e-6):
-    """[Safe] Denominator lock."""
-    Smax_safe = torch.clamp(Smax, min=1.0)
-    arg = torch.clamp(-p2 * S / Smax_safe, min=-30.0, max=0.0)
-    rate = p1 * torch.exp(arg)
-    return torch.minimum(rate, fin)
-
-
-def infiltration_2(p1, p2, S1, S1max, flux, S2, nearzero=1e-6):
-    """[Safe] Denominator lock."""
-    S1max_safe = torch.clamp(S1max, min=1.0)
-    arg = torch.clamp(-p2 * S1 / S1max_safe, min=-30.0, max=0.0)
-    rate = p1 * torch.exp(arg)
-    net_inf = F.relu(rate - flux)
-    return torch.minimum(net_inf, S2)
-
-
-def evap_2(p1, S, Smax, Ep, nearzero=1e-6):
-    Smax_safe = torch.clamp(Smax, min=1.0)
-    ratio = torch.clamp(S / Smax_safe, max=1.0)
-    potential = p1 * ratio
-    return torch.minimum(torch.minimum(potential, Ep), S)
-
-
-def interception_1(incoming_flux, S, Smax, nearzero=1e-6):
-    "影响比较大"
-    excess = F.relu(S - Smax)
-    return torch.minimum(excess, S)
-
-
 def create_initial_state(
     n_grid: int, nmul: int, device: torch.device, nearzero: float = 1e-6
 ) -> Tuple[
@@ -110,44 +65,6 @@ def create_initial_state(
     S4 = torch.zeros((n_grid, nmul), device=device) + nearzero
     S5 = torch.zeros((n_grid, nmul), device=device) + nearzero
     return S1, S2, S3, S4, S5
-
-
-# ==============================================================================
-# 2. 主 Step 函数 (包含入口清洗逻辑)
-# ==============================================================================
-def depression_1(ads, md, S, Smax, incoming_flux, nearzero=1e-6):
-    """
-    [Fixed] Uses MD parameter based on MODHYDROLOG Eq (Source 108).
-    TRAP = (DSC - ADS * S_accumulated) * exp(-MD * DSC / RUN)
-    """
-    # 1. 计算剩余容量 (Capacity)
-    # S 是当前洼地蓄水量，Smax 是 DSC (Depression Store Capacity)
-    # 论文中 Source 108: (DSC - ADS * ARGD)
-    # 这里简化模型假设 S 已经是归一化后的洼地蓄水
-    capacity = F.relu(Smax - S)
-
-    # 2. 构建指数衰减因子 (The filling efficiency)
-    # 原文逻辑：RUN (incoming_flux) 越大，截留越容易充满
-    # 我们使用稳定的软阈值来模拟 RUN 对截留率的影响
-
-    valid_run = torch.clamp(incoming_flux, min=nearzero)
-    Smax_safe = torch.clamp(Smax, min=1.0)
-
-    # 构造指数项：exp(-MD * DSC / RUN)
-    # 注意：如果 RUN 很大，exponent -> 0, exp -> 1.0 (全截留)
-    # 如果 RUN 很小，exponent -> -inf, exp -> 0.0 (不截留)
-    # 为了数值稳定性，限制 exponent 的下限
-    exponent = -md * (Smax_safe / valid_run)
-    exponent = torch.clamp(exponent, min=-20.0, max=0.0)  # 防止梯度爆炸
-
-    efficiency_factor = torch.exp(exponent)
-
-    # 3. 计算潜在截留量
-    # ads 是洼地面积比例 (Fraction of area)
-    potential_trap = ads * incoming_flux * efficiency_factor
-
-    # 4. 物理约束：不能超过剩余容量，也不能超过流入量
-    return torch.minimum(torch.minimum(potential_trap, capacity), incoming_flux)
 
 
 # ==============================================================================
@@ -256,7 +173,9 @@ def modhydrolog_step(
     
     # 5.3 深层渗漏 (Seepage from S4) [关键修正点]
     flux_SEEP_pot = exchange_3(vcond, S4, dlev)
-    flux_SEEP = torch.minimum(flux_SEEP_pot, S4)
+    # Seepage is an outward loss: a negative exchange value denotes the
+    # opposite direction and must not be counted as negative evaporation.
+    flux_SEEP = torch.minimum(F.relu(flux_SEEP_pot), S4)
     S4 = S4 - flux_SEEP # 这里扣除了水，必须在输出中体现
     
     # 5.4 交互流 (Flow between S4 and S5)

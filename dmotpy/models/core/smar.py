@@ -78,6 +78,8 @@ def smar_step(
     S5: torch.Tensor,
     S6: torch.Tensor,
     nearzero: float = 1e-6,
+    *,
+    return_routing_fluxes: bool = False,
 ) -> Tuple[
     torch.Tensor,
     torch.Tensor,
@@ -197,4 +199,6 @@ def smar_step(
     Qsim = flux_qr + flux_qg
     Ea = flux_evap_base + flux_e1 + flux_e2 + flux_e3 + flux_e4 + flux_e5
 
+    if return_routing_fluxes:
+        return Qsim, Ea, S1_new, S2_new, S3_new, S4_new, S5_new, S6_new, (flux_qr, flux_qg)
     return Qsim, Ea, S1_new, S2_new, S3_new, S4_new, S5_new, S6_new

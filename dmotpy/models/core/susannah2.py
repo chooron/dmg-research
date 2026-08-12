@@ -55,6 +55,8 @@ def susannah2_step(
     S1: torch.Tensor,
     S2: torch.Tensor,
     nearzero: float = 1e-6,
+    *,
+    return_diagnostics: bool = False,
 ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
     """
     Susannah Brook model v2 single-step calculation.
@@ -156,4 +158,12 @@ def susannah2_step(
     Qsim = flux_qse + flux_qss
     Ea = flux_eus + flux_esat
 
+    if return_diagnostics:
+        diagnostics = {
+            "external_losses": flux_qr,
+            "runoff_prerouting": Qsim,
+            "actual_et": Ea,
+            "state_names": ("S1", "S2"),
+        }
+        return Qsim, Ea, S1_new, S2_new, diagnostics
     return Qsim, Ea, S1_new, S2_new

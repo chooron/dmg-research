@@ -14,12 +14,16 @@ from dmg.core.calc.metrics import Metrics
 from dmg.core.data import create_training_grid
 
 create_dl_training_grid = create_training_grid
-from dmg.core.utils.factory import import_data_sampler, load_criterion
-from dmg.core.utils.utils import save_outputs, save_train_state
+from dmg.core.utils.factory import import_data_sampler
+from dmg.core.utils.utils import save_outputs
 
 save_outputsv2 = save_outputs
 from dmg.models.model_handler import ModelHandler
 from dmg.trainers.base import BaseTrainer
+
+from losses import build_loss_from_config
+
+from .checkpoint import save_training_checkpoint
 
 log = logging.getLogger(__name__)
 
@@ -40,6 +44,7 @@ class CommonTrainer(BaseTrainer):
         verbose: Optional[bool] = False,
     ) -> None:
         self.config = config
+        self._normalize_dmotpy_config()
         self.model = model or ModelHandler(config)
         self.train_dataset = train_dataset
         self.eval_dataset = eval_dataset
@@ -55,11 +60,7 @@ class CommonTrainer(BaseTrainer):
                 raise ValueError("'train_dataset' required for training mode.")
 
             self.epochs = self.config["train"]["epochs"]
-            self.loss_func = loss_func or load_criterion(
-                self.train_dataset["target"],
-                config["loss_function"],
-                device=config["device"],
-            )
+            self.loss_func = loss_func or build_loss_from_config(config["loss_function"])
             self.model.loss_func = self.loss_func
 
             self.optimizer = optimizer or self.init_optimizer()
@@ -72,6 +73,41 @@ class CommonTrainer(BaseTrainer):
             self.load_states()
         elif "test" in config["mode"]:
             self.load_test_states()
+
+    def _normalize_dmotpy_config(self) -> None:
+        """Bridge the dMoT config schema to the legacy Trainer internals.
+
+        The external dMG package uses ``delta_model`` while the dMoT entry
+        point uses ``model``.  This is a schema adapter, not a model-specific
+        branch, and keeps the Trainer's public lifecycle uniform.
+        """
+        train = self.config.setdefault("train", {})
+        model = self.config.setdefault("model", {})
+        phy = model.get("phy", {}) or {}
+        nn_model = model.get("nn", {}) or {}
+        if model.get("warmup") is None:
+            model["warmup"] = int(model.get("warm_up", phy.get("warm_up", 0)) or 0)
+        model_name = phy.get("model_name") or phy.get("name") or "unknown"
+        if isinstance(model_name, (list, tuple)):
+            model_name = model_name[0]
+        scheduler = train.get("lr_scheduler")
+        if isinstance(scheduler, dict):
+            scheduler_name = scheduler.get("name")
+            scheduler_params = dict(scheduler)
+            scheduler_params.pop("name", None)
+        else:
+            scheduler_name = scheduler
+            scheduler_params = {}
+        config_delta = self.config.setdefault("delta_model", {})
+        config_delta.setdefault("rho", int(model.get("rho", 365)))
+        config_delta.setdefault("phy_model", {"model": model_name, "warm_up": int(model.get("warm_up", phy.get("warm_up", 0)))})
+        config_delta.setdefault("nn_model", {"lr_scheduler": scheduler_name})
+        config_delta.setdefault("train", {"lr_scheduler": scheduler_name, "lr_scheduler_params": scheduler_params})
+        self.config.setdefault("model_path", self.config.get("model_dir", "."))
+        self.config.setdefault("out_path", self.config.get("output_dir", "."))
+        train.setdefault("learning_rate", train.get("lr", 1e-3))
+        train.setdefault("save_epoch", 1)
+        self.config.setdefault("loss_function", train.get("loss_function", {"name": "NseBatchLoss"}))
 
     @abstractmethod
     def init_optimizer(self) -> torch.optim.Optimizer:
@@ -205,6 +241,84 @@ class CommonTrainer(BaseTrainer):
     ) -> None:
         return None
 
+    @staticmethod
+    def _assert_finite_output(output: Any, context: str) -> None:
+        """Fail at the first non-finite forward value with training context."""
+        if isinstance(output, torch.Tensor):
+            if not torch.isfinite(output).all():
+                raise FloatingPointError(f"{context}: model output contains NaN or Inf")
+        elif isinstance(output, dict):
+            for key, value in output.items():
+                CommonTrainer._assert_finite_output(value, f"{context}.{key}")
+        elif isinstance(output, (tuple, list)):
+            for index, value in enumerate(output):
+                CommonTrainer._assert_finite_output(value, f"{context}[{index}]")
+
+    @staticmethod
+    def _align_loss_tensors(
+        prediction: torch.Tensor,
+        target: torch.Tensor,
+        mask: torch.Tensor | None,
+    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor | None]:
+        if prediction.ndim > 2 and prediction.shape[-1] == 1:
+            prediction = prediction.squeeze(-1)
+        if target.ndim > 2 and target.shape[-1] == 1:
+            target = target.squeeze(-1)
+        if mask is not None and mask.ndim > 2 and mask.shape[-1] == 1:
+            mask = mask.squeeze(-1)
+        if prediction.ndim != target.ndim:
+            raise ValueError(
+                f"prediction/target rank mismatch for loss: {prediction.shape} vs {target.shape}"
+            )
+        if prediction.shape[0] != target.shape[0]:
+            n = min(prediction.shape[0], target.shape[0])
+            prediction = prediction[-n:]
+            target = target[-n:]
+            if mask is not None:
+                mask = mask[-n:]
+        if prediction.shape != target.shape:
+            raise ValueError(
+                f"prediction/target shape mismatch for loss: {prediction.shape} vs {target.shape}"
+            )
+        if mask is not None and mask.shape != target.shape:
+            raise ValueError(f"mask shape {mask.shape} does not match target {target.shape}")
+        return prediction, target, mask
+
+    def _calculate_loss(self, dataset_sample: dict[str, torch.Tensor]) -> torch.Tensor:
+        """Apply every configured loss through the same explicit contract.
+
+        This bypasses the installed dMG ModelHandler's legacy loss call so the
+        dMoT Trainer owns mask, sample and temporal semantics consistently.
+        """
+        if not hasattr(self.model, "output_dict"):
+            raise TypeError("training model must expose output_dict after forward")
+        target_name = self._get_target_name()
+        target = dataset_sample["target"]
+        mask = dataset_sample.get("mask")
+        if mask is None:
+            mask = torch.isfinite(target)
+        sample_ids = dataset_sample.get("batch_sample")
+        losses: list[torch.Tensor] = []
+        for model_name, output in self.model.output_dict.items():
+            if target_name not in output:
+                raise KeyError(f"model '{model_name}' has no output '{target_name}'")
+            prediction, target_aligned, mask_aligned = self._align_loss_tensors(
+                output[target_name], target, mask
+            )
+            losses.append(
+                self.loss_func(
+                    prediction,
+                    target_aligned,
+                    mask=mask_aligned,
+                    sample_ids=sample_ids,
+                    basin_ids=sample_ids,
+                    time_index=dataset_sample.get("time_index"),
+                )
+            )
+        if not losses:
+            raise RuntimeError("no model outputs were available for loss computation")
+        return torch.stack(losses).sum()
+
     def _postprocess_prediction_dict(
         self,
         prediction: dict[str, torch.Tensor],
@@ -274,24 +388,36 @@ class CommonTrainer(BaseTrainer):
                 num_start,
             )
 
-            _ = self.model(dataset_sample)
+            model_output = self.model(dataset_sample)
+            self._assert_finite_output(
+                model_output,
+                f"model={self._get_primary_model_name()} batch={mb}",
+            )
             self._prepare_model_outputs_for_loss(dataset_sample, num_start)
-            loss = self.model.calc_loss(dataset_sample)
+            loss = self._calculate_loss(dataset_sample)
 
-            if torch.isnan(loss) or torch.isinf(loss):
-                log.debug(
-                    f"[Warning] Batch {mb}: Loss is NaN/Inf. Skipping this batch."
+            if not torch.isfinite(loss).all():
+                self.optimizer.zero_grad(set_to_none=True)
+                raise FloatingPointError(
+                    f"Batch {mb}: loss is non-finite; refusing to skip or sanitize it"
                 )
-                self.optimizer.zero_grad()
-                continue
 
             loss.backward()
 
-            for param in self.model.get_parameters():
-                if param.grad is not None:
-                    torch.nan_to_num_(param.grad, nan=0.0, posinf=1.0, neginf=-1.0)
+            model_parameters = list(self.model.get_parameters())
+            bad_gradient_indices = [
+                index
+                for index, param in enumerate(model_parameters)
+                if param.grad is not None and not torch.isfinite(param.grad).all()
+            ]
+            if bad_gradient_indices:
+                self.optimizer.zero_grad(set_to_none=True)
+                raise FloatingPointError(
+                    f"Batch {mb}: non-finite gradients in parameter indices "
+                    f"{bad_gradient_indices}; gradients were not sanitized"
+                )
 
-            torch.nn.utils.clip_grad_norm_(self.model.get_parameters(), max_norm=1.0)
+            torch.nn.utils.clip_grad_norm_(model_parameters, max_norm=1.0)
             self.optimizer.step()
             self.optimizer.zero_grad()
             self.total_loss += loss.item()
@@ -314,11 +440,14 @@ class CommonTrainer(BaseTrainer):
         """Save model checkpoint if needed."""
         if epoch % self.config["train"]["save_epoch"] == 0:
             self.model.save_model(epoch)
-            save_train_state(
-                self.config,
+            save_training_checkpoint(
+                self.config["model_dir"],
+                model=self.model,
                 epoch=epoch,
                 optimizer=self.optimizer,
                 scheduler=self.scheduler,
+                config=self.config,
+                sampler=self.sampler,
                 clear_prior=True,
             )
 

@@ -1,10 +1,11 @@
 import torch
 import torch.nn.functional as F
 from typing import Tuple
+from ..flux.evap import evap_ihacres_deficit as evap_linear_deficit
 from ..flux.saturation import saturation_5
 from ..flux.split import split_1
 
-# Parameter range dictionary (based on MARRMoT m_05_ihacres_7p_1s)
+# Parameter range dictionary (MARRMoT m_05 IHACRES: 6 parameters, 1 state)
 IHACRES_PARAMS_BOUNDS = {
     "lp": [1.0, 2000.0],  # Wilting point [mm]
     "d": [1.0, 2000.0],  # Threshold for flow generation [mm]
@@ -12,7 +13,6 @@ IHACRES_PARAMS_BOUNDS = {
     "alpha": [0.0, 1.0],  # Fast/slow flow division [-]
     "tau_q": [1.0, 5.0],  # Fast flow routing delay [d]
     "tau_s": [1.0, 30.0],  # Slow flow routing delay [d]
-    "tau_d": [1.0, 10.0],  # Pure time delay of total flow [d] (New)
 }
 
 # Parameter description dictionary
@@ -24,17 +24,6 @@ IHACRES_PARAMS_DESC = {
     "tau_q": "Fast flow routing delay [d]",
     "tau_s": "Slow flow routing delay [d]",
 }
-
-
-def evap_linear_deficit(
-    S: torch.Tensor,
-    lp: torch.Tensor,
-    Ep: torch.Tensor,
-    nearzero: float = 1e-6,
-) -> torch.Tensor:
-    """Linear evaporation decline based on moisture deficit (specialv2)."""
-    stress = torch.clamp(1.0 - S / (lp + nearzero), min=0.0, max=1.0)
-    return stress * Ep
 
 
 def create_initial_state(
@@ -59,10 +48,11 @@ def ihacres_step(
     alpha: torch.Tensor,
     tau_q: torch.Tensor,
     tau_s: torch.Tensor,
-    tau_d: torch.Tensor,
     # State variable (Deficit store)
     S1: torch.Tensor,
     nearzero: float = 1e-6,
+    *,
+    return_routing_fluxes: bool = False,
 ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
     """
     IHACRES model single-step calculation.
@@ -106,4 +96,6 @@ def ihacres_step(
     Qsim = flux_uq + flux_us
     Ea = flux_ea
 
+    if return_routing_fluxes:
+        return Qsim, Ea, S1_new, (flux_uq, flux_us)
     return Qsim, Ea, S1_new

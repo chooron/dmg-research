@@ -2,17 +2,18 @@ import torch
 import torch.nn.functional as F
 from typing import Optional, Tuple
 
-from .mopex1 import (
-    evap_7,
-    saturation_1,
-    baseflow_1,
-    recharge_3,
+from ..flux.mopex import (
+    mopex_baseflow_1 as baseflow_1,
+    mopex_evap_7 as evap_7,
+    mopex_melt_1 as melt_1,
+    mopex_rainfall_1 as rainfall_1,
+    mopex_recharge_3 as recharge_3,
+    mopex_saturation_1 as saturation_1,
+    mopex_snowfall_1 as snowfall_1,
 )
-from .mopex2 import (
-    snowfall_1,
-    rainfall_1,
-    melt_1,
-)
+# The original seasonal interception kernel is shared with restored MOPEX4
+# (alpha/is_time, context-free hot path) so MOPEX5 nests the exact MOPEX4
+# interception semantics.
 from .mopex4 import interception_4
 
 # ================================================================
@@ -72,36 +73,29 @@ def create_initial_state(
 
 
 # ================================================================
-# 2. Phenology Flux Function
+# 2. Phenology — original GSI (Growing Season Index) PET adjustment
 # ================================================================
 
-def phenology_1(
+def phenology_effective_pet(
     T: torch.Tensor,
     tmin: torch.Tensor,
     trange: torch.Tensor,
     PET: torch.Tensor,
     nearzero: float = 1e-6,
 ) -> torch.Tensor:
-    """
-    MATLAB 原版：out = min(1, max(0, (T-p1)/(p2-p1))) * Ep
-    其中 p1=tmin, p2=tmin+trange，即在 [tmin, tmin+trange] 上线性爬坡的 GSI。
+    """Original MOPEX5 phenology PET demand (MARRMoT `phenology_1` with the
+    production lambda_p = 1.0).
 
-    物理含义：
-        T <= tmin          → GSI = 0，植被休眠，有效 PET = 0
-        T >= tmin+trange   → GSI = 1，植被全活跃，有效 PET = PET
-        tmin < T < tmax    → GSI 线性插值，有效 PET 按比例缩减
+        gsi    = clamp((T - tmin) / trange, 0, 1)
+        PET_epc = gsi * PET
 
-    梯度处理：
-        MATLAB 的 min/max 双重截断等价于 torch.clamp(gsi, 0, 1)。
-        clamp 在线性区间内对 tmin、trange 的梯度完整传递：
-            ∂gsi/∂tmin   = -1/trange  （T 在线性区时）
-            ∂gsi/∂trange = -(T-tmin)/trange²
-        在饱和区（GSI=0 或 GSI=1）梯度为零，符合物理预期
-        （极端温度下调整 tmin/trange 不改变 GSI 输出）。
-        对于需要完全光滑梯度的场景，可改用双 sigmoid 近似，
-        但对大样本优化实践而言 clamp 已经足够。
+    The GSI factor lies in [0, 1], so the phenology-adjusted daily demand
+    satisfies ``0 <= PET_epc <= PET`` by construction.  This single quantity
+    is the shared daily evaporative demand consumed in order by interception,
+    ET1 and ET2 (same corrected budget semantics as restored MOPEX4).
     """
-    gsi = torch.clamp((T - tmin) / (trange + nearzero), 0.0, 1.0)
+    safe_trange = torch.clamp(trange, min=nearzero)
+    gsi = torch.clamp((T - tmin) / safe_trange, 0.0, 1.0)
     return gsi * PET
 
 
@@ -113,7 +107,6 @@ def mopex5_step(
     P: torch.Tensor,
     T: torch.Tensor,
     PET: torch.Tensor,
-    doy: torch.Tensor,
     # Parameters — order matches MOPEX5_PARAMS_BOUNDS keys
     tcrit: torch.Tensor,
     ddf: torch.Tensor,
@@ -135,22 +128,42 @@ def mopex5_step(
     Sn: torch.Tensor,
     delta_t: float = 1.0,
     nearzero: float = 1e-6,
+    *,
+    doy: torch.Tensor = None,
+    phase_cos: torch.Tensor = None,
+    phase_sin: torch.Tensor = None,
 ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
     """
-    MOPEX-5 离散单步计算。
+    MOPEX-5 离散单步计算 — original formulas with corrected process order.
 
-    MATLAB ODE 对应关系：
+    MOPEX5 keeps the MOPEX4 core hydrology and adds the phenology PET
+    extension: the daily shared evaporative demand is the phenology-adjusted
+    ``PET_epc = GSI(T) * PET`` (original ``phenology_1`` formula, production
+    lambda_p = 1.0; ``0 <= PET_epc <= PET`` by construction).
+
+    Corrected process semantics (aligned with restored MOPEX4; the OLD MOPEX5
+    added gross Pr+qn to S1, ran ET1 before interception, capped interception
+    by the post-ET1 storage instead of the shared PET demand, fed gross
+    Pr+qn to saturation_1, and let ET2 consume the full PET_epc again):
+
+        I       = min(I_pot, Pr, PET_epc)          # interception-first
+        Pr_net  = Pr - I                           # only liquid rainfall
+        soil    = Pr_net + qn                      # net + snowmelt
+        ET1     = evap_7(S1, Sb1, PET_epc - I)
+        q1f     = saturation_1(soil, S1, Sb1)      # net event input
+        ET2     = evap_7(S2, se*s3max, PET_epc - I - ET1)
+
+    so ``I + ET1 + ET2 <= PET_epc <= PET`` holds by construction.
+    ``phase_cos``/``phase_sin`` are accepted for call compatibility and unused.
+
+    MATLAB ODE 对应关系（原始公式不变）：
         dS1 = ps   - qn                                  (Sn：积雪)
         dS2 = pr   + qn - et1 - i - q1f - qw            (S1：土壤)
         dS3 = qw   - et2 - q2f - q2u                    (S2：地下)
         dS4 = q1f  + q2f - qf                            (Sc1：快速流)
         dS5 = q2u  - qs                                  (Sc2：慢速流)
-
-    与 MOPEX-4 的唯一结构差异：
-        新增 flux_epc = phenology_1(T, tmin, tmin+trange, PET)
-        ET1 和 ET2 均使用 flux_epc（物候修正后的有效 PET）而非原始 PET，
-        其余所有通量、状态更新顺序与 MOPEX-4 完全一致。
     """
+    del phase_cos, phase_sin  # unused in the fixed hot path
 
     # ── Guards ────────────────────────────────────────────────────
     Sn  = F.relu(Sn)
@@ -160,18 +173,14 @@ def mopex5_step(
     Sc2 = F.relu(Sc2)
 
     # ============================================================
-    # Phenology Module
+    # Phenology Module — the single shared daily evaporative demand
     # MATLAB: flux_epc = phenology_1(T, tmin, tmin+trange, Ep)
-    # 物候修正后的有效 PET，仅影响 ET1 和 ET2，
-    # 截留蒸发（flux_i）不受物候影响（冠层拦截与植被活性无关）
     # ============================================================
-    PET_epc = phenology_1(T, tmin, trange, PET, nearzero)
+    PET_epc = phenology_effective_pet(T, tmin, trange, PET, nearzero)
 
     # ============================================================
     # Snow Bucket (Sn = MATLAB S1)
-    # MATLAB: dS1 = ps - qn
     # ============================================================
-
     flux_ps = snowfall_1(P, T, tcrit)
     flux_pr = rainfall_1(P, T, tcrit)
     # 守恒：flux_ps + flux_pr = P
@@ -183,66 +192,61 @@ def mopex5_step(
 
     # ============================================================
     # Soil Bucket (S1 = MATLAB S2)
-    # MATLAB: dS2 = pr + qn - et1 - i - q1f - qw
-    # 顺序：加入有效降水 → 蒸发(PET_epc) → 截留 → 饱和径流 → 下渗
+    # 顺序（corrected）：截留 I（从液态雨扣除）→ 净雨 Pr_net + qn 进入土壤
+    #     → 蒸发 et1 → 饱和径流 q1f → 下渗 qw
     # ============================================================
 
-    S1 = S1 + flux_pr + flux_qn
+    # Step 1: interception-first water path (original alpha/is_time kernel,
+    # sourced exclusively from the post-partition liquid rainfall and capped
+    # by the shared phenology-adjusted PET demand).
+    i_pot = interception_4(flux_pr, doy, alpha, is_time, nearzero=nearzero)
+    flux_i = torch.minimum(i_pot, PET_epc)         # exact hard budget limiter
+    flux_pr_net = flux_pr - flux_i
+    pet_after_i = PET_epc - flux_i
 
-    # Step 1：蒸发（使用物候修正后的 PET_epc）
-    # MATLAB: flux_et1 = evap_7(S2, s2max, flux_epc, dt)
-    flux_et1 = evap_7(S1, Sb1, PET_epc, delta_t, nearzero)
+    soil_input = flux_pr_net + flux_qn
+    S1 = S1 + soil_input
+
+    # Step 2: ET1 consumes the remaining shared demand after interception.
+    flux_et1 = evap_7(S1, Sb1, pet_after_i, delta_t, nearzero)
     flux_et1 = torch.minimum(flux_et1, S1)
     S1 = S1 - flux_et1
+    pet_remaining = pet_after_i - flux_et1
 
-    # Step 2：截留（使用原始 PET，与 MOPEX-4 一致）
-    # MATLAB: flux_i = interception_4(i_alpha, i_s, t, tmax, flux_pr, dt)
-    flux_i = interception_4(flux_pr, doy, alpha, is_time, nearzero=nearzero)
-    flux_i = torch.minimum(flux_i, S1)
-    S1 = S1 - flux_i
-
-    # Step 3：饱和径流
-    # MATLAB: flux_q1f = saturation_1(flux_pr+flux_qn, S2, s2max)
-    flux_q1f = saturation_1(flux_pr + flux_qn, S1, Sb1, nearzero=nearzero)
+    # Step 3: 饱和径流（corrected：event input = net rainfall + snowmelt）
+    flux_q1f = saturation_1(soil_input, S1, Sb1, nearzero=nearzero)
     flux_q1f = torch.minimum(flux_q1f, S1)
     S1 = S1 - flux_q1f
 
     # Step 4：下渗
-    # MATLAB: flux_qw = recharge_3(tw, S2) → tw * S2
     flux_qw = recharge_3(tw, S1)
     S1_new  = S1 - flux_qw               # S1_new ≥ 0 保证
 
     # ============================================================
     # Subsurface Bucket (S2 = MATLAB S3)
-    # MATLAB: dS3 = qw - et2 - q2f - q2u
-    # 顺序：加入下渗 → 地下溢流 → 基流 → 蒸发(PET_epc)
+    # 顺序：加入下渗 → 地下溢流 → 基流 → 蒸发（剩余共享 budget）
     # ============================================================
 
     S2 = S2 + flux_qw
 
     # Step 1：地下溢流
-    # MATLAB: flux_q2f = saturation_1(flux_qw, S3, s3max)
     flux_q2f = saturation_1(flux_qw, S2, Sb2, nearzero=nearzero)
     flux_q2f = torch.minimum(flux_q2f, S2)
     S2 = S2 - flux_q2f
 
     # Step 2：基流
-    # MATLAB: flux_q2u = baseflow_1(tu, S3) → tu * S3
     flux_q2u = baseflow_1(tu, S2)
     S2 = S2 - flux_q2u
 
-    # Step 3：蒸发（使用物候修正后的 PET_epc）
-    # MATLAB: flux_et2 = evap_7(S3, se*s3max, flux_epc, dt)
+    # Step 3：蒸发（剩余共享 budget after I and ET1）
     se_abs   = Se * Sb2
-    flux_et2 = evap_7(S2, se_abs, PET_epc, delta_t, nearzero)
+    flux_et2 = evap_7(S2, se_abs, pet_remaining, delta_t, nearzero)
     flux_et2 = torch.minimum(flux_et2, S2)
     S2_new   = S2 - flux_et2             # S2_new ≥ 0 保证
 
     # ============================================================
     # Routing Buckets
-    # MATLAB: dS4 = q1f + q2f - qf；dS5 = q2u - qs
     # ============================================================
-
     Sc1      = Sc1 + flux_q1f + flux_q2f
     flux_qf  = baseflow_1(tc, Sc1)
     Sc1_new  = Sc1 - flux_qf
@@ -253,7 +257,6 @@ def mopex5_step(
 
     # ============================================================
     # Output
-    # MATLAB: FluxGroups.Ea = [et1, et2]；FluxGroups.Q = [qf, qs]
     # ET_total 含截留蒸发，与 CAMELS ET 口径一致
     # ============================================================
     Q_total  = flux_qf + flux_qs

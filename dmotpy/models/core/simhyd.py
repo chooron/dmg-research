@@ -1,57 +1,56 @@
-import torch
-import torch.nn.functional as F
-from typing import Tuple
-from ..flux.evap import evap_1, evap_2
-from ..flux.interception import interception_1
-from ..flux.infiltration import infiltration_1
-from ..flux.interflow import interflow_1
-from ..flux.recharge import recharge_1
-from ..flux.saturation import saturation_1
-from ..flux.baseflow import baseflow_1
+"""Seven-parameter SIMHYD runoff generation without unit-hydrograph routing.
 
-# Parameter range dictionary (based on MARRMoT m_18_simhyd_7p_3s)
+This is the two-store formulation from
+``project/hydro_structure_diagnosis/models/simhyd.py`` with its optional PET
+multiplier fixed to one and its Gamma unit hydrograph removed.  It therefore
+keeps the fixed 7-parameter calibration contract while avoiding an additional
+routing model and its two parameters.
+"""
+from __future__ import annotations
+
+from typing import Tuple
+
+import torch
+
+
 SIMHYD_PARAMS_BOUNDS = {
-    "insc": [0.0, 5.0],  # Maximum interception capacity [mm]
-    "coeff": [0.0, 600.0],  # Maximum infiltration loss parameter [mm]
-    "sq": [0.0, 15.0],  # Infiltration loss exponent [-]
-    "smsc": [1.0, 2000.0],  # Maximum soil moisture capacity [mm]
-    "sub": [0.0, 1.0],  # Interflow proportionality constant [-]
-    "crak": [0.0, 1.0],  # Recharge proportionality constant [-]
-    "k": [0.0, 1.0],  # Slow flow time scale [d-1]
+    "insc": [0.0, 5.0],
+    "coeff": [0.0, 600.0],
+    "sq": [0.0, 15.0],
+    "smsc": [1.0, 2000.0],
+    "sub": [0.0, 1.0],
+    "crak": [0.0, 1.0],
+    "k": [0.0, 1.0],
 }
 
-# Parameter description dictionary
 SIMHYD_PARAMS_DESC = {
-    "insc": "Maximum interception capacity [mm]",
-    "coeff": "Maximum infiltration loss parameter [mm]",
-    "sq": "Infiltration loss exponent [-]",
+    "insc": "Same-day interception and evaporation capacity [mm]",
+    "coeff": "Maximum infiltration capacity [mm]",
+    "sq": "Infiltration capacity exponent [-]",
     "smsc": "Maximum soil moisture capacity [mm]",
-    "sub": "Proportionality constant for interflow [-]",
-    "crak": "Proportionality constant for recharge [-]",
-    "k": "Slow flow time scale [d-1]",
+    "sub": "Interflow proportionality constant [-]",
+    "crak": "Recharge proportionality constant [-]",
+    "k": "Groundwater recession coefficient [d-1]",
 }
 
 
 def create_initial_state(
-    n_grid: int, nmul: int, device: torch.device, nearzero: float = 1e-6
-) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    n_grid: int, nmul: int, device: torch.device, nearzero: float = 1e-6,
+) -> Tuple[torch.Tensor, torch.Tensor]:
+    """Create the reference variant's soil and groundwater stores.
+
+    The production path repeats five water years as warm-up, so these neutral
+    initial states are equilibrated before any calibrated target is scored.
     """
-    Create initial states for SimHyd model.
-    S1: Interception store
-    S2: Soil moisture store
-    S3: Groundwater store
-    """
-    S1 = torch.zeros((n_grid, nmul), device=device) + nearzero
-    S2 = torch.zeros((n_grid, nmul), device=device) + nearzero
-    S3 = torch.zeros((n_grid, nmul), device=device) + nearzero
-    return S1, S2, S3
+    soil = torch.full((n_grid, nmul), nearzero, device=device)
+    groundwater = torch.zeros((n_grid, nmul), device=device)
+    return soil, groundwater
 
 
 def simhyd_step(
     P: torch.Tensor,
     T: torch.Tensor,
     PET: torch.Tensor,
-    # Parameters matching SIMHYD_PARAMS_BOUNDS keys
     insc: torch.Tensor,
     coeff: torch.Tensor,
     sq: torch.Tensor,
@@ -59,106 +58,49 @@ def simhyd_step(
     sub: torch.Tensor,
     crak: torch.Tensor,
     k: torch.Tensor,
-    # State variables
-    S1: torch.Tensor,
-    S2: torch.Tensor,
-    S3: torch.Tensor,
+    soil: torch.Tensor,
+    groundwater: torch.Tensor,
     nearzero: float = 1e-6,
-) -> Tuple[
-    torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor
-]:
+) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+    """One mass-conserving daily step of the no-UH 7p SIMHYD variant.
+
+    ``T`` is accepted for the common model interface but is not part of this
+    rainfall/PET model.  The equations follow the diagnosis implementation:
+    interception is same-day evaporation capped by precipitation/PET/capacity;
+    soil overflow recharges groundwater; and baseflow is released from the
+    step-initial groundwater store.  No Gamma unit hydrograph is applied.
     """
-    SimHyd model single-step calculation.
+    del T
+    precip = torch.clamp(P, min=0.0)
+    pet = torch.clamp(PET, min=0.0)
+    insc_safe = torch.clamp(insc, min=nearzero)
+    smsc_safe = torch.clamp(smsc, min=nearzero)
+    coeff_safe = torch.clamp(coeff, min=nearzero)
 
-    Model reference:
-    Chiew, F. H. S., Peel, M. C., & Western, A. W. (2002). Application and
-    testing of the simple rainfall-runoff model SIMHYD.
-    """
+    interception = torch.minimum(torch.minimum(insc_safe, pet), precip)
+    rainfall_excess = precip - interception
+    pet_remaining = pet - interception
 
-    # --- 1. Interception Process (S1) ---
-    # flux_EXC: Excess rainfall after interception
-    flux_EXC = interception_1(P, S1, insc, nearzero=nearzero)
-    zeros = torch.zeros_like(flux_EXC)
-    flux_EXC = torch.clamp(flux_EXC, min=zeros, max=P)
+    soil_ratio = torch.clamp(soil / (smsc_safe + nearzero), min=0.0, max=1.0)
+    infiltration_capacity = coeff_safe * torch.exp(-torch.clamp(sq, min=0.0) * soil_ratio)
+    infiltration = torch.minimum(infiltration_capacity, rainfall_excess)
+    direct_runoff = rainfall_excess - infiltration
 
-    # State update for interception evaporation
-    S1_tmp = S1 + P - flux_EXC
-    S1_tmp = torch.clamp(S1_tmp, min=nearzero)
+    interflow = torch.clamp(sub, min=0.0, max=1.0) * soil_ratio * infiltration
+    recharge = torch.clamp(crak, min=0.0, max=1.0) * soil_ratio * (infiltration - interflow)
+    soil_fill = infiltration - interflow - recharge
 
-    # flux_Ei: Evaporation from interception store
-    flux_Ei = evap_1(S1_tmp, PET, nearzero=nearzero)
-    flux_Ei = torch.minimum(flux_Ei, S1_tmp - nearzero)
-    flux_Ei = F.relu(flux_Ei)
+    soil_available = torch.clamp(soil + soil_fill, min=nearzero)
+    soil_evaporation = torch.minimum(10.0 * soil_ratio, pet_remaining)
+    soil_evaporation = torch.minimum(soil_evaporation, soil_available)
+    soil_after_evaporation = soil_available - soil_evaporation
+    soil_overflow = torch.clamp(soil_after_evaporation - smsc_safe, min=0.0)
+    soil_new = soil_after_evaporation - soil_overflow
 
-    # Final S1 update
-    S1_new = S1_tmp - flux_Ei
-    S1_new = torch.clamp(S1_new, min=nearzero)
+    recharge_total = recharge + soil_overflow
+    baseflow = torch.clamp(k, min=0.0, max=1.0) * groundwater
+    groundwater_new = groundwater + recharge_total - baseflow
 
-    # --- 2. Soil Moisture Process (S2) ---
-    # Step 2.1: Surface processes (Infiltration and Runoff)
-    # flux_INF: Infiltration into the soil
-    flux_INF = infiltration_1(coeff, sq, S2, smsc, flux_EXC, nearzero=nearzero)
-    flux_INF = torch.minimum(flux_INF, flux_EXC)
-
-    # flux_SRUN: Surface runoff (Saturation excess before infiltration)
-    flux_SRUN = F.relu(flux_EXC - flux_INF)
-
-    # Step 2.2: Internal soil moisture split
-    # flux_INT: Interflow from infiltrated water
-    flux_INT = interflow_1(sub, S2, smsc, flux_INF, nearzero=nearzero)
-    flux_INT = torch.minimum(flux_INT, flux_INF)
-
-    # flux_REC: Groundwater recharge
-    flux_rem_inf = F.relu(flux_INF - flux_INT)
-    flux_REC = recharge_1(crak, S2, smsc, flux_rem_inf, nearzero=nearzero)
-    flux_REC = torch.minimum(flux_REC, flux_rem_inf)
-
-    # flux_SMF: Soil moisture filling flux
-    flux_SMF = F.relu(flux_rem_inf - flux_REC)
-
-    # flux_GWF: Saturation excess from soil moisture store to groundwater
-    flux_GWF = saturation_1(flux_SMF, S2, smsc, nearzero=nearzero)
-    flux_GWF = torch.clamp(flux_GWF, min=zeros, max=flux_SMF)
-
-    # Step 2.3: State update and Evapotranspiration
-    S2_tmp = S2 + flux_SMF - flux_GWF
-    S2_tmp = torch.clamp(S2_tmp, min=nearzero)
-
-    # Remaining PET after interception ET
-    pet_rem = F.relu(PET - flux_Ei)
-
-    # flux_Et: Transpiration from soil
-    # MATLAB: evap_2(10, S2, smsc, Ep) - p1=10 is used as a constant
-    p1_const = torch.tensor(10.0, device=P.device)
-    flux_Et = evap_2(p1_const, S2_tmp, smsc, pet_rem, nearzero=nearzero)
-    flux_Et = torch.minimum(flux_Et, S2_tmp - nearzero)
-    flux_Et = torch.minimum(flux_Et, pet_rem)
-    flux_Et = F.relu(flux_Et)
-
-    # Final S2 update
-    S2_new = S2_tmp - flux_Et
-    S2_new = torch.clamp(S2_new, min=nearzero)
-
-    # --- 3. Groundwater Process (S3) ---
-    # Inflow to S3: groundwater recharge (REC) and saturation overflow (GWF)
-    inflow_S3 = flux_REC + flux_GWF
-
-    S3_tmp = S3 + inflow_S3
-    S3_tmp = torch.clamp(S3_tmp, min=nearzero)
-
-    # flux_BAS: Baseflow from groundwater
-    flux_BAS = baseflow_1(k, S3_tmp, nearzero=nearzero)
-    flux_BAS = torch.minimum(flux_BAS, S3_tmp - nearzero)
-    flux_BAS = F.relu(flux_BAS)
-
-    # Final S3 update
-    S3_new = S3_tmp - flux_BAS
-    S3_new = torch.clamp(S3_new, min=nearzero)
-
-    # --- 4. Output Aggregation ---
-    # Qsim = Surface Runoff + Interflow + Baseflow
-    # Ea = Interception ET + Soil Transpiration
-    Qsim = flux_SRUN + flux_INT + flux_BAS
-    Ea = flux_Ei + flux_Et
-
-    return Qsim, Ea, S1_new, S2_new, S3_new
+    streamflow = direct_runoff + interflow + baseflow
+    evaporation = interception + soil_evaporation
+    return streamflow, evaporation, soil_new, groundwater_new

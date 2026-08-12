@@ -3,8 +3,8 @@ import torch.nn.functional as F
 
 
 def depression_1(
-    p1: torch.Tensor,
-    p2: torch.Tensor,
+    ads: torch.Tensor,
+    md: torch.Tensor,
     S: torch.Tensor,
     Smax: torch.Tensor,
     incoming_flux: torch.Tensor,
@@ -15,8 +15,8 @@ def depression_1(
     Formula: out = min(p1 * exp(-p2 * S / max(Smax - S, 0)) * flux, max(Smax - S, 0))
     """
     capacity = F.relu(Smax - S)
-    # Protection for exp argument and division
-    potential_inflow = (
-        p1 * torch.exp(-p2 * S / (capacity + nearzero)) * incoming_flux
+    exponent = torch.clamp(
+        -md * S / (capacity + nearzero), min=-30.0, max=0.0
     )
-    return torch.minimum(potential_inflow, capacity)
+    potential_inflow = ads * torch.exp(exponent) * incoming_flux
+    return torch.minimum(torch.minimum(potential_inflow, capacity), incoming_flux)

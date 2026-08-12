@@ -54,46 +54,30 @@ def create_initial_state(
     return S1, S2, S3, S4
 
 
-def flexi_step(
+def flexi_step_pre(
     P: torch.Tensor,
     T: torch.Tensor,
     PET: torch.Tensor,
-    # Parameters matching FLEXI_PARAMS_BOUNDS keys
     smax: torch.Tensor,
     beta: torch.Tensor,
     d_split: torch.Tensor,
     percmax: torch.Tensor,
     lp: torch.Tensor,
-    nlagf: torch.Tensor,
-    nlags: torch.Tensor,
-    kf: torch.Tensor,
-    ks: torch.Tensor,
     imax: torch.Tensor,
-    # State variables
     S1: torch.Tensor,
     S2: torch.Tensor,
-    S3: torch.Tensor,
-    S4: torch.Tensor,
     nearzero: float = 1e-6,
-) -> Tuple[
-    torch.Tensor,
-    torch.Tensor,
-    torch.Tensor,
-    torch.Tensor,
-    torch.Tensor,
-    torch.Tensor,
-]:
-    """
-    Flex-I model single-step calculation.
+) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+    """Flex-I pre-UH step: interception (S1) and soil moisture (S2).
 
-    Model reference:
-    Fenicia, F., McDonnell, J. J., & Savenije, H. H. G. (2008).
-    Learning from model improvement: On the contribution of complementary
-    data to process understanding. Water Resources Research, 44(6).
+    Returns:
+        flux_rf   -- fast runoff component (enters UH)
+        flux_rsl  -- slow runoff component (percolation + slow split) (enters UH)
+        flux_ei   -- interception evaporation (passthrough to post)
+        flux_eur  -- soil evaporation (passthrough to post)
+        S1_new    -- updated interception store
+        S2_new    -- updated soil moisture store
     """
-
-    # UH parameters are unused (identity routing)
-    _ = (nlagf, nlags)
 
     # --- 1. Interception Process (S1) ---
     # flux_peff: Throughfall (Saturation excess from S1)
@@ -150,12 +134,38 @@ def flexi_step(
     S2_new = S2_tmp2 - flux_ps
     S2_new = torch.clamp(S2_new, min=nearzero)
 
-    # --- 3. Routing Processes (S3 and S4) ---
-
-    # TODO: Inner Routing using DplTri3, using nlagf and nlags as delay parameters
-    # Instantaneous routing for flux_rf (fast) and (flux_ps + flux_rs) (slow)
-    flux_rfl = flux_rf
     flux_rsl = flux_ps + flux_rs
+
+    return flux_rf, flux_rsl, flux_ei, flux_eur, S1_new, S2_new
+
+
+def flexi_step_post(
+    flux_rfl: torch.Tensor,
+    flux_rsl: torch.Tensor,
+    flux_ei: torch.Tensor,
+    flux_eur: torch.Tensor,
+    S3: torch.Tensor,
+    S4: torch.Tensor,
+    kf: torch.Tensor,
+    ks: torch.Tensor,
+    nearzero: float = 1e-6,
+) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+    """Flex-I post-UH step: routing stores (S3 fast, S4 slow) and aggregation.
+
+    Args:
+        flux_rfl  -- fast inflow (UH-routed or direct)
+        flux_rsl  -- slow inflow (percolation + slow split, UH-routed or direct)
+        flux_ei   -- interception evaporation (from pre)
+        flux_eur  -- soil evaporation (from pre)
+        S3        -- fast routing store
+        S4        -- slow routing store
+        kf, ks    -- routing coefficients
+
+    Returns:
+        Qsim, Ea, S3_new, S4_new
+    """
+
+    # --- 3. Routing Processes (S3 and S4) ---
 
     # S3: Fast Routing Store
     S3_tmp = S3 + flux_rfl
@@ -185,4 +195,54 @@ def flexi_step(
     Qsim = flux_qf + flux_qs
     Ea = flux_ei + flux_eur
 
+    return Qsim, Ea, S3_new, S4_new
+
+
+def flexi_step(
+    P: torch.Tensor,
+    T: torch.Tensor,
+    PET: torch.Tensor,
+    # Parameters matching FLEXI_PARAMS_BOUNDS keys
+    smax: torch.Tensor,
+    beta: torch.Tensor,
+    d_split: torch.Tensor,
+    percmax: torch.Tensor,
+    lp: torch.Tensor,
+    nlagf: torch.Tensor,
+    nlags: torch.Tensor,
+    kf: torch.Tensor,
+    ks: torch.Tensor,
+    imax: torch.Tensor,
+    # State variables
+    S1: torch.Tensor,
+    S2: torch.Tensor,
+    S3: torch.Tensor,
+    S4: torch.Tensor,
+    nearzero: float = 1e-6,
+) -> Tuple[
+    torch.Tensor,
+    torch.Tensor,
+    torch.Tensor,
+    torch.Tensor,
+    torch.Tensor,
+    torch.Tensor,
+]:
+    """
+    Flex-I model single-step calculation.
+
+    Model reference:
+    Fenicia, F., McDonnell, J. J., & Savenije, H. H. G. (2008).
+    Learning from model improvement: On the contribution of complementary
+    data to process understanding. Water Resources Research, 44(6).
+    """
+
+    # UH parameters are unused (identity routing)
+    _ = (nlagf, nlags)
+
+    flux_rf, flux_rsl, flux_ei, flux_eur, S1_new, S2_new = flexi_step_pre(
+        P, T, PET, smax, beta, d_split, percmax, lp, imax, S1, S2, nearzero,
+    )
+    Qsim, Ea, S3_new, S4_new = flexi_step_post(
+        flux_rf, flux_rsl, flux_ei, flux_eur, S3, S4, kf, ks, nearzero,
+    )
     return Qsim, Ea, S1_new, S2_new, S3_new, S4_new

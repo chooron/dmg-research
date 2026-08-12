@@ -27,9 +27,10 @@ def saturation_2(
     """
     Saturation excess from a store with different degrees of saturation.
     """
-    s_rel = S / (Smax + nearzero)
-    term = torch.clamp(1.0 - s_rel, min=0.0, max=1.0)
-    out_frac = 1.0 - (term + nearzero).pow(p1)
+    Smax_safe = torch.clamp(Smax, min=nearzero)
+    s_rel = S / Smax_safe
+    term = torch.clamp(1.0 - s_rel, min=nearzero, max=1.0)
+    out_frac = 1.0 - term.pow(p1)
     return out_frac * incoming_flux
 
 

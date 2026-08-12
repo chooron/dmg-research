@@ -17,8 +17,12 @@ def exchange_1(
     Note: dt is assumed to be 1.0.
     """
     s_abs = torch.abs(S)
-    flow = (p1 * s_abs + p2 * (1.0 - torch.exp(-p3 * s_abs))) * torch.sign(S)
-    return torch.maximum(flow, -fmax)
+    linear_part = p1 * S
+    arg = torch.clamp(-p3 * s_abs, min=-30.0, max=0.0)
+    exp_term = 1.0 - torch.exp(arg)
+    smooth_sign = S / (s_abs + nearzero)
+    flow = linear_part + p2 * exp_term * smooth_sign
+    return torch.maximum(flow, -torch.abs(fmax))
 
 
 def exchange_2(
@@ -46,3 +50,13 @@ def exchange_3(
     Formula: out = p1 * (S - p2)
     """
     return p1 * (S - p2)
+
+
+def exchange_gr4j(
+    x2: torch.Tensor,
+    S: torch.Tensor,
+    x3: torch.Tensor,
+    nearzero: float = 1e-6,
+) -> torch.Tensor:
+    """GR4J groundwater-exchange term from routing-store saturation."""
+    return x2 * (S / (x3 + nearzero)).pow(3.5)

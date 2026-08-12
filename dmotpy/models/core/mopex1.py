@@ -2,6 +2,13 @@ import torch
 import torch.nn.functional as F
 from typing import Tuple
 
+from ..flux.mopex import (
+    mopex_baseflow_1 as baseflow_1,
+    mopex_evap_7 as evap_7,
+    mopex_recharge_3 as recharge_3,
+    mopex_saturation_1 as saturation_1,
+)
+
 # ================================================================
 # 1. Parameter Configuration
 # 严格对应 MARRMoT MATLAB 原版参数语义
@@ -34,69 +41,6 @@ def create_initial_state(
         torch.zeros((n_grid, nmul), device=device) + nearzero,
         torch.zeros((n_grid, nmul), device=device) + nearzero,
     )
-
-
-# ================================================================
-# 2. Flux Functions
-# ================================================================
-
-def evap_7(
-    S: torch.Tensor,
-    Smax: torch.Tensor,
-    Ep: torch.Tensor,
-    dt: float = 1.0,
-    nearzero: float = 1e-6,
-) -> torch.Tensor:
-    """
-    MATLAB 原版：out = min(S/Smax * Ep, S/dt)
-    梯度处理：ratio clamp(max=1) 防止 S > Smax 时 ET 超过 Ep。
-    注意：调用方还需再做 minimum(flux, S) 以应对离散步进中 S 被前序通量消耗后变小的情况。
-    """
-    ratio  = torch.clamp(S / (Smax + nearzero), max=1.0)
-    et_pot = Ep * ratio * dt
-    et_cap = S                   # 等价于 MATLAB 的 S/dt * dt
-    return torch.minimum(et_pot, et_cap)
-
-
-def saturation_1(
-    P: torch.Tensor,
-    S: torch.Tensor,
-    Smax: torch.Tensor,
-    r: float = 0.01,
-    e: float = 5.0,
-    nearzero: float = 1e-6,
-) -> torch.Tensor:
-    """
-    MATLAB 原版：out = P * (1 - smoothThreshold_storage_logistic(S, Smax))
-    产流比例随蓄满程度增大，S = Smax 时趋近于 1（全部降雨成为径流）。
-    梯度处理：sigmoid 全程光滑可导，s1max 梯度始终存在。
-    """
-    threshold   = Smax * (1.0 - r)
-    scale       = Smax * r * e + nearzero
-    frac_runoff = torch.sigmoid((S - threshold) / scale)
-    return P * frac_runoff
-
-
-def baseflow_1(
-    k: torch.Tensor,
-    S: torch.Tensor,
-) -> torch.Tensor:
-    """
-    MATLAB 原版：out = k * S，k 为率参数 [d⁻¹]。
-    离散安全保证：min(k*S, S)，防止优化过程中 k 短暂越界时超抽。
-    梯度：k 和 S 均线性可导。
-    """
-    return torch.minimum(k * S, S)
-
-
-def recharge_3(
-    k: torch.Tensor,
-    S: torch.Tensor,
-) -> torch.Tensor:
-    """
-    MATLAB 原版：out = k * S（与 baseflow_1 形式相同）。
-    """
-    return torch.minimum(k * S, S)
 
 
 # ================================================================

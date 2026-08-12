@@ -7,6 +7,7 @@ from typing import Any, Optional
 import torch
 
 from .common_trainer import CommonTrainer
+from .checkpoint import load_training_checkpoint
 
 log = logging.getLogger(__name__)
 
@@ -66,31 +67,33 @@ class CalTrainer(CommonTrainer):
 
     def load_states(self) -> None:
         path = self.config["model_path"]
-        for file in os.listdir(path):
-            if "train_state" in file:
-                checkpoint = torch.load(
-                    os.path.join(path, file),
-                    map_location=self.config["device"],
-                )
-                self.optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
-                self.model.load_model(epoch=checkpoint["epoch"])
-                self.start_epoch = checkpoint["epoch"] + 1
-
-                if self.scheduler:
-                    self.scheduler.load_state_dict(checkpoint["scheduler_state_dict"])
-
-                torch.set_rng_state(checkpoint["random_state"].cpu().byte())
-                if torch.cuda.is_available() and "cuda_random_state" in checkpoint:
-                    torch.cuda.set_rng_state_all(
-                        checkpoint["cuda_random_state"].cpu().byte()
-                    )
-                log.debug(f"Loaded checkpoint from epoch {checkpoint['epoch']}")
-                return
+        files = sorted(
+            (os.path.join(path, file) for file in os.listdir(path)),
+            key=lambda item: item,
+        ) if os.path.isdir(path) else []
+        files = [file for file in files if os.path.basename(file).startswith("trainer_state_ep")]
+        if not files:
             self.start_epoch = 1
+            self.global_step = 0
+            return
+        checkpoint = load_training_checkpoint(
+            files[-1],
+            model=self.model,
+            optimizer=self.optimizer,
+            scheduler=self.scheduler,
+            sampler=self.sampler,
+            map_location=self.config["device"],
+        )
+        self.start_epoch = int(checkpoint["epoch"]) + 1
+        self.global_step = int(checkpoint["global_step"])
+        log.debug(f"Loaded checkpoint from epoch {checkpoint['epoch']}")
 
     def train(self) -> None:
         self.is_in_train = True
         n_samples, n_minibatch, n_timesteps = self._setup_training_grid()
+        max_batches = self.config.get("train", {}).get("max_batches")
+        if max_batches is not None:
+            n_minibatch = min(n_minibatch, max(int(max_batches), 1))
         n_basins = self.train_dataset["xc_nn_norm"].shape[1]
 
         self._log_training_start(n_basins)

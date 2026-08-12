@@ -15,8 +15,9 @@ def infiltration_1(
     Infiltration as exponentially declining based on relative storage.
     Formula: out = min(p1 * exp(-p2 * S / Smax), fin)
     """
-    # Using nearzero for division safety
-    rate = p1 * torch.exp(-p2 * S / (Smax + nearzero))
+    Smax_safe = torch.clamp(Smax, min=1.0)
+    exponent = torch.clamp(-p2 * S / Smax_safe, min=-30.0, max=0.0)
+    rate = p1 * torch.exp(exponent)
     return torch.minimum(rate, fin)
 
 
@@ -34,7 +35,9 @@ def infiltration_2(
     Formula: out = max(min(p1 * exp(-p2 * S1 / S1max) - flux, S2), 0)
     Note: dt is assumed to be 1.0.
     """
-    potential_inf = p1 * torch.exp(-p2 * S1 / (S1max + nearzero))
+    S1max_safe = torch.clamp(S1max, min=1.0)
+    exponent = torch.clamp(-p2 * S1 / S1max_safe, min=-30.0, max=0.0)
+    potential_inf = p1 * torch.exp(exponent)
     net_inf = potential_inf - flux
     return F.relu(torch.minimum(net_inf, S2))
 

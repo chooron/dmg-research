@@ -2,11 +2,14 @@ import torch
 import torch.nn.functional as F
 from typing import Tuple
 
-from .mopex1 import (
-    evap_7,
-    saturation_1,
-    baseflow_1,
-    recharge_3,
+from ..flux.mopex import (
+    mopex_baseflow_1 as baseflow_1,
+    mopex_evap_7 as evap_7,
+    mopex_melt_1 as melt_1,
+    mopex_rainfall_1 as rainfall_1,
+    mopex_recharge_3 as recharge_3,
+    mopex_saturation_1 as saturation_1,
+    mopex_snowfall_1 as snowfall_1,
 )
 
 # ================================================================
@@ -48,72 +51,6 @@ def create_initial_state(
         torch.zeros((n_grid, nmul), device=device) + nearzero,
         torch.zeros((n_grid, nmul), device=device) + nearzero,
     )
-
-
-# ================================================================
-# 2. Snow Flux Functions
-# ================================================================
-
-def snowfall_1(
-    P: torch.Tensor,
-    T: torch.Tensor,
-    tcrit: torch.Tensor,
-    r: float = 0.01,
-) -> torch.Tensor:
-    """
-    MATLAB 原版：out = P * smoothThreshold_temperature_logistic(T, tcrit)
-    即温度低于 tcrit 时降水以降雪形式存在，比例随温度平滑过渡。
-
-    smoothThreshold_temperature_logistic(T, tcrit) ≈ 1 when T << tcrit（全部为雪）
-                                                    ≈ 0 when T >> tcrit（全部为雨）
-
-    梯度处理：sigmoid((tcrit - T) / scale) 替代硬阈值，tcrit 全程可导。
-    注意：snowfall_1 + rainfall_1 = P，两者严格互补，降水守恒。
-    """
-    scale = torch.abs(tcrit) * r + r   # 参考 MARRMoT 默认 r=0.01
-    snow_frac = torch.sigmoid((tcrit - T) / (scale + 1e-6))
-    return P * snow_frac
-
-
-def rainfall_1(
-    P: torch.Tensor,
-    T: torch.Tensor,
-    tcrit: torch.Tensor,
-    r: float = 0.01,
-) -> torch.Tensor:
-    """
-    MATLAB 原版：out = P * (1 - smoothThreshold_temperature_logistic(T, tcrit))
-    即温度高于 tcrit 时降水以降雨形式存在。
-
-    梯度处理：sigmoid((T - tcrit) / scale) 替代硬阈值，与 snowfall_1 互补。
-    """
-    scale = torch.abs(tcrit) * r + r
-    rain_frac = torch.sigmoid((T - tcrit) / (scale + 1e-6))
-    return P * rain_frac
-
-
-def melt_1(
-    ddf: torch.Tensor,
-    tcrit: torch.Tensor,
-    T: torch.Tensor,
-    Sn: torch.Tensor,
-    dt: float = 1.0,
-) -> torch.Tensor:
-    """
-    MATLAB 原版：out = max(min(ddf * (T - tcrit), S/dt), 0)
-    即度日因子融雪，融雪量受积雪库容约束，且不能为负（温度低于阈值时无融雪）。
-
-    梯度处理：
-    - MATLAB 的 max(0, ...) 对应 F.relu，在 T=tcrit 处梯度不连续。
-      替换为 sigmoid(T-tcrit) * softplus(T-tcrit)：
-        * sigmoid 保证低温端趋近于 0（抑制虚假融雪）
-        * softplus 保证高温端平滑线性增长
-        * 乘积在 tcrit 处光滑，tcrit 和 ddf 均全程可导
-    - MATLAB 的 min(..., S/dt) 用 torch.minimum 实现，天然可导。
-    """
-    melt_drive = torch.sigmoid(T - tcrit) * F.softplus(T - tcrit)
-    melt_pot   = ddf * melt_drive * dt        # [mm]，对应 ddf*(T-tcrit)*dt
-    return torch.minimum(melt_pot, Sn)        # 受积雪库容约束，等价于 min(..., S/dt)*dt
 
 
 # ================================================================

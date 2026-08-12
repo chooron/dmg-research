@@ -1,50 +1,13 @@
+from typing import Tuple
+
 import torch
 import torch.nn.functional as F
-from typing import Tuple
+
+from ..flux.baseflow import baseflow_1, baseflow_tcm as baseflow_6
 from ..flux.effective import effective_1
-from ..flux.split import split_1
 from ..flux.evap import evap_1, evap_16
 from ..flux.saturation import saturation_1, saturation_9
-from ..flux.baseflow import baseflow_1
-from ..flux.smooth import smooth_threshold_storage_logistic
-
-
-def baseflow_6(
-    p1: torch.Tensor, p2: torch.Tensor, S: torch.Tensor, nearzero: float = 1e-6
-) -> torch.Tensor:
-    """
-    Baseflow 6: Quadratic outflow if storage threshold is exceeded
-    Fixed version for TCM S4.
-    """
-    # 1. 解决量级问题：
-    # TCM 的 k2 物理单位极其敏感。为了让模型能学到 [0,1] 范围内的参数，
-    # 我们在这里对 p1 进行缩放，假设 S 的单位是 mm。
-    # 如果不缩放，k2 必须在 1e-4 级别才正常。
-    # 这里除以 1000 是一个经验值，保证 S=100mm, k2=0.5 时，流量约为 5mm/d 而不是 5000mm/d
-    scale_factor = 1000.0
-    k2_scaled = p1 / scale_factor
-
-    # 2. 计算二次流：
-    # 注意：不要在这里直接用 minimum(S) 截断梯度，
-    # 而是让它保持公式形态，具体的质量守恒截断(clamp)应该在 tcm_step 外部做，
-    # 或者使用软截断（Soft Minimum）来保留梯度，但简单的做法是先算出来。
-    q_unconstrained = k2_scaled * S.pow(2)
-
-    # 3. 阈值逻辑修正：
-    # sf 在 S > p2 时为 1。我们需要的是“当 S > p2 时有流量”。
-    # 所以应该乘以 sf，而不是 (1-sf)。
-    sf = smooth_threshold_storage_logistic(S, p2, nearzero=nearzero)
-
-    q_out = q_unconstrained * sf
-
-    # 4. 再次处理梯度截断 (极其重要技巧)：
-    # 如果直接用 min(q, S)，当 q > S 时，梯度断裂。
-    # 这里我们返回计算值，但在 tcm_step 里你已经写了：
-    # flux_q = torch.minimum(flux_q, S4_tmp - nearzero)
-    # 这部分保留即可，但为了防止 baseflow_6 内部数值爆炸，可以做一个稍微宽松的约束
-
-    return q_out
-
+from ..flux.split import split_1
 
 # Parameter range dictionary (based on MARRMoT m_25_tcm_6p_4s)
 # Note: fa is the fraction of mean(P) that forms abstraction rate.
@@ -103,9 +66,10 @@ def tcm_step(
     S2: torch.Tensor,
     S3: torch.Tensor,
     S4: torch.Tensor,
-    # Pre-computed mean precipitation for abstraction: ca = fa * mean(P)
-    mean_P: torch.Tensor,
     nearzero: float = 1e-6,
+    *,
+    mean_P: torch.Tensor,
+    return_diagnostics: bool = False,
 ) -> Tuple[
     torch.Tensor,
     torch.Tensor,
@@ -174,8 +138,13 @@ def tcm_step(
     # Sequential: first compute qex2 from current S2, then update
     # flux_qex2 = saturation_9(flux_qex1, S2, 0.01):
     #   passes qex1 through when S2 deficit is near zero (saturated)
-    flux_qex2 = saturation_9(flux_qex1, S2, torch.tensor(0.01, device=P.device), nearzero=nearzero)
-
+    flux_qex2 = saturation_9(
+        flux_qex1, S2, torch.tensor(0.01, device=P.device), nearzero=nearzero
+    )
+    S2_raw = S2 + flux_et + flux_qex2 - flux_qex1
+    # If discrete recharge over-fills the deficit store, route the excess forward
+    # instead of losing it in the nearzero clamp.
+    flux_qex2 = flux_qex2 + torch.relu(nearzero - S2_raw)
     S2_new = torch.clamp(S2 + flux_et + flux_qex2 - flux_qex1, min=nearzero)
 
     # --- 4. Fast Routing (S3) ---
@@ -195,9 +164,7 @@ def tcm_step(
     S4 = S4 - flux_a
 
     # Baseflow: baseflow_6(k2, 0, S4) — quadratic, threshold=0
-    flux_q = baseflow_6(
-        k2, torch.tensor(0.0, device=P.device), S4, nearzero=nearzero
-    )
+    flux_q = baseflow_6(k2, torch.tensor(0.0, device=P.device), S4, nearzero=nearzero)
     flux_q = torch.minimum(flux_q, S4)
     S4 = S4 - flux_q
     S4_new = torch.clamp(S4, min=nearzero)
@@ -206,5 +173,14 @@ def tcm_step(
     Qsim = flux_q
     # Ea = interception loss + S1 evap + deep ET; abstraction is a separate sink
     Ea = flux_en + flux_ea + flux_et
+
+    if return_diagnostics:
+        diagnostics = {
+            "external_losses": flux_a,
+            "runoff_prerouting": Qsim,
+            "actual_et": Ea,
+            "state_names": ("S1", "S2", "S3", "S4"),
+        }
+        return Qsim, Ea, S1_new, S2_new, S3_new, S4_new, diagnostics
 
     return Qsim, Ea, S1_new, S2_new, S3_new, S4_new

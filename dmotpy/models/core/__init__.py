@@ -31,21 +31,29 @@ from .collie3 import (
 from .flexb import (
     FLEXB_PARAMS_BOUNDS,
     flexb_step,
+    flexb_step_pre,
+    flexb_step_post,
     create_initial_state as flexb_init,
 )
 from .flexi import (
     FLEXI_PARAMS_BOUNDS,
     flexi_step,
+    flexi_step_pre,
+    flexi_step_post,
     create_initial_state as flexi_init,
 )
 from .flexis import (
     FLEXIS_PARAMS_BOUNDS,
     flexis_step,
+    flexis_step_pre,
+    flexis_step_post,
     create_initial_state as flexis_init,
 )
 from .gr4j import (
     GR4J_PARAMS_BOUNDS,
     gr4j_step,
+    gr4j_step_pre,
+    gr4j_step_post,
     create_initial_state as gr4j_init,
 )
 from .gsfb import (
@@ -339,26 +347,26 @@ NPARAM_INFO = {
     "topmodel": 7,
     "us1": 5,
     "vic": 10,
-    "wetland": 2,
+    "wetland": 4,
     "xinanjiang": 12,
 }
 
 STATE_INFO = {
-    "alpine1": 1,
+    "alpine1": 2,
     "alpine2": 2,
     "australia": 3,
     "collie1": 1,
     "collie2": 1,
     "collie3": 2,
-    "flexb": 4,
-    "flexi": 5,
+    "flexb": 3,
+    "flexi": 4,
     "flexis": 5,
     "gr4j": 2,
-    "gsfb": 4,
+    "gsfb": 3,
     "hbv96": 5,
-    "hillslope": 4,
+    "hillslope": 2,
     "hymod": 5,
-    "ihacres": 2,
+    "ihacres": 1,
     # "lascam": 4,
     "modhydrolog": 5,
     "mopex1": 4,
@@ -366,21 +374,21 @@ STATE_INFO = {
     "mopex3": 5,
     "mopex4": 5,
     "mopex5": 5,
-    "newzealand1": 3,
+    "newzealand1": 1,
     "newzealand2": 2,
-    "penman": 1,
-    "plateau": 4,
+    "penman": 3,
+    "plateau": 2,
     # "sacramento": 5,
-    "simhyd": 3,
-    "smar": 5,
-    "susannah1": 5,
-    "susannah2": 5,
-    "tank": 6,
-    "tcm": 1,
+    "simhyd": 2,
+    "smar": 6,
+    "susannah1": 2,
+    "susannah2": 2,
+    "tank": 4,
+    "tcm": 4,
     "topmodel": 2,
-    "us1": 4,
-    "vic": 2,
-    "wetland": 6,
+    "us1": 2,
+    "vic": 3,
+    "wetland": 1,
     "xinanjiang": 4,
 }
 
@@ -425,4 +433,4 @@ NUMBER_INFO = {
     "xinanjiang": 28,
 }
 
-__all__ = ["PARAM_INFO", "STFN_INFO", "INIT_INFO", "STATE_INFO", "NUMBER_INFO"]
+__all__ = ["PARAM_INFO", "STFN_INFO", "INIT_INFO", "STATE_INFO", "NUMBER_INFO", "NPARAM_INFO"]

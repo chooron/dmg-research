@@ -8,6 +8,7 @@ from ..flux.interflow import interflow_5
 from ..flux.percolation import percolation_4
 from ..flux.soilmoisture import soilmoisture_1, soilmoisture_2
 from ..flux.baseflow import baseflow_1
+from ..flux.sacramento import deficit_based_distribution
 
 # Parameter range dictionary (based on MARRMoT m_33_sacramento_11p_5s)
 SACRAMENTO_PARAMS_BOUNDS = {
@@ -62,57 +63,6 @@ def create_initial_state(
     S4 = torch.zeros((n_grid, nmul), device=device) + nearzero
     S5 = torch.zeros((n_grid, nmul), device=device) + nearzero
     return S1, S2, S3, S4, S5
-
-
-def deficit_based_distribution(
-    S1: torch.Tensor,
-    S1max: torch.Tensor,
-    S2: torch.Tensor,
-    S2max: torch.Tensor,
-    nearzero: float = 1e-6,
-) -> Tuple[torch.Tensor, torch.Tensor]:
-    """
-    High-performance, gradient-stable implementation of MARRMoT's deficitBasedDistribution.
-
-    Logic:
-    1. Calculate relative deficits: rd = (Smax - S) / Smax
-    2. If sum(rd) > 0: f1 = rd1 / (rd1 + rd2)
-    3. If sum(rd) == 0 (both full): f1 = S1max / (S1max + S2max)
-    """
-    # 1. Clamp states to max to ensure non-negative deficit (Stability fix)
-    #    Although logic theoretically prevents S > Smax, numerical drift can cause it.
-    S1_safe = torch.minimum(S1, S1max)
-    S2_safe = torch.minimum(S2, S2max)
-
-    # 2. Calculate Relative Deficits (rd)
-    #    MATLAB: rd = (S - Smax) / Smax (which is negative).
-    #    Here we use Positive Deficit Ratio for cleaner math: (Smax - S) / Smax
-    #    The ratio result is identical.
-    rd1 = (S1max - S1_safe) / (S1max + nearzero)
-    rd2 = (S2max - S2_safe) / (S2max + nearzero)
-
-    sum_rd = rd1 + rd2
-
-    # 3. Calculation for Case A: Deficit exists
-    #    Add nearzero to denominator to protect gradient even if masked out later
-    f1_deficit = rd1 / (sum_rd + nearzero)
-
-    # 4. Calculation for Case B: Both stores full (sum_rd approx 0)
-    #    Distribute based on capacity size
-    sum_cap = S1max + S2max
-    f1_capacity = S1max / (sum_cap + nearzero)
-
-    # 5. Differentiable Switch using torch.where
-    #    If total relative deficit is significant, use deficit-based split.
-    #    Otherwise (stores are full), use capacity-based split.
-    condition = sum_rd > nearzero
-    f1 = torch.where(condition, f1_deficit, f1_capacity)
-
-    # 6. Enforce conservation and bounds
-    f1 = torch.clamp(f1, 0.0, 1.0)
-    f2 = 1.0 - f1
-
-    return f1, f2
 
 
 def sacramento_step(

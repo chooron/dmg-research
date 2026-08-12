@@ -66,6 +66,8 @@ def plateau_step(
     S1: torch.Tensor,
     S2: torch.Tensor,
     nearzero: float = 1e-6,
+    *,
+    return_routing_fluxes: bool = False,
 ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
     """
     Plateau model (FLEX-Topo) single-step calculation.
@@ -142,4 +144,6 @@ def plateau_step(
     Qsim = flux_qpgw + flux_qpieo
     Ea = flux_ei + flux_et
 
+    if return_routing_fluxes:
+        return Qsim, Ea, S1_new, S2_new, (flux_qpieo, flux_qpgw)
     return Qsim, Ea, S1_new, S2_new

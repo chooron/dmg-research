@@ -11,36 +11,17 @@ from .registry import INIT_INFO, PARAM_INFO, STATE_INFO, STFN_INFO
 def _maybe_compile(fn, backend: str):
     if backend == "compile" and hasattr(torch, "compile"):
         if importlib.util.find_spec("setuptools") is None:
-            return fn
+            raise RuntimeError("torch.compile requested but setuptools is unavailable")
 
-        try:
-            compiled_fn = torch.compile(fn)
-        except Exception:
-            return fn
+        compiled_fn = torch.compile(fn)
 
         @wraps(fn)
-        def compiled_or_eager(*args, **kwargs):
-            nonlocal compiled_fn
+        def compiled_only(*args, **kwargs):
+            return compiled_fn(*args, **kwargs)
 
-            if compiled_fn is None:
-                return fn(*args, **kwargs)
-
-            try:
-                return compiled_fn(*args, **kwargs)
-            except Exception as exc:
-                exc_module = type(exc).__module__
-                exc_text = str(exc)
-                is_compile_failure = isinstance(exc, (ImportError, ModuleNotFoundError)) or exc_module.startswith(
-                    ("torch._dynamo", "torch._inductor")
-                )
-                is_compile_failure = is_compile_failure or "torch._dynamo" in exc_text or "torch._inductor" in exc_text
-                if not is_compile_failure:
-                    raise
-
-                compiled_fn = None
-                return fn(*args, **kwargs)
-
-        return compiled_or_eager
+        setattr(compiled_only, "_compile_enabled", True)
+        setattr(compiled_only, "_compile_backend", "torch_default")
+        return compiled_only
     if backend == "jit":
         return torch.jit.script(fn)
     return fn
@@ -50,7 +31,7 @@ class HydrologyModel(nn.Module):
     """Unified hydrology model base for calibration and prediction modes.
 
     Main differences between the legacy v1/v2 paths are now config-driven:
-    - parameter inputs can be `(batch, n_params)` or `(batch, n_params, n_groups)`
+    - parameter inputs can be ``(batch, n_params)`` or ``(batch, n_params, n_groups)``
     - routing can treat groups independently or average them before routing
     - trainers can inspect the model to decide whether targets should be
       expanded to every parameter group or kept at basin scale
@@ -64,6 +45,37 @@ class HydrologyModel(nn.Module):
 
     ANALYSIS_MEAN = "mean"
     ANALYSIS_KEEP = "keep"
+
+    def __new__(
+        cls,
+        config: Optional[Dict[str, Any]] = None,
+        device: Optional[torch.device] = None,
+        backend: str = "compile",
+    ) -> "HydrologyModel":
+        if cls is not HydrologyModel:
+            return super().__new__(cls)
+        if config and config.get("model_name", "").lower() in {"mopex4", "mopex5"}:
+            from .mopex_doy_model import MopexDoyModel
+
+            return super().__new__(MopexDoyModel)
+        if config and config.get("model_name", "").lower() == "tcm":
+            from .tcm_model import TCMModel
+
+            return super().__new__(TCMModel)
+        if config and config.get("uh_enabled"):
+            from .endpoint_uh_model import EndpointUHModel
+            from .gr4j_uh_model import GR4JUHModel
+            from .intermediate_uh_model import IntermediateUHModel
+
+            uh_mode = config.get("uh_mode")
+            model_name = config.get("model_name", "")
+            if uh_mode == "endpoint":
+                return super().__new__(EndpointUHModel)
+            if uh_mode == "intermediate":
+                if model_name == "gr4j":
+                    return super().__new__(GR4JUHModel)
+                return super().__new__(IntermediateUHModel)
+        return super().__new__(cls)
 
     def __init__(
         self,
@@ -91,6 +103,8 @@ class HydrologyModel(nn.Module):
         self.variables = ["prcp", "tmean", "pet"]
         self.nearzero = 1e-5
         self.check_water_balance = False
+        self.parameter_mapping = "linear"
+        self.log_mapping_span_threshold = 100.0
 
         self.group_routing_strategy = self.GROUP_INDIVIDUAL
         self.group_loss_strategy = self.LOSS_PER_GROUP
@@ -111,6 +125,8 @@ class HydrologyModel(nn.Module):
             "variables",
             "nearzero",
             "check_water_balance",
+            "parameter_mapping",
+            "log_mapping_span_threshold",
             "nmul",
             "group_routing_strategy",
             "group_loss_strategy",
@@ -120,7 +136,6 @@ class HydrologyModel(nn.Module):
             if attr in config:
                 setattr(self, attr, config[attr])
 
-        # Backward-compatible config aliases.
         if "routing_strategy" in config:
             self.group_routing_strategy = config["routing_strategy"]
         if "loss_strategy" in config:
@@ -129,6 +144,29 @@ class HydrologyModel(nn.Module):
             self.group_analysis_strategy = config["mc_dropout_group_strategy"]
 
         self.nearzero = float(self.nearzero)
+        self.parameter_mapping = str(self.parameter_mapping).lower()
+        self.log_mapping_span_threshold = float(self.log_mapping_span_threshold)
+
+    # ------------------------------------------------------------------
+    # Parameter / state helpers
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _should_use_log_mapping(
+        bounds: list[float],
+        mapping: str,
+        span_threshold: float,
+    ) -> bool:
+        lower = float(bounds[0])
+        upper = float(bounds[1])
+        if mapping in {"linear", "none"}:
+            return False
+        if mapping not in {"auto", "auto_log", "log_auto"}:
+            raise ValueError(
+                f"Unsupported parameter_mapping '{mapping}'. "
+                "Use 'linear' or 'auto_log'."
+            )
+        return lower > 0.0 and upper > lower and (upper / lower) >= span_threshold
 
     def _init_states(
         self,
@@ -141,25 +179,21 @@ class HydrologyModel(nn.Module):
             self.device,
             self.nearzero,
         )
-        
+
     @staticmethod
-    def _change_param_range(param: torch.Tensor, bounds: list[float]) -> torch.Tensor:
-        """Change the range of a parameter to the specified bounds.
-
-        Parameters
-        ----------
-        param
-            The parameter.
-        bounds
-            The parameter bounds.
-
-        Returns
-        -------
-        torch.Tensor
-            The parameter with the specified bounds.
-        """
+    def _change_param_range(
+        param: torch.Tensor,
+        bounds: list[float],
+        mapping: str = "linear",
+        span_threshold: float = 100.0,
+    ) -> torch.Tensor:
+        if HydrologyModel._should_use_log_mapping(bounds, mapping, span_threshold):
+            lower = torch.as_tensor(bounds[0], dtype=param.dtype, device=param.device)
+            upper = torch.as_tensor(bounds[1], dtype=param.dtype, device=param.device)
+            log_lower = torch.log(lower)
+            log_upper = torch.log(upper)
+            return torch.exp(log_lower + param * (log_upper - log_lower))
         return param * (bounds[1] - bounds[0]) + bounds[0]
-    
 
     def _descale_params(self, raw: torch.Tensor) -> Dict[str, torch.Tensor]:
         if raw.dim() == 2:
@@ -167,13 +201,20 @@ class HydrologyModel(nn.Module):
                 name: self._change_param_range(
                     raw[:, index : index + 1],
                     self.parameter_bounds[name],
+                    self.parameter_mapping,
+                    self.log_mapping_span_threshold,
                 )
                 for index, name in enumerate(self.phy_param_names)
             }
 
         bounds = self.parameter_bounds
         return {
-            name: raw[:, index, :] * (bounds[name][1] - bounds[name][0]) + bounds[name][0]
+            name: self._change_param_range(
+                raw[:, index, :],
+                bounds[name],
+                self.parameter_mapping,
+                self.log_mapping_span_threshold,
+            )
             for index, name in enumerate(self.phy_param_names)
         }
 
@@ -229,6 +270,10 @@ class HydrologyModel(nn.Module):
             return raw[:, :static_count]
         return raw[:, : static_count * actual_nmul].view(raw.shape[0], static_count, actual_nmul)
 
+    # ------------------------------------------------------------------
+    # Forward / simulation
+    # ------------------------------------------------------------------
+
     def forward(
         self,
         x_dict: Dict[str, torch.Tensor],
@@ -240,34 +285,6 @@ class HydrologyModel(nn.Module):
         states = self._init_states(n_grid, n_groups)
         params_dict = self._descale_params(raw)
         return self._run_model(x_dict, states, params_dict, n_groups)
-
-    def _run_forcing_warmup(
-        self,
-        forcing_sequences: tuple[
-            tuple[torch.Tensor, ...],
-            tuple[torch.Tensor, ...],
-            tuple[torch.Tensor, ...],
-        ],
-        param_values: list[torch.Tensor],
-        states: Tuple[torch.Tensor, ...],
-        effective_warmup: int,
-    ) -> Tuple[torch.Tensor, ...]:
-        p_seq, t_seq, pet_seq = forcing_sequences
-        curr_states = states
-
-        with torch.no_grad():
-            for t in range(effective_warmup):
-                outputs = self.step_fn(
-                    p_seq[t],
-                    t_seq[t],
-                    pet_seq[t],
-                    *param_values,
-                    *curr_states,
-                    self.nearzero,
-                )
-                curr_states = outputs[2:]
-
-        return tuple(state.detach() for state in curr_states)
 
     def _run_warmup(
         self,
@@ -286,14 +303,17 @@ class HydrologyModel(nn.Module):
         self,
         forcing: torch.Tensor,
         n_groups: int,
-    ) -> tuple[tuple[torch.Tensor, ...], tuple[torch.Tensor, ...], tuple[torch.Tensor, ...]]:
+    ) -> tuple:
         if n_groups > 1:
             p_seq = forcing[..., 0:1].expand(-1, -1, n_groups).unbind(0)
             t_seq = forcing[..., 1:2].expand(-1, -1, n_groups).unbind(0)
             pet_seq = forcing[..., 2:3].expand(-1, -1, n_groups).unbind(0)
             return p_seq, t_seq, pet_seq
 
-        return forcing[..., 0:1].unbind(0), forcing[..., 1:2].unbind(0), forcing[..., 2:3].unbind(0)
+        p_seq = forcing[..., 0:1].unbind(0)
+        t_seq = forcing[..., 1:2].unbind(0)
+        pet_seq = forcing[..., 2:3].unbind(0)
+        return p_seq, t_seq, pet_seq
 
     def _run_model(
         self,
@@ -307,19 +327,27 @@ class HydrologyModel(nn.Module):
         effective_warmup = min(self.warm_up, n_steps)
 
         p_seq, t_seq, pet_seq = self._make_forcing_sequences(forcing, n_groups)
+
         param_values = [params_dict[name] for name in self.phy_param_names]
-        curr_states = self._run_forcing_warmup(
-            (p_seq, t_seq, pet_seq),
-            param_values,
-            states,
-            effective_warmup,
-        )
+        curr_states = states
+        with torch.no_grad():
+            for t in range(effective_warmup):
+                outputs = self.step_fn(
+                    p_seq[t],
+                    t_seq[t],
+                    pet_seq[t],
+                    *param_values,
+                    *curr_states,
+                    nearzero=self.nearzero,
+                )
+                curr_states = tuple(outputs[2:])
+        curr_states = tuple(state.detach() for state in curr_states)
 
         n_train = n_steps - effective_warmup
         streamflow = torch.empty(
             (n_train, n_grid, n_groups),
-            device=self.device,
-            dtype=torch.float32,
+            device=forcing.device,
+            dtype=forcing.dtype,
         )
 
         for offset, t in enumerate(range(effective_warmup, n_steps)):
@@ -329,7 +357,7 @@ class HydrologyModel(nn.Module):
                 pet_seq[t],
                 *param_values,
                 *curr_states,
-                self.nearzero,
+                nearzero=self.nearzero,
             )
             streamflow[offset] = outputs[0]
             curr_states = outputs[2:]
