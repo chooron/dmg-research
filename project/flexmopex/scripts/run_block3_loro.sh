@@ -8,6 +8,7 @@ cd "${PROJECT_DIR}"
 
 GPU=${1:-0}
 MAX_PARALLEL=${2:-4}   # max concurrent jobs
+PYTHON_BIN="${PYTHON_BIN:-python}"
 read -r -a REGIONS <<< "${LORO_REGIONS:-0 1 2 3 4 5 6}"
 read -r -a SEEDS <<< "${LORO_SEEDS:-42 123 456}"
 read -r -a MODEL_TYPES <<< "${LORO_MODEL_TYPES:-flex full base}"
@@ -24,15 +25,16 @@ for ((i=0; i<MAX_PARALLEL; i++)); do printf '%s\n' slot >&9; done
 run_exp() {
     local region=$1 seed=$2 model_type=$3
     local tag="${model_type}_region${region}_seed${seed}"
-    local save_path="${OUT_ROOT}/${tag}"
+    # Hierarchical: results/block3_loro/{model_type}/region{r}/seed{seed}
+    local save_path="${OUT_ROOT}/${model_type}/region${region}/seed${seed}"
     mkdir -p "$save_path"
     echo "[$(date +%H:%M:%S)] Starting: $tag (parallel slot)"
-    if ! python run_model.py \
+    if ! "${PYTHON_BIN}" run_model.py \
         --model-type "${model_type}" \
         --alpha "${ALPHA}" \
         --seed "${seed}" \
         --loro-holdout-region "${region}" \
-        --output-root "${OUT_ROOT}" \
+        --output-root "${save_path}" \
         --gpu-id "${GPU}" \
         ${RUN_MODEL_EXTRA_ARGS:-} \
         2>&1 | tee "${save_path}/train.log"; then
