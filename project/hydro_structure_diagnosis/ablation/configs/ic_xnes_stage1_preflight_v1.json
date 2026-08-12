@@ -1,0 +1,30 @@
+{
+  "experiment_name": "ic_xnes_stage1_preflight_v1",
+  "dataset_manifest": "/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/ablation/configs/ic_foundation_531_v1.json",
+  "basin_manifest": "/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/ablation/manifests/ic_ablation_96_basins_v1.json",
+  "lhs_manifest": "/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/ablation/manifests/ic_stage1_lhs_centers_v1.npz",
+  "seed_manifest": "/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/ablation/manifests/ic_stage1_seed_manifest_v1.json",
+  "output_root": "/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/outputs/ic_ablation",
+  "run_subdir": "stage1_preflight/xnes",
+  "model_key": "XAJ",
+  "optimizer": {
+    "name": "XNES",
+    "population": 48,
+    "generations": 400,
+    "starts": 3,
+    "optimizer_seeds": [0],
+    "stdev_init": 0.25,
+    "ranking_method": "nes"
+  },
+  "precision": {
+    "forward_dtype": "float32",
+    "metric_dtype": "float64"
+  },
+  "boundary_handling": "clip_0_1",
+  "compute_test_metric": false,
+  "checkpoint_every_generations": 1,
+  "save_generation_trace": true,
+  "save_candidate_summary": true,
+  "fail_fast": false,
+  "global_seed": 20260723
+}

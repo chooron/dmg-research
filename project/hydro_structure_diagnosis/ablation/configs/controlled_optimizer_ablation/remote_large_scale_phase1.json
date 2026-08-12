@@ -1,0 +1,24 @@
+{
+    "data_path": "/autodl-fs/data/",
+    "output_path": "/autodl-fs/data/dmg_hydro_structure_diagnosis/outputs/ic_ablation/large_scale_screening/v1/",
+    "models": ["GR4J", "SIMHYD", "XAJ"],
+    "optimizers": ["XNES", "CMAES"],
+    "populations": {
+        "GR4J": [8, 16, 24, 32],
+        "SIMHYD": [20, 40, 60, 80],
+        "XAJ": [30, 60, 90, 120]
+    },
+    "fixed_params": {
+        "starts": 3,
+        "stdev_init": 0.25,
+        "generations": 200,
+        "seeds": [101, 202, 303],
+        "split": "Split A (32 basins)"
+    },
+    "date_protocol": {
+        "warmup": "1988",
+        "train": "1989-1998",
+        "total_days": 4018
+    },
+    "max_concurrent_groups": 6
+}
