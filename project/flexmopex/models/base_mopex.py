@@ -72,7 +72,10 @@ class BaseMopex(nn.Module):
 
     def _compile_step(self, step_fn):
         if hasattr(torch, "compile") and not bool(self.config.get("disable_compile", False)):
-            return torch.compile(step_fn)
+            try:
+                return torch.compile(step_fn)
+            except Exception:
+                pass  # e.g. Dynamo not supported on Python 3.12+
         return step_fn
 
     def _descale_mopex_params(

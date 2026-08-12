@@ -19,6 +19,7 @@
 ```
 scripts/
 ├── run_block1_main.sh        # 实验块1：主模型对比（Basic / Full / Flex × 5 seeds）
+├── run_block1_full_lopo.sh   # 实验块1：Full-MOPEX leave-one-process-out 消融
 ├── run_block1_alpha_path.sh  # 实验块1：alpha 正则化路径
 ├── run_block3_loro.sh        # 实验块3：Leave-one-region-out 泛化验证
 ├── run_analysis.sh           # 后处理分析（所有块）
@@ -87,6 +88,30 @@ bash scripts/run_block3_loro.sh [GPU_IDS] [MAX_PARALLEL]
 # 示例
 bash scripts/run_block3_loro.sh 0 4
 bash scripts/run_block3_loro.sh 0,1 8
+```
+
+---
+
+### `run_block1_full_lopo.sh` — Full-MOPEX LOPO 消融
+
+运行 4 个 Full-minus-one-process 消融，每个消融使用固定结构掩码并对其余参数重新训练：
+
+- `full_minus_phenology`: `(0, 1, 1, 1)`
+- `full_minus_interception`: `(1, 0, 1, 1)`
+- `full_minus_snow`: `(1, 1, 0, 1)`
+- `full_minus_subsurface`: `(1, 1, 1, 0)`
+
+默认使用 `42/123/456` 三个 seeds，并发 2 个 Python 进程；完成后自动生成 basin-level `ΔNSE` 汇总和 retraining audit。
+
+输出目录：`results/block1_full_lopo/`
+
+```bash
+# 用法
+bash scripts/run_block1_full_lopo.sh [GPU_IDS] [MAX_PARALLEL]
+
+# 示例
+bash scripts/run_block1_full_lopo.sh 0 2
+bash scripts/run_block1_full_lopo.sh 0,1 2
 ```
 
 ---
@@ -204,3 +229,97 @@ results/
 - [ ] `run_model.py` 需确认支持 `model_type` 参数（basic_minimal/full/flex）
 - [ ] Block 3 需要先生成水文气候分区文件
 - [ ] `analysis/` 脚本需适配新 `results/` 目录路径
+
+
+### Remote run
+
+#### Block 1 Main（远程版）— `run_remote_block1_main.sh`
+
+将 base / full / flex×{0.005, 0.01, 0.03} × 5 seeds（共 25 个 jobs）部署到远程服务器并通过 tmux 管理。
+
+**显存分配策略**：当前已用 6 GB，余额 32 GB，单任务约 300 MB。
+脚本默认 `MAX_PARALLEL=8`（约占 2.4 GB），3 个 tmux window 各独立控制并行度，总体保守留有余量。
+
+| tmux window  | 任务                          | 默认并行 |
+|-------------|-------------------------------|---------|
+| `base_full` | base×5 + full×5（10 jobs）    | 3       |
+| `flex_low`  | flex 0.005×5 + flex 0.01×5（10 jobs）| 3  |
+| `flex_high` | flex 0.03×5（5 jobs）          | 2       |
+
+```bash
+# 最简单用法（用 .env 里的密码，默认 GPU=0，MAX_PARALLEL=8）
+cd /workspace/autoresearch
+bash project/flexmopex/scripts/run_remote_block1_main.sh
+
+# 自定义并行度（例如显存充裕时跑更多）
+MAX_PARALLEL=12 bash project/flexmopex/scripts/run_remote_block1_main.sh
+
+# 指定 GPU 和自定义 session 前缀
+GPU=1 MAX_PARALLEL=8 bash project/flexmopex/scripts/run_remote_block1_main.sh
+```
+
+脚本完成后会打印 attach 命令，例如：
+
+```bash
+# 查看全部 window
+ssh -p 52180 root@connect.westc.seetacloud.com "tmux attach -t block1_main_20260528_120000"
+
+# 只看某个 window
+ssh -p 52180 root@connect.westc.seetacloud.com "tmux attach -t block1_main_20260528_120000:flex_low"
+
+# 实时跟踪日志
+ssh -p 52180 root@connect.westc.seetacloud.com \
+  "tail -f /root/dmg-research/project/flexmopex/results/block1_main/tmux_base_full.log"
+```
+
+结果保存在远程 `/root/dmg-research/project/flexmopex/results/block1_main/`，目录结构与本地相同。
+
+---
+
+#### Block 1 Alpha Path（远程版）— `run_remote_block1_alpha_path.sh`
+
+将 flex × {0.005, 0.01, 0.03}（key, 5 seeds）+ flex × {0.0, 0.001, 0.003, 0.007, 0.05, 0.07, 0.1}（path, 3 seeds）共 **36 个 jobs** 部署到远程并通过 tmux 管理。
+
+| tmux window   | 任务                                  | 默认并行 |
+|--------------|---------------------------------------|---------|
+| `key_alphas`  | flex × {0.005,0.01,0.03} × 5 seeds（15 jobs） | 13 |
+| `path_alphas` | flex × 7 path alphas × 3 seeds（21 jobs）     | 12 |
+
+```bash
+# 最简单用法（默认 GPU=0，MAX_PARALLEL=24）
+cd /workspace/autoresearch
+bash project/flexmopex/scripts/run_remote_block1_alpha_path.sh
+
+# 自定义并行度
+MAX_PARALLEL=30 bash project/flexmopex/scripts/run_remote_block1_alpha_path.sh
+
+# DRY_RUN 调试单个 job（不启动 tmux）
+DRY_RUN=1 bash project/flexmopex/scripts/run_remote_block1_alpha_path.sh
+```
+
+脚本完成后打印 attach 命令，例如：
+
+```bash
+ssh -p 52180 root@connect.westc.seetacloud.com "tmux attach -t block1_alpha_20260528_120000"
+ssh -p 52180 root@connect.westc.seetacloud.com "tmux attach -t block1_alpha_20260528_120000:key_alphas"
+
+# 实时跟踪日志
+ssh -p 52180 root@connect.westc.seetacloud.com \
+  "tail -f /root/dmg-research/project/flexmopex/results/block1_alpha_path/tmux_key_alphas.log"
+```
+
+结果保存在远程 `/root/dmg-research/project/flexmopex/results/block1_alpha_path/flex/alpha{alpha}/seed{seed}/`。
+
+---
+
+#### Block 3 LORO（远程版）— `run_remote_block3_loro.sh`
+
+```
+cd /workspace/autoresearch && \
+LORO_SEEDS="42" \
+LORO_MODEL_TYPES="flex full base" \
+PER_REGION_PARALLEL=3 \
+GPU=0 \
+SESSION="block3_loro_seed42_$(date +%Y%m%d_%H%M%S)" \
+bash project/flexmopex/scripts/run_remote_block3_loro.sh
+```

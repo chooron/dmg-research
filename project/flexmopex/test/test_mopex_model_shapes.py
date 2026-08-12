@@ -94,6 +94,28 @@ def test_fixed_weight_mopex_forward_outputs_config_weights():
         assert torch.allclose(out[name], torch.full_like(out[name], value))
 
 
+def test_fixed_weight_mopex_still_responds_to_parameter_changes():
+    batch_size = 3
+    nmul = 2
+    config = _base_config(nmul)
+    config["fixed_weights"] = {
+        "w_phen": 1.0,
+        "w_int": 0.0,
+        "w_snow": 1.0,
+        "w_sub": 1.0,
+    }
+    model = FixedWeightMopex(config, device="cpu")
+    x_dict = _x_dict(batch_size=batch_size)
+    params_a = _param_routing(batch_size, nmul)
+    params_b = {
+        "params": params_a["params"] + 0.5,
+        "gamma_uh": params_a["gamma_uh"] - 0.25,
+    }
+    out_a = model(x_dict, params_a)
+    out_b = model(x_dict, params_b)
+    assert not torch.allclose(out_a["streamflow"], out_b["streamflow"])
+
+
 def test_learned_weight_mopex_forward_outputs_probabilities():
     batch_size = 3
     nmul = 2

@@ -146,11 +146,18 @@ class FlexMopexModelHandler(torch.nn.Module):
                 for key, value in output.items()
                 if key.startswith("w_") and isinstance(value, torch.Tensor)
             }
+            # Pass log_alpha for NseL0BatchLoss: BinaryWeightMopex stores it as
+            # _last_log_alpha on the phy model to avoid shape conflicts in trainer batching.
+            extra_kwargs: dict = {}
+            phy_model = getattr(self.model_dict.get(name), "phy_model", None)
+            if phy_model is not None and hasattr(phy_model, "_last_log_alpha"):
+                extra_kwargs["log_alpha"] = phy_model._last_log_alpha
             loss = criterion(
                 model_output,
                 target,
                 sample_ids=dataset_dict["batch_sample"],
                 weights=weights,
+                **extra_kwargs,
             )
             loss_combined = loss if loss_combined is None else loss_combined + loss
             self.loss_dict[name] += float(loss.item())

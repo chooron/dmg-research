@@ -11,6 +11,12 @@ from typing import Any
 import numpy as np
 import torch
 from dmg.core.data.samplers.hydro_sampler import HydroSampler
+
+# ── torch.compile persistent cache ──────────────────────────────────────────
+# Allows different processes on the same machine to reuse compiled kernels
+# instead of recompiling from scratch every run.
+os.environ.setdefault("TORCHINDUCTOR_CACHE_DIR", "/tmp/torch_inductor_cache")
+os.environ.setdefault("TORCH_COMPILE_DEBUG", "0")
 from dmg.core.utils import import_data_loader, set_randomseed
 
 PROJECT_DIR = Path(__file__).resolve().parent
@@ -28,8 +34,9 @@ from project.flexmopex.models.pub_sampler import PubSampler  # noqa: E402
 from project.flexmopex.local_model_handler import FlexMopexModelHandler  # noqa: E402
 from project.flexmopex.models.nse_aic_batch_loss import NseAicBatchLoss  # noqa: E402
 from project.flexmopex.models.nse_dyn_aic_batch_loss import NseDynAicBatchLoss  # noqa: E402
+from project.flexmopex.models.nse_l0_batch_loss import NseL0BatchLoss  # noqa: E402
 
-BASIN_GROUPS_DIR = get_env_path("BASIN_GROUPS_DIR")
+BASIN_GROUPS_DIR = get_env_path("BASIN_GROUPS_DIR", default=REPO_ROOT / "data" / "basin_groups")
 TOTAL_BASINS = 671
 
 
@@ -46,7 +53,10 @@ RUNTIME_PATH_KEYS = (
 LOSS_REGISTRY = {
     "NseAicBatchLoss": NseAicBatchLoss,
     "NseDynAicBatchLoss": NseDynAicBatchLoss,
+    "NseL0BatchLoss": NseL0BatchLoss,
 }
+
+FIXED_WEIGHT_NAMES = ("w_phen", "w_int", "w_snow", "w_sub")
 
 
 class FlexMopexSampler(HydroSampler):
@@ -78,7 +88,7 @@ class FlexMopexSampler(HydroSampler):
                 i_t,
                 has_grad=False,
             ),
-            "target": self.select_subset(dataset["target"], i_sample, i_t, warmup=0),
+            "target": self.select_subset(dataset["target"], i_sample, i_t),
             "batch_sample": i_sample,
         }
         if "doy" in dataset:
@@ -166,6 +176,18 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--start-epoch", type=int, default=None, help="Override train.start_epoch.")
     parser.add_argument("--epochs", type=int, default=None, help="Override train.epochs.")
     parser.add_argument("--batch-size", type=int, default=None, help="Override train/test batch_size.")
+    parser.add_argument("--nmul", type=int, default=None, help="Override model.phy.nmul.")
+    parser.add_argument(
+        "--fixed-weights",
+        type=float,
+        nargs=4,
+        default=None,
+        metavar=("W_PHEN", "W_INT", "W_SNOW", "W_SUB"),
+        help=(
+            "Fixed structural weights for model-type=fixed in the strict order "
+            "w_phen w_int w_snow w_sub."
+        ),
+    )
     parser.add_argument(
         "--output-root",
         default=str(PROJECT_DIR / "outputs"),
@@ -189,12 +211,14 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     )
     parser.add_argument(
         "--model-type",
-        choices=("base", "full", "flex"),
+        choices=("base", "full", "fixed", "flex", "binary"),
         default="flex",
         help=(
             "Model type: 'base' = FixedWeightMopex(all weights=0), "
             "'full' = FixedWeightMopex(all weights=1), "
-            "'flex' = LearnedWeightMopex (default)."
+            "'fixed' = FixedWeightMopex(user-specified fixed weights), "
+            "'flex' = LearnedWeightMopex (default), "
+            "'binary' = BinaryWeightMopex (Hard-Concrete L0 gates)."
         ),
     )
     parser.add_argument(
@@ -257,6 +281,25 @@ def _refresh_runtime_paths(config: dict[str, Any], output_dir: Path) -> None:
         Path(config[key]).mkdir(parents=True, exist_ok=True)
 
 
+def _fixed_weight_dict(values: list[float] | tuple[float, ...]) -> dict[str, float]:
+    if len(values) != len(FIXED_WEIGHT_NAMES):
+        raise ValueError(
+            f"Expected {len(FIXED_WEIGHT_NAMES)} fixed weights in order "
+            f"{FIXED_WEIGHT_NAMES}, got {len(values)}."
+        )
+    fixed_weights: dict[str, float] = {}
+    for name, value in zip(FIXED_WEIGHT_NAMES, values):
+        if not np.isfinite(value):
+            raise ValueError(f"Fixed weight {name} must be finite, got {value!r}.")
+        value_float = float(value)
+        if not 0.0 <= value_float <= 1.0:
+            raise ValueError(
+                f"Fixed weight {name} must be within [0, 1], got {value_float}."
+            )
+        fixed_weights[name] = value_float
+    return fixed_weights
+
+
 def _load_loro_basin_split(region_id: int) -> int:
     """Return the group_id for a LORO region (11 + region_id).
 
@@ -304,6 +347,10 @@ def apply_runtime_overrides(
     if args.batch_size is not None:
         config.setdefault("train", {})["batch_size"] = args.batch_size
         config.setdefault("test", {})["batch_size"] = args.batch_size
+    if args.nmul is not None:
+        config.setdefault("delta_model", {}).setdefault("phy_model", {})["nmul"] = args.nmul
+        config.setdefault("model", {}).setdefault("phy", {})["nmul"] = args.nmul
+        config.setdefault("model", {}).setdefault("nn", {})["nmul"] = args.nmul
 
     loss_name = _loss_name(config)
     if loss_name:
@@ -313,24 +360,40 @@ def apply_runtime_overrides(
 
     # Apply --model-type overrides
     model_type = args.model_type
-    if model_type == "base":
+    if model_type in {"base", "full", "fixed"}:
         config.setdefault("delta_model", {}).setdefault("phy_model", {})["model"] = ["FixedWeightMopex"]
-        config["delta_model"]["phy_model"]["fixed_weights"] = {
-            "w_phen": 0.0,
-            "w_int": 0.0,
-            "w_snow": 0.0,
-            "w_sub": 0.0,
-        }
-    elif model_type == "full":
-        config.setdefault("delta_model", {}).setdefault("phy_model", {})["model"] = ["FixedWeightMopex"]
-        config["delta_model"]["phy_model"]["fixed_weights"] = {
-            "w_phen": 1.0,
-            "w_int": 1.0,
-            "w_snow": 1.0,
-            "w_sub": 1.0,
-        }
-    else:  # flex
+        if model_type == "base":
+            fixed_weights = _fixed_weight_dict([0.0, 0.0, 0.0, 0.0])
+        elif model_type == "full":
+            fixed_weights = _fixed_weight_dict([1.0, 1.0, 1.0, 1.0])
+        else:
+            if args.fixed_weights is None:
+                raise ValueError("--model-type fixed requires --fixed-weights.")
+            fixed_weights = _fixed_weight_dict(list(args.fixed_weights))
+        config["delta_model"]["phy_model"]["fixed_weights"] = fixed_weights
+    else:  # flex / binary
         config.setdefault("delta_model", {}).setdefault("phy_model", {})["model"] = ["LearnedWeightMopex"]
+
+    if model_type == "binary":
+        config.setdefault("delta_model", {}).setdefault("phy_model", {})["model"] = ["BinaryWeightMopex"]
+        config.setdefault("delta_model", {}).setdefault("nn_model", {})["model"] = "BinaryStructureNet"
+        _set_loss_name(config, "NseL0BatchLoss")
+
+    # Keep config["model"]["phy"] in sync so model_builder.get_phy_model_names()
+    # returns the correct name (it reads config["model"]["phy"]["name"], not
+    # config["delta_model"]["phy_model"]["model"]).
+    # Also sync fixed_weights so build_phy_config() passes them to FixedWeightMopex.
+    _phy_cfg = config["delta_model"]["phy_model"]
+    _phy_names = _phy_cfg["model"]
+    config.setdefault("model", {}).setdefault("phy", {})["name"] = list(_phy_names)
+    config["model"]["phy"]["model"] = list(_phy_names)
+    if "fixed_weights" in _phy_cfg:
+        config["model"]["phy"]["fixed_weights"] = dict(_phy_cfg["fixed_weights"])
+
+    # Sync nn_model name override (used by binary model type)
+    _nn_cfg = config.get("delta_model", {}).get("nn_model", {})
+    if "model" in _nn_cfg:
+        config.setdefault("model", {}).setdefault("nn", {})["name"] = _nn_cfg["model"]
 
     # Apply --loro-holdout-region overrides
     region_id = args.loro_holdout_region
@@ -489,7 +552,11 @@ def run_loro_train(config: dict[str, Any], verbose: bool, *, preflight_only: boo
     print(f"Training complete. Model saved to \n{config['model_path']}")
 
     # Evaluate on holdout (val) basins
+    # Use mode="test" so PubTrainer.__init__ skips _load_states() (which would
+    # try to reload checkpoints that may not exist for FixedWeightMopex).
+    # The model weights are already in memory from training above.
     print("Evaluating on holdout basins...")
+    config["mode"] = "test"
     eval_trainer = PubTrainer(
         config,
         model,
@@ -499,6 +566,31 @@ def run_loro_train(config: dict[str, Any], verbose: bool, *, preflight_only: boo
         verbose=verbose,
     )
     eval_trainer.sampler = sampler
+    eval_trainer.evaluate()
+    print(f"Metrics and predictions saved to \n{config['out_path']}")
+
+
+def run_loro_test(config: dict[str, Any], verbose: bool) -> None:
+    """LORO test-only: load checkpoint, evaluate on holdout basins via PubTrainer+PubSampler."""
+    config["mode"] = "test"
+    set_randomseed(config["random_seed"])
+    data_loader = _build_data_loader(config)
+    model = FlexMopexModelHandler(config, verbose=verbose)
+    load_epoch = config.get("test", {}).get("test_epoch", 50)
+    model.load_model(load_epoch)
+    print(f"Loaded test checkpoint: {config['model_dir']}/learnedweightmopex_ep{load_epoch}.pt")
+    loss_func = _build_loss(config, data_loader.train_dataset)
+    sampler = PubSampler(config)
+    eval_trainer = PubTrainer(
+        config,
+        model,
+        train_dataset=data_loader.train_dataset,
+        eval_dataset=data_loader.eval_dataset,
+        loss_func=loss_func,
+        verbose=verbose,
+    )
+    eval_trainer.sampler = sampler
+    print("Evaluating model...")
     eval_trainer.evaluate()
     print(f"Metrics and predictions saved to \n{config['out_path']}")
 
@@ -535,7 +627,7 @@ def main(argv: list[str] | None = None) -> None:
         if mode in ("train", "train_test"):
             run_loro_train(config, args.verbose, preflight_only=args.preflight_only)
         elif mode == "test":
-            run_test(config, args.verbose)
+            run_loro_test(config, args.verbose)
         else:
             raise ValueError(f"Unsupported mode for LORO: {mode!r}")
         return

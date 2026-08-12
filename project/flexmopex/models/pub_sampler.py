@@ -108,7 +108,7 @@ class PubSampler(BaseSampler):
             'c_phy': dataset['c_phy'] if len(dataset['c_phy']) == 0 else dataset['c_phy'][global_indices],
             'c_nn': dataset['c_nn'][global_indices],
             'xc_nn_norm': self.select_subset(dataset['xc_nn_norm'], global_indices, i_t, has_grad=False),
-            'target': self.select_subset(dataset['target'], global_indices, i_t)[self.warm_up:, :],
+            'target': self.select_subset(dataset['target'], global_indices, i_t),
             'batch_sample': global_indices,
         }
         if 'c_nn_norm' in dataset:

@@ -207,7 +207,10 @@ class PubTrainer:
         val_indices = self.sampler.val_indices
         log.info(f"Evaluating on {len(val_indices)} holdout basins.")
 
-        model_name = self.config["delta_model"]["phy_model"]["model"][0]
+        # Use the actual key from model_dict rather than config, since
+        # apply_runtime_overrides may write to a different config path than
+        # what model_builder.get_phy_model_names() reads.
+        model_name = next(iter(self.model.model_dict))
         all_preds: list[dict] = []
 
         for basin_idx in tqdm.tqdm(
