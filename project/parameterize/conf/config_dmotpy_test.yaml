@@ -30,7 +30,8 @@ train:
     T_max: 100
     eta_min: 1e-5
   loss_function:
-    name: KgeBatchLoss
+    # Decomposable training objective; full-sequence KGE is validation-only.
+    name: NseBatchLoss
   batch_size: 100
   epochs: 100
   start_epoch: 0
@@ -91,7 +92,7 @@ model:
   nn:
     name: Calibrate  # Calibrate or Parameterize
     # Calibrate specific parameters
-    num_basins: 531  # number of basins in dataset
+    num_basins: 671  # number of basins in the production CAMELS pickle
     num_start: 10    # number of initialization samples
     init_strategy: lhs_logit  # initialization strategy
     # Parameterize specific parameters

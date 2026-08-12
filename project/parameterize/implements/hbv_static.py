@@ -94,6 +94,9 @@ class HbvStatic(nn.Module):
 
     N_PHY = len(parameter_bounds)
     N_ROUTE = len(routing_parameter_bounds)
+    PARAMETER_NAMES = tuple(parameter_bounds)
+    ROUTING_PARAMETER_NAMES = tuple(routing_parameter_bounds)
+    ALL_PARAMETER_NAMES = PARAMETER_NAMES + ROUTING_PARAMETER_NAMES
 
     def __init__(
         self,
@@ -136,6 +139,55 @@ class HbvStatic(nn.Module):
             route[name] = change_param_range(r[:, idx], bounds)
         return phy, route
 
+    def _stack_physical_parameters(
+        self,
+        phy: dict[str, torch.Tensor],
+        route: dict[str, torch.Tensor],
+    ) -> torch.Tensor:
+        phy_parts = [phy[name].reshape(phy[name].shape[0], -1) for name in self.PARAMETER_NAMES]
+        route_parts = [route[name].unsqueeze(-1) for name in self.ROUTING_PARAMETER_NAMES]
+        return torch.cat([*phy_parts, *route_parts], dim=-1)
+
+    def physical_parameters_from_normalized(self, parameters: torch.Tensor) -> torch.Tensor:
+        """Return the physical-scale parameter tensor used by ``forward``.
+
+        The output order is the trained parameter order:
+        ``parBETA ... parCWH, route_a, route_b``.
+        """
+        phy, route = self._unpack(parameters)
+        return self._stack_physical_parameters(phy, route)
+
+    def _unpack_physical(self, physical_parameters: torch.Tensor):
+        if physical_parameters.ndim == 3:
+            physical = physical_parameters[-1]
+        elif physical_parameters.ndim == 2:
+            physical = physical_parameters
+        else:
+            raise ValueError(
+                "physical_parameters must have shape [B, P] or [T, B, P]. "
+                f"Got {tuple(physical_parameters.shape)}."
+            )
+
+        expected = self.N_PHY * self.nmul + self.N_ROUTE
+        if physical.shape[-1] != expected:
+            raise ValueError(
+                f"Expected {expected} physical parameters in the last dimension, "
+                f"got {physical.shape[-1]}."
+            )
+
+        basin_count = physical.shape[0]
+        p = physical[:, : self.N_PHY * self.nmul].view(basin_count, self.N_PHY, self.nmul)
+        phy = {
+            name: p[:, idx, :].clone()
+            for idx, name in enumerate(self.PARAMETER_NAMES)
+        }
+        route_start = self.N_PHY * self.nmul
+        route = {
+            name: physical[:, route_start + idx].clone()
+            for idx, name in enumerate(self.ROUTING_PARAMETER_NAMES)
+        }
+        return phy, route
+
     def forward(
         self,
         x_dict: dict[str, torch.Tensor],
@@ -157,6 +209,49 @@ class HbvStatic(nn.Module):
 
         q_pred, _ = self._step_loop(x[warm_up:], states, phy)
         qs = torch.cat([q_warm, q_pred], dim=0).mean(-1) if q_warm is not None else q_pred.mean(-1)
+
+        nsteps_full = qs.shape[0]
+        a = route["route_a"].unsqueeze(0).unsqueeze(-1).expand(nsteps_full, -1, 1)
+        b = route["route_b"].unsqueeze(0).unsqueeze(-1).expand(nsteps_full, -1, 1)
+        uh = uh_gamma(a, b, lenF=15)
+        rf = qs.unsqueeze(-1).permute(1, 2, 0)
+        streamflow = uh_conv(rf, uh.permute(1, 2, 0)).permute(2, 0, 1)
+
+        if pred_cutoff > 0:
+            streamflow = streamflow[pred_cutoff:]
+        return {"streamflow": streamflow}
+
+    def forward_from_physical(
+        self,
+        x_dict: dict[str, torch.Tensor],
+        physical_parameters: torch.Tensor,
+    ) -> dict[str, torch.Tensor]:
+        """Run the HBV forward path from physical-scale parameters directly.
+
+        This mirrors ``forward`` after the normalized-to-physical rescaling step
+        so that a physical parameter tensor extracted from the standard path
+        reproduces the same post-warm-up routed streamflow.
+        """
+        x = x_dict["x_phy"]
+        ngrid = x.shape[1]
+        phy, route = self._unpack_physical(physical_parameters)
+
+        warm_up = self.warm_up if self.warm_up_states else 0
+        pred_cutoff = self.warm_up
+        states = self._init_states(ngrid)
+
+        if warm_up > 0:
+            with torch.no_grad():
+                q_warm, states = self._step_loop(x[:warm_up], states, phy)
+        else:
+            q_warm = None
+
+        q_pred, _ = self._step_loop(x[warm_up:], states, phy)
+        qs = (
+            torch.cat([q_warm, q_pred], dim=0).mean(-1)
+            if q_warm is not None
+            else q_pred.mean(-1)
+        )
 
         nsteps_full = qs.shape[0]
         a = route["route_a"].unsqueeze(0).unsqueeze(-1).expand(nsteps_full, -1, 1)

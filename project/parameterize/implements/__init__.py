@@ -5,6 +5,16 @@ from __future__ import annotations
 from typing import Any
 
 from .deterministic_param_trainer import DeterministicParamTrainer
+from .differentiable_signatures import (
+    annual_peak_reference,
+    baseflow_index,
+    calibrate_mean_annual_peak_tau,
+    lyne_hollick_baseflow,
+    mean_annual_peak,
+    recession_constant,
+    total_runoff_volume,
+    water_year_ids_from_dates,
+)
 from .distributional_param_trainer import DistributionalParamTrainer
 from .hbv_static import HbvStatic
 from .mc_dropout_param_trainer import McDropoutParamTrainer
@@ -57,13 +67,21 @@ def build_paper_trainer(config: dict[str, Any], **kwargs: Any) -> MyTrainer:
 __all__ = [
     "DeterministicParamModel",
     "DeterministicParamTrainer",
+    "annual_peak_reference",
+    "baseflow_index",
+    "calibrate_mean_annual_peak_tau",
     "DistributionalParamModel",
     "DistributionalParamTrainer",
     "HbvStatic",
+    "lyne_hollick_baseflow",
+    "mean_annual_peak",
     "McDropoutParamTrainer",
     "McMlpModel",
     "MyDplModel",
     "MyTrainer",
+    "recession_constant",
+    "total_runoff_volume",
+    "water_year_ids_from_dates",
     "build_paper_dpl",
     "build_paper_trainer",
 ]
