@@ -1,0 +1,50 @@
+{
+  "_protocol": "dpl_unified_config_v1",
+  "_note": "Unified HBV-selected dPL configuration applied without model-specific tuning.",
+  "data_npz": "/home/jingxin/code/dmg-research/data/camels_dataset_petv2.npz",
+  "gage_ids_path": "/home/jingxin/code/dmg-research/data/gage_id.npy",
+  "dates_path": "/home/jingxin/code/dmg-research/data/camels_dates.npy",
+  "data_pkl_dataset": "/home/jingxin/code/dmg-research/data/camels_dataset",
+  "data_basin_ids": "/home/jingxin/code/dmg-research/project/benchmark/data/559sub_id.txt",
+  "output_dir": "outputs/dpl_unified_365d_v1",
+  "time_periods": {
+    "warmup": {"start": "1988-01-02", "end": "1988-12-31", "days": 365},
+    "calibration": {"start": "1989-01-01", "end": "1998-12-31", "days": 3652},
+    "evaluation": {"start": "1999-01-01", "end": "2009-12-31", "days": 4018}
+  },
+  "window": {
+    "warmup_days": 365,
+    "prediction_days": 365,
+    "stride_days": 365,
+    "drop_incomplete_tail": true
+  },
+  "network": {
+    "hidden_size": 256,
+    "hidden_sizes": [256, 256, 256],
+    "depth": 3,
+    "dropout": 0.05,
+    "activation": "SiLU",
+    "normalization": "robust_median_iqr_clip5",
+    "output_epsilon": 0.0001,
+    "initialization": "physical_parameter_defaults",
+    "parameter_mapping": "sigmoid_to_physical_range_linear_tgd_a_ks_v1",
+    "tgd_structure_version": "temperature_conditioned_input_routing_a_ks_v1"
+  },
+  "training": {
+    "epochs": 100,
+    "batch_size": 128,
+    "optimizer": "AdamW",
+    "lr": 0.001,
+    "weight_decay": 0.0001,
+    "grad_clip_norm": 1.0,
+    "scheduler": "cosine",
+    "min_lr": 0.0001,
+    "seed": 42,
+    "validation_interval": 10
+  },
+  "runtime": {
+    "device": "cuda",
+    "forward_dtype": "float32",
+    "final_metric_dtype": "float64"
+  }
+}
