@@ -1,38 +1,88 @@
-# Python-generated files
+# --- Python generated / caches ---
 __pycache__/
 *.py[oc]
 build/
 dist/
 wheels/
 *.egg-info
-
-# Virtual environments
-.venv
-
-# Results file
-results.tsv
-
-data
-
-*.md
-
-!README.md
-
-outputs
-.claude
-.omx/
-
-
-*.csv
-*.json
-*.png
-*.npz
 .ruff_cache/
+.pytest_cache/
+.mypy_cache/
 
-.devcontainer/
+# --- Virtual environments ---
+.venv
+venv/
+env/
 
+# --- Local data (shared read-only, never uploaded) ---
+data/
+
+# --- Generated outputs / results / checkpoints / logs (worktree-local) ---
 outputs/
 output/
+results/
+checkpoints/
+logs/
+downloads/
+reports/
+validation_results/
+tmp/
+.tmp/
+archive/
 
+# --- Generated result/data file extensions ---
 *.pt
 *.npy
+*.npz
+*.pkl
+*.h5
+*.ckpt
+*.csv
+*.parquet
+results.tsv
+
+# --- Figures / generated charts ---
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.pdf
+
+# --- Archives / releases / temp ---
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.gz
+*.rar
+*.7z
+*.bak
+*.orig
+releases/
+
+# --- Paper / manuscript generated artifacts (source scripts stay possible) ---
+manuscript/
+manuscriptv2/
+!project/hydro_structure_diagnosis/manuscript/
+project/hydro_structure_diagnosis/manuscript/*
+!project/hydro_structure_diagnosis/manuscript/scripts/
+
+# --- Local LLM / agent tooling ---
+.pi-subagents/
+.codex/
+.agents/
+.omx/
+.claude/
+
+# --- Deployment snapshots / vendored copies ---
+project/benchmark/dmotpy/
+
+# --- Third-party vendored reference (local only) ---
+MARRMoT/
+
+# --- Secrets ---
+.env
+.env.*
+!.env.example
+!.env.template
