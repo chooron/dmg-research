@@ -10,12 +10,12 @@ wheels/
 .mypy_cache/
 
 # --- Virtual environments ---
-.venv
-venv/
-env/
+/.venv
+/venv
+/env
 
 # --- Local data (shared read-only, never uploaded) ---
-data/
+/data
 
 # --- Generated outputs / results / checkpoints / logs (worktree-local) ---
 outputs/
