@@ -1,44 +1,62 @@
 #!/usr/bin/env python3
-"""Final R2 Figure 4 (F4): parameter-specific compensation signatures + spatial organization.
+"""Final R2 Figure 4 (F4) v5: parameter-specific compensation signatures + spatial organization.
 
 F4 answers:
-  1. Which shared parameters concentrate the Base–CN (compensatory) reorganization;
-  2. How the key parameters' Base–CN differences evolve with snow regime;
-  3. Whether the key parameter differences show geographic organization.
+  1. Which shared parameters concentrate the Base-CN (compensatory) reorganization;
+  2. How the key parameters' paired shifts dZ = z_Base - z_CN evolve with snow influence;
+  3. Whether these paired shifts show geographic organization;
+  4. How the same structural absence is expressed differently under the IC and dPL
+     parameter-constraint regimes.
 
 F4 is NOT an IC-vs-dPL ranking figure, NOT a parameter-truth figure, NOT a raw scatter
-regression collage, and NOT a Base/CN/TGD2 comparison grid. IC and dPL are contrasting
+regression collage, and NOT a Base/CN occupation figure. IC and dPL are contrasting
 parameter-constraint regimes (IC = main independent environmental anchor; dPL = shared
 cross-basin mapping expression). TGD2 stays in the Supplement.
 
-Final layout (compact, not wide; full-width overview + GIS column):
-  Row 0 (full width): (a) Shared-parameter paired shifts (IC | dPL facets, all 15
-                      shared parameters) - the overview panel.
-  Row 1: left column  (b) um / (c) ki / (d) ci  - snow-conditioned parameter
-                      OCCUPATION DISTRIBUTIONS (ridgeline-style: per S1-S5 regime the
-                      Base and CN normalized-value densities are drawn as overlaid
-                      filled ridges with median dots; IC and dPL as two strips).
-         right column (e) Geographic organization of paired shifts (header + three
-                      vertical mini-maps um/ki/ci, dPL regime, shared blue-orange
-                      diverging scale centred at 0).
+Unified core quantity across the WHOLE figure (a, b-d, GIS):
+    dZ_{p,i} = z_{Base,p,i} - z_{CN,p,i}    (normalized paired shift; z in [0,1])
+
+Final layout (three balanced columns + bottom shared legend):
+  Col 1 (panel a only):  (a) Snow gradients of paired shifts - split vertically
+                         into (a1) IC regime (top) and (a2) dPL regime (bottom);
+                         all 15 shared parameters, single structural contrast
+                         Base-CN (deep-blue squares, the primary estimand).
+                         um / ki / ci rows carry a very light band + bold labels
+                         (highlight = expanded in panels b-d).
+  Col 2 (ridges):        (b) um / (c) ki / (d) ci - ridgeline distributions of
+                         basin-level dZ = z_Base - z_CN across snow regimes S1-S5,
+                         stacked (Base-CN only).
+  Col 3 (GIS):           (e) Geographic patterns of paired shifts - three enlarged
+                         Base-CN maps (um | ki | ci, dPL regime), full column width.
+  Bottom:                one shared horizontal row with the IC/dPL ridge legend and
+                         the (e) horizontal colour bar.
+
+Ridgeline grammar (b-d), restrained HESS style:
+  * One shared baseline per regime row; IC density mirrored above it (deep blue fill,
+    solid outline), dPL density mirrored below (orange fill, thin dashed outline) -
+    direct within-regime comparison of the two parameter-constraint regimes.
+  * Fixed-bandwidth boundary-reflected KDE, peak-normalized; very light grey
+    per-regime baselines; faint vertical grid; thin x = 0 reference; small median
+    dot + thin short IQR line as auxiliary overlays; regime n in the y-axis labels;
+    snow-influence cue on panel (b) only.
 
 Colour semantics:
-  * Blue  = CN structure (F1/F2); in (a), the ordinary shared parameters.
-  * Orange= Base structure (F1/F2); in (a), the KEY compensation parameters (um, ki, ci).
-    Colour encodes parameter class in (a), not IC vs dPL.
-  * IC/dPL are separated by facet/strip position.
-  * Maps use a blue (negative) - neutral (0) - orange (positive) diverging scale.
+  * In (a): uniform deep blue = the single Base-CN contrast; um / ki / ci are
+    highlighted only by a very light row band + bold labels (a manuscript-focus
+    highlight, not a significance/threshold encoding).
+  * In (b-d): IC = deep blue (above baseline), dPL = orange (below baseline).
+  * Maps: blue (negative) - neutral (0) - orange (positive) diverging scale.
 
 Statistics (all frozen-style, read-only) and GIS (read-only shapefiles, EPSG:5070):
-  r2_snow_gradients_summary.csv, r2_parameter_values_canonical.csv,
-  r2_paired_shifts_basin_level.csv, r2_snow_gradient_robustness.csv,
-  r2_gd_diagnostic_summary.csv,
+  r2_snow_gradients_summary.csv (slopes + CI), r2_paired_shifts_basin_level.csv
+  (canonical per-basin dZ = delta_base_minus_cn, with snow_regime),
+  r2_parameter_values_canonical.csv (canonical z, used for the [0,1] sanity check),
   data/camels_loc/conus_clipped/{camels_671_loc_conus_clipped,s_18mr25_conus}.shp.
-Only deterministic descriptive aggregations are computed locally (regime medians/IQR,
-bounded KDE of stored canonical z, map colour scales); no upstream analysis is
-recomputed or modified.
+Only deterministic descriptive aggregations are computed locally (fixed-bandwidth
+boundary-reflected KDE of stored canonical dZ, regime medians/IQR, map colour scales);
+no upstream analysis is recomputed or modified.
 
-Output: high-resolution PNG only (600 DPI), saved to manuscript/plots/figures/;
+Output: high-resolution PNG (600 DPI) only, saved to manuscript/plots/figures/;
 IC versions of the maps are also written to the Supplement (Fig_S4_IC_maps.png).
 """
 from __future__ import annotations
@@ -53,9 +71,9 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from matplotlib.lines import Line2D
+from matplotlib.patches import Patch
 from matplotlib.cm import ScalarMappable
 from matplotlib.colors import Normalize, LinearSegmentedColormap
-from scipy.stats import gaussian_kde
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from r1_plot_style import (  # noqa: E402
@@ -85,17 +103,21 @@ DISPLAY = {
     "xaj_k": "k", "xaj_b": "b", "xaj_im": "im", "xaj_um": "um",
     "xaj_lm": "lm", "xaj_dm": "dm", "xaj_c": "c", "xaj_sm": "sm",
     "xaj_ex": "ex", "xaj_ki": "ki", "xaj_kg": "kg", "xaj_ci": "ci",
-    "xaj_cg": "cg", "xaj_a": "a", "xaj_theta": "θ",
+    "xaj_cg": "cg", "xaj_a": "a", "xaj_theta": "\u03b8",
 }
 KEY_PARAMS = ["xaj_um", "xaj_ki", "xaj_ci"]   # key compensation parameters
 REGIMES = ["S1", "S2", "S3", "S4", "S5"]
+REGIME_N = [165, 156, 121, 34, 55]
 
 # ---------------------------------------------------------------------------
 # Visual grammar (F1/F2/F3 system)
 # ---------------------------------------------------------------------------
-COLOR_BASE = MODEL_COLORS["Base"]   # #EE7733  Base structure / key-compensation emphasis
-COLOR_CN = MODEL_COLORS["CN"]       # #0077BB  CN structure / ordinary shared parameters
+COLOR_BASE = MODEL_COLORS["Base"]   # #EE7733  warm orange (dPL ridges in (b-d))
+COLOR_CN = MODEL_COLORS["CN"]       # #0077BB  deep blue (Base-CN contrast in (a); IC ridges)
 COLOR_REF = "#999999"               # reference lines
+RIDGE_EDGE = "#0B4C79"              # darker blue ridge outline (IC)
+KEY_ROW_SHADE = "#FEF8F1"           # very light warm shading for highlighted-parameter rows in (a)
+
 GEO_BASIN_SHP = PROJECT.parents[1] / "data" / "camels_loc" / "conus_clipped" / "camels_671_loc_conus_clipped.shp"
 GEO_STATES_SHP = PROJECT.parents[1] / "data" / "camels_loc" / "conus_clipped" / "s_18mr25_conus.shp"
 GEO_CRS = "EPSG:5070"
@@ -103,10 +125,20 @@ GEO_CRS = "EPSG:5070"
 # Blue (negative) -> neutral (0) -> orange (positive) diverging map scale.
 MAP_CMAP = LinearSegmentedColormap.from_list(
     "cn_base_div", ["#0077BB", "#F2F2F2", "#EE7733"], N=256)
-MAP_VLIM = 1.0  # delta z bounded by [-1, +1]; shared across the three maps
+MAP_VLIM = 1.0  # dZ bounded by [-1, +1]; shared across the three maps
 
-RIDGE_PEAK = 0.42  # ridgeline height in regime-row units (Base up, CN down split)
-
+# Ridgeline geometry for (b)-(d): IC and dPL share one baseline per regime row,
+# mirrored as IC density above / dPL density below (restrained HESS style)
+DZ_GRID = np.linspace(-1.0, 1.0, 240)   # fixed symmetric axis [-1, 1]
+DZ_BW = 0.075                           # fixed absolute KDE bandwidth on the dZ scale (mild smoothing to avoid small-n fragmentation)
+RIDGE_HEIGHT = 0.36                     # peak ridge height from the shared baseline
+IC_FILL_ALPHA = 0.42                    # deeper blue fill for IC
+DPL_FILL_ALPHA = 0.20                   # lighter orange fill for dPL
+DPL_LINESTYLE = (0, (4.0, 2.0))         # thin dashed outline for dPL
+BASELINE_COLOR = "#DDDDDD"              # very light grey per-regime baseline
+ZERO_LINE_COLOR = "#888888"             # x = 0 reference (slightly darker, thin)
+GRID_ALPHA = 0.12                       # very faint vertical reference grid
+DZ_XTICKS = [-1.0, -0.5, 0.0, 0.5, 1.0]
 
 # ---------------------------------------------------------------------------
 # Data loading (frozen-style, read-only)
@@ -115,7 +147,7 @@ def load_data():
     df_g = pd.read_csv(RESULTS_R2 / "r2_snow_gradients_summary.csv")        # slopes + CI
     df_c = pd.read_csv(RESULTS_R2 / "r2_parameter_values_canonical.csv")    # canonical z
     df_c["basin_id"] = df_c["basin_id"].astype(str).str.zfill(8)
-    df_p = pd.read_csv(RESULTS_R2 / "r2_paired_shifts_basin_level.csv")     # basin delta
+    df_p = pd.read_csv(RESULTS_R2 / "r2_paired_shifts_basin_level.csv")     # basin dZ
     df_p["basin_id"] = df_p["basin_id"].astype(str).str.zfill(8)
     return df_g, df_c, df_p
 
@@ -127,23 +159,22 @@ def slope_ci_param(df_g, paradigm, parameter):
     return float(r["beta"]), float(r["ci95_low"]), float(r["ci95_high"])
 
 
-def bounded_kde(vals, grid):
-    """KDE on [0,1] with boundary reflection (robust to boundary concentration)."""
+def ridge_density(vals, grid, h):
+    """Fixed-bandwidth Gaussian KDE on [-1, 1] with boundary reflection.
+
+    All regimes share the same absolute bandwidth ``h`` (DZ_BW) so ridge shapes are
+    directly comparable; each ridge is peak-normalized to 1 so sample size does not
+    control peak height.
+    """
     v = np.asarray(vals, dtype=float)
-    v = v[(v >= 0.0) & (v <= 1.0)]
-    if len(v) < 2 or np.ptp(v) < 1e-12:
+    v = v[(v >= -1.0) & (v <= 1.0)]
+    if len(v) < 2:
         d = np.zeros_like(grid)
-        d[np.abs(grid - float(np.median(v))) < 1e-6] = 1.0
+        d[np.argmin(np.abs(grid - float(np.median(v))))] = 1.0
         return d
-    refl = np.concatenate([-v, v, 2.0 - v])          # reflect at 0 and 1
-    try:
-        kde = gaussian_kde(refl)
-    except Exception:
-        d = np.zeros_like(grid)
-        d[np.abs(grid - float(np.median(v))) < 1e-6] = 1.0
-        return d
-    d = kde(grid)
-    d[grid < 0.0] = 0.0
+    refl = np.concatenate([-2.0 - v, v, 2.0 - v])        # reflect at -1 and +1
+    d = np.exp(-0.5 * ((grid[:, None] - refl[None, :]) / h) ** 2).sum(axis=1)
+    d[grid < -1.0] = 0.0
     d[grid > 1.0] = 0.0
     if d.max() > 0:
         d = d / d.max()
@@ -151,101 +182,119 @@ def bounded_kde(vals, grid):
 
 
 # ---------------------------------------------------------------------------
-# Panel (a): shared-parameter paired shifts (15 params, key ones in orange)
+# Panel (a): snow gradients of paired parameter shifts (Base-CN only)
+#   Single structural contrast per parameter row (deep-blue squares). The
+#   um / ki / ci rows carry a very light band + bold labels (highlight =
+#   expanded in panels b-d); colours are uniform because there is one contrast.
 # ---------------------------------------------------------------------------
-def panel_a_forest(ax, df_g, paradigm, show_legend=False):
+def panel_a_forest(ax, df_g, paradigm, shared_lim=None):
+    """One (a) subplot: snow gradients of paired shifts (Base-CN) for 15 parameters.
+
+    The primary estimand Base-CN is drawn as a deep-blue square per parameter with
+    the established 95 % bootstrap CI; um/ki/ci rows carry a very light band + bold
+    labels as a focus highlight (expanded in panels b-d) - no significance encoding.
+    ``shared_lim`` (lo, hi, ticks) unifies the x-axis across the IC and dPL subplots.
+    """
     y_pos = np.arange(len(PARAM_ORDER))
+    # very light background band behind the highlighted rows
+    for i, p in enumerate(PARAM_ORDER):
+        if p in KEY_PARAMS:
+            ax.axhspan(i - 0.5, i + 0.5, color=KEY_ROW_SHADE, linewidth=0, zorder=0)
     for i, p in enumerate(PARAM_ORDER):
         slope, lo, hi = slope_ci_param(df_g, paradigm, p)
         y = y_pos[i]
-        key = p in KEY_PARAMS
-        color = COLOR_BASE if key else COLOR_CN
         ax.errorbar(slope, y, xerr=[[slope - lo], [hi - slope]], fmt="s",
-                    color=color, ecolor=color, elinewidth=1.4,
-                    capsize=3.0, capthick=1.1, markersize=5.5,
-                    markerfacecolor=color, zorder=3)
-    ax.axvline(0, color=COLOR_REF, linestyle="--", linewidth=0.9, zorder=1)
+                    color=COLOR_CN, ecolor=COLOR_CN, elinewidth=1.1,
+                    capsize=2.4, capthick=0.9, markersize=4.8,
+                    markerfacecolor=COLOR_CN, markeredgecolor="none",
+                    linestyle="none", zorder=3)
+    ax.axvline(0, color=COLOR_REF, linestyle="--", linewidth=0.85, zorder=1)
     ax.set_yticks(y_pos)
     ax.set_yticklabels([DISPLAY[p] for p in PARAM_ORDER], fontsize=7.5)
     for tick, p in zip(ax.get_yticklabels(), PARAM_ORDER):
         if p in KEY_PARAMS:
             tick.set_fontweight("bold")
-            tick.set_color(COLOR_BASE)
-    ax.set_xlabel("Snow gradient of paired shift, β", labelpad=3)
-    ax.grid(True, axis="x", linestyle=":", alpha=0.25)
-    cilo = min(slope_ci_param(df_g, paradigm, p)[1] for p in PARAM_ORDER)
-    cihi = max(slope_ci_param(df_g, paradigm, p)[2] for p in PARAM_ORDER)
-    pad = max(0.05, (cihi - cilo) * 0.08)
-    ax.set_xlim(cilo - pad, cihi + pad)
-    if show_legend:
-        handles = [
-            Line2D([0], [0], marker="s", color=COLOR_BASE, markerfacecolor=COLOR_BASE,
-                   markersize=5.5, linestyle="none",
-                   label="Key compensation parameters"),
-            Line2D([0], [0], marker="s", color=COLOR_CN, markerfacecolor=COLOR_CN,
-                   markersize=5.5, linestyle="none", label="Other shared parameters"),
-        ]
-        ax.legend(handles=handles, loc="upper right", frameon=True, framealpha=0.90,
-                  edgecolor="none", fontsize=6.2)
-
+    ax.set_ylim(-0.75, len(PARAM_ORDER) - 0.25)
+    ax.set_xlabel("Snow gradient of paired shift, \u03b2", labelpad=3)
+    ax.grid(True, axis="x", linestyle=":", alpha=0.12)
+    if shared_lim is not None:
+        lo_r, hi_r, ticks = shared_lim
+        ax.set_xlim(lo_r, hi_r)
+        ax.set_xticks(ticks)
+    else:
+        cilo = min(slope_ci_param(df_g, paradigm, p)[1] for p in PARAM_ORDER)
+        cihi = max(slope_ci_param(df_g, paradigm, p)[2] for p in PARAM_ORDER)
+        pad = max(0.05, (cihi - cilo) * 0.08)
+        # round outward to a 0.5 grid and add a label buffer so the outermost tick
+        # labels are never clipped at the axes / figure edge
+        lo_r = np.floor((cilo - pad) / 0.5) * 0.5
+        hi_r = np.ceil((cihi + pad) / 0.5) * 0.5
+        ax.set_xlim(lo_r, hi_r + 0.10)
+        ax.set_xticks(np.arange(lo_r, hi_r + 0.5 + 1e-9, 0.5))
 
 # ---------------------------------------------------------------------------
-# Panels (b)-(d): snow-conditioned occupation ridgelines
+# Panels (b)-(d): ridgeline distributions of paired shifts dZ = z_Base - z_CN
+#   One regime row holds the IC ridge (up, solid, deeper) and the dPL ridge
+#   (down, dashed, lighter) so both regimes are compared within each snow regime.
 # ---------------------------------------------------------------------------
-def _strip_ridgeline(ax, df_c, paradigm, parameter, xlabel=False):
-    """One regime strip: per S1-S5 row, Base (up) and CN (down) occupation densities."""
-    grid = np.linspace(0.0, 1.0, 120)
+def _dz_ridge_pair(ax, df_p, parameter, xlabel=False):
+    """Per S1-S5 row: IC density mirrored above the shared baseline, dPL below.
+
+    Restrained HESS-style grammar: very light grey per-regime baseline, faint
+    vertical grid, thin x=0 reference; the density is the first visual layer and
+    the summary overlays (small median dot, thin short IQR line) stay auxiliary.
+    """
     y_pos = np.arange(len(REGIMES))  # S1 at bottom, S5 at top
     for i, reg in enumerate(REGIMES):
         y = y_pos[i]
-        for structure, color, mk, sign in [("Base", COLOR_BASE, "o", +1.0),
-                                           ("CN", COLOR_CN, "s", -1.0)]:
-            vals = df_c[(df_c["paradigm"] == paradigm)
-                        & (df_c["structure"] == structure)
-                        & (df_c["parameter"] == parameter)
-                        & (df_c["snow_regime"] == reg)]["z"].to_numpy()
-            d = bounded_kde(vals, grid)
-            curve = y + sign * RIDGE_PEAK * d
-            ax.fill_between(grid, y, curve, color=color, alpha=0.42,
+        ax.axhline(y, color=BASELINE_COLOR, linewidth=0.6, zorder=1)
+        for paradigm, sign, alpha, fill, edge, ls in [
+            ("IC", +1.0, IC_FILL_ALPHA, COLOR_CN, RIDGE_EDGE, "-"),
+            ("dPL", -1.0, DPL_FILL_ALPHA, COLOR_BASE, COLOR_BASE, DPL_LINESTYLE),
+        ]:
+            vals = df_p[(df_p["paradigm"] == paradigm)
+                        & (df_p["parameter"] == parameter)
+                        & (df_p["snow_regime"] == reg)]["delta_base_minus_cn"].to_numpy()
+            d = ridge_density(vals, DZ_GRID, DZ_BW)
+            curve = y + sign * RIDGE_HEIGHT * d
+            ax.fill_between(DZ_GRID, y, curve, color=fill, alpha=alpha,
                             linewidth=0, zorder=2)
-            ax.plot(grid, curve, color=color, linewidth=0.7, zorder=3)
+            ax.plot(DZ_GRID, curve, color=edge, linestyle=ls, linewidth=0.7, zorder=3)
             med = float(np.median(vals))
-            ax.plot([med], [y], marker=mk, color=color, markersize=3.6,
-                    markerfacecolor=color, markeredgecolor="white",
-                    markeredgewidth=0.4, zorder=4)
+            # small median dot on the ridge, in the ridge's own colour (auxiliary)
+            ax.plot([med], [y + sign * RIDGE_HEIGHT * d[np.argmin(np.abs(DZ_GRID - med))]],
+                    marker="o", color=edge, markersize=2.4,
+                    markerfacecolor=edge, markeredgecolor="none", zorder=5)
+            # thin short IQR line at the baseline, in the ridge's own colour
+            q1, q3 = np.percentile(vals, [25, 75])
+            ax.plot([q1, q3], [y + sign * 0.015, y + sign * 0.015],
+                    color=edge, linewidth=0.9, solid_capstyle="butt", zorder=5)
+    # x = 0 reference: slightly darker than the grid, still thin and restrained
+    ax.axvline(0, color=ZERO_LINE_COLOR, linestyle="--", linewidth=0.8, zorder=1)
     ax.set_yticks(y_pos)
-    ax.set_yticklabels(REGIMES, fontsize=7.0)
-    ax.set_xlim(0.0, 1.0)
-    ax.set_ylim(-0.62, 4.62)
-    ax.set_xticks([0.0, 0.25, 0.5, 0.75, 1.0])
-    ax.grid(True, axis="x", linestyle=":", alpha=0.25)
+    ax.set_yticklabels([f"{r} (n={n})" for r, n in zip(REGIMES, REGIME_N)],
+                       fontsize=7.0)
+    ax.set_xlim(-1.0, 1.0)
+    ax.set_ylim(-0.5, float(len(REGIMES)) + 0.5)
+    ax.set_xticks(DZ_XTICKS)
+    ax.set_xticklabels(["-1", "-0.5", "0", "0.5", "1"], fontsize=7.0)
+    ax.grid(True, axis="x", linestyle=":", alpha=GRID_ALPHA)
     if xlabel:
-        ax.set_xlabel("Normalized parameter value, z", labelpad=3)
+        ax.set_xlabel(r"$\Delta z = z_{\mathrm{Base}} - z_{\mathrm{CN}}$", labelpad=3)
 
-
-def panel_bcd_param(ax_ic, ax_dpl, df_c, parameter, title, show_legend=False):
-    """One parameter panel: two strips (IC top, dPL bottom) of occupation ridgelines."""
-    ax_ic.set_title(title, weight="bold", loc="left", pad=6)
-    _strip_ridgeline(ax_ic, df_c, "IC", parameter)
-    _strip_ridgeline(ax_dpl, df_c, "dPL", parameter, xlabel=True)
-    ax_ic.set_xticklabels([])
-    ax_ic.text(0.02, 0.97, "IC regime", transform=ax_ic.transAxes, ha="left",
-               va="top", fontsize=7.5, fontweight="bold", color="#333333")
-    ax_dpl.text(0.02, 0.97, "dPL regime", transform=ax_dpl.transAxes, ha="left",
-                va="top", fontsize=7.5, fontweight="bold", color="#333333")
-    if show_legend:
-        handles = [
-            Line2D([0], [0], marker="o", color=COLOR_BASE, markerfacecolor=COLOR_BASE,
-                   markersize=4.0, linestyle="none", label="Base"),
-            Line2D([0], [0], marker="s", color=COLOR_CN, markerfacecolor=COLOR_CN,
-                   markersize=4.0, linestyle="none", label="CN"),
-        ]
-        ax_ic.legend(handles=handles, loc="upper right", frameon=True,
-                     framealpha=0.90, edgecolor="none", fontsize=6.2)
+def panel_ridge(ax, df_p, parameter, letter, xlabel=False, snow_cue=False):
+    """One middle-column parameter panel: (letter) name + per-regime IC/dPL ridges."""
+    ax.set_title(f"({letter}) {DISPLAY[parameter]}", weight="bold", loc="left",
+                 pad=5, fontsize=9.0)
+    _dz_ridge_pair(ax, df_p, parameter, xlabel=xlabel)
+    if snow_cue:
+        # very light snow-gradient cue (auxiliary; once, on the first panel only)
+        ax.text(0.02, 0.985, "Increasing snow influence \u2191", transform=ax.transAxes,
+                ha="left", va="top", fontsize=6.4, color="#999999")
 
 
 # ---------------------------------------------------------------------------
-# Panel (e): GIS column - three vertical mini-maps (blue-orange diverging)
+# GIS row: horizontal row of three maps of the same paired shift dZ
 # ---------------------------------------------------------------------------
 def _load_geo():
     import geopandas as gpd  # noqa: WPS433
@@ -264,7 +313,7 @@ def _draw_map(ax, basins, states, delta, title):
     states.plot(ax=ax, facecolor="#F6F6F3", edgecolor="#D5D5D0", linewidth=0.25,
                 zorder=1)
     ax.scatter(basins["x"], basins["y"], c=delta, cmap=MAP_CMAP, vmin=-MAP_VLIM,
-               vmax=MAP_VLIM, s=11, alpha=0.85, edgecolors="none", zorder=3)
+               vmax=MAP_VLIM, s=15, alpha=0.90, edgecolors="none", zorder=3)
     minx, miny, maxx, maxy = states.total_bounds
     px, py = (maxx - minx) * 0.015, (maxy - miny) * 0.02
     ax.set_xlim(minx - px, maxx + px)
@@ -274,7 +323,7 @@ def _draw_map(ax, basins, states, delta, title):
     ax.set_yticks([])
     for spine in ax.spines.values():
         spine.set_visible(False)
-    ax.set_title(title, fontweight="bold", pad=2, fontsize=8.5)
+    ax.set_title(title, fontweight="bold", pad=2, fontsize=9.5)
 
 
 def _maps_data(df_p, paradigm):
@@ -294,92 +343,83 @@ def panel_e_maps(axs, df_p, paradigm):
         _draw_map(ax, basins, states, delta, DISPLAY[p])
     return basins, states
 
-
-def _maps_data(df_p, paradigm):
-    sub = df_p[df_p["paradigm"] == paradigm]
-    out = {}
-    for p in KEY_PARAMS:
-        s = sub[sub["parameter"] == p][["basin_id", "delta_base_minus_cn"]]
-        out[p] = s.set_index("basin_id")["delta_base_minus_cn"]
-    return out
-
-
-def panel_e_maps(axs, df_p, paradigm):
-    """Three vertical mini-maps (um, ki, ci) with the shared blue-orange scale."""
-    basins, states = _load_geo()
-    delta_map = _maps_data(df_p, paradigm)
-    for ax, p in zip(axs, KEY_PARAMS):
-        delta = basins["basin_id"].map(delta_map[p])
-        _draw_map(ax, basins, states, delta, DISPLAY[p])
-    return basins, states
 
 # ---------------------------------------------------------------------------
 # Figure assembly
 # ---------------------------------------------------------------------------
 def build_figure(df_g, df_c, df_p) -> None:
-    fig = plt.figure(figsize=(10.2, 12.2))
-    # Row 0: (a) full width; Row 1: left (b)(c)(d) + right GIS column
-    gs = gridspec.GridSpec(2, 1, height_ratios=[1.0, 1.75], hspace=0.50,
-                           left=0.07, right=0.98, top=0.96, bottom=0.05)
+    fig = plt.figure(figsize=(13.0, 10.6))
+    TOP, BOT = 0.955, 0.096
+    # legend strip sits ~1 character below the panels (BOT small).
+    c1 = (0.050, 0.314)   # panel (a)
+    c2 = (0.372, 0.647)   # ridgelines (b)(c)(d)
+    c3 = (0.676, 0.982)   # GIS (e)
+    gsL = gridspec.GridSpec(2, 1, left=c1[0], right=c1[1], top=TOP, bottom=BOT, hspace=0.28)
+    gsM = gridspec.GridSpec(3, 1, left=c2[0], right=c2[1], top=TOP, bottom=BOT, hspace=0.22)
+    gsR = gridspec.GridSpec(4, 1, left=c3[0], right=c3[1], top=TOP, bottom=BOT,
+                            height_ratios=[0.09, 1.0, 1.0, 1.0], hspace=0.05)
 
-    # ---- (a) full-width overview ----
-    gsa = gridspec.GridSpecFromSubplotSpec(1, 2, subplot_spec=gs[0], wspace=0.30)
-    ax_a1 = fig.add_subplot(gsa[0, 0]); apply_clean_spines(ax_a1)
-    ax_a2 = fig.add_subplot(gsa[0, 1]); apply_clean_spines(ax_a2)
-    ax_a1.set_title("(a) Shared-parameter paired shifts", weight="bold",
-                    loc="left", pad=6)
-    panel_a_forest(ax_a1, df_g, "IC", show_legend=True)
-    panel_a_forest(ax_a2, df_g, "dPL")
+    # ---- Column 1: (a) split into (a1) IC regime / (a2) dPL regime (vertical) ----
+    ax_a1 = fig.add_subplot(gsL[0, 0]); apply_clean_spines(ax_a1)
+    ax_a2 = fig.add_subplot(gsL[1, 0]); apply_clean_spines(ax_a2)
+    ax_a1.set_title("(a) Snow gradients of paired shifts", weight="bold",
+                    loc="left", pad=5)
+    # shared x-axis across the two regimes (Base-CN only)
+    cilo = min(slope_ci_param(df_g, p_, par)[1] for p_ in ["IC", "dPL"] for par in PARAM_ORDER)
+    cihi = max(slope_ci_param(df_g, p_, par)[2] for p_ in ["IC", "dPL"] for par in PARAM_ORDER)
+    pad = max(0.05, (cihi - cilo) * 0.08)
+    lo_r = np.floor((cilo - pad) / 0.5) * 0.5
+    hi_r = np.ceil((cihi + pad) / 0.5) * 0.5
+    shared_lim = (lo_r, hi_r + 0.10, np.arange(lo_r, hi_r + 0.5 + 1e-9, 0.5))
+    panel_a_forest(ax_a1, df_g, "IC", shared_lim=shared_lim)
+    panel_a_forest(ax_a2, df_g, "dPL", shared_lim=shared_lim)
     ax_a1.set_ylabel("Parameter", labelpad=3)
-    ax_a2.set_yticklabels([])
     ax_a1.text(0.02, 0.97, "IC regime", transform=ax_a1.transAxes, ha="left",
-               va="top", fontsize=8.0, fontweight="bold", color="#333333")
+               va="top", fontsize=7.6, fontweight="bold", color="#333333")
     ax_a2.text(0.02, 0.97, "dPL regime", transform=ax_a2.transAxes, ha="left",
-               va="top", fontsize=8.0, fontweight="bold", color="#333333")
+               va="top", fontsize=7.6, fontweight="bold", color="#333333")
 
-    # ---- Row 1: left (b)(c)(d) | right GIS ----
-    gs_row = gridspec.GridSpecFromSubplotSpec(1, 2, subplot_spec=gs[1],
-                                              width_ratios=[1.45, 1.0], wspace=0.16)
-    # left: three parameter panels
-    gsL = gridspec.GridSpecFromSubplotSpec(3, 1, subplot_spec=gs_row[0, 0],
-                                           hspace=0.55)
+    # ---- Column 2: (b) um / (c) ki / (d) ci ridgelines (vertical) ----
     for row, (param, letter) in enumerate(zip(KEY_PARAMS, ["b", "c", "d"])):
-        gsp = gridspec.GridSpecFromSubplotSpec(2, 1, subplot_spec=gsL[row, 0],
-                                               hspace=0.20)
-        ax_t = fig.add_subplot(gsp[0, 0]); apply_clean_spines(ax_t)
-        ax_b = fig.add_subplot(gsp[1, 0]); apply_clean_spines(ax_b)
-        panel_bcd_param(ax_t, ax_b, df_c, param, f"({letter}) {DISPLAY[param]}",
-                        show_legend=(row == 0))
+        ax = fig.add_subplot(gsM[row, 0]); apply_clean_spines(ax)
+        panel_ridge(ax, df_p, param, letter,
+                    xlabel=(row == 2), snow_cue=(row == 0))
 
-    # right: GIS column (header + three maps) with the (e) title at the top
-    gsRcol = gridspec.GridSpecFromSubplotSpec(1, 2, subplot_spec=gs_row[0, 1],
-                                              width_ratios=[0.93, 0.07], wspace=0.03)
-    gsR = gridspec.GridSpecFromSubplotSpec(4, 1, subplot_spec=gsRcol[0, 0],
-                                           height_ratios=[0.4, 1.0, 1.0, 1.0],
-                                           hspace=0.42)
+    # ---- Column 3: (e) GIS column - three enlarged maps (um | ki | ci), full width
     header_ax = fig.add_subplot(gsR[0, 0])
     header_ax.axis("off")
-    header_ax.text(0.5, 0.95, "(e) Geographic organization\nof paired shifts",
-                   transform=header_ax.transAxes, ha="center", va="top",
-                   fontsize=8.5, fontweight="bold", linespacing=1.3)
+    header_ax.text(0.5, 0.5, "(e) Geographic patterns\nof paired shifts",
+                   transform=header_ax.transAxes, ha="center", va="center",
+                   fontsize=8.8, fontweight="bold", linespacing=1.25)
     map_axes = [fig.add_subplot(gsR[i, 0]) for i in [1, 2, 3]]
     panel_e_maps(map_axes, df_p, "dPL")
-    # shared vertical colour bar in its own sub-column of the GIS column
-    mappable = ScalarMappable(norm=Normalize(-MAP_VLIM, MAP_VLIM), cmap=MAP_CMAP)
-    cax = fig.add_subplot(gsRcol[0, 1])
-    cbar = fig.colorbar(mappable, cax=cax, orientation="vertical")
-    cbar.set_label("Δz (Base − CN)", fontsize=7.0, labelpad=2)
-    cbar.ax.tick_params(labelsize=6.0, pad=1, length=2)
 
-    # Output: PNG only, saved to manuscript/plots/figures/ (no PDF, no figures/ copy).
-    out = PLOTS_FIG_DIR / f"{OUT_NAME}.png"
-    plt.savefig(out, dpi=600)
-    print("saved:", out)
-    plt.close()
+    # ---- Shared bottom row: IC/dPL ridge legend + the (e) colour bar, on one line ----
+    regime_handles = [
+        Patch(facecolor=COLOR_CN, alpha=IC_FILL_ALPHA, edgecolor=RIDGE_EDGE,
+              linewidth=0.8, label="IC"),
+        Patch(facecolor=COLOR_BASE, alpha=DPL_FILL_ALPHA, edgecolor=COLOR_BASE,
+              linewidth=0.7, linestyle=DPL_LINESTYLE, label="dPL"),
+    ]
+    leg1 = fig.legend(handles=regime_handles, loc="lower center",
+                      bbox_to_anchor=(0.30, 0.028), ncol=2, frameon=False,
+                      fontsize=7.0, columnspacing=1.4, handlelength=1.8)
+    for t in leg1.get_texts():
+        t.set_fontsize(7.0)
+    # horizontal colour bar for (e), in the same bottom row
+    mappable = ScalarMappable(norm=Normalize(-MAP_VLIM, MAP_VLIM), cmap=MAP_CMAP)
+    cax = fig.add_axes([0.70, 0.030, 0.23, 0.015])
+    cbar = fig.colorbar(mappable, cax=cax, orientation="horizontal")
+    cbar.set_label("\u0394z (Base \u2212 CN)", fontsize=6.6, labelpad=1)
+    # Output: high-resolution PNG only, saved to manuscript/plots/figures/
+    out_png = PLOTS_FIG_DIR / f"{OUT_NAME}.png"
+    fig.savefig(out_png, dpi=600)
+    print("saved:", out_png)
+    plt.close(fig)
 
 
 def build_ic_maps_supplement(df_p) -> None:
-    """IC versions of the (e) maps -> Supplement (Fig_S4_IC_maps.png)."""
+    """IC versions of the GIS maps -> Supplement (Fig_S4_IC_maps.png)."""
     fig = plt.figure(figsize=(8.8, 3.4))
     gs = gridspec.GridSpec(1, 3, wspace=0.10, left=0.02, right=0.92,
                            top=0.92, bottom=0.08)
@@ -388,7 +428,7 @@ def build_ic_maps_supplement(df_p) -> None:
     mappable = ScalarMappable(norm=Normalize(-MAP_VLIM, MAP_VLIM), cmap=MAP_CMAP)
     cbar = fig.colorbar(mappable, ax=map_axes, orientation="vertical",
                         fraction=0.04, pad=0.01)
-    cbar.set_label("Δz (Base − CN)", fontsize=7.5, labelpad=2)
+    cbar.set_label("\u0394z (Base \u2212 CN)", fontsize=7.5, labelpad=2)
     out = SUPP_FIG_DIR / "Fig_S4_IC_maps.png"
     fig.savefig(out, dpi=600, bbox_inches="tight", pad_inches=0.03)
     print("saved:", out)
@@ -406,12 +446,13 @@ def main() -> None:
         assert len(df_p[df_p["paradigm"] == paradigm]) == 531 * 15
     zc = df_c[df_c["parameter"].isin(PARAM_ORDER)]["z"]
     assert float(zc.min()) >= -1e-9 and float(zc.max()) <= 1.0 + 1e-9
+    # paired shifts are canonical z differences -> bounded in [-1, 1]
+    dz = df_p[df_p["parameter"].isin(KEY_PARAMS)]["delta_base_minus_cn"]
+    assert float(dz.min()) >= -1.0 - 1e-9 and float(dz.max()) <= 1.0 + 1e-9
     assert (df_p[(df_p["paradigm"] == "dPL") & (df_p["parameter"].isin(KEY_PARAMS))]
                .groupby("basin_id").ngroups) == 531
     build_figure(df_g, df_c, df_p)
     build_ic_maps_supplement(df_p)
-    print("Figure 4 (full-width overview + occupation ridgelines + GIS column) generated.")
-
-
+    print("Figure 4 final (Base-CN only: snow-gradient overview + ridgelines + GIS) generated.")
 if __name__ == "__main__":
     main()
