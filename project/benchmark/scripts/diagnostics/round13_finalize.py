@@ -1,4 +1,10 @@
-"""Generate the immutable final evidence tables for round 13."""
+"""DEPRECATED (2026-08-12): historical dPL checkpoint selection by maximum
+VALIDATION median KGE.  Superseded by train-loss-based selection
+(scripts/diagnostics/reselect_dpl_trainloss_eval.py) because it used the
+1995-2010 validation window that is also the final evaluation window
+(selection leakage).  Kept only as provenance of the old rule.
+
+Generate the immutable final evidence tables for round 13."""
 from __future__ import annotations
 import json
 import re

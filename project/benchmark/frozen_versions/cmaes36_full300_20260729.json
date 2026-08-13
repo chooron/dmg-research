@@ -1,0 +1,1403 @@
+{
+  "aggregate_source_hash": "c76755aed6f73de6450ed1766221e4fa7cb766f4f9ab7cf3f0eb4accc5d8c872",
+  "created_at_utc": "2026-07-29T07:39:56.202393+00:00",
+  "git_head": null,
+  "model_registry": {
+    "alpine1": 4,
+    "alpine2": 6,
+    "australia": 8,
+    "collie1": 1,
+    "collie2": 4,
+    "collie3": 6,
+    "flexb": 9,
+    "flexi": 10,
+    "flexis": 12,
+    "gr4j": 4,
+    "gsfb": 8,
+    "hbv96": 15,
+    "hillslope": 7,
+    "hymod": 5,
+    "ihacres": 6,
+    "modhydrolog": 15,
+    "mopex1": 5,
+    "mopex2": 7,
+    "mopex3": 8,
+    "mopex4": 10,
+    "mopex5": 12,
+    "newzealand1": 6,
+    "newzealand2": 8,
+    "penman": 4,
+    "plateau": 8,
+    "simhyd": 7,
+    "smar": 8,
+    "susannah1": 6,
+    "susannah2": 6,
+    "tank": 12,
+    "tcm": 6,
+    "topmodel": 7,
+    "us1": 5,
+    "vic": 10,
+    "wetland": 4,
+    "xinanjiang": 12
+  },
+  "name": "cmaes36_full300_20260729",
+  "note": "The repository worktree is not assumed clean; source_hashes are the authoritative freeze identifier.",
+  "parameter_bounds": {
+    "alpine1": [
+      [
+        -3.0,
+        5.0
+      ],
+      [
+        0.0,
+        20.0
+      ],
+      [
+        1.0,
+        2000.0
+      ],
+      [
+        0.0,
+        1.0
+      ]
+    ],
+    "alpine2": [
+      [
+        -3.0,
+        5.0
+      ],
+      [
+        0.0,
+        20.0
+      ],
+      [
+        1.0,
+        2000.0
+      ],
+      [
+        0.05,
+        0.95
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ]
+    ],
+    "australia": [
+      [
+        1.0,
+        2000.0
+      ],
+      [
+        0.05,
+        0.95
+      ],
+      [
+        0.01,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        1.0,
+        5.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        1.0,
+        5.0
+      ]
+    ],
+    "collie1": [
+      [
+        1.0,
+        2000.0
+      ]
+    ],
+    "collie2": [
+      [
+        1.0,
+        2000.0
+      ],
+      [
+        0.05,
+        0.95
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.05,
+        0.95
+      ]
+    ],
+    "collie3": [
+      [
+        1.0,
+        2000.0
+      ],
+      [
+        0.05,
+        0.95
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.05,
+        0.95
+      ],
+      [
+        1.0,
+        5.0
+      ],
+      [
+        0.0,
+        1.0
+      ]
+    ],
+    "flexb": [
+      [
+        1.0,
+        2000.0
+      ],
+      [
+        0.0,
+        10.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        20.0
+      ],
+      [
+        0.05,
+        0.95
+      ],
+      [
+        1.0,
+        5.0
+      ],
+      [
+        1.0,
+        15.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ]
+    ],
+    "flexi": [
+      [
+        1.0,
+        2000.0
+      ],
+      [
+        0.0,
+        10.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        20.0
+      ],
+      [
+        0.05,
+        0.95
+      ],
+      [
+        1.0,
+        5.0
+      ],
+      [
+        1.0,
+        15.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        5.0
+      ]
+    ],
+    "flexis": [
+      [
+        1.0,
+        2000.0
+      ],
+      [
+        0.0,
+        10.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        20.0
+      ],
+      [
+        0.05,
+        0.95
+      ],
+      [
+        1.0,
+        5.0
+      ],
+      [
+        1.0,
+        15.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        5.0
+      ],
+      [
+        -3.0,
+        5.0
+      ],
+      [
+        0.0,
+        20.0
+      ]
+    ],
+    "gr4j": [
+      [
+        1.0,
+        2000.0
+      ],
+      [
+        -20.0,
+        20.0
+      ],
+      [
+        1.0,
+        300.0
+      ],
+      [
+        0.5,
+        15.0
+      ]
+    ],
+    "gsfb": [
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.05,
+        0.95
+      ],
+      [
+        1.0,
+        2000.0
+      ],
+      [
+        0.0,
+        20.0
+      ],
+      [
+        0.0,
+        200.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        1.0,
+        300.0
+      ]
+    ],
+    "hbv96": [
+      [
+        -3.0,
+        5.0
+      ],
+      [
+        0.0,
+        17.0
+      ],
+      [
+        -3.0,
+        3.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        20.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        4.0
+      ],
+      [
+        1.0,
+        2000.0
+      ],
+      [
+        0.05,
+        0.95
+      ],
+      [
+        0.0,
+        10.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        4.0
+      ],
+      [
+        0.0,
+        20.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        1.0,
+        120.0
+      ]
+    ],
+    "hillslope": [
+      [
+        0.0,
+        5.0
+      ],
+      [
+        0.0,
+        10.0
+      ],
+      [
+        1.0,
+        2000.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        1.0,
+        120.0
+      ],
+      [
+        0.0,
+        4.0
+      ],
+      [
+        0.0,
+        1.0
+      ]
+    ],
+    "hymod": [
+      [
+        1.0,
+        2000.0
+      ],
+      [
+        0.0,
+        10.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ]
+    ],
+    "ihacres": [
+      [
+        1.0,
+        2000.0
+      ],
+      [
+        1.0,
+        2000.0
+      ],
+      [
+        0.0,
+        10.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        1.0,
+        5.0
+      ],
+      [
+        1.0,
+        30.0
+      ]
+    ],
+    "modhydrolog": [
+      [
+        0.1,
+        5.0
+      ],
+      [
+        0.0,
+        600.0
+      ],
+      [
+        0.0,
+        15.0
+      ],
+      [
+        1.0,
+        2000.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        20.0
+      ],
+      [
+        1.0,
+        50.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.99,
+        1.0
+      ],
+      [
+        0.0,
+        0.5
+      ],
+      [
+        -10.0,
+        10.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        100.0
+      ]
+    ],
+    "mopex1": [
+      [
+        1.0,
+        2000.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        1.0,
+        2000.0
+      ],
+      [
+        0.0,
+        1.0
+      ]
+    ],
+    "mopex2": [
+      [
+        -3.0,
+        3.0
+      ],
+      [
+        0.0,
+        20.0
+      ],
+      [
+        1.0,
+        2000.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        1.0,
+        2000.0
+      ],
+      [
+        0.0,
+        1.0
+      ]
+    ],
+    "mopex3": [
+      [
+        -3.0,
+        3.0
+      ],
+      [
+        0.0,
+        20.0
+      ],
+      [
+        1.0,
+        2000.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.05,
+        0.95
+      ],
+      [
+        1.0,
+        2000.0
+      ],
+      [
+        0.0,
+        1.0
+      ]
+    ],
+    "mopex4": [
+      [
+        -3.0,
+        3.0
+      ],
+      [
+        0.0,
+        20.0
+      ],
+      [
+        1.0,
+        2000.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        1.0,
+        365.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.05,
+        0.95
+      ],
+      [
+        1.0,
+        2000.0
+      ],
+      [
+        0.0,
+        1.0
+      ]
+    ],
+    "mopex5": [
+      [
+        -3.0,
+        3.0
+      ],
+      [
+        0.0,
+        20.0
+      ],
+      [
+        1.0,
+        2000.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        1.0,
+        365.0
+      ],
+      [
+        -10.0,
+        0.0
+      ],
+      [
+        1.0,
+        20.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.05,
+        0.95
+      ],
+      [
+        1.0,
+        2000.0
+      ],
+      [
+        0.0,
+        1.0
+      ]
+    ],
+    "newzealand1": [
+      [
+        1.0,
+        2000.0
+      ],
+      [
+        0.05,
+        0.95
+      ],
+      [
+        0.05,
+        0.95
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        1.0,
+        5.0
+      ],
+      [
+        0.0,
+        1.0
+      ]
+    ],
+    "newzealand2": [
+      [
+        0.0,
+        5.0
+      ],
+      [
+        1.0,
+        2000.0
+      ],
+      [
+        0.05,
+        0.95
+      ],
+      [
+        0.05,
+        0.95
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        1.0,
+        5.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        1.0,
+        30.0
+      ]
+    ],
+    "penman": [
+      [
+        1.0,
+        2000.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ]
+    ],
+    "plateau": [
+      [
+        0.0,
+        200.0
+      ],
+      [
+        0.0,
+        5.0
+      ],
+      [
+        1.0,
+        2000.0
+      ],
+      [
+        0.05,
+        0.95
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        1.0,
+        120.0
+      ],
+      [
+        0.0,
+        4.0
+      ],
+      [
+        0.0,
+        1.0
+      ]
+    ],
+    "simhyd": [
+      [
+        0.0,
+        5.0
+      ],
+      [
+        0.0,
+        600.0
+      ],
+      [
+        0.0,
+        15.0
+      ],
+      [
+        1.0,
+        2000.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ]
+    ],
+    "smar": [
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        200.0
+      ],
+      [
+        1.0,
+        2000.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        1.0,
+        10.0
+      ],
+      [
+        1.0,
+        120.0
+      ]
+    ],
+    "susannah1": [
+      [
+        1.0,
+        2000.0
+      ],
+      [
+        0.05,
+        0.95
+      ],
+      [
+        0.05,
+        0.95
+      ],
+      [
+        1.0,
+        50.0
+      ],
+      [
+        0.2,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ]
+    ],
+    "susannah2": [
+      [
+        1.0,
+        2000.0
+      ],
+      [
+        0.05,
+        0.95
+      ],
+      [
+        0.05,
+        0.95
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        1.0,
+        5.0
+      ]
+    ],
+    "tank": [
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        1.0,
+        2000.0
+      ],
+      [
+        0.01,
+        0.99
+      ],
+      [
+        0.01,
+        0.99
+      ],
+      [
+        0.01,
+        0.99
+      ]
+    ],
+    "tcm": [
+      [
+        0.0,
+        1.0
+      ],
+      [
+        1.0,
+        2000.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ]
+    ],
+    "topmodel": [
+      [
+        1.0,
+        2000.0
+      ],
+      [
+        0.05,
+        0.95
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.1,
+        200.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        1.0,
+        7.5
+      ],
+      [
+        0.1,
+        5.0
+      ]
+    ],
+    "us1": [
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.05,
+        0.95
+      ],
+      [
+        1.0,
+        2000.0
+      ],
+      [
+        0.05,
+        0.95
+      ],
+      [
+        0.0,
+        1.0
+      ]
+    ],
+    "vic": [
+      [
+        0.1,
+        5.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        1.0,
+        365.0
+      ],
+      [
+        1.0,
+        2000.0
+      ],
+      [
+        0.01,
+        0.99
+      ],
+      [
+        0.0,
+        10.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        10.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        1.0,
+        5.0
+      ]
+    ],
+    "wetland": [
+      [
+        0.0,
+        5.0
+      ],
+      [
+        0.0,
+        10.0
+      ],
+      [
+        1.0,
+        2000.0
+      ],
+      [
+        0.0,
+        1.0
+      ]
+    ],
+    "xinanjiang": [
+      [
+        0.0,
+        1.0
+      ],
+      [
+        -0.49,
+        0.49
+      ],
+      [
+        0.0,
+        10.0
+      ],
+      [
+        1.0,
+        2000.0
+      ],
+      [
+        0.01,
+        0.99
+      ],
+      [
+        0.01,
+        0.99
+      ],
+      [
+        0.01,
+        0.99
+      ],
+      [
+        0.0,
+        10.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.0,
+        1.0
+      ]
+    ]
+  },
+  "resolved_config": {
+    "_resolved_from": "/root/dmg-research/experiments/cmaes_36models/configs/full_run_10starts_300gen_warm1980_1981x5.yaml",
+    "active": true,
+    "checkpoint_every_generations": 5,
+    "checkpoint_milestones": [
+      25,
+      50,
+      100,
+      150,
+      200,
+      250,
+      300
+    ],
+    "compile_modes": [
+      "eager",
+      "default",
+      "reduce-overhead"
+    ],
+    "convergence": {
+      "cross_start_gap": 0.01,
+      "improvement_threshold": 0.0001,
+      "improvement_window": 30,
+      "objective_range_threshold": 0.001,
+      "objective_range_window": 10
+    },
+    "data": {
+      "basin_ids": "data/531sub_id.txt",
+      "data_path": "data/camels_dataset",
+      "reference_ids": "data/gage_id.npy",
+      "test": {
+        "end_time": "2009-12-31",
+        "start_time": "1999-01-01"
+      },
+      "train": {
+        "end_time": "1998-12-31",
+        "start_time": "1989-01-01"
+      }
+    },
+    "device": "cuda",
+    "escalation": {
+      "continuation_multiplier": 1.8,
+      "ipop_multiplier": 2,
+      "max_ipop_restarts": 1,
+      "restart_starts": 5
+    },
+    "full_covariance": true,
+    "global_seed": 20260729,
+    "invalid_penalty": -1000000.0,
+    "memory_fraction_limit": 0.88,
+    "memory_limit_gib": 10.5,
+    "model_freeze_manifest": "frozen_versions/cmaes36_full300_20260729/manifest.json",
+    "objective": "KGE",
+    "optimization": {
+      "active_cma": true,
+      "full_covariance": true,
+      "generations": 300,
+      "population_by_dimension": {
+        "1": 8,
+        "12-15": 20,
+        "4-6": 12,
+        "7-10": 16
+      },
+      "separable": false,
+      "starts": 10,
+      "stdev_init": 0.1
+    },
+    "resume": true,
+    "selection_period": "train_only",
+    "separable": false,
+    "stage": "full_production_prepared",
+    "stdev_init": 0.1,
+    "warm_up": 365,
+    "warmup": {
+      "mode": "repeat_forcing",
+      "objective_includes_warmup": false,
+      "repetitions": 5,
+      "source": {
+        "end_time": "1981-09-30",
+        "start_time": "1980-10-01"
+      },
+      "source_days": 365,
+      "total_days": 1825
+    },
+    "wide_restart_stdev": 0.25
+  },
+  "source_hashes_sha256": {
+    "dmotpy/models/__init__.py": "4bb36f6019143d16ffbcda6af5901063f09929c6eb53dc144fa23811c56c52d8",
+    "dmotpy/models/core/__init__.py": "e25c25e6484dfdda383900eba14be0d1fb04ab336cba6d0464b19b2ed6d97fef",
+    "dmotpy/models/core/alpine1.py": "f24f068efc35130c9985fa6ac23af1b79e06dfa2e7959bda10756261c6918a8f",
+    "dmotpy/models/core/alpine2.py": "bbe93f41c6f6116378210d46bc5ac004d7e95d12eaf9d1a12906d0369b682cea",
+    "dmotpy/models/core/archive/gsfb_original.py": "f180d35871f20cf38cf6a847a7c84963243639fc24c9937d9e862a3291e21cec",
+    "dmotpy/models/core/australia.py": "6248e689ec6e84b60573838dfd6a3f030af415e351eae7c48d76a26fa31d30ed",
+    "dmotpy/models/core/collie1.py": "e45f8fdda4213f473c0ada2445ac0c9a4ba9c4567d5d472f563283660f27371e",
+    "dmotpy/models/core/collie2.py": "5ae9d2a977aefd32c7176a40d5bdd7f8f3fe6b03818e5e718a1d2deb36e9f58e",
+    "dmotpy/models/core/collie3.py": "e75e7ec1d79936593a4957664b90132bbd5e17be0f97b46a052512e8f229f1ed",
+    "dmotpy/models/core/flexb.py": "939f442c0553c139e5e1840e07369f0e167ff86ddb72a7e471007f00e26b08bd",
+    "dmotpy/models/core/flexi.py": "e118ad65185f3fb5fd4e37b2fe302a8c883060c6704b4bdf6b57650080bf0d5c",
+    "dmotpy/models/core/flexis.py": "45c1de64fc6e4b6122d8404fcf1723277f85a6e1de3bbbfa844f2e079b54a1a1",
+    "dmotpy/models/core/gr4j.py": "af19e6c422766154926c1940fdaa312860c32492e08a3e663a7cfc794c64cab6",
+    "dmotpy/models/core/gsfb.py": "f5270da24fde1bec8bd434fa5d88926f0bf2526c2cad56f0e191e03e933e0ff6",
+    "dmotpy/models/core/hbv96.py": "79cbb713f94197810b6cf1a865a500b24e51a403cb741f8580469fc3c1713416",
+    "dmotpy/models/core/hillslope.py": "5f8b352b5d582ea91297d52da3ac6a4f1632cec71ede48b292fb0f069f1c161a",
+    "dmotpy/models/core/hymod.py": "78bcb372042c80a889225a23fe4c4c2456af52f02381947fb4a7242c5f5f6778",
+    "dmotpy/models/core/ihacres.py": "f5118b63041f99ee51fe8d4182438cf0d70d5b5ea8dc0a56d36dd268d5831b56",
+    "dmotpy/models/core/lascam.py": "74cdb802711c77a14b76e81a93d3ce63b07cadae098520627aa1106ebe21af75",
+    "dmotpy/models/core/modhydrolog.py": "324558daae4357d48b7aff95b6a4c5d6a39b3c3440ceafd57555a74277e4d8e9",
+    "dmotpy/models/core/mopex1.py": "f0d45c5b0e26f509000d137d1fa2cb126a241c10c48fb428220b01dfbc7f5a54",
+    "dmotpy/models/core/mopex2.py": "b70972152770210c0ed9c679eff682cf84a05451cb27083c9a2139599dda0ceb",
+    "dmotpy/models/core/mopex3.py": "4b3c2e44049203b4ecbc178cc5386088292b8df640e7ad29fa21d8fe8620d2a8",
+    "dmotpy/models/core/mopex4.py": "b255acbaaec84f4db02e05aab44971b5b99a6e7fffadabea8c8dfde9a77b2523",
+    "dmotpy/models/core/mopex5.py": "fe7d0b0a0e5542950deca9438bbd7508f6140004df9935ec35e53c65d00b330d",
+    "dmotpy/models/core/newzealand1.py": "d915735ad666a1832b4abdee2fed26d61add6f72a2e79ea5d1db0b28e16fefea",
+    "dmotpy/models/core/newzealand2.py": "e086cba041dd9c130b250f3a94f57c48ad87c53021b25175b606c2707dcfb807",
+    "dmotpy/models/core/penman.py": "aa6cfc1559286257743de62d920e7396efc0b814562f2a862278444f7ca017f7",
+    "dmotpy/models/core/plateau.py": "60042c1ebcaf18380966e7c2baff07230c7c9c11f431d894f21eb24dc6e7e98d",
+    "dmotpy/models/core/sacramento.py": "855fedfdcb91340f2cb630deb1d1fd338bf6111764ec83c29d16b8ba6ba3ed96",
+    "dmotpy/models/core/simhyd.py": "f35dccce19af7ce66dd2d38ac28344e694ddb8b6b2767cd7a002f5237ef0fa61",
+    "dmotpy/models/core/smar.py": "0c4309ea71f56236c197ec24873fda9a0efa35eca642d886e56231097fda9ef8",
+    "dmotpy/models/core/susannah1.py": "414374da0e46ec331cd0d3bf03ed77f3cf3f16509c3eabaa60491ba83f8ea164",
+    "dmotpy/models/core/susannah2.py": "2627fb06928e0791864a1bfd18bcf40c761b5217b566f0b6743b12efdad84255",
+    "dmotpy/models/core/tank.py": "0922f6884a53fb61fbda11875f9d20d43aa50a23b63b7bdd7f6dc8a90a5a69a6",
+    "dmotpy/models/core/tcm.py": "e17c800950649038719b2b7ceb010cbb2a7444997e4f76d3459dbcbafb06b6d0",
+    "dmotpy/models/core/topmodel.py": "5205255b3f0661e9e6df3917e1761eb73e09f205cee46011b9d4b59b50a9c7b0",
+    "dmotpy/models/core/us1.py": "9fad2e8d84e535cc69534ba29bc134ba0c71b8bcc1acefda619d3aeeeb15a698",
+    "dmotpy/models/core/vic.py": "fffd8b8272b39b177b8777371b7d38bd44c6f6d854fe2b2da872e866294cc328",
+    "dmotpy/models/core/wetland.py": "059a9ac3b907533fe4406047db45f12f968d29dd9ea75ec134d613d0c432ad33",
+    "dmotpy/models/core/xinanjiang.py": "60cd04bceb781037ac3104418ad92a62545053fd95af241612998f659afbda7b",
+    "dmotpy/models/endpoint_uh_model.py": "f3a59ed205c733fca0aa550c45ef56c4d6b6134319af7159a56b1e7b35dc3b72",
+    "dmotpy/models/flux/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "dmotpy/models/flux/area.py": "55adc6cf06a1b25283d7a922ab70883a7ba37375b6953cee5139f93752fe42fb",
+    "dmotpy/models/flux/baseflow.py": "7bc21c51f90c9157e46a5aa43d2d3c2301caa4ba82811c29eaa406a4196da8de",
+    "dmotpy/models/flux/capillary.py": "d404ff573a2ceb9c0c1df536e4290d002cc6073dae44fc444a33c9a5654e4842",
+    "dmotpy/models/flux/depression.py": "b52c9638d58f1862ea4d84ea59e97d970713f13537aee60ed94890a35ef07d51",
+    "dmotpy/models/flux/effective.py": "d789e4a4b46d1599716b97086088d943168f499b3d9f60438249edf783bf70a1",
+    "dmotpy/models/flux/evap.py": "49189ba628737ffee4a036eaf1101757d8e0a2cecf3b8e6b46533c7f0256be9c",
+    "dmotpy/models/flux/excess.py": "a31a4b7479f85d0a7b3a5fad9b03b2e811223b27e89a89b4ddcd18867a657837",
+    "dmotpy/models/flux/exchange.py": "3332f3f626d2cc548a518b16fd24e4fa7c4da3ca5902fa193d844d6cb9da208f",
+    "dmotpy/models/flux/infiltration.py": "a22094a7926df82bdd39bf32f2167629347bd786acb93e4faacd73b12396399f",
+    "dmotpy/models/flux/interception.py": "3dc3998bfae700928a4344eeaedc3b392fe824440a13d0aee58402ad3758fda6",
+    "dmotpy/models/flux/interflow.py": "48adb4a10b36c7618c2cdf0850f70de2eca34df48d0c7bd7e652afe96d008cf5",
+    "dmotpy/models/flux/melt.py": "ae9adfac273619335cb3a9fa873f86205506566c1c0bf2a3d4968d1b1260853a",
+    "dmotpy/models/flux/mopex.py": "a51e7b4db9bc241bf1f8fbd4fa604caf12a6d3f6edbacc6a6349d6335474ea5c",
+    "dmotpy/models/flux/percolation.py": "e6cfd3c07d9dee73116503818cc26d4f52b47e683edf7f8bf5605d1f0f4f6764",
+    "dmotpy/models/flux/phenology.py": "18a34ceebf446532d63cf4b94d312b4c1e65f1584952a21ab5d9f220a0653aac",
+    "dmotpy/models/flux/rainfall.py": "49d86b05916226ac8e4b4f5de1341f2a977c5fcd0dee3a312c05a08e9d24c17a",
+    "dmotpy/models/flux/recharge.py": "288250fde49758e2ec3fee7760e4d4a0f10c93aaa74b9cfbc626baace452bb22",
+    "dmotpy/models/flux/refreeze.py": "97f444690314cedfe9565b8ed2a8b4386ccf73e369c63fcdc87810b26e906b3b",
+    "dmotpy/models/flux/sacramento.py": "9fc818f75fe1423b0a76915df2fdbb340da179f5ec80d2af0b697f537c744ffb",
+    "dmotpy/models/flux/saturation.py": "08ea45daa5a613a92c51a6a5f05e286a0da13426b954a37c94703c40ab9fe8b4",
+    "dmotpy/models/flux/smooth.py": "cf4c979f79759605d759bd2e57d49239e0ab7bd9f23ebaa4cec90e093cd64325",
+    "dmotpy/models/flux/snowfall.py": "4a60309ff5cd24196aa023cf00471e6ae168a661cf76ee7147e563a98ff65ccd",
+    "dmotpy/models/flux/soilmoisture.py": "ed9040b129df0d0030bd44ce694eb537582f99559fea682cd36ff1e92b466fa1",
+    "dmotpy/models/flux/split.py": "0956ab4b2df74835cd87397a350c109ed9c1691137e5cecf295e350b2af52088",
+    "dmotpy/models/gr4j_uh_model.py": "c292d8183b7acff613dd461ad41ad1e4d5065af54a000a49cea2e0090be211b6",
+    "dmotpy/models/hydrology_model.py": "6b4895477ba2eb33815c5c0f9ffad45e5afefabe54e2d9c4a98e34d706706f71",
+    "dmotpy/models/intermediate_uh_model.py": "ca8679c83f07de5555edebf9c6b730f4385a500b1d92e511cdb07a26bc0aba76",
+    "dmotpy/models/mopex_doy_model.py": "b1ee0aa4cadff9ba1dc61bde62002123034bc324cb98adef366f33d8a4c2d84a",
+    "dmotpy/models/registry.py": "5d07f259c2d2f6081e7efe1d24a99ba657390624f8b32980da132288484fb8b3",
+    "dmotpy/models/special_models.py": "5b4904b16166a065382e2814359c40ec07cbe5b76f4966e6c82a37f5a6f15f7f",
+    "dmotpy/models/tcm_model.py": "21bca3ddb7c1e96d99df18e8f1e8413058abd7624262ebab9f5def3359250f31",
+    "dmotpy/models/unify_v1.py": "30f4127ed3671a53abe7fb7a40b90fdbe1a0957c77d6bfd5fa8c09999f1939e7",
+    "dmotpy/models/unify_v2.py": "f10fa0b889ac4a2e9c9fff94200f7f5e3d3154e3cb4a56d15e2186b4b7189e2e",
+    "dmotpy/models/unithydro/__init__.py": "ade514a3c93fd56b283f7ec370e9728f0d614a46f1da8c04e51a850547d07029",
+    "dmotpy/models/unithydro/base.py": "87096d0acff0ffc9d326bf4d66cb04e47e41c9b565b76e2fa6a4ef176d2efe6d",
+    "dmotpy/models/unithydro/base_new.py": "0010a5c6bfa65348de7084032494420565d94baaca0f7bfb084a7dd24ca41f4a",
+    "dmotpy/models/unithydro/test/test_uh.py": "eb2ff19aca6348c6d5764046ebc38142c2a9c7e1c1018e645665445bae6932fb",
+    "dmotpy/models/unithydro/test/test_uh2.py": "358d13a9dcb48e0e86e0daedee2dc636fb3d671a847ca338eda6d3db87773132",
+    "dmotpy/models/unithydro/test/test_uh_5.py": "f008c474e012e605b775f1691b659b4fb75d88886ac27b1c6ab3f59af104d576",
+    "dmotpy/models/unithydro/test/test_uh_6.py": "5f27233d9aed62e1fce2c5e8126913c587d06688e1cbf3de39b45070e913b121",
+    "dmotpy/models/unithydro/test/test_uh_7.py": "c601d26477685399ab07949bcfe6e910f4a7a0b8a5b0d52eb6903619763e2287",
+    "dmotpy/models/unithydro/test/test_uh_8.py": "fd9a37f3e63efe50cc993c904b66f839b085023308df3df3adb2597e1c03464c",
+    "dmotpy/models/unithydro/test/test_uh_tri_3.py": "f87ec64fe42939e75a7f8e4d1eadfc33d8bb6fec8df2b0cc063c439643bd1184",
+    "dmotpy/models/unithydro/test/test_uh_tri_4.py": "b50f85b4b85209c4fc32f5327d1bebe40bfee7c5ec89642f60bcb97ee3a5dc1b",
+    "dmotpy/models/unithydro/uh_delay_8.py": "3b449343767cbe862a76f3b75c5c42533bac92a0d43e5e4b7ec6ad0ff12987d5",
+    "dmotpy/models/unithydro/uh_exp_5.py": "028d0d5d44796e50a92b6b0f1c86ab9a9889b6fba2ccaa240b8947cb9dd9e947",
+    "dmotpy/models/unithydro/uh_full_2.py": "c621466981f9e5b786b57d2e094caacc4a7068d14a9b7036584b370cca90c685",
+    "dmotpy/models/unithydro/uh_gamma_6.py": "a4932b14f7c79f16769ad5f4a4368bb22ddf762d7fefa3c0a08c867e68c2698e",
+    "dmotpy/models/unithydro/uh_half_1.py": "3ad883e8716cd20f386a999a7f2fbf12bdd5d9f6d59ffcdf23ac9d5ada310174",
+    "dmotpy/models/unithydro/uh_identity_0.py": "837978869e58cc5d8362b5e456129520011f81407912cb3c7090dd62a032992f",
+    "dmotpy/models/unithydro/uh_tri_3.py": "7a06c57e872c278bc6325797964be284c41e3e8e2d5718987201552255ade9b9",
+    "dmotpy/models/unithydro/uh_tri_4.py": "8417e88db7018db73cdb20017eaf6cabf8b1e18cdb3e8079496b49e53a5cf960",
+    "dmotpy/models/unithydro/uh_uniform_7.py": "4a3f68930bbdae12aa3a48ae8e7e6a7dd162a4ffb6be4667234bf6e61dabb2fb",
+    "experiments/cmaes_36models/configs/full_run_10starts_300gen_warm1980_1981x5.yaml": "91f9838369270a00a1c46e19d79bf46094aae81abeaf104d2f8fc0e87a70ced8",
+    "experiments/cmaes_36models/scripts/run_36model_pilot.py": "b457b3019a9a9b4efa4e65cdc87338ea1a374efc7b5f182c36fb69b53d4ff276",
+    "experiments/cmaes_36models/src/__init__.py": "5d2448940f090d904960fe89713e8910ba21c2afee92c3d6ed2827edd60f1da8",
+    "experiments/cmaes_36models/src/batched_cmaes.py": "a678160413c3045e411c2254525619f038894919b59f036c109e29a8c564e2f9",
+    "experiments/cmaes_36models/src/checkpointing.py": "f85c2cea52f60083c4ebb8ee8c708ecf4aa7102c1ec1b579007d18378bc33f6e",
+    "experiments/cmaes_36models/src/compile_utils.py": "f4096927d70847dcefccb9d289958a3a58a4cd2e2ca8b2f7558f23a8f6134917",
+    "experiments/cmaes_36models/src/convergence.py": "88674c426b3cad5cf3165194960145575756b63d7b3baf5526c3f61b0e061c92",
+    "experiments/cmaes_36models/src/data_selection.py": "06cbad1487356fff1ed038681276bb5403416341a9bf4064a884186e06741c05",
+    "experiments/cmaes_36models/src/evotorch_reference.py": "006ef2164fc3045f0bf45cd2c7b8ffce90a37c8ad084e04a9199fe0ad526ce52",
+    "experiments/cmaes_36models/src/gpu_batch_planner.py": "32c4c852e6178c2b7a442a9c0773e98d9a33a1002b4870aef5b977fd2683f63b",
+    "experiments/cmaes_36models/src/model_adapter.py": "b75cee53f21928b6c7199a242a4658ad11c30696e4527eb4d8e400b961807960",
+    "experiments/cmaes_36models/src/model_registry.py": "fb200f62aa2f7111c570d9875b2c23df58ec0cc2ebbcd5e5b218dfc2ac5f9f2b",
+    "experiments/cmaes_36models/src/objective.py": "8993636c88859d9800270a8777ed43834c2b23c1f47909711529495ef8a15d4f",
+    "experiments/cmaes_36models/src/parameter_transform.py": "11543ef71ef291f2ba2af9cdcd71fe6fbf3ed4f1ab16476dc6808d935be78ab2",
+    "experiments/cmaes_36models/src/production_config.py": "8240de28b6471a19a3eaae35f3b2c9533e85cc7931decdaf5b69f1634db6b3e8",
+    "experiments/cmaes_36models/src/reporting.py": "69ab6024676606b2ed11a965562141050295a9b65f422a3a6b37912a3c7f3f9d",
+    "experiments/cmaes_36models/src/solver_coordinator.py": "a1bc5f20eed36936bb6ab961db0c12898f0563db70494232dca67889a127356d"
+  }
+}

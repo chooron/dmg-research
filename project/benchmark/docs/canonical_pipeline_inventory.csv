@@ -1,0 +1,125 @@
+path,role,referenced_by,canonical_status,action,reason
+scripts/run_36model_benchmark.py,"IC Full300 training entry (per-model, memory-aware, resume built-in)",,CANONICAL,KEEP,Local equivalent of remote run_36model_pilot.py production path; verified
+scripts/run_full_benchmark.sh,IC Full300 orchestration (train all 36 + evaluate),,CANONICAL,KEEP,Single one-shot canonical orchestration
+scripts/run_continuation.sh,IC Full300 continuation/resume launcher (unfinished models),,CANONICAL,KEEP,Local equivalent of remote run_full300_remaining_continuation.sh
+scripts/evaluate_benchmark_metrics.py,"Canonical train/test evaluation (frozen params, gen-300 guard added)",,CANONICAL,KEEP,Reproduces canonical full300 results exactly
+scripts/evaluate_ic_aligned_gen300.py,Aligned 1995-2010 evaluation (gen-300 guard),,CANONICAL,KEEP,Moved from diagnostics; canonical aligned eval
+scripts/validate_full300_config.py,Canonical config+manifest validation,,CANONICAL,KEEP,Adapted from remote deployment snapshot
+scripts/freeze_model_version.py,Canonical model/version manifest freeze,,CANONICAL,KEEP,Adapted from remote deployment snapshot
+scripts/consolidate_final_checkpoints.py,"Final checkpoint set build/verify (gen-300, 531 basins)",,CANONICAL,KEEP,New canonical consolidation helper
+scripts/deploy_to_ssh.py,Remote deployment/sync (SSH),,CANONICAL,KEEP,Remote access entry
+configs/full_run_10starts_300gen_warm1980_1981x5.yaml,"Canonical full300 config (train 1989-98, test 1999-2009, warmup 1980-81x5)",,CANONICAL,KEEP,Verified identical to deployment snapshot
+configs/default.yaml,Config base (invariant settings),,CANONICAL,KEEP,Required base; identical to snapshot
+src/batched_cmaes.py,CMA-ES solver core,,CANONICAL,KEEP,Identical to snapshot; required
+src/checkpointing.py,Atomic checkpoint IO,,CANONICAL,KEEP,Identical to snapshot; required
+src/compile_utils.py,Compile utilities,,CANONICAL,KEEP,Identical to snapshot; required
+src/convergence.py,Convergence criteria,,CANONICAL,KEEP,Identical to snapshot; required
+src/data_selection.py,Data split + canonical frozen-param loader + evaluate_period,,CANONICAL,KEEP,Extended local version (canonical helpers)
+src/evotorch_reference.py,Reference solver,,CANONICAL,KEEP,Identical to snapshot; required
+src/gpu_batch_planner.py,GPU batch planning / OOM fallback,,CANONICAL,KEEP,Identical to snapshot; required
+src/model_adapter.py,Model adapter layer,,CANONICAL,KEEP,Identical to snapshot; required
+src/model_registry.py,36-model registry + build_model,,CANONICAL,KEEP,Extended local version (state-init specs)
+src/objective.py,KGE objective (streaming_kge),,CANONICAL,KEEP,Identical to snapshot; required
+src/parameter_transform.py,Latent->physical transform,,CANONICAL,KEEP,Identical to snapshot; required
+src/production_config.py,Config resolution/validation,,CANONICAL,KEEP,Identical to snapshot; required
+src/reporting.py,Run reporting,,CANONICAL,KEEP,Identical to snapshot; required
+src/solver_coordinator.py,Solver coordination,,CANONICAL,KEEP,Identical to snapshot; required
+src/checkpoint_guard.py,Canonical checkpoint provenance guard (gen-300/531/DONE/manifest),,CANONICAL,KEEP,New hard guard against pilot/gen-30 misuse
+docs/full300_cmaes_training_runbook.md,Runbook (single canonical doc),,CANONICAL,KEEP,Canonical documentation
+frozen_versions/cmaes36_full300_20260729.json,Canonical frozen manifest (provenance of 2026-07-29 freeze),,PROVENANCE,KEEP,Historical freeze record; hashes predate 08-12 rewrite
+frozen_versions/cmaes36_current_check/manifest.json,Validation-demo manifest of current code,,PROVENANCE,KEEP,Evidence that current code is self-consistent
+scripts/diagnostics/reselect_dpl_trainloss_eval.py,Chapter-4 downstream rebuild,,CANONICAL,KEEP,Canonical downstream rebuild (referenced by runbook)
+scripts/diagnostics/rebuild_all36_diagnosis_trainloss.py,Chapter-4 downstream rebuild,,CANONICAL,KEEP,Canonical downstream rebuild (referenced by runbook)
+scripts/extract_caravan_attributes.py,Data utility (Caravan attributes),,UTILITY,KEEP,Data pipeline
+scripts/launch_36models_pool6.py,dPL pool launcher (Framework 2 track),,DPL_TRACK,KEEP,"dPL track, not IC; keep"
+scripts/launch_parallel_dpl_remote.py,dPL remote launcher (Framework 2),,DPL_TRACK,KEEP,dPL track; keep
+scripts/remote_exec_launch.py,dPL remote execution/monitor (Framework 2),,DPL_TRACK,KEEP,dPL track; keep
+scripts/run_dpl_benchmark_20ep.py,"dPL training (20-epoch, Framework 2)",,DPL_TRACK,KEEP,dPL track; keep
+scripts/run_dpl_benchmark_dmg_native.py,dPL native training module (Framework 2),,DPL_TRACK,KEEP,dPL track; 40 refs; keep
+scripts/diagnostics/audit_mopex34_root_cause.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/audit_mopex45_fidelity_forward.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/audit_mopex45_formula_fidelity.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/audit_mopex45_sequential_discretization.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/audit_mopex45_water_interception.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/cma_bias_initialization.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/create_saturation2_callers_csv.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/debug_mopex4_gradient_flow.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/diagnose_mopex45_landscape.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/diagnose_mopex45_trainability.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/diagnose_vic_before_fix.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/dpl_gradient_decision_experiments.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/dpl_gradient_evidence.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/dpl_third_round_diagnostics.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/e1_reachability.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/e2_boundary_kink.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/e4_pilot_ablation.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/fd_kink_diagnosis.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/finalize_mopex45_discretization_report.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/finalize_mopex45_stage01.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/full_model_alpha_fd_check.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/full_model_fd_warmup_modes.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/generate_phase1_report.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/h_training_pilot.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/i2_mapping_audit.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/i4_pretrain_fivefold_cv.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/j3_nz1_state_reachability.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/k_full_retrain.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/mopex45_discr_steps.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/mopex45_faithful_steps.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/mopex4_interception_variants.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/pretrain_cma_initializer.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/rebuild_all36_diagnosis_trainloss.py,Chapter-4 downstream rebuild,,CANONICAL,KEEP,Canonical downstream rebuild (referenced by runbook)
+scripts/diagnostics/reselect_dpl_trainloss_eval.py,Chapter-4 downstream rebuild,,CANONICAL,KEEP,Canonical downstream rebuild (referenced by runbook)
+scripts/diagnostics/round12_edge_probe.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/round12_offline.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/round13_finalize.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/round13_m1.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/round13_offline.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/round13_slot_queue.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/round13_topmodel.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/round14_loss_aggregation.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/round15_bestpoint_summary.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/round15_guarded_retrain.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/run_mopex45_circular_stage.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/run_mopex45_continuation_block.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/run_mopex45_continuation_check.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/run_mopex45_phase_fix.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/run_mopex4_branch_trapping_probe.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/run_mopex4_f0_forward_reachability.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/run_mopex4_f0_reachability.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/run_mopex4_final_official_seed.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/run_mopex4_freeze_validation.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/run_mopex4_frozen_shared_dpl_pilot.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/run_mopex4_full_continuation.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/run_mopex4_gradient_isolation_probe.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/run_mopex4_interception_parameterization_probe.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/run_mopex4_liu_interception_audit.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/run_mopex4_liu_predpl_validation.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/run_mopex4_pet_budget_closure.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/run_mopex4_phase_relaxed_diagnostics.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/run_mopex4_process_order_final.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/run_mopex4_relaxed_manifold.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/run_mopex4_relaxed_repair.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/run_mopex4_t1a_shared_dpl_pilot.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/run_mopex4_two_param_final_validation.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/run_mopex4_two_param_interception_audit.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/run_mopex4_two_param_shared_dpl_pilot.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/run_mopex5_design_audit.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/run_mopex5_nested_continuation_pilot.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/run_round12_gpu.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/run_simhyd_100epochs.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/run_vic_resumes.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/s0_spatial_split_audit.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/simhyd_failure_trace.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/test_saturation_2.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/topmodel_local_sensitivity.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/validate_mopex4_formula_decouple.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/validate_mopex5_process_semantics.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/verify_flux_recompute.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/verify_mopex4_canonical_chain.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/verify_simhyd_all_boundaries.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/verify_simhyd_fix.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/verify_vic_failure_replay.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/vic_failure_trace.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/warmup_gradient_contract.py,Historical one-off diagnostic (dPL/MOPEX45/simhyd/vic/Flex track),,HISTORICAL,KEEP,Not part of canonical IC pipeline; provenance of dPL/MOPEX45 work; see diagnostics/README.md
+scripts/diagnostics/analyze_dpl_vs_ic_comparison.py,Old IC-vs-dPL comparison (superseded by aligned diagnosis),(none),OBSOLETE,DELETED,"Orphan (0 refs), fully superseded by aligned diagnosis, potential misuse; git-recoverable"

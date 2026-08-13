@@ -6,6 +6,50 @@
 
 ---
 
+## 🚀 Canonical Full300 CMA-ES IC Pipeline（唯一推荐执行路径，2026-08 收敛）
+
+> **完整说明见 `docs/full300_cmaes_training_runbook.md`（唯一权威文档）。**
+> 目录清点见 `docs/canonical_pipeline_inventory.csv`；旧结果替代关系见 `docs/superseded_results_registry.csv`。
+
+```bash
+# 1. 校验 canonical config（含 manifest hash 校验）
+python scripts/validate_full300_config.py \
+    --config full_run_10starts_300gen_warm1980_1981x5.yaml \
+    --manifest frozen_versions/cmaes36_full300_20260729.json
+
+# 2. 训练（全 36 模型，memory-aware chunk fallback，resume 内置）
+bash scripts/run_full_benchmark.sh <RUN_ID>
+#    或单模型：python scripts/run_36model_benchmark.py --model mopex1 --run-id <RUN_ID> --config configs/full_run_10starts_300gen_warm1980_1981x5.yaml
+
+# 3. 续跑（只训练未完成模型）
+bash scripts/run_continuation.sh <RUN_ID>
+
+# 4. 收敛 final checkpoint 集（gen-300 / 531 流域校验）
+python scripts/consolidate_final_checkpoints.py --checkpoint-root checkpoints/<final>
+
+# 5. canonical train/test 评价（强制 gen-300 guard，pilot/gen-30 会被拒绝）
+python scripts/evaluate_benchmark_metrics.py \
+    --checkpoint-root checkpoints/<final> \
+    --config configs/full_run_10starts_300gen_warm1980_1981x5.yaml \
+    --output-dir results/<eval_dir>
+
+# 6. aligned 1995–2010 评价（强制 gen-300 guard）
+python scripts/evaluate_ic_aligned_gen300.py \
+    --ckpt-root checkpoints/<final> \
+    --out results/all36_ic_gen300_aligned_<date>
+
+# 7. Chapter-4 下游重建（dPL train-loss 选择 + 全 36 诊断）
+python scripts/diagnostics/reselect_dpl_trainloss_eval.py
+python scripts/diagnostics/rebuild_all36_diagnosis_trainloss.py
+```
+
+**Canonical checkpoint 集（现成）**：`checkpoints/full300_final_36models/`（36 模型，gen-300，best-of-10，531 流域）。
+**当前 aligned 基础数据（IC 已修正）**：`results/all36_ic_gen300_aligned_20260812/`。
+**⚠️ 禁止读取**：`results/all36_dpl_gap_diagnosis_20260812/`（IC 列误用 pilot/gen-30 检查点，见 superseded registry）。
+**历史一次性诊断**：`scripts/diagnostics/`（不属 canonical，见其 README）。
+
+---
+
 ## 📌 项目概述 (Executive Summary)
 
 本项目是一个基于 **PyTorch CUDA 向量化加速** 的大规模水文模型基准与可微参数学习研究平台。它将经典水文模型框架（MARRMoT / MOPEX 概念水文模型）重构为纯张量算子，在美国 CAMELS 数据集（531 个典型流域）上实现了高效率定与评估。

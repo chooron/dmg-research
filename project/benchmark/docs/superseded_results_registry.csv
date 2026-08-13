@@ -1,0 +1,10 @@
+old_result_path,superseded_by,reason,safe_to_use,notes
+results/all36_dpl_gap_diagnosis_20260812,results/all36_ic_gen300_aligned_20260812 + results/all36_dpl_gap_diagnosis_20260812_trainloss,IC column used pilot(gen-30) checkpoints; dPL column used validation-KGE selection,no,Chapter-4 must NOT read this; IC=-0.12/-0.04/-0.16 for MOPEX1-3 was artifact
+results/six_models_aligned_audit_20260812,results/all36_ic_gen300_aligned_20260812 + results/all36_dpl_gap_diagnosis_20260812_trainloss,IC column used pilot(gen-30) checkpoints (provenance says gen_30),no,6-model audit superseded by corrected 36-model aligned table
+results/ic_vs_dpl_aligned_1995_2010_recomputed.csv,results/all36_ic_gen300_aligned_20260812/all36_aligned_gen300_ic.csv,pre-diagnosis recomputation (pilot IC),no,historical artifact
+results/dpl_gap_diagnosis_20260812,results/all36_dpl_gap_diagnosis_20260812_trainloss,earlier dPL gap diagnosis (validation-KGE selection),no,dPL selection rule superseded by train-loss selection
+results/dpl_round13_20260805/final/*,results/all36_dpl_gap_diagnosis_20260812_trainloss (selection rule),round13 final tables used max validation KGE selection,no,old selection rule; keep as provenance of dPL training itself
+results/full300_final_36models_evaluation,(none - canonical),full300 canonical train/test KGE (gen-300),yes,canonical IC result; used as reproduction reference
+results/all36_ic_gen300_aligned_20260812,(none - canonical),corrected 36-model aligned IC (gen-300) + dPL (train-loss),yes,canonical aligned base; downstream Chapter-4 rebuild must start here
+results/all36_dpl_gap_diagnosis_20260812_trainloss,results/all36_ic_gen300_aligned_20260812 (for IC column),"dPL side canonical (train-loss), but IC column still old pilot-based",partial,use dPL column only; IC column replaced by all36_ic_gen300_aligned_20260812
+results/cmaes_mopex4_ic_20260812,(none),"mopex4 IC re-run (2026-08-12, gen-300) - separate track",yes,mopex4 phase-fix track; not canonical 36-model set

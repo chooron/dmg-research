@@ -19,6 +19,7 @@ import torch
 BENCHMARK_ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(BENCHMARK_ROOT), str(BENCHMARK_ROOT / "src")]
 
+from src.checkpoint_guard import validate_canonical_checkpoint
 from src.checkpointing import load_checkpoint
 from src.data_selection import evaluate_period, frozen_parameters, load_ids
 from src.model_registry import NPARAM_INFO_36
@@ -42,6 +43,12 @@ def evaluate_single_model(model_dir: Path, config: dict, device: str, backend: s
     model_name = model_dir.name
     starts = int(config["optimization"]["starts"])
     generations = int(config["optimization"]["generations"])
+    # Canonical provenance guard: reject pilot / intermediate (gen < required)
+    # checkpoints loudly instead of silently evaluating them.
+    validate_canonical_checkpoint(
+        model_dir, model_name=model_name,
+        required_generation=generations, required_basins=531,
+    )
 
     basin_ids, latent, checkpoint_train = frozen_parameters(model_dir, generations, starts)
     train_kge = evaluate_period(model_name, latent, basin_ids, config, "train", device, backend)
