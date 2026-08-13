@@ -11,14 +11,15 @@ IC-vs-dPL benchmark). Frozen R2 positioning:
      (both CN and TGD2 are D = 17).
   5. Which parameters carry the reorganization is left to Figure 4.
 
-Layout (5 panels, compact, slightly vertical)
----------------------------------------------
+Layout (2x3 composite, near-square equal cells)
+-----------------------------------------------
   Row 1: (a) Structural separation under IC | (b) Structural separation under dPL
-  Row 2: (c) HERO — Snow-dependent structural separation
-         (two compact facets: left IC, right dPL; continuous frac_snow relationship:
-          basin-level scatter + regression line & slope-CI wedge + S1–S5 binned markers)
-  Row 3: (d) Sources of excess separation (two facets: IC, dPL; Base–CN between vs
-         within lines across S1–S5) | (e) Snow-gradient summary (slopes with CIs)
+         | (d) Sources of excess separation (merged: IC blue / dPL orange colour
+         families, dark shade = between, light shade = within)
+  Row 2: (c) HERO — Snow-dependent structural separation (two facets: left IC, right
+         dPL; continuous frac_snow relationship: basin-level scatter + regression
+         line & slope-CI wedge + S1–S5 binned markers) | (e) Snow-gradient summary
+         (slopes with CIs)
 
 The paired Δβ difference is no longer a main panel; it is reported in the caption and
 the execution report.
@@ -62,9 +63,7 @@ from r1_plot_style import (  # noqa: E402
 PROJECT = Path(__file__).resolve().parents[2]
 MANUSCRIPT = PROJECT / "manuscript"
 RESULTS_R2 = MANUSCRIPT / "results" / "R2"
-FIG_DIR = MANUSCRIPT / "figures"
 PLOTS_FIG_DIR = MANUSCRIPT / "plots" / "figures"
-FIG_DIR.mkdir(parents=True, exist_ok=True)
 PLOTS_FIG_DIR.mkdir(parents=True, exist_ok=True)
 
 OUT_NAME = "Figure3_R2_final"
@@ -89,6 +88,13 @@ COLOR_TGD2 = MODEL_COLORS["TGD"]     # #009988  Base–TGD2 contrast
 COLOR_WITHIN = "#A0A0A0"             # within-structure baseline (neutral)
 COLOR_REF = "#999999"                # reference lines (F2 grey)
 COLOR_NEUTRAL = "#333333"            # F2 neutral for dark annotation text
+# (d) merged-panel colour families: IC = blue family, dPL = orange family;
+# within each regime the between series uses the dark shade (solid) and the within
+# series the light shade (dashed) — same-colour-family light/dark encoding.
+COLOR_IC_DARK = MODEL_COLORS["CN"]     # #0077BB deep blue (IC between)
+COLOR_IC_LIGHT = "#9CC4E4"             # light blue (IC within)
+COLOR_DPL_DARK = MODEL_COLORS["Base"]  # #EE7733 deep orange (dPL between)
+COLOR_DPL_LIGHT = "#F4C29E"            # light orange (dPL within)
 
 CONTRAST_STYLE = {
     CN_PRIMARY: {"color": COLOR_BETWEEN, "mk": "s", "ls": "-"},
@@ -231,44 +237,54 @@ def panel_c_hero(ax_ic, ax_dpl, df_b, df_s, df_r):
                  frameon=True, framealpha=0.90, edgecolor="none", fontsize=7.0)
 
 
-def _facet_decomp(ax, df_s, paradigm):
-    """One (d) facet: Base–CN between vs within across S1–S5 (lines + CI)."""
+def panel_d_merged(ax, df_s):
+    """(d) MERGED: Base–CN between vs within for IC and dPL on one shared axis.
+    IC = blue colour family, dPL = orange colour family; within each regime the
+    between series uses the dark shade (solid) and the within series the light
+    shade (dashed) — same-colour-family light/dark encoding per regime."""
     x_idx = np.arange(len(REGIMES))
-    b_med, b_lo, b_hi = regime_series(df_s, paradigm, CN_PRIMARY, "between_all")
-    w_med, w_lo, w_hi = regime_series(df_s, paradigm, CN_PRIMARY, "within_pooled")
-    ax.errorbar(x_idx, b_med, yerr=[b_med - b_lo, b_hi - b_med],
-                marker="s", linestyle="-", color=COLOR_BETWEEN, ecolor=COLOR_BETWEEN,
-                elinewidth=1.4, capsize=3.0, capthick=1.1, markersize=5.0,
-                markerfacecolor=COLOR_BETWEEN, zorder=3,
-                label="Between-structure distance")
-    ax.errorbar(x_idx, w_med, yerr=[w_med - w_lo, w_hi - w_med],
-                marker="s", linestyle="--", color=COLOR_WITHIN, ecolor=COLOR_WITHIN,
-                elinewidth=1.0, capsize=2.0, capthick=0.9, markersize=3.5,
-                markerfacecolor=COLOR_WITHIN, zorder=2,
-                label="Within baseline")
+    all_vals = []
+    for paradigm, dark, light in [
+        ("IC", COLOR_IC_DARK, COLOR_IC_LIGHT),
+        ("dPL", COLOR_DPL_DARK, COLOR_DPL_LIGHT),
+    ]:
+        b_med, b_lo, b_hi = regime_series(df_s, paradigm, CN_PRIMARY, "between_all")
+        w_med, w_lo, w_hi = regime_series(df_s, paradigm, CN_PRIMARY, "within_pooled")
+        all_vals += [float(b_lo.min()), float(b_hi.max()),
+                     float(w_lo.min()), float(w_hi.max())]
+        ax.errorbar(x_idx, b_med, yerr=[b_med - b_lo, b_hi - b_med],
+                    marker="s", linestyle="-", color=dark, ecolor=dark,
+                    elinewidth=1.4, capsize=3.0, capthick=1.1, markersize=5.0,
+                    markerfacecolor=dark, zorder=3,
+                    label=f"{paradigm} between")
+        ax.errorbar(x_idx, w_med, yerr=[w_med - w_lo, w_hi - w_med],
+                    marker="s", linestyle="--", color=light, ecolor=light,
+                    elinewidth=1.0, capsize=2.0, capthick=0.9, markersize=3.5,
+                    markerfacecolor=light, zorder=2,
+                    label=f"{paradigm} within")
+    ax.set_title("(d) Sources of excess separation", weight="bold",
+                 loc="left", pad=6)
     ax.set_xticks(x_idx)
     ax.set_xticklabels(REGIME_XTICK_SHORT, fontsize=6.8)
     ax.set_xlabel("Snow regime", labelpad=3)
+    ax.set_ylabel("RMS distance", labelpad=3)
+    ylo = max(0.0, float(np.min(all_vals)) - 0.03)
+    yhi = float(np.max(all_vals)) + 0.03
+    ax.set_ylim(ylo, yhi)
     ax.grid(True, axis="y", linestyle=":", alpha=0.25)
-
-
-def panel_d_sources(ax_ic, ax_dpl, df_s):
-    """(d) Sources of excess separation: Base–CN between vs within per regime."""
-    ax_ic.set_title("(d) Sources of excess separation", weight="bold",
-                    loc="left", pad=6)
-    _facet_decomp(ax_ic, df_s, "IC")
-    ax_ic.set_ylim(0.42, 0.62)
-    ax_ic.set_ylabel("RMS distance", labelpad=3)
-    ax_ic.text(0.02, 0.94, "IC regime", transform=ax_ic.transAxes, ha="left",
-               va="top", fontsize=8.0, fontweight="bold", color="#333333")
-    ax_ic.legend(loc="upper left", bbox_to_anchor=(0.02, 0.78), frameon=True,
-                 framealpha=0.90, edgecolor="none", fontsize=6.6)
-
-    _facet_decomp(ax_dpl, df_s, "dPL")
-    ax_dpl.set_ylim(0.05, 0.52)
-    ax_dpl.set_ylabel("RMS distance", labelpad=3)
-    ax_dpl.text(0.02, 0.94, "dPL regime", transform=ax_dpl.transAxes, ha="left",
-                va="top", fontsize=8.0, fontweight="bold", color="#333333")
+    handles = [
+        Line2D([0], [0], marker="s", linestyle="-", color=COLOR_IC_DARK,
+               markersize=5.0, label="IC between"),
+        Line2D([0], [0], marker="s", linestyle="--", color=COLOR_IC_LIGHT,
+               markersize=3.5, label="IC within"),
+        Line2D([0], [0], marker="s", linestyle="-", color=COLOR_DPL_DARK,
+               markersize=5.0, label="dPL between"),
+        Line2D([0], [0], marker="s", linestyle="--", color=COLOR_DPL_LIGHT,
+               markersize=3.5, label="dPL within"),
+    ]
+    ax.legend(handles=handles, loc="upper left", bbox_to_anchor=(0.02, 0.98),
+              frameon=True, framealpha=0.92, facecolor="white",
+              edgecolor="none", fontsize=6.2)
 
 
 def panel_e_slopes(ax, df_r):
@@ -315,31 +331,42 @@ def panel_e_slopes(ax, df_r):
 # ---------------------------------------------------------------------------
 # Figure assembly
 # ---------------------------------------------------------------------------
+def _probe_layout(axes_by_name):
+    """Programmatic layout validation: six near-square equal cells in a 2x3 grid."""
+    plt.gcf().canvas.draw()
+    boxes = {k: ax.get_position() for k, ax in axes_by_name.items()}
+    widths = [b.width for b in boxes.values()]
+    heights = [b.height for b in boxes.values()]
+    assert max(widths) - min(widths) <= 0.02 * max(widths), f"unequal widths {widths}"
+    assert max(heights) - min(heights) <= 0.02 * max(heights), f"unequal heights {heights}"
+    for name, b in boxes.items():
+        # physical aspect: bbox fractions are normalized to the figure, so
+        # convert with the figure size in inches before judging square-ness.
+        fw, fh = plt.gcf().get_size_inches()
+        aspect = (b.height * fh) / (b.width * fw)
+        assert 0.8 <= aspect <= 1.25, f"{name} aspect {aspect:.3f} not near-square"
+    for col, below in [("a", "c1"), ("b", "c2"), ("d", "e")]:
+        assert boxes[col].y0 >= boxes[below].y1 - 1e-6, f"{col} not above {below}"
+    fw, fh = plt.gcf().get_size_inches()
+    phys = (min(heights) * fh) / (min(widths) * fw)
+    print(f"LAYOUT PROBE OK: 6 equal cells ({min(widths) * fw:.3f} x "
+          f"{min(heights) * fh:.3f} in, aspect {phys:.3f}), 2x3 aligned.")
+
+
 def build_figure(df_b, df_s, df_r) -> None:
-    # Compact, slightly vertical 5-panel composite.
-    fig = plt.figure(figsize=(8.0, 10.2))
-    gs = gridspec.GridSpec(3, 1, height_ratios=[1.0, 1.55, 1.1], hspace=0.38,
-                           left=0.09, right=0.97, top=0.96, bottom=0.06)
+    # 2x3 composite of near-square equal cells:
+    #   Row 0: (a) | (b) | (d) merged
+    #   Row 1: (c1) | (c2) | (e)
+    fig = plt.figure(figsize=(10.8, 7.3))
+    gs = gridspec.GridSpec(2, 3, hspace=0.35, wspace=0.28,
+                           left=0.08, right=0.97, top=0.96, bottom=0.06)
 
-    # Row 1: (a) (b)
-    gs0 = gridspec.GridSpecFromSubplotSpec(1, 2, subplot_spec=gs[0],
-                                           width_ratios=[1.0, 1.0], wspace=0.28)
-    ax_a = fig.add_subplot(gs0[0, 0]); apply_clean_spines(ax_a)
-    ax_b = fig.add_subplot(gs0[0, 1]); apply_clean_spines(ax_b)
-
-    # Row 2: (c) hero, two compact facets (IC left, dPL right)
-    gsc = gridspec.GridSpecFromSubplotSpec(1, 2, subplot_spec=gs[1], wspace=0.22)
-    ax_c1 = fig.add_subplot(gsc[0, 0]); apply_clean_spines(ax_c1)
-    ax_c2 = fig.add_subplot(gsc[0, 1]); apply_clean_spines(ax_c2)
-
-    # Row 3: (d) wider (1.3) | (e) narrower (0.7)
-    gs2 = gridspec.GridSpecFromSubplotSpec(1, 2, subplot_spec=gs[2],
-                                           width_ratios=[1.3, 0.7], wspace=0.34)
-    # (d) is one panel with two internal facets (IC left, dPL right)
-    gsd = gridspec.GridSpecFromSubplotSpec(1, 2, subplot_spec=gs2[0, 0], wspace=0.18)
-    ax_d1 = fig.add_subplot(gsd[0, 0]); apply_clean_spines(ax_d1)
-    ax_d2 = fig.add_subplot(gsd[0, 1]); apply_clean_spines(ax_d2)
-    ax_e = fig.add_subplot(gs2[0, 1]); apply_clean_spines(ax_e)
+    ax_a = fig.add_subplot(gs[0, 0]); apply_clean_spines(ax_a)
+    ax_b = fig.add_subplot(gs[0, 1]); apply_clean_spines(ax_b)
+    ax_d = fig.add_subplot(gs[0, 2]); apply_clean_spines(ax_d)  # merged (d)
+    ax_c1 = fig.add_subplot(gs[1, 0]); apply_clean_spines(ax_c1)
+    ax_c2 = fig.add_subplot(gs[1, 1]); apply_clean_spines(ax_c2)
+    ax_e = fig.add_subplot(gs[1, 2]); apply_clean_spines(ax_e)
 
     def frac_above(paradigm, contrast):
         sub = df_b[(df_b["paradigm"] == paradigm) & (df_b["contrast"] == contrast)]
@@ -353,7 +380,7 @@ def build_figure(df_b, df_s, df_r) -> None:
     panel_ab_scatter(ax_b, df_b, "dPL", f_dp_cn, f_dp_tg,
                      "(b) Structural separation under dPL", lim=0.65)
     panel_c_hero(ax_c1, ax_c2, df_b, df_s, df_r)
-    panel_d_sources(ax_d1, ax_d2, df_s)
+    panel_d_merged(ax_d, df_s)
     panel_e_slopes(ax_e, df_r)
 
     # shared (a)/(b) legend in (a) upper-left
@@ -366,9 +393,11 @@ def build_figure(df_b, df_s, df_r) -> None:
     ax_a.legend(handles=handles, loc="upper left", frameon=True, framealpha=0.85,
                 edgecolor="none", fontsize=7.0)
 
-    for out_dir in (FIG_DIR, PLOTS_FIG_DIR):
-        plt.savefig(out_dir / f"{OUT_NAME}.png", dpi=600)
-        print("saved:", out_dir / f"{OUT_NAME}.png")
+    _probe_layout({"a": ax_a, "b": ax_b, "d": ax_d,
+                   "c1": ax_c1, "c2": ax_c2, "e": ax_e})
+
+    plt.savefig(PLOTS_FIG_DIR / f"{OUT_NAME}.png", dpi=600)
+    print("saved:", PLOTS_FIG_DIR / f"{OUT_NAME}.png")
     plt.close()
 
 

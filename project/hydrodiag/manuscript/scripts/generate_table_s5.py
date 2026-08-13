@@ -34,6 +34,13 @@ OUT_DIRS = (MANUSCRIPT / "stats" / "tables", MANUSCRIPT / "tables")
 PARAMS = ["xaj_um", "xaj_ki", "xaj_ci"]
 DISPLAY = {"xaj_um": "$u_m$", "xaj_ki": "$k_i$", "xaj_ci": "$c_i$"}
 REGIMES = ["S1", "S2", "S3", "S4", "S5"]
+REGIME_LABELS = {
+    "S1": "S1 (0\u20130.05)",
+    "S2": "S2 (0.05\u20130.15)",
+    "S3": "S3 (0.15\u20130.30)",
+    "S4": "S4 (0.30\u20130.50)",
+    "S5": "S5 (0.50\u20131.00)",
+}
 
 
 def fmt(v, decimals=3):
@@ -66,10 +73,10 @@ def rows(raw, bm, kde):
                 frac_exact1 = (float(b["n_exact_plus1"]) + float(b["n_exact_minus1"])) / n
                 frac_near = float(k["frac_absdz_ge_095"])
                 md_rows.append({
-                    "Parameter": DISPLAY[p], "Regime": paradigm, "Snow": regime,
+                    "Parameter": DISPLAY[p], "Regime": paradigm, "Snow": REGIME_LABELS[regime],
                     "n": n, "zero": fmt(frac_zero), "exact1": fmt(frac_exact1),
                     "near": fmt(frac_near)})
-                tex_rows.append([DISPLAY[p], paradigm, regime, str(n),
+                tex_rows.append([DISPLAY[p], paradigm, REGIME_LABELS[regime], str(n),
                                  fmt(frac_zero), fmt(frac_exact1), fmt(frac_near)])
     return md_rows, tex_rows
 
@@ -90,7 +97,7 @@ def main():
     md += """
 *Note*: The paired shift is $\\Delta z = z_{\\mathrm{Base}} - z_{\\mathrm{CN}}$
 (normalized parameters, $z \\in [0,1]$). Reported fractions are basin counts over
-the regime sample size $n$. Exact $\\Delta z = 0$ marks basins where the two
+the regime sample size $n$. Snow regimes S1\u2013S5 are the fixed strata by basin snow fraction: S1 $[0, 0.05)$ ($n=165$), S2 $[0.05, 0.15)$ ($n=156$), S3 $[0.15, 0.30)$ ($n=121$), S4 $[0.30, 0.50)$ ($n=34$), S5 $[0.50, 1.00]$ ($n=55$). Exact $\\Delta z = 0$ marks basins where the two
 structures co-locate at identical normalized values (under IC, these are
 predominantly cases where both structures sit at a shared parameter bound);
 exact $|\\Delta z| = 1$ marks basins where one structure sits at one bound and the
@@ -103,7 +110,7 @@ primary threshold.
 
     tex = r"""\begin{table}[t]
 \centering
-\caption{Boundary and point-mass characteristics of the parameters highlighted in Figure 4 ($u_m$, $k_i$, $c_i$) by snow regime and parameter-constraint regime, based on the canonical paired shift $\Delta z = z_{\mathrm{Base}} - z_{\mathrm{CN}}$. Fractions are basin counts over the regime sample size $n$: exact $\Delta z = 0$ (point mass), exact $|\Delta z| = 1$ (opposite-bound co-location; IC only, because dPL reconstructed values are strictly interior), and near-boundary $|\Delta z| \ge 0.95$ at the audit's primary threshold.}
+\caption{Boundary and point-mass characteristics of the parameters highlighted in Figure 4 ($u_m$, $k_i$, $c_i$) by snow regime and parameter-constraint regime, based on the canonical paired shift $\Delta z = z_{\mathrm{Base}} - z_{\mathrm{CN}}$. Snow regimes S1--S5 are the fixed strata by basin snow fraction: S1 $[0, 0.05)$ ($n=165$), S2 $[0.05, 0.15)$ ($n=156$), S3 $[0.15, 0.30)$ ($n=121$), S4 $[0.30, 0.50)$ ($n=34$), S5 $[0.50, 1.00]$ ($n=55$). Fractions are basin counts over the regime sample size $n$: exact $\Delta z = 0$ (point mass), exact $|\Delta z| = 1$ (opposite-bound co-location; IC only, because dPL reconstructed values are strictly interior), and near-boundary $|\Delta z| \ge 0.95$ at the audit's primary threshold.}
 \label{tab:tables5_boundary_point_mass}
 \begin{threeparttable}
 \begin{tabular}{lllcccc}

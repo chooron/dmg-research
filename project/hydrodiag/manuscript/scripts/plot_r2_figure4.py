@@ -28,8 +28,8 @@ Final layout (three balanced columns + bottom shared legend):
                          stacked (Base-CN only).
   Col 3 (GIS):           (e) Geographic patterns of paired shifts - three enlarged
                          Base-CN maps (um | ki | ci, dPL regime), full column width.
-  Bottom:                one shared horizontal row with the IC/dPL ridge legend and
-                         the (e) horizontal colour bar.
+  Bottom:                the (e) horizontal colour bar now hugs the GIS maps; the
+                         IC/dPL ridge legend sits inside the upper-right of panel (b).
 
 Ridgeline grammar (b-d), restrained HESS style:
   * One shared baseline per regime row; IC density mirrored above it (deep blue fill,
@@ -203,19 +203,25 @@ def panel_a_forest(ax, df_g, paradigm, shared_lim=None):
     for i, p in enumerate(PARAM_ORDER):
         slope, lo, hi = slope_ci_param(df_g, paradigm, p)
         y = y_pos[i]
+        # um / ki / ci rows carry the orange highlight (marker + CI) matching
+        # their bold orange y-tick labels; all other rows stay deep blue.
+        col = COLOR_BASE if p in KEY_PARAMS else COLOR_CN
         ax.errorbar(slope, y, xerr=[[slope - lo], [hi - slope]], fmt="s",
-                    color=COLOR_CN, ecolor=COLOR_CN, elinewidth=1.1,
+                    color=col, ecolor=col, elinewidth=1.1,
                     capsize=2.4, capthick=0.9, markersize=4.8,
-                    markerfacecolor=COLOR_CN, markeredgecolor="none",
+                    markerfacecolor=col, markeredgecolor="none",
                     linestyle="none", zorder=3)
     ax.axvline(0, color=COLOR_REF, linestyle="--", linewidth=0.85, zorder=1)
     ax.set_yticks(y_pos)
-    ax.set_yticklabels([DISPLAY[p] for p in PARAM_ORDER], fontsize=7.5)
+    ax.set_yticklabels([DISPLAY[p] for p in PARAM_ORDER], fontsize=11.2)
     for tick, p in zip(ax.get_yticklabels(), PARAM_ORDER):
         if p in KEY_PARAMS:
             tick.set_fontweight("bold")
+            tick.set_color(COLOR_BASE)   # orange highlight for um/ki/ci
     ax.set_ylim(-0.75, len(PARAM_ORDER) - 0.25)
-    ax.set_xlabel("Snow gradient of paired shift, \u03b2", labelpad=3)
+    ax.set_xlabel("Snow gradient of paired shift, \u03b2", labelpad=3,
+                  fontsize=11.5)
+    ax.tick_params(axis="x", labelsize=11.2)
     ax.grid(True, axis="x", linestyle=":", alpha=0.12)
     if shared_lim is not None:
         lo_r, hi_r, ticks = shared_lim
@@ -272,25 +278,25 @@ def _dz_ridge_pair(ax, df_p, parameter, xlabel=False):
     # x = 0 reference: slightly darker than the grid, still thin and restrained
     ax.axvline(0, color=ZERO_LINE_COLOR, linestyle="--", linewidth=0.8, zorder=1)
     ax.set_yticks(y_pos)
-    ax.set_yticklabels([f"{r} (n={n})" for r, n in zip(REGIMES, REGIME_N)],
-                       fontsize=7.0)
+    ax.set_yticklabels(REGIMES, fontsize=11.0)
     ax.set_xlim(-1.0, 1.0)
     ax.set_ylim(-0.5, float(len(REGIMES)) + 0.5)
     ax.set_xticks(DZ_XTICKS)
-    ax.set_xticklabels(["-1", "-0.5", "0", "0.5", "1"], fontsize=7.0)
+    ax.set_xticklabels(["-1", "-0.5", "0", "0.5", "1"], fontsize=11.0)
     ax.grid(True, axis="x", linestyle=":", alpha=GRID_ALPHA)
     if xlabel:
-        ax.set_xlabel(r"$\Delta z = z_{\mathrm{Base}} - z_{\mathrm{CN}}$", labelpad=3)
+        ax.set_xlabel(r"$\Delta z = z_{\mathrm{Base}} - z_{\mathrm{CN}}$", labelpad=3,
+                      fontsize=11.5)
 
-def panel_ridge(ax, df_p, parameter, letter, xlabel=False, snow_cue=False):
-    """One middle-column parameter panel: (letter) name + per-regime IC/dPL ridges."""
-    ax.set_title(f"({letter}) {DISPLAY[parameter]}", weight="bold", loc="left",
-                 pad=5, fontsize=9.0)
+def panel_ridge(ax, df_p, parameter, letter, xlabel=False):
+    """One middle-column parameter panel: (letter) name + per-regime IC/dPL ridges.
+
+    Panel label is drawn in the axes' upper-left corner (no set_title).
+    """
     _dz_ridge_pair(ax, df_p, parameter, xlabel=xlabel)
-    if snow_cue:
-        # very light snow-gradient cue (auxiliary; once, on the first panel only)
-        ax.text(0.02, 0.985, "Increasing snow influence \u2191", transform=ax.transAxes,
-                ha="left", va="top", fontsize=6.4, color="#999999")
+    ax.text(0.02, 0.975, f"({letter}) {DISPLAY[parameter]}",
+            transform=ax.transAxes, ha="left", va="top", fontsize=11.8,
+            fontweight="bold", color="#333333")
 
 
 # ---------------------------------------------------------------------------
@@ -323,7 +329,7 @@ def _draw_map(ax, basins, states, delta, title):
     ax.set_yticks([])
     for spine in ax.spines.values():
         spine.set_visible(False)
-    ax.set_title(title, fontweight="bold", pad=2, fontsize=9.5)
+    ax.set_title(title, fontweight="bold", pad=2, fontsize=12.3)
 
 
 def _maps_data(df_p, paradigm):
@@ -354,16 +360,17 @@ def build_figure(df_g, df_c, df_p) -> None:
     c1 = (0.050, 0.314)   # panel (a)
     c2 = (0.372, 0.647)   # ridgelines (b)(c)(d)
     c3 = (0.676, 0.982)   # GIS (e)
-    gsL = gridspec.GridSpec(2, 1, left=c1[0], right=c1[1], top=TOP, bottom=BOT, hspace=0.28)
+    gsL = gridspec.GridSpec(2, 1, left=c1[0], right=c1[1], top=TOP, bottom=BOT, hspace=0.12)
     gsM = gridspec.GridSpec(3, 1, left=c2[0], right=c2[1], top=TOP, bottom=BOT, hspace=0.22)
-    gsR = gridspec.GridSpec(4, 1, left=c3[0], right=c3[1], top=TOP, bottom=BOT,
-                            height_ratios=[0.09, 1.0, 1.0, 1.0], hspace=0.05)
+    # GIS block sits slightly higher than the (a) and (b-d) columns (top += 0.012)
+    gsR = gridspec.GridSpec(3, 1, left=c3[0], right=c3[1], top=TOP + 0.012, bottom=BOT,
+                            height_ratios=[1.0, 1.0, 1.0], hspace=0.015)
 
     # ---- Column 1: (a) split into (a1) IC regime / (a2) dPL regime (vertical) ----
     ax_a1 = fig.add_subplot(gsL[0, 0]); apply_clean_spines(ax_a1)
     ax_a2 = fig.add_subplot(gsL[1, 0]); apply_clean_spines(ax_a2)
-    ax_a1.set_title("(a) Snow gradients of paired shifts", weight="bold",
-                    loc="left", pad=5)
+    ax_a1.text(0.985, 0.975, "(a)", transform=ax_a1.transAxes, ha="right",
+               va="top", fontsize=12.3, fontweight="bold")
     # shared x-axis across the two regimes (Base-CN only)
     cilo = min(slope_ci_param(df_g, p_, par)[1] for p_ in ["IC", "dPL"] for par in PARAM_ORDER)
     cihi = max(slope_ci_param(df_g, p_, par)[2] for p_ in ["IC", "dPL"] for par in PARAM_ORDER)
@@ -373,44 +380,47 @@ def build_figure(df_g, df_c, df_p) -> None:
     shared_lim = (lo_r, hi_r + 0.10, np.arange(lo_r, hi_r + 0.5 + 1e-9, 0.5))
     panel_a_forest(ax_a1, df_g, "IC", shared_lim=shared_lim)
     panel_a_forest(ax_a2, df_g, "dPL", shared_lim=shared_lim)
+    # a1/a2 share one x-axis: ticks+label only on the bottom panel (a2)
+    ax_a1.set_xlabel(None)
+    ax_a1.tick_params(labelbottom=False)
     ax_a1.set_ylabel("Parameter", labelpad=3)
+    ax_a2.set_ylabel("Parameter", labelpad=3)
     ax_a1.text(0.02, 0.97, "IC regime", transform=ax_a1.transAxes, ha="left",
-               va="top", fontsize=7.6, fontweight="bold", color="#333333")
+               va="top", fontsize=11.2, fontweight="bold", color="#333333")
     ax_a2.text(0.02, 0.97, "dPL regime", transform=ax_a2.transAxes, ha="left",
-               va="top", fontsize=7.6, fontweight="bold", color="#333333")
+               va="top", fontsize=11.2, fontweight="bold", color="#333333")
 
     # ---- Column 2: (b) um / (c) ki / (d) ci ridgelines (vertical) ----
+    ridge_axes = []
     for row, (param, letter) in enumerate(zip(KEY_PARAMS, ["b", "c", "d"])):
         ax = fig.add_subplot(gsM[row, 0]); apply_clean_spines(ax)
-        panel_ridge(ax, df_p, param, letter,
-                    xlabel=(row == 2), snow_cue=(row == 0))
+        ridge_axes.append(ax)
+        panel_ridge(ax, df_p, param, letter, xlabel=(row == 2))
 
     # ---- Column 3: (e) GIS column - three enlarged maps (um | ki | ci), full width
-    header_ax = fig.add_subplot(gsR[0, 0])
-    header_ax.axis("off")
-    header_ax.text(0.5, 0.5, "(e) Geographic patterns\nof paired shifts",
-                   transform=header_ax.transAxes, ha="center", va="center",
-                   fontsize=8.8, fontweight="bold", linespacing=1.25)
-    map_axes = [fig.add_subplot(gsR[i, 0]) for i in [1, 2, 3]]
+    map_axes = [fig.add_subplot(gsR[i, 0]) for i in [0, 1, 2]]
     panel_e_maps(map_axes, df_p, "dPL")
+    map_axes[0].text(0.005, 0.985, "(e)", transform=map_axes[0].transAxes,
+                     ha="left", va="top", fontsize=11.8, fontweight="bold")
 
-    # ---- Shared bottom row: IC/dPL ridge legend + the (e) colour bar, on one line ----
+    # ---- IC/dPL ridge legend: in-figure, inside the upper-right of panel (b) ----
     regime_handles = [
         Patch(facecolor=COLOR_CN, alpha=IC_FILL_ALPHA, edgecolor=RIDGE_EDGE,
               linewidth=0.8, label="IC"),
         Patch(facecolor=COLOR_BASE, alpha=DPL_FILL_ALPHA, edgecolor=COLOR_BASE,
               linewidth=0.7, linestyle=DPL_LINESTYLE, label="dPL"),
     ]
-    leg1 = fig.legend(handles=regime_handles, loc="lower center",
-                      bbox_to_anchor=(0.30, 0.028), ncol=2, frameon=False,
-                      fontsize=7.0, columnspacing=1.4, handlelength=1.8)
-    for t in leg1.get_texts():
-        t.set_fontsize(7.0)
-    # horizontal colour bar for (e), in the same bottom row
+    leg1 = ridge_axes[0].legend(handles=regime_handles, loc="upper right",
+                                ncol=2, frameon=True,
+                                facecolor="white", framealpha=0.85, edgecolor="none",
+                                fontsize=10.4, columnspacing=1.2, handlelength=1.6)
+    # horizontal colour bar for (e): hug the bottom edge of the GIS maps
+    fig.canvas.draw()
+    gis_bottom = map_axes[2].get_position()
     mappable = ScalarMappable(norm=Normalize(-MAP_VLIM, MAP_VLIM), cmap=MAP_CMAP)
-    cax = fig.add_axes([0.70, 0.030, 0.23, 0.015])
+    cax = fig.add_axes([gis_bottom.x0, gis_bottom.y0 - 0.014, gis_bottom.width, 0.014])
     cbar = fig.colorbar(mappable, cax=cax, orientation="horizontal")
-    cbar.set_label("\u0394z (Base \u2212 CN)", fontsize=6.6, labelpad=1)
+    cbar.set_label("\u0394z (Base \u2212 CN)", fontsize=10.2, labelpad=1)
     # Output: high-resolution PNG only, saved to manuscript/plots/figures/
     out_png = PLOTS_FIG_DIR / f"{OUT_NAME}.png"
     fig.savefig(out_png, dpi=600)
@@ -428,7 +438,7 @@ def build_ic_maps_supplement(df_p) -> None:
     mappable = ScalarMappable(norm=Normalize(-MAP_VLIM, MAP_VLIM), cmap=MAP_CMAP)
     cbar = fig.colorbar(mappable, ax=map_axes, orientation="vertical",
                         fraction=0.04, pad=0.01)
-    cbar.set_label("\u0394z (Base \u2212 CN)", fontsize=7.5, labelpad=2)
+    cbar.set_label("\u0394z (Base \u2212 CN)", fontsize=11.0, labelpad=2)
     out = SUPP_FIG_DIR / "Fig_S4_IC_maps.png"
     fig.savefig(out, dpi=600, bbox_inches="tight", pad_inches=0.03)
     print("saved:", out)

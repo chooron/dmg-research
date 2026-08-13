@@ -147,7 +147,10 @@ Panel B reports the OLS slope of the canonical paired shift
 $\\Delta z = z_{\\mathrm{Base}} - z_{\\mathrm{CN}}$ against $f_{\\mathrm{snow}}$ for
 the parameters highlighted in Figure 4 and the qualified parameter $i_m$, with the
 same bootstrap CI protocol. All estimates are dimensionless normalized-parameter
-slopes per unit $f_{\\mathrm{snow}}$; $n$ is the number of matched basins.
+slopes per unit $f_{\\mathrm{snow}}$; $n$ is the number of matched basins. Snow
+regimes S1\u2013S5 are the fixed strata by basin snow fraction: S1 $[0, 0.05)$
+($n=165$), S2 $[0.05, 0.15)$ ($n=156$), S3 $[0.15, 0.30)$ ($n=121$),
+S4 $[0.30, 0.50)$ ($n=34$), S5 $[0.50, 1.00]$ ($n=55$).
 """
 
     pa_tex_body = "\n".join(" & ".join(r) + " \\\\" for r in pa_tex)
@@ -175,7 +178,7 @@ Parameter & Regime & Subset & $n$ & $\beta$ [95\% CI] & \\
 \end{tabular}
 \begin{tablenotes}[flushleft]
 \small
-\item \textit{Note}: Panel A reports the OLS slope of the basin-level excess distance against $f_{\mathrm{snow}}$ for the two structural contrasts, with 95\% basin-level bootstrap CIs (10,000 resamples, fixed seed) and the basin-paired slope difference $\Delta\beta$. Panel B reports the OLS slope of the canonical paired shift $\Delta z = z_{\mathrm{Base}} - z_{\mathrm{CN}}$ against $f_{\mathrm{snow}}$, same CI protocol. All estimates are dimensionless normalized-parameter slopes per unit $f_{\mathrm{snow}}$; $n$ is the number of matched basins.
+\item \textit{Note}: Panel A reports the OLS slope of the basin-level excess distance against $f_{\mathrm{snow}}$ for the two structural contrasts, with 95\% basin-level bootstrap CIs (10,000 resamples, fixed seed) and the basin-paired slope difference $\Delta\beta$. Panel B reports the OLS slope of the canonical paired shift $\Delta z = z_{\mathrm{Base}} - z_{\mathrm{CN}}$ against $f_{\mathrm{snow}}$, same CI protocol. All estimates are dimensionless normalized-parameter slopes per unit $f_{\mathrm{snow}}$; $n$ is the number of matched basins. Snow regimes S1--S5 are the fixed strata by basin snow fraction: S1 $[0, 0.05)$ ($n=165$), S2 $[0.05, 0.15)$ ($n=156$), S3 $[0.15, 0.30)$ ($n=121$), S4 $[0.30, 0.50)$ ($n=34$), S5 $[0.50, 1.00]$ ($n=55$).
 \end{tablenotes}
 \end{threeparttable}
 \end{table*}

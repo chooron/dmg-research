@@ -18,7 +18,7 @@ def format_stat(med, ci_low, ci_high, decimals=3):
 
 
 def main():
-    project_root = "/home/jingxin/code/dmg-research/project/hydrodiag"
+    project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     r1_dir = os.path.join(project_root, "manuscript/results/R1")
 
     out_stats_dir = os.path.join(project_root, "manuscript/stats/tables")
@@ -32,11 +32,11 @@ def main():
 
     scopes = [
         ("All basins", "full_sample", None, 531),
-        ("0–0.05", "snow_stratum", "S1", 165),
-        ("0.05–0.15", "snow_stratum", "S2", 156),
-        ("0.15–0.30", "snow_stratum", "S3", 121),
-        ("0.30–0.50", "snow_stratum", "S4", 34),
-        ("0.50–1.00", "snow_stratum", "S5", 55),
+        ("S1 (0\u20130.05)", "snow_stratum", "S1", 165),
+        ("S2 (0.05\u20130.15)", "snow_stratum", "S2", 156),
+        ("S3 (0.15\u20130.30)", "snow_stratum", "S3", 121),
+        ("S4 (0.30\u20130.50)", "snow_stratum", "S4", 34),
+        ("S5 (0.50\u20131.00)", "snow_stratum", "S5", 55),
     ]
 
     contrasts = [
@@ -52,7 +52,7 @@ def main():
     panel_a_tex_rows = []
 
     for label, s_level, s_stratum, n in scopes:
-        row_md = {"Snow Interval": label, "n": n}
+        row_md = {"Snow regime": label, "n": n}
         row_tex_vals = [label, str(n)]
         for eff, p_query, c_label in contrasts:
             if s_level == "full_sample":
@@ -114,12 +114,12 @@ def main():
 
 ### Panel A: Evaluation Period (1995–2010) Paired Structural ΔKGE Effects Across Snow Regimes
 
-| Snow Interval | n | CN − TGD (IC) | CN − TGD (dPL) | CN − Base (IC) | CN − Base (dPL) | TGD − Base (IC) | TGD − Base (dPL) |
+| Snow regime | n | CN − TGD (IC) | CN − TGD (dPL) | CN − Base (IC) | CN − Base (dPL) | TGD − Base (IC) | TGD − Base (dPL) |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 """
     for r in panel_a_md_rows:
         md_content += (
-            f"| {r['Snow Interval']} | {r['n']} | "
+            f"| {r['Snow regime']} | {r['n']} | "
             f"{r['CN − TGD (IC)']} | {r['CN − TGD (dPL)']} | "
             f"{r['CN − Base (IC)']} | {r['CN − Base (dPL)']} | "
             f"{r['TGD − Base (IC)']} | {r['TGD − Base (dPL)']} |\n"
@@ -159,7 +159,7 @@ def main():
 \toprule
 \multicolumn{7}{l}{\textbf{Panel A: Evaluation Period (1995--2010) Paired Structural $\Delta\text{KGE}$ Effects Across Snow Regimes}} \\
 \midrule
-Snow Interval & $n$ & CN $-$ TGD (IC) & CN $-$ TGD (dPL) & CN $-$ Base (IC) & CN $-$ Base (dPL) & TGD $-$ Base (IC) & TGD $-$ Base (dPL) \\
+Snow regime & $n$ & CN $-$ TGD (IC) & CN $-$ TGD (dPL) & CN $-$ Base (IC) & CN $-$ Base (dPL) & TGD $-$ Base (IC) & TGD $-$ Base (dPL) \\
 \midrule
 """ + tex_a_str + r"""\midrule
 \multicolumn{7}{l}{\textbf{Panel B: Sensitivity of Screened Large Center-of-Timing Errors to Threshold Definition ($\text{KGE} \ge 0.60$)}} \\
