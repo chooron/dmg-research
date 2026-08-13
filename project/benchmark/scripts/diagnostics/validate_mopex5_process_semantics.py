@@ -34,7 +34,12 @@ import numpy as np
 import torch
 
 ROOT = Path(__file__).resolve().parents[2]
-sys.path[:0] = [str(ROOT), str(ROOT / "src")]
+# The authoritative production `dmotpy` lives at the worktree root.  The shared
+# venv's site-packages still contains a stale pre-correction copy of MOPEX4/5
+# (and lacks mopex_doy_model), so prepend the repo root to resolve determinis-
+# tically to this worktree's package instead of silently validating the old code.
+REPO = ROOT.parent.parent
+sys.path[:0] = [str(REPO), str(ROOT), str(ROOT / "src")]
 
 from dpl.attributes import CatchmentAttributeBuilder
 from dpl.nn_parameterizer import CatchmentParameterizer
@@ -73,9 +78,8 @@ def step(P, T, PET, pv, doy, states):
 def recompute_fluxes(P, T, PET, pv, doy, states):
     """Local flux-by-flux mirror of the corrected mopex5_step (for WB + checks)."""
     p = [torch.tensor(v, dtype=DT) for v in pv]
-    Sn, S1, S2, Sc1, Sc2 = [torch.tensor(v, dtype=DT) for v in states]
-    Sn = torch.relu(Sn); S1 = torch.relu(S1); S2 = torch.relu(S2)
-    Sc1 = torch.relu(Sc1); Sc2 = torch.relu(Sc2)
+    Sn_e, S1_e, S2_e, Sc1_e, Sc2_e = [torch.relu(torch.tensor(v, dtype=DT)) for v in states]
+    Sn, S1, S2, Sc1, Sc2 = Sn_e, S1_e, S2_e, Sc1_e, Sc2_e
     P_t, T_t, PET_t = torch.tensor(P, dtype=DT), torch.tensor(T, dtype=DT), torch.tensor(PET, dtype=DT)
     doy_t = torch.tensor(doy, dtype=DT)
     pet_epc = phenology_effective_pet(T_t, p[6], p[7], PET_t, 1e-6)
@@ -110,7 +114,9 @@ def recompute_fluxes(P, T, PET, pv, doy, states):
     qs = baseflow_1(p[11], Sc2)
     Sc2_new = Sc2 - qs
     Q = qf + qs
-    dS = (Sn_new - Sn) + (S1_new - S1) + (S2_new - S2) + (Sc1_new - Sc1) + (Sc2_new - Sc2)
+    # dS must be entry-vs-final (the working S1/S2/Sc1/Sc2 locals are mutated
+    # intermediates, so differencing them would silently drop the increments).
+    dS = (Sn_new - Sn_e) + (S1_new - S1_e) + (S2_new - S2_e) + (Sc1_new - Sc1_e) + (Sc2_new - Sc2_e)
     residual = (ps + pr) - flux_i - et1 - et2 - Q - dS
     return {"Q": Q, "I": flux_i, "ET1": et1, "ET2": et2, "pr": pr, "qn": qn,
             "soil_input": soil_input, "pet_epc": pet_epc, "residual": residual,
@@ -154,13 +160,19 @@ def check_forward_source_water() -> dict:
             f"I<=PETepc={checks['I<=PET_epc']} soil=Prnet+qn={checks['soil_input=Pr_net+qn']} "
             f"Qmatch={checks['Q_step==Q_recompute']} nonneg={checks['states_nonneg']} "
             f"I={float(I):.4f} Pr={float(pr_c):.4f} PETepc={float(comp['pet_epc']):.4f}")
-    # phenology path: warm day must have larger ET than cold day at equal P/PET
-    gsi_cold = float(phenology_effective_pet(torch.tensor(0.0, dtype=DT), torch.tensor(-2.0, dtype=DT),
-                                             torch.tensor(12.0, dtype=DT), torch.tensor(3.0, dtype=DT)))
-    gsi_warm = float(phenology_effective_pet(torch.tensor(15.0, dtype=DT), torch.tensor(-2.0, dtype=DT),
-                                             torch.tensor(12.0, dtype=DT), torch.tensor(3.0, dtype=DT)))
-    results["_gsi"] = {"cold": gsi_cold, "warm": gsi_warm,
-                       "cold<warm": gsi_cold < gsi_warm, "gsi_in_01": 0.0 <= gsi_cold <= 1.0 and 0.0 <= gsi_warm <= 1.0}
+    # phenology path: warm day must have larger ET than cold day at equal P/PET.
+    # phenology_effective_pet returns PET_epc = GSI*PET (mm/d), not the GSI
+    # itself, so derive GSI = PET_epc/PET for the [0,1] range check.
+    pet_epc_cold = float(phenology_effective_pet(torch.tensor(0.0, dtype=DT), torch.tensor(-2.0, dtype=DT),
+                                                 torch.tensor(12.0, dtype=DT), torch.tensor(3.0, dtype=DT)))
+    pet_epc_warm = float(phenology_effective_pet(torch.tensor(15.0, dtype=DT), torch.tensor(-2.0, dtype=DT),
+                                                 torch.tensor(12.0, dtype=DT), torch.tensor(3.0, dtype=DT)))
+    gsi_cold = pet_epc_cold / 3.0
+    gsi_warm = pet_epc_warm / 3.0
+    results["_gsi"] = {"pet_epc_cold": pet_epc_cold, "pet_epc_warm": pet_epc_warm,
+                       "cold<warm": pet_epc_cold < pet_epc_warm,
+                       "gsi_cold": gsi_cold, "gsi_warm": gsi_warm,
+                       "gsi_in_01": 0.0 <= gsi_cold <= 1.0 and 0.0 <= gsi_warm <= 1.0}
     et_cold = float(recompute_fluxes(10.0, 0.0, 3.0, PARAMS, 180.0, [0.0] * 5)["ET1"] +
                     recompute_fluxes(10.0, 0.0, 3.0, PARAMS, 180.0, [0.0] * 5)["ET2"] +
                     recompute_fluxes(10.0, 0.0, 3.0, PARAMS, 180.0, [0.0] * 5)["I"])
@@ -169,7 +181,7 @@ def check_forward_source_water() -> dict:
                     recompute_fluxes(10.0, 15.0, 3.0, PARAMS, 180.0, [0.0] * 5)["I"])
     results["_phenology_et_path"] = {"cold_ET": et_cold, "warm_ET": et_warm,
                                      "warm>cold": et_warm > et_cold}
-    log(f"  GSI: cold(T=0)={gsi_cold:.4f} warm(T=15)={gsi_warm:.4f} cold<warm={results['_gsi']['cold<warm']}")
+    log(f"  GSI: cold(T=0)={gsi_cold:.4f} warm(T=15)={gsi_warm:.4f} cold<warm={results['_gsi']['cold<warm']} (PET_epc: {pet_epc_cold:.4f}/{pet_epc_warm:.4f} mm/d)")
     log(f"  ET path: cold_ET={et_cold:.4f} warm_ET={et_warm:.4f} warm>cold={et_warm > et_cold} (phenology enters demand)")
     return results
 
@@ -198,7 +210,10 @@ def check_pet_budget() -> dict:
         if exc_pet > 1e-6: exceed_days_pet += 1
         max_exceed_epc = max(max_exceed_epc, exc_epc)
         max_exceed_pet = max(max_exceed_pet, exc_pet)
-        st = list(out[2:])
+        # mopex5_step returns (Q, ET, S1, S2, Sc1, Sc2, Sn) in STEP order; the
+        # harness tracks states in create order (Sn, S1, S2, Sc1, Sc2), so
+        # convert before feeding the next day (no silent rotation).
+        st = [out[6], out[2], out[3], out[4], out[5]]
     res = {"exceedance_days_vs_PET_epc": exceed_days_epc, "max_exceedance_vs_PET_epc": max_exceed_epc,
            "exceedance_days_vs_raw_PET": exceed_days_pet, "max_exceedance_vs_raw_PET": max_exceed_pet,
            "gsi_range": [gsi_min, gsi_max], "closure_pass_epc": exceed_days_epc == 0,
@@ -231,7 +246,9 @@ def check_water_balance() -> dict:
         comp = recompute_fluxes(float(P[t]), float(T[t]), float(PET[t]), PARAMS, 180.0 + t, st)
         max_daily = max(max_daily, float(abs(comp["residual"])))
         p_sum += float(P[t]); et_sum += float(out[1]); q_sum += float(out[0])
-        st = list(out[2:])
+        # step-order (S1,S2,Sc1,Sc2,Sn) output -> create-order (Sn,S1,S2,Sc1,Sc2)
+        # state for the next day (matches the wrapper's state contract).
+        st = [out[6], out[2], out[3], out[4], out[5]]
     final = sum(float(s) for s in st)
     cumulative = p_sum - et_sum - q_sum - (final - 5e-6)
     res["seq365_max_daily_abs_residual"] = max_daily
@@ -291,30 +308,41 @@ def check_gradient_health() -> dict:
     res["grad_finite"] = bool(torch.isfinite(g).all())
 
     # FD spot-checks: tmin, trange (interior, no clamp), alpha, is_time (uncapped)
-    def loss_at(raw_slots):
+    def loss_at(raw_slots, basin=None):
         th = torch.full((20, n, 1), 0.5, dtype=DT, device=DEVICE)
         th[:, 4] = 0.55; th[:, 5] = 0.45; th[:, 6] = 0.6; th[:, 7] = 0.5
         for slot, v in raw_slots:
-            th[:, slot] = v
+            if basin is None:
+                th[:, slot] = v
+            else:
+                th[basin, slot] = v
         qq = hydro({"x_phy": x}, (None, th))["streamflow"].squeeze(-1).squeeze(-1)
         return qq.square().mean()
 
     fd_report = {}
-    for slot, name, delta in [(6, "tmin", 0.01), (7, "trange", 0.01), (4, "alpha", 0.01), (5, "is_time", 0.01)]:
+    # Single-basin perturbation: perturbing every basin's slot simultaneously and
+    # comparing with the basin-mean autograd is off by a factor of n_basins (the
+    # loss is a mean over basins while FD perturbs all of them).  Perturb one
+    # basin and compare with that basin's own autograd (a true directional
+    # derivative, dL/dtheta_{j,b}).
+    FD_BASIN = 0
+    for slot, name, delta in [(6, "tmin", 1e-3), (7, "trange", 1e-3), (4, "alpha", 1e-3), (5, "is_time", 1e-3)]:
         eps = delta
-        th_p = [(slot, 0.5 + eps)]; th_m = [(slot, 0.5 - eps)]
         with torch.no_grad():
-            lp = loss_at(th_p).item(); lm = loss_at(th_m).item()
+            lp = loss_at([(slot, 0.5 + eps)], basin=FD_BASIN).item()
+            lm = loss_at([(slot, 0.5 - eps)], basin=FD_BASIN).item()
         fd = (lp - lm) / (2 * eps)
         th = torch.full((20, n, 1), 0.5, dtype=DT, device=DEVICE)
-        th[:, slot] = 0.5
+        th[:, 4] = 0.55; th[:, 5] = 0.45; th[:, 6] = 0.6; th[:, 7] = 0.5
+        th[FD_BASIN, slot] = 0.5
         th.requires_grad_(True)
         ll = hydro({"x_phy": x}, (None, th))["streamflow"].squeeze(-1).squeeze(-1).square().mean()
         ll.backward()
-        ag = float(th.grad[:, slot].mean())
+        ag = float(th.grad[FD_BASIN, slot])
         rel = abs(ag - fd) / (abs(fd) + 1e-12)
-        fd_report[name] = {"autograd": ag, "fd": fd, "rel_err": rel}
-        log(f"  FD {name:8s}: autograd={ag:+.3e} fd={fd:+.3e} rel_err={rel:.2e}")
+        fd_report[name] = {"autograd": ag, "fd": fd, "rel_err": rel,
+                           "perturbation": f"single-basin[{FD_BASIN}]"}
+        log(f"  FD {name:8s}: autograd={ag:+.3e} fd={fd:+.3e} rel_err={rel:.2e} (single-basin[{FD_BASIN}])")
     res["fd_spot_checks"] = fd_report
     return res
 
@@ -365,7 +393,7 @@ def check_state_mapping_compile() -> dict:
     qs_eager = []
     for t in range(20):
         out = step(5.0, 10.0, 3.0, pv, 180.0 + t, st)
-        qs_eager.append(out[0]); st = list(out[2:])
+        qs_eager.append(out[0]); st = [out[6], out[2], out[3], out[4], out[5]]
     comp_step = torch.compile(raw5, backend="inductor", mode="default", fullgraph=True)
     pv2 = [torch.tensor(v, dtype=DT) for v in PARAMS]
     st2 = [torch.tensor(1e-6, dtype=DT) for _ in range(5)]
@@ -374,15 +402,17 @@ def check_state_mapping_compile() -> dict:
         out = comp_step(torch.tensor(5.0, dtype=DT), torch.tensor(10.0, dtype=DT), torch.tensor(3.0, dtype=DT),
                         *pv2, st2[1], st2[2], st2[3], st2[4], st2[0], delta_t=1.0, nearzero=1e-6,
                         doy=torch.tensor(180.0 + t, dtype=DT))
-        qs_comp.append(out[0]); st2 = list(out[2:])
+        qs_comp.append(out[0]); st2 = [out[6], out[2], out[3], out[4], out[5]]
     res["fullgraph_compile"] = True
     res["eager_vs_compile_q_max_diff"] = float(max(abs(float(a) - float(b)) for a, b in zip(qs_eager, qs_comp)))
     log(f"  fullgraph compile ok=True; eager-vs-compile max|dQ|={res['eager_vs_compile_q_max_diff']:.2e}")
 
     hydro_comp = build_model("mopex5", DEVICE, warm_up=60, backend="compile",
                              parameter_mapping="auto", warmup_grad_mode="detach")
-    qc = hydro_comp({"x_phy": x[:60]}, (None, torch.full((20, n, 1), 0.5, dtype=DT, device=DEVICE)))["streamflow"]
-    qe = hydro({"x_phy": x[:60]}, (None, torch.full((20, n, 1), 0.5, dtype=DT, device=DEVICE)))["streamflow"]
+    qc = hydro_comp({"x_phy": x[:120]}, (None, torch.full((20, n, 1), 0.5, dtype=DT, device=DEVICE)))["streamflow"]
+    hydro = build_model("mopex5", DEVICE, warm_up=60, backend="eager",
+                        parameter_mapping="auto", warmup_grad_mode="detach")
+    qe = hydro({"x_phy": x[:120]}, (None, torch.full((20, n, 1), 0.5, dtype=DT, device=DEVICE)))["streamflow"]
     res["canonical_compile_fwd"] = bool(torch.isfinite(qc).all())
     res["canonical_eager_vs_compile_max_diff"] = float((qc - qe).abs().max())
     log(f"  canonical build_model(compile, auto, detach) fwd finite={bool(torch.isfinite(qc).all())} "

@@ -48,7 +48,10 @@ import torch
 import torch.nn as nn
 
 ROOT = Path(__file__).resolve().parents[2]
-sys.path[:0] = [str(ROOT), str(ROOT / "src")]
+# dmotpy lives at the repo root; prepend it so this runner deterministically
+# imports the current worktree's package (never a stale site-packages copy).
+REPO = ROOT.parent.parent
+sys.path[:0] = [str(REPO), str(ROOT), str(ROOT / "src")]
 
 from dpl.attributes import CatchmentAttributeBuilder
 from dpl.nn_parameterizer import CatchmentParameterizer
@@ -59,11 +62,26 @@ from src.model_registry import NPARAM_INFO_36, build_model
 
 DEVICE = torch.device("cuda")
 BATCH, STEPS, WINDOW, WARMUP = 100, 169, 730, 365
-# restored MOPEX4 = original alpha/is_time formula + corrected process order.
-# MOPEX4_OUT selects the result directory so historical runs are never touched.
+# Canonical dPL runner for restored MOPEX4 (default) and MOPEX5.  Both share
+# the restored-MOPEX4 process semantics; MOPEX5 adds the original phenology
+# PET adjustment (tmin/trange).  The training protocol is identical and the
+# result directory is selected per model so historical runs are never touched.
+def resolve_run_config(model: str) -> tuple:
+    if model == "mopex4":
+        i0, i1, phen = "alpha", "is_time", ()
+        env, default = "MOPEX4_OUT", "results/dpl_mopex4_final_20260811"
+    elif model == "mopex5":
+        i0, i1, phen = "alpha", "is_time", ("tmin", "trange")
+        env, default = "MOPEX5_OUT", "results/dpl_mopex5_final_20260812"
+    else:
+        raise ValueError(f"unsupported canonical dPL model: {model}")
+    return i0, i1, phen, Path(_os.environ.get(env, str(ROOT / default)))
+
 import os as _os
+
 MODEL = "mopex4"
 I0, I1 = "alpha", "is_time"
+PHEN: tuple[str, ...] = ()
 OUT_ROOT = Path(_os.environ.get("MOPEX4_OUT", str(ROOT / "results/dpl_mopex4_final_20260811")))
 
 
@@ -134,10 +152,11 @@ def initialize_midpoint(network: CatchmentParameterizer) -> None:
 def make_fluxes_step(hydro, pv):
     """Return a step closure replicating the production step flux-by-flux.
 
-    Restored interception kernel: original seasonal alpha/is_time.  Returns
-    (Q, I, ET1, ET2, new_states) plus the water-balance residual.
+    Restored interception kernel (original seasonal alpha/is_time) is shared by
+    both models.  MOPEX4 closes the budget against raw PET; MOPEX5 against the
+    phenology-adjusted demand PET_epc = GSI(T)*PET (with PET_epc <= PET).
+    Returns (Q, I, ET1, ET2, new_states) plus the water-balance residual.
     """
-    from dmotpy.models.core.mopex4 import mopex4_step
     from dmotpy.models.flux.mopex import (
         mopex_baseflow_1 as baseflow_1,
         mopex_evap_7 as evap_7,
@@ -148,23 +167,34 @@ def make_fluxes_step(hydro, pv):
         mopex_snowfall_1 as snowfall_1,
     )
     from dmotpy.models.core.mopex4 import interception_4 as interception_kernel
+    nearzero = hydro.nearzero
+    if MODEL == "mopex4":
+        from dmotpy.models.core.mopex4 import mopex4_step
+        raw_step = mopex4_step
+    else:
+        from dmotpy.models.core.mopex5 import mopex5_step, phenology_effective_pet
+        raw_step = mopex5_step
 
     def step(P, T, PET, states, doy):
         S1, S2, Sc1, Sc2, Sn = states
-        out = mopex4_step(
+        out = raw_step(
             P, T, PET, *pv, S1, S2, Sc1, Sc2, Sn,
-            delta_t=1.0, nearzero=hydro.nearzero, doy=doy,
+            delta_t=1.0, nearzero=nearzero, doy=doy,
         )
         Q, ET_tot, S1n, S2n, Sc1n, Sc2n, Snn = out
-        tcrit, ddf, Sb1, tw, a4, a5, tu, Se, Sb2, tc = pv
-        nearzero = hydro.nearzero
+        if MODEL == "mopex5":
+            tcrit, ddf, Sb1, tw, a4, a5, tmin, trange, tu, Se, Sb2, tc = pv
+            pet_demand = phenology_effective_pet(T, tmin, trange, PET, nearzero)
+        else:
+            tcrit, ddf, Sb1, tw, a4, a5, tu, Se, Sb2, tc = pv
+            pet_demand = PET
         flux_ps = snowfall_1(P, T, tcrit)
         flux_pr = rainfall_1(P, T, tcrit)
         flux_qn = melt_1(ddf, tcrit, T, Sn, 1.0)
         Sn_w = Sn + flux_ps - flux_qn
         i_pot = interception_kernel(flux_pr, doy, a4, a5, nearzero=nearzero)
-        flux_i = torch.minimum(i_pot, PET)
-        pet_after_i = PET - flux_i
+        flux_i = torch.minimum(i_pot, pet_demand)
+        pet_after_i = pet_demand - flux_i
         soil_input = (flux_pr - flux_i) + flux_qn
         S1_w = S1 + soil_input
         flux_et1 = torch.minimum(evap_7(S1_w, Sb1, pet_after_i, 1.0, nearzero), S1_w)
@@ -202,7 +232,12 @@ def run_pet_water_balance(hydro, val_x, val_y, val_theta, ids, sample_count: int
 
     val_x: [time, basin, 4] (calendar already appended); scored period only.
     """
-    from dmotpy.models.core.mopex4 import mopex4_step
+    if MODEL == "mopex4":
+        from dmotpy.models.core.mopex4 import mopex4_step
+        warmup_step = mopex4_step
+    else:
+        from dmotpy.models.core.mopex5 import mopex5_step
+        warmup_step = mopex5_step
     n_time, n_basin = val_x.shape[0], val_x.shape[1]
     torch.manual_seed(1234)
     sample_idx = torch.randperm(n_basin)[:sample_count].tolist()
@@ -217,6 +252,7 @@ def run_pet_water_balance(hydro, val_x, val_y, val_theta, ids, sample_count: int
     cum = {k: torch.zeros(sample_count, device=DEVICE) for k in
            ("P", "Pliq", "Psnow", "I", "ET1", "ET2", "Q")}
     max_exceed = torch.zeros(sample_count, device=DEVICE)
+    max_exceed_epc = torch.zeros(sample_count, device=DEVICE)
     exceed_days = torch.zeros(sample_count, device=DEVICE)
     max_wb = torch.zeros(sample_count, device=DEVICE)
     scored = 0
@@ -230,7 +266,7 @@ def run_pet_water_balance(hydro, val_x, val_y, val_theta, ids, sample_count: int
     xw = val_x[:WARMUP, sample_idx]
     for t in range(WARMUP):
         with torch.no_grad():
-            out = mopex4_step(
+            out = warmup_step(
                 xw[t, :, 0], xw[t, :, 1], xw[t, :, 2], *pv,
                 S1, S2, Sc1, Sc2, Sn, delta_t=1.0, nearzero=hydro.nearzero,
                 doy=xw[t, :, 3],
@@ -244,6 +280,10 @@ def run_pet_water_balance(hydro, val_x, val_y, val_theta, ids, sample_count: int
         closure = I + ET1 + ET2
         exceed = torch.clamp(closure - PET, min=0.0)
         max_exceed = torch.maximum(max_exceed, exceed)
+        if MODEL == "mopex5":
+            from dmotpy.models.core.mopex5 import phenology_effective_pet
+            pet_epc = phenology_effective_pet(T, pv[6], pv[7], PET, hydro.nearzero)
+            max_exceed_epc = torch.maximum(max_exceed_epc, torch.clamp(closure - pet_epc, min=0.0))
         exceed_days += (exceed > 1e-6).float()
         max_wb = torch.maximum(max_wb, residual.abs())
         cum["P"] += P
@@ -267,6 +307,8 @@ def run_pet_water_balance(hydro, val_x, val_y, val_theta, ids, sample_count: int
             "exceedance_day_fraction_scored": float(exceed_days[j] / scored),
             "max_exceedance_scored": float(max_exceed[j]),
             "closure_pass": bool(max_exceed[j] <= 1e-6),
+            "pet_epc_closure_pass": (bool(max_exceed_epc[j] <= 1e-6) if MODEL == "mopex5" else None),
+            "pet_epc_max_exceedance_scored": (float(max_exceed_epc[j]) if MODEL == "mopex5" else None),
             "water_balance_max_daily_abs_residual": float(max_wb[j]),
             # float32 sequential-update noise is ~1e-5 mm/d; a genuine
             # order/formula violation shows residuals of flux magnitude.
@@ -289,6 +331,7 @@ def run_pet_water_balance(hydro, val_x, val_y, val_theta, ids, sample_count: int
 
 def main() -> None:
     parser = argparse.ArgumentParser()
+    parser.add_argument("--model", type=str, default="mopex4", choices=["mopex4", "mopex5"])
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--epochs", type=int, default=100)
     parser.add_argument("--lr", type=float, default=1e-3)
@@ -296,6 +339,10 @@ def main() -> None:
     parser.add_argument("--steps-per-epoch", type=int, default=STEPS)
     parser.add_argument("--evaluation-every", type=int, default=1)
     args = parser.parse_args()
+
+    global MODEL, I0, I1, PHEN, OUT_ROOT
+    MODEL = args.model
+    I0, I1, PHEN, OUT_ROOT = resolve_run_config(MODEL)
 
     if not torch.cuda.is_available():
         raise RuntimeError("CUDA required")
@@ -318,16 +365,21 @@ def main() -> None:
         "eval_metric": "per-basin KGE + NSE; median/mean over basins",
         "stop_rule": "force exactly 100; early stopping disabled (matches round13 MOPEX3 reference)",
         "model_source": (
-            "project/benchmark/dmotpy (canonical benchmark loading); "
-            "mopex4_step = restored original seasonal interception (alpha/is_time) "
+            f"repo-root dmotpy ({REPO / 'dmotpy'}); "
+            f"{MODEL}_step = restored original seasonal interception (alpha/is_time) "
             "with corrected process order"
+            + (" + MOPEX5 original phenology PET adjustment (tmin/trange)" if MODEL == "mopex5" else "")
         ),
         "interception": (
             "I_pot = softplus(50*(alpha+(1-alpha)cos(2pi(doy-is_time)/365.25)))/50 * Pr; "
-            "I = min(I_pot, PET); Pr_net = Pr - I; soil_input = Pr_net + qn"
+            + ("I = min(I_pot, PET_epc); Pr_net = Pr - I; soil_input = Pr_net + qn; "
+               "PET_epc = clamp((T-tmin)/trange,0,1)*PET; I+ET1+ET2 <= PET_epc <= PET"
+               if MODEL == "mopex5" else
+               "I = min(I_pot, PET); Pr_net = Pr - I; soil_input = Pr_net + qn; I+ET1+ET2 <= PET")
         ),
         "interception_slots": [I0, I1],
-        "bounds": {k: PARAM_INFO[MODEL][k] for k in (I0, I1)},
+        "phenology_slots": list(PHEN),
+        "bounds": {k: PARAM_INFO[MODEL][k] for k in ([I0, I1] + list(PHEN))},
         "freeze_manifest": (
             "results/mopex4_formula_decouple_20260811/ (pre-training validation) + "
             "git " + __import__("subprocess").check_output(
@@ -374,18 +426,20 @@ def main() -> None:
     gradients_path = arm_dir / "parameter_gradients.csv"
     failfast_path = arm_dir / "final" / "failfast_epoch1.csv"
 
-    print(f"=== Official MOPEX4 dPL seed {seed}: {len(ids)} basins, {args.epochs} epochs ===", flush=True)
+    print(f"=== Official canonical dPL seed {seed}: model={MODEL} {len(ids)} basins, {args.epochs} epochs ===", flush=True)
     print(f"params: {list(PARAM_INFO[MODEL])}", flush=True)
+    print(f"dmotpy: {__import__('dmotpy').__file__}", flush=True)
     t0 = time.time()
     best_median_so_far = -1.0
+    # MOPEX5 key slots: interception (alpha, is_time) + phenology (tmin, trange).
+    key_slots = [4, 5] + ([6, 7] if MODEL == "mopex5" else [])
     for epoch in range(start, args.epochs + 1):
         network.train()
         loss_total = 0.0
         elapsed = 0.0
         observed = torch.zeros((len(ids), NPARAM_INFO_36[MODEL]), dtype=torch.bool, device=DEVICE)
         epoch_nan_batches = 0
-        epoch_seff_grad_abs = 0.0
-        epoch_c_grad_abs = 0.0
+        key_grad_abs = {slot: 0.0 for slot in key_slots}
         n_grad_checks = 0
         for mb in range(args.steps_per_epoch):
             basins = torch.randperm(len(ids), device=DEVICE)[: args.batch_size]
@@ -413,8 +467,8 @@ def main() -> None:
             if not finite_grad:
                 raise RuntimeError(f"non-finite gradient at epoch {epoch} batch {mb}")
             if theta.grad is not None:
-                epoch_seff_grad_abs += float(theta.grad[:, 4].abs().mean())
-                epoch_c_grad_abs += float(theta.grad[:, 5].abs().mean())
+                for _slot in key_slots:
+                    key_grad_abs[_slot] += float(theta.grad[:, _slot].abs().mean())
                 n_grad_checks += 1
             observed[basins] |= theta.grad.detach() != 0
             nn.utils.clip_grad_norm_(network.parameters(), max_norm=1.0)
@@ -434,17 +488,29 @@ def main() -> None:
         mean_kge = float(kge.mean())
         median_nse = float(torch.nanmedian(nse))
         mean_nse = float(torch.nanmean(nse))
+        params = list(PARAM_INFO[MODEL])
         theta_boundary = float(((val_theta < 0.02) | (val_theta > 0.98)).float().mean())
-        seff_boundary = float(((val_theta[:, 4] < 0.02) | (val_theta[:, 4] > 0.98)).float().mean())
-        c_boundary = float(((val_theta[:, 5] < 0.02) | (val_theta[:, 5] > 0.98)).float().mean())
-        seff_lower_hit = float((val_theta[:, 4] < 0.02).float().mean())
-        seff_upper_hit = float((val_theta[:, 4] > 0.98).float().mean())
-        c_lower_hit = float((val_theta[:, 5] < 0.02).float().mean())
-        c_upper_hit = float((val_theta[:, 5] > 0.98).float().mean())
-        seff_bound_dist_med = float(torch.minimum(val_theta[:, 4], 1.0 - val_theta[:, 4]).median())
-        c_bound_dist_med = float(torch.minimum(val_theta[:, 5], 1.0 - val_theta[:, 5]).median())
-        seff_raw_median = float(val_theta[:, 4].median())
-        c_raw_median = float(val_theta[:, 5].median())
+        key_stats = {}
+        for _slot in key_slots:
+            v = val_theta[:, _slot]
+            key_stats[_slot] = {
+                "boundary_fraction": float(((v < 0.02) | (v > 0.98)).float().mean()),
+                "lower_hit_fraction": float((v < 0.02).float().mean()),
+                "upper_hit_fraction": float((v > 0.98).float().mean()),
+                "boundary_distance_median": float(torch.minimum(v, 1.0 - v).median()),
+                "raw_median": float(v.median()),
+                "grad_mean_abs": key_grad_abs[_slot] / max(n_grad_checks, 1),
+            }
+        key_fields = {}
+        for _slot in key_slots:
+            nm = params[_slot]
+            st = key_stats[_slot]
+            key_fields[f"{nm}_boundary_fraction"] = st["boundary_fraction"]
+            key_fields[f"{nm}_lower_hit_fraction"] = st["lower_hit_fraction"]
+            key_fields[f"{nm}_upper_hit_fraction"] = st["upper_hit_fraction"]
+            key_fields[f"{nm}_boundary_distance_median"] = st["boundary_distance_median"]
+            key_fields[f"{nm}_raw_median"] = st["raw_median"]
+            key_fields[f"{nm}_grad_mean_abs"] = st["grad_mean_abs"]
 
         row = {
             "model": MODEL, "arm": arm, "epoch": epoch, "status": "COMPLETED_EPOCH",
@@ -452,14 +518,7 @@ def main() -> None:
             "validation_median_nse": median_nse, "validation_mean_nse": mean_nse,
             "train_loss_1_minus_kge": loss_total / args.steps_per_epoch,
             "theta_boundary_fraction": theta_boundary,
-            f"{I0}_boundary_fraction": seff_boundary, f"{I1}_boundary_fraction": c_boundary,
-            f"{I0}_lower_hit_fraction": seff_lower_hit, f"{I0}_upper_hit_fraction": seff_upper_hit,
-            f"{I1}_lower_hit_fraction": c_lower_hit, f"{I1}_upper_hit_fraction": c_upper_hit,
-            f"{I0}_boundary_distance_median": seff_bound_dist_med,
-            f"{I1}_boundary_distance_median": c_bound_dist_med,
-            f"{I0}_raw_median": seff_raw_median, f"{I1}_raw_median": c_raw_median,
-            f"{I0}_grad_mean_abs": epoch_seff_grad_abs / max(n_grad_checks, 1),
-            f"{I1}_grad_mean_abs": epoch_c_grad_abs / max(n_grad_checks, 1),
+            **key_fields,
             "nan_batches": epoch_nan_batches,
             "seconds_per_train_step": elapsed / args.steps_per_epoch,
             "parameter_mapping": "auto", "warmup_grad_mode": "detach",
@@ -474,30 +533,29 @@ def main() -> None:
         } for j, p in enumerate(PARAM_INFO[MODEL])])
 
         if epoch == 1:
-            ff_rows = [{
+            ff_fields = {
                 "seed": seed, "epoch": epoch,
                 "train_q_nonfinite": invalid_train, "val_q_nonfinite": invalid_val,
                 "nan_batches": epoch_nan_batches,
                 "theta_finite": True, "grad_finite": True,
-                f"{I0}_raw_median": seff_raw_median, f"{I1}_raw_median": c_raw_median,
-                f"{I0}_boundary_fraction": seff_boundary, f"{I1}_boundary_fraction": c_boundary,
-                f"{I0}_lower_hit_fraction": seff_lower_hit, f"{I0}_upper_hit_fraction": seff_upper_hit,
-                f"{I1}_lower_hit_fraction": c_lower_hit, f"{I1}_upper_hit_fraction": c_upper_hit,
-                f"{I0}_boundary_distance_median": seff_bound_dist_med,
-                f"{I1}_boundary_distance_median": c_bound_dist_med,
+                **{f"{params[_slot]}_raw_median": key_stats[_slot]["raw_median"] for _slot in key_slots},
+                **{f"{params[_slot]}_boundary_fraction": key_stats[_slot]["boundary_fraction"] for _slot in key_slots},
+                **{f"{params[_slot]}_lower_hit_fraction": key_stats[_slot]["lower_hit_fraction"] for _slot in key_slots},
+                **{f"{params[_slot]}_upper_hit_fraction": key_stats[_slot]["upper_hit_fraction"] for _slot in key_slots},
+                **{f"{params[_slot]}_boundary_distance_median": key_stats[_slot]["boundary_distance_median"] for _slot in key_slots},
                 "theta_boundary_fraction": theta_boundary,
-                "seff_grad_mean_abs": epoch_seff_grad_abs / max(n_grad_checks, 1),
-                "c_grad_mean_abs": epoch_c_grad_abs / max(n_grad_checks, 1),
+                **{f"{params[_slot]}_grad_mean_abs": key_stats[_slot]["grad_mean_abs"] for _slot in key_slots},
                 "val_median_kge": median_kge, "val_median_nse": median_nse,
-            }]
-            write_csv(failfast_path, ff_rows)
+            }
+            write_csv(failfast_path, [ff_fields])
             print(f"[fail-fast epoch 1] nan_batches={epoch_nan_batches} "
                   f"train_nonfinite={invalid_train} val_nonfinite={invalid_val} "
                   f"theta_finite=True grad_finite=True "
-                  f"{I0}_raw_median={seff_raw_median:.4f} {I1}_raw_median={c_raw_median:.4f} "
+                  f"raw_medians=" + " ".join(
+                      f"{params[_slot]}={key_stats[_slot]['raw_median']:.4f}" for _slot in key_slots) + " "
                   f"boundary={theta_boundary:.4f} "
-                  f"grad|{I0}|={epoch_seff_grad_abs / max(n_grad_checks, 1):.3e} "
-                  f"grad|{I1}|={epoch_c_grad_abs / max(n_grad_checks, 1):.3e} "
+                  f"grads=" + " ".join(
+                      f"|{params[_slot]}|={key_stats[_slot]['grad_mean_abs']:.3e}" for _slot in key_slots) + " "
                   f"val_median_kge={median_kge:.4f}", flush=True)
             # PET closure / water balance on sampled basins (training windows)
             torch.manual_seed(7)
@@ -531,8 +589,9 @@ def main() -> None:
             }, dst)
         print(f"Epoch [{epoch:03d}/{args.epochs:03d}] val_med_kge={median_kge:.4f} "
               f"val_med_nse={median_nse:.4f} loss={row['train_loss_1_minus_kge']:.4f} "
-              f"boundary={theta_boundary:.4f} {I0}_raw_med={seff_raw_median:.3f} "
-              f"{I1}_raw_med={c_raw_median:.3f} ({elapsed / args.steps_per_epoch:.2f}s/step)",
+              f"boundary={theta_boundary:.4f} "
+              + " ".join(f"{params[_slot]}_raw={key_stats[_slot]['raw_median']:.3f}" for _slot in key_slots)
+              + f" ({elapsed / args.steps_per_epoch:.2f}s/step)",
               flush=True)
 
     # ---- final diagnostics -------------------------------------------------
@@ -589,38 +648,32 @@ def main() -> None:
     } for i, b in enumerate(ids)]
     write_csv(arm_dir / "final" / "basin_metrics.csv", metric_rows)
 
-    # basin-level parameters at best epoch (interception slots are model-aware)
+    # basin-level parameters at best epoch (key-slot boundary diagnostics are model-aware)
     pd_best = hydro._descale_params(theta_best)
     param_rows = []
-    iv0 = pd_best[I0].squeeze(-1)
-    iv1 = pd_best[I1].squeeze(-1)
+    iv_vals = {_slot: pd_best[params[_slot]].squeeze(-1) for _slot in key_slots}
     pstar = None
     for i, b in enumerate(ids):
         entry = {"basin_id": f"{b:08d}"}
         for name in PARAM_INFO[MODEL]:
             entry[name] = float(pd_best[name][i, 0])
-        entry[I0] = float(iv0[i])
-        entry[I1] = float(iv1[i])
+        for _slot in key_slots:
+            nm = params[_slot]
+            r = float(theta_best[i, _slot])
+            entry[f"{nm}_boundary_hit"] = bool(r < 0.02 or r > 0.98)
+            entry[f"{nm}_boundary_distance"] = float(min(r, 1.0 - r))
+            entry[f"{nm}_lower_hit"] = bool(r < 0.02)
+            entry[f"{nm}_upper_hit"] = bool(r > 0.98)
+            entry[f"{nm}_lower_distance"] = float(r)
+            entry[f"{nm}_upper_distance"] = float(1.0 - r)
         if pstar is not None:
             entry["P_star"] = float(pstar[i])
-        entry[f"{I0}_boundary_hit"] = bool(float(theta_best[i, 4]) < 0.02 or float(theta_best[i, 4]) > 0.98)
-        entry[f"{I1}_boundary_hit"] = bool(float(theta_best[i, 5]) < 0.02 or float(theta_best[i, 5]) > 0.98)
-        entry[f"{I0}_boundary_distance"] = float(min(float(theta_best[i, 4]), 1.0 - float(theta_best[i, 4])))
-        entry[f"{I1}_boundary_distance"] = float(min(float(theta_best[i, 5]), 1.0 - float(theta_best[i, 5])))
-        entry[f"{I0}_lower_hit"] = bool(float(theta_best[i, 4]) < 0.02)
-        entry[f"{I0}_upper_hit"] = bool(float(theta_best[i, 4]) > 0.98)
-        entry[f"{I1}_lower_hit"] = bool(float(theta_best[i, 5]) < 0.02)
-        entry[f"{I1}_upper_hit"] = bool(float(theta_best[i, 5]) > 0.98)
-        entry[f"{I0}_lower_distance"] = float(theta_best[i, 4])
-        entry[f"{I0}_upper_distance"] = float(1.0 - theta_best[i, 4])
-        entry[f"{I1}_lower_distance"] = float(theta_best[i, 5])
-        entry[f"{I1}_upper_distance"] = float(1.0 - theta_best[i, 5])
         param_rows.append(entry)
     write_csv(arm_dir / "final" / "basin_parameters.csv", param_rows)
 
     # correlations between the two interception slots
-    iv0_np = iv0.cpu().numpy()
-    iv1_np = iv1.cpu().numpy()
+    iv0_np = iv_vals[params.index(I0)].cpu().numpy()
+    iv1_np = iv_vals[params.index(I1)].cpu().numpy()
     pearson = float(pd.Series(iv0_np).corr(pd.Series(iv1_np)))
     spearman = float(pd.Series(iv0_np).corr(pd.Series(iv1_np), method="spearman"))
     # PET closure / water balance on sampled basins (validation period)
@@ -633,20 +686,16 @@ def main() -> None:
         "val_median_nse_best": float(best_epoch_row["validation_median_nse"]),
         "val_median_kge_final": float(np_median(kge_final_np)),
         "val_median_nse_final": float(np_median(nse_final_np)),
-        f"{I0}_median": float(torch.median(iv0)),
-        f"{I1}_median": float(torch.median(iv1)),
+        **{f"{params[_slot]}_median": float(torch.median(iv_vals[_slot])) for _slot in key_slots},
         "pstar_median": (float(torch.median(pstar)) if pstar is not None else None),
-        f"{I0}_boundary_hit_fraction": float(((theta_best[:, 4] < 0.02) | (theta_best[:, 4] > 0.98)).float().mean()),
-        f"{I1}_boundary_hit_fraction": float(((theta_best[:, 5] < 0.02) | (theta_best[:, 5] > 0.98)).float().mean()),
-        f"{I0}_lower_hit_fraction": float((theta_best[:, 4] < 0.02).float().mean()),
-        f"{I0}_upper_hit_fraction": float((theta_best[:, 4] > 0.98).float().mean()),
-        f"{I1}_lower_hit_fraction": float((theta_best[:, 5] < 0.02).float().mean()),
-        f"{I1}_upper_hit_fraction": float((theta_best[:, 5] > 0.98).float().mean()),
-        f"{I0}_boundary_distance_median": float(torch.minimum(theta_best[:, 4], 1.0 - theta_best[:, 4]).median()),
-        f"{I1}_boundary_distance_median": float(torch.minimum(theta_best[:, 5], 1.0 - theta_best[:, 5]).median()),
+        **{f"{params[_slot]}_boundary_hit_fraction": float(((theta_best[:, _slot] < 0.02) | (theta_best[:, _slot] > 0.98)).float().mean()) for _slot in key_slots},
+        **{f"{params[_slot]}_lower_hit_fraction": float((theta_best[:, _slot] < 0.02).float().mean()) for _slot in key_slots},
+        **{f"{params[_slot]}_upper_hit_fraction": float((theta_best[:, _slot] > 0.98).float().mean()) for _slot in key_slots},
+        **{f"{params[_slot]}_boundary_distance_median": float(torch.minimum(theta_best[:, _slot], 1.0 - theta_best[:, _slot]).median()) for _slot in key_slots},
         f"corr_{I0}_{I1}_pearson": pearson, f"corr_{I0}_{I1}_spearman": spearman,
         "theta_boundary_fraction_best_epoch": float(best_epoch_row["theta_boundary_fraction"]),
         "pet_closure_pass_basins": sum(1 for r in wb_rows if r["closure_pass"]),
+        "pet_epc_closure_pass_basins": (sum(1 for r in wb_rows if r.get("pet_epc_closure_pass") is True) if MODEL == "mopex5" else None),
         "pet_closure_total_basins": len(wb_rows),
         "water_balance_pass_basins": sum(1 for r in wb_rows if r["water_balance_pass"]),
         "water_balance_total_basins": len(wb_rows),
