@@ -1,6 +1,6 @@
 import torch
 import torch.nn.functional as F
-from typing import Optional, Tuple
+from typing import Tuple
 from ..flux.evap import evap_7
 from ..flux.interception import interception_1
 from ..flux.excess import excess_1
@@ -61,6 +61,7 @@ def vic_step(
     P: torch.Tensor,
     T: torch.Tensor,
     PET: torch.Tensor,
+    # t_idx: torch.Tensor,  # todo t_idx
     # Parameters matching VIC_PARAMS_BOUNDS keys
     ibar: torch.Tensor,
     idelta: torch.Tensor,
@@ -77,8 +78,6 @@ def vic_step(
     S2: torch.Tensor,
     S3: torch.Tensor,
     nearzero: float = 1e-6,
-    doy: Optional[torch.Tensor] = None,
-    delta_t: float = 1.0,
 ) -> Tuple[
     torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor
 ]:
@@ -98,45 +97,25 @@ def vic_step(
     tmax = torch.tensor(
         365.25, device=P.device
     )  # Length of one growing cycle [d]
+
     # --- 1. Interception Store (S1) ---
-    # Interception capacity varies seasonally (Phenology).  MARRMoT m_22
-    # evaluates phenology at the current day-of-year (1-indexed timestep);
-    # when the caller supplies ``doy`` (e.g. the calendar forcing channel)
-    # that value is used, otherwise fall back to a constant t=1 (legacy).
-    if doy is None:
-        t_idx = torch.ones_like(P)
-    else:
-        t_idx = doy.to(P.dtype)
-    aux_imax_raw = phenology_2(ibar, idelta, ishift, t_idx, tmax, nearzero=nearzero)
-    # Guard the seasonal capacity denominator: aux_imax can approach zero at
-    # the seasonal minimum (idelta -> 1, sin -> -1), which would make
-    # evap_7/interception_1 divide by a vanishing Smax.
-    aux_imax = torch.clamp(aux_imax_raw, min=nearzero)
+    # Interception capacity varies seasonally (Phenology)
+    t_idx = torch.ones_like(P)
+    aux_imax = phenology_2(ibar, idelta, ishift, t_idx, tmax, nearzero=nearzero)
 
     # flux_ei: Evaporation from interception
     flux_ei = evap_7(S1, aux_imax, PET, nearzero=nearzero)
     flux_ei = torch.minimum(flux_ei, S1 - nearzero)
     flux_ei = F.relu(flux_ei)
 
-    # flux_peff: Throughfall (Precipitation effectively reaching the soil).
-    # The project's interception_1 helper is ``In * gate_above(S, Smax)``:
-    # throughfall ~0 while S1 << aux_imax and full once S1 reaches capacity.
-    # This has the same hydrologic direction as the MARRMoT ``In*(1-gate_below)``
-    # (both transition from 0 -> P as S1 fills) while keeping the smoother,
-    # gradient-friendlier dMoT gate shape.  Keep the project gate.
+    # flux_peff: Throughfall (Precipitation effectively reaching the soil)
     flux_peff = interception_1(P, S1, aux_imax, nearzero=nearzero)
-    flux_peff = torch.clamp(flux_peff, min=torch.zeros_like(flux_peff), max=P)
+    zeros = torch.zeros_like(flux_peff)
+    flux_peff = torch.clamp(flux_peff, min=zeros, max=P)
 
-    # flux_iex: Interception excess (overflow when storage exceeds capacity).
-    # Evaluated from the input-aware intermediate state S1 + P - peff (the
-    # same-day rainfall that actually reaches the interception stage), matching
-    # the healthy dMoT convention (e.g. us1 uses excess_1(S1 + p_eff - flux_rg,
-    # s_fc_limit)).  Mass balance: S1_new = S1 + P - ei - peff - iex.
+    # flux_iex: Interception excess (Overflow when storage capacity is exceeded)
     flux_iex = excess_1(S1 + P - flux_peff, aux_imax, nearzero=nearzero)
     flux_iex = F.relu(flux_iex)
-
-    # (the old start-of-step S1 version was removed: capacity excess must see
-    # the same-day input, per the healthy dMoT intermediate-state convention)
 
     # Update S1 final
     S1_new = S1 + P - flux_ei - flux_peff - flux_iex
@@ -145,7 +124,6 @@ def vic_step(
     # --- 2. Soil Moisture Store (S2) ---
     # Total potential infiltration from above
     potential_inf = flux_peff + flux_iex
-    zeros = torch.zeros_like(potential_inf)
 
     # flux_qie: Infiltration excess runoff (VIC-specific formulation)
     flux_qie = saturation_2(S2, smmax, b, potential_inf, nearzero=nearzero)

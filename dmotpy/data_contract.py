@@ -11,7 +11,7 @@ import pandas as pd
 import torch
 
 
-CALENDAR_MODELS = frozenset({"mopex4", "mopex5", "vic"})
+CALENDAR_MODELS = frozenset({"mopex4", "mopex5"})
 
 
 def calendar_features(

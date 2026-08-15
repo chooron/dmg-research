@@ -11,13 +11,12 @@ import time
 from pathlib import Path
 
 BENCHMARK_ROOT = Path(__file__).resolve().parents[1]
-sys.path[:0] = [str(BENCHMARK_ROOT), str(BENCHMARK_ROOT / "src"), str(BENCHMARK_ROOT.parents[1])]
+sys.path[:0] = [str(BENCHMARK_ROOT), str(BENCHMARK_ROOT / "src")]
 
 from src.model_registry import NPARAM_INFO_36
 
 LOGS_DIR = BENCHMARK_ROOT / "logs" / "dpl_pool"
-CHECKPOINTS_DIR = BENCHMARK_ROOT / "checkpoints" / "dpl"
-RESULTS_DIR = BENCHMARK_ROOT / "results" / "dpl"
+CHECKPOINTS_DIR = BENCHMARK_ROOT / "checkpoints" / "dpl_production_20260730"
 LOGS_DIR.mkdir(parents=True, exist_ok=True)
 
 ALL_MODELS = list(NPARAM_INFO_36.keys())
@@ -25,9 +24,7 @@ ALL_MODELS = list(NPARAM_INFO_36.keys())
 
 def run_constant_pool_of_6(
     models_queue: list[str],
-    epochs: int = 100,
-    min_epochs: int = 50,
-    patience: int = 10,
+    epochs: int = 10,
     batch_size: int = 100,
     device: str = "cuda",
     max_workers: int = 6,
@@ -46,11 +43,8 @@ def run_constant_pool_of_6(
     completed_checkpoints: list[str] = []
     pending_models: list[str] = []
     for model in models_queue:
-        # Completion is signalled by the canonical DONE marker
-        # (results/dpl/{model}/1-kge/seed42/DONE), not by a fixed-epoch file:
-        # early stopping may legitimately finish before the epoch budget.
-        done = RESULTS_DIR / model / "1-kge" / "seed42" / "DONE"
-        if skip_completed and done.exists():
+        checkpoint = CHECKPOINTS_DIR / model / f"epoch_{epochs:02d}.pt"
+        if skip_completed and checkpoint.exists():
             completed_checkpoints.append(model)
         else:
             pending_models.append(model)
@@ -91,8 +85,6 @@ def run_constant_pool_of_6(
                         str(BENCHMARK_ROOT / "scripts" / "run_dpl_benchmark_dmg_native.py"),
                         "--model", model,
                         "--epochs", str(epochs),
-                        "--min-epochs", str(min_epochs),
-                        "--patience", str(patience),
                         "--batch_size", str(batch_size),
                         "--device", device,
                     ]
@@ -159,9 +151,7 @@ def run_constant_pool_of_6(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Constant worker pool for all dPL models")
-    parser.add_argument("--epochs", type=int, default=100, help="Maximum epochs budget (early stopping may finish earlier)")
-    parser.add_argument("--min-epochs", type=int, default=50, help="Early stopping never triggers before this epoch")
-    parser.add_argument("--patience", type=int, default=10, help="Stop after N epochs without validation-KGE improvement (after min-epochs)")
+    parser.add_argument("--epochs", type=int, default=10)
     parser.add_argument("--batch_size", type=int, default=100)
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--max_workers", type=int, default=6)
@@ -177,8 +167,6 @@ def main() -> None:
     run_constant_pool_of_6(
         models,
         epochs=args.epochs,
-        min_epochs=args.min_epochs,
-        patience=args.patience,
         batch_size=args.batch_size,
         device=args.device,
         max_workers=args.max_workers,

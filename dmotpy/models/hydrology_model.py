@@ -54,7 +54,7 @@ class HydrologyModel(nn.Module):
     ) -> "HydrologyModel":
         if cls is not HydrologyModel:
             return super().__new__(cls)
-        if config and config.get("model_name", "").lower() in {"mopex4", "mopex5", "vic"}:
+        if config and config.get("model_name", "").lower() in {"mopex4", "mopex5"}:
             from .mopex_doy_model import MopexDoyModel
 
             return super().__new__(MopexDoyModel)

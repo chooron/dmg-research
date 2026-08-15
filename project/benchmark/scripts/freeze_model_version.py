@@ -46,19 +46,8 @@ def main() -> None:
     paths = sorted((BENCHMARK_ROOT / "dmotpy/models").rglob("*.py"))
     paths += sorted((BENCHMARK_ROOT / "src").glob("*.py"))
     paths += [BENCHMARK_ROOT / "scripts/run_36model_benchmark.py", Path(config["_resolved_from"])]
-    # Deduplicate on the resolved path (a dmotpy symlink under BENCHMARK_ROOT
-    # resolves outside it) but keep the original relative path as the manifest
-    # key so validate_full300_config.py can re-open it through the same layout.
-    seen: set[Path] = set()
-    source_hashes: dict[str, str] = {}
-    for path in paths:
-        if "__pycache__" in path.parts:
-            continue
-        resolved = path.resolve()
-        if resolved in seen:
-            continue
-        seen.add(resolved)
-        source_hashes[str(path.relative_to(BENCHMARK_ROOT))] = digest(resolved)
+    unique = sorted({path.resolve() for path in paths if "__pycache__" not in path.parts})
+    source_hashes = {str(path.relative_to(BENCHMARK_ROOT)): digest(path) for path in unique}
     bounds = {name: get_spec(name).bounds.cpu().tolist() for name in NPARAM_INFO_36}
     try:
         git_head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=BENCHMARK_ROOT, text=True).strip()

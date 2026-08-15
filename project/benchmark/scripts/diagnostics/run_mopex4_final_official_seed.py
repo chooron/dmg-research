@@ -69,10 +69,10 @@ BATCH, STEPS, WINDOW, WARMUP = 100, 169, 730, 365
 def resolve_run_config(model: str) -> tuple:
     if model == "mopex4":
         i0, i1, phen = "alpha", "is_time", ()
-        env, default = "MOPEX4_OUT", "results/dpl/mopex4/1-kge"
+        env, default = "MOPEX4_OUT", "results/dpl_mopex4_final_20260811"
     elif model == "mopex5":
         i0, i1, phen = "alpha", "is_time", ("tmin", "trange")
-        env, default = "MOPEX5_OUT", "results/dpl/mopex5/1-kge"
+        env, default = "MOPEX5_OUT", "results/dpl_mopex5_final_20260812"
     else:
         raise ValueError(f"unsupported canonical dPL model: {model}")
     return i0, i1, phen, Path(_os.environ.get(env, str(ROOT / default)))
@@ -82,7 +82,7 @@ import os as _os
 MODEL = "mopex4"
 I0, I1 = "alpha", "is_time"
 PHEN: tuple[str, ...] = ()
-OUT_ROOT = Path(_os.environ.get("MOPEX4_OUT", str(ROOT / "results/dpl/mopex4/1-kge")))
+OUT_ROOT = Path(_os.environ.get("MOPEX4_OUT", str(ROOT / "results/dpl_mopex4_final_20260811")))
 
 
 def load_module(path: Path, name: str):

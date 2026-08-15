@@ -75,12 +75,7 @@ def percolation_5(
     """
     # Assuming S >= 0 from global constraints
     ratio = F.relu(S) / (Smax + nearzero)
-    # Guard the power term: for ratio >> 1 the potential flow is far above S,
-    # so ``min(S, potential)`` selects S either way.  Clamping the ratio keeps
-    # the FP32 power from overflowing to inf (which would poison the backward
-    # pass through 0*inf) without changing any finite-domain result.
-    safe_ratio = torch.clamp(ratio + nearzero, max=1e3)
-    potential_flow = p1 * safe_ratio.pow(p2)
+    potential_flow = p1 * (ratio + nearzero).pow(p2)
     return torch.minimum(S, potential_flow)
 
 
