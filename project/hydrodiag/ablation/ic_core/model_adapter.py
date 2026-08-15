@@ -136,6 +136,7 @@ class ModelAdapter:
         forcing_names: tuple[str, ...] = ("P", "T", "PET"),
         temp_mean_train: torch.Tensor | None = None,
         temp_std_train: torch.Tensor | None = None,
+        cn_psol_annual: torch.Tensor | None = None,
         return_states: bool = False,
     ) -> tuple[torch.Tensor, dict[str, Any]]:
         if physical_parameters.ndim == 1:
@@ -168,6 +169,15 @@ class ModelAdapter:
             elif temp_std_train.shape[0] != n_params:
                 temp_std_train = temp_std_train.repeat_interleave(n_params // temp_std_train.shape[0])
             model_forcing["temp_std_train"] = temp_std_train
+        if cn_psol_annual is not None:
+            cn_psol_annual = cn_psol_annual.to(device=self.device, dtype=self.dtype).reshape(-1)
+            if cn_psol_annual.shape[0] == 1 and n_params > 1:
+                cn_psol_annual = cn_psol_annual.expand(n_params)
+            elif cn_psol_annual.shape[0] != n_params:
+                cn_psol_annual = cn_psol_annual.repeat_interleave(
+                    n_params // cn_psol_annual.shape[0]
+                )
+            model_forcing["cn_psol_annual"] = cn_psol_annual
         params = {
             name: physical_parameters[:, index].to(device=self.device, dtype=self.dtype)
             for index, name in enumerate(self.parameter_names)

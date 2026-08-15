@@ -260,8 +260,15 @@ def load_data(config: dict, indices: dict[str, tuple[int, int]], max_basins: int
 
     with open(config["data_pkl_dataset"], "rb") as handle:
         dataset_forcing, dataset_target, all_attributes = pickle.load(handle)
-    attributes = np.asarray(all_attributes, dtype=np.float32)[selected]
-
+    # Attribute normalization is defined on the FULL configured basin list
+    # (the canonical 531 set), so subset/smoke runs share the same input
+    # preprocessing semantics as the full run and as the R3 truth mapping
+    # g*(A).  The network input rows are sliced to the run's basin subset
+    # after normalization in main().
+    configured_selected = np.array(
+        [id_to_index[basin_id] for basin_id in configured_basin_ids], dtype=np.int64
+    )
+    attributes = np.asarray(all_attributes, dtype=np.float32)[configured_selected]
     axis = {"precip": FORCING_NAMES.index("P"),
             "temp": FORCING_NAMES.index("T"),
             "pet": FORCING_NAMES.index("PET")}
@@ -288,7 +295,7 @@ def load_data(config: dict, indices: dict[str, tuple[int, int]], max_basins: int
         }
         calibration_obs = convert_streamflow_ft3s_to_mm_day(
             target[:, ci_s:ci_e + 1, 0],
-            attributes[:, AREA_GAGES2_ATTRIBUTE_INDEX],
+            attributes[:len(basin_ids), AREA_GAGES2_ATTRIBUTE_INDEX],
         )
         eval_warmup_start = ei_s - config["window"]["warmup_days"]
         evaluation_forcing = {
@@ -297,7 +304,7 @@ def load_data(config: dict, indices: dict[str, tuple[int, int]], max_basins: int
         }
         evaluation_obs = convert_streamflow_ft3s_to_mm_day(
             target[:, ei_s:ei_e + 1, 0],
-            attributes[:, AREA_GAGES2_ATTRIBUTE_INDEX],
+            attributes[:len(basin_ids), AREA_GAGES2_ATTRIBUTE_INDEX],
         )
     elif data_source == "npz_559":
         raw = np.load(config["data_npz"], allow_pickle=True)
@@ -321,6 +328,69 @@ def load_data(config: dict, indices: dict[str, tuple[int, int]], max_basins: int
         evaluation_obs = target[ei_s:ei_e + 1, :len(basin_ids), 0].transpose().copy()
     else:
         raise ValueError(f"Unsupported data_source: {data_source}")
+
+    # R3 synthetic-truth target override: replace the observed calibration /
+    # evaluation targets with Q* (mm/day) from an NPZ aligned to the full
+    # [n_basins, n_time] axis.  Unit conversion is skipped because Q* is
+    # already mm/day.  Absent this key the loader behaves exactly as before.
+    target_override = config.get("target_override_npz")
+    if target_override:
+        override = np.load(target_override)
+        if "target_mm_day" not in override:
+            raise ValueError("target_override_npz must contain key 'target_mm_day'")
+        full = np.asarray(override["target_mm_day"], dtype=np.float32)
+        if full.ndim == 3 and full.shape[2] == 1:
+            full = full[:, :, 0]
+        if full.ndim != 2:
+            raise ValueError("target_override_npz target must be [basin, time]")
+        n_time_full = int(np.asarray(dataset_target).shape[1])
+        if full.shape[0] != len(configured_basin_ids) or full.shape[1] != n_time_full:
+            raise ValueError(
+                f"target_override_npz shape {full.shape} does not match "
+                f"[{len(configured_basin_ids)}, {n_time_full}]"
+            )
+        if not np.isfinite(full).all() or (full < 0).any():
+            raise ValueError("target_override_npz must be finite and non-negative")
+        # Select override rows by basin ID: the override's row axis follows
+        # its own stored basin_ids (the canonical 531 order), which may
+        # differ from the configured basin-list order (e.g. the R3 pilot
+        # reorders the 531 list with the pilot basins first).  Position-based
+        # selection silently paired basins with the wrong Q* rows.
+        override_basin_ids = None
+        if "basin_ids" in override:
+            override_basin_ids = [str(b) for b in override["basin_ids"]]
+            if set(override_basin_ids) != set(configured_basin_ids):
+                raise ValueError(
+                    "target_override_npz basin_ids do not match the configured basin list"
+                )
+            positions = np.array(
+                [override_basin_ids.index(b) for b in basin_ids], dtype=np.int64
+            )
+        else:
+            positions = np.array(
+                [configured_basin_ids.index(b) for b in basin_ids], dtype=np.int64
+            )
+        selected_override = full[positions]
+        calibration_obs = selected_override[:, ci_s:ci_e + 1].copy()
+        evaluation_obs = selected_override[:, ei_s:ei_e + 1].copy()
+        config["target_override_applied"] = {
+            "path": str(target_override),
+            "shape": list(full.shape),
+            "unit": "mm/day (synthetic Q*)",
+        }
+        # Synthetic-truth protocol: the CN snow-cover threshold must use the
+        # canonical full-record mean annual solid precipitation (the same
+        # quantity the generating truth used), not a per-window estimate.
+        # ``forcing`` holds the full time axis for the run's basins.
+        if data_source == "camels_dataset_pickle" and forcing.ndim == 3:
+            from models.cemaneige import _estimate_psol_annual
+
+            forcing_t = torch.from_numpy(forcing)
+            cn_psol_annual = _estimate_psol_annual(
+                forcing_t[:, :, axis["precip"]], forcing_t[:, :, axis["temp"]]
+            ).numpy().astype(np.float32, copy=False)
+            train_forcing["cn_psol_annual"] = cn_psol_annual
+            evaluation_forcing["cn_psol_annual"] = cn_psol_annual.copy()
 
     # Freeze basin-wise statistics from the calibration portion only.  The
     # forcing windows include warmup, so remove that prefix before computing
@@ -689,7 +759,10 @@ def main() -> None:
     )
     attrs_np, attr_stats = robust_normalize(raw_attrs)
     np.savez_compressed(output_dir / "attribute_normalization.npz", **attr_stats)
-    attributes = torch.from_numpy(attrs_np)
+    # raw_attrs covers the full configured basin list (canonical 531);
+    # slice to the run's basin subset after normalization so subset runs
+    # share the canonical preprocessing semantics.
+    attributes = torch.from_numpy(attrs_np[:len(basin_ids)])
 
     win = config["window"]
     warmup_days = int(win["warmup_days"])
@@ -884,6 +957,10 @@ def main() -> None:
             }
             for key in ("temp_mean_train", "temp_std_train"):
                 fc[key] = torch.from_numpy(train_forcing[key][batch_index].copy()).to(device)
+            if "cn_psol_annual" in train_forcing:
+                fc["cn_psol_annual"] = torch.from_numpy(
+                    train_forcing["cn_psol_annual"][batch_index].copy()
+                ).to(device)
             obs = torch.from_numpy(calibration_obs[batch_index[:, None], target_index].copy()).to(device)
             qsim, _ = model(forcings=fc, params=params)
             kge = kge_per_basin(qsim[:, warmup_days:], obs)

@@ -40,6 +40,22 @@ class ICObjectiveRuntime:
         self.basin_batch_size = int(config["batching"].get("basin_batch_size", 4))
         self.cache_device_data = bool(config.get("batching", {}).get("cache_device_data", False))
         self._device_split_cache: dict[str, tuple[torch.Tensor, torch.Tensor, int]] = {}
+        # Canonical CN forcing-derived quantity (R3 synthetic protocol):
+        # when requested, the CN snow-cover threshold uses the mean annual
+        # solid precipitation computed once from the FULL basin record, so
+        # split/window evaluations reproduce the generating truth exactly.
+        # Default (flag absent) keeps the historical per-sequence estimate.
+        self._cn_psol_annual: np.ndarray | None = None
+        if bool(config.get("canonical_cn_psol_annual", False)) and model_key.endswith("_CN"):
+            from models.cemaneige import _estimate_psol_annual
+
+            forcing_t = torch.from_numpy(self.bundle.forcing)
+            precip = forcing_t[:, :, 0]
+            temp = forcing_t[:, :, 1]
+            with torch.no_grad():
+                self._cn_psol_annual = _estimate_psol_annual(precip, temp).numpy().astype(
+                    np.float32, copy=False
+                )
 
     def _split_arrays(self, split: str) -> tuple[np.ndarray, np.ndarray, int]:
         if split == "train":
@@ -119,6 +135,9 @@ class ICObjectiveRuntime:
         q_full, _ = self.model_adapter.run_model(
             forcing_expanded, physical_flat, forcing_names=self.bundle.forcing_names,
             temp_mean_train=temp_mean_train, temp_std_train=temp_std_train,
+            cn_psol_annual=(torch.from_numpy(self._cn_psol_annual[basin_array])
+                            .to(device=self.device, dtype=torch.float32)
+                            if self._cn_psol_annual is not None else None),
         )
         q_eval = q_full[:, warmup_days:].reshape(n_basins, population, -1)
         return self.objective.evaluate(q_eval, target_tensor)

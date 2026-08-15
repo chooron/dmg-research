@@ -152,7 +152,14 @@ class GR4JWithCemaNeige(BaseHydrologicalModel):
 
         ctg = cn_params["cn_ctg"]
         kf = cn_params["cn_kf"]
-        g_thresh = 0.9 * _estimate_psol_annual(precip, temp)
+        # Optional canonical override: ``forcings["cn_psol_annual"]``
+        # precomputes the mean annual solid precipitation from a fixed full
+        # record so the snow-cover threshold does not depend on this call's
+        # own sequence length (used by the R3 synthetic-truth protocol).
+        psol_annual = forcings.get("cn_psol_annual")
+        if psol_annual is None:
+            psol_annual = _estimate_psol_annual(precip, temp)
+        g_thresh = 0.9 * psol_annual
         G, eTG = _init_basic_states(batch, device, dtype, cn_initial)
         x1 = gr4j_params["x1"]
         x2 = gr4j_params["x2"]
@@ -281,7 +288,13 @@ class XAJWithCemaNeige(BaseHydrologicalModel):
         # loop, exactly as in the standalone XAJ implementation.
         ctg = cn_params["cn_ctg"]
         kf = cn_params["cn_kf"]
-        g_thresh = 0.9 * _estimate_psol_annual(precip, temp)
+        # Optional canonical override (same semantics as the other CN
+        # compositions): ``forcings["cn_psol_annual"]`` fixes the mean annual
+        # solid precipitation from the full record instead of this sequence.
+        psol_annual = forcings.get("cn_psol_annual")
+        if psol_annual is None:
+            psol_annual = _estimate_psol_annual(precip, temp)
+        g_thresh = 0.9 * psol_annual
         G, eTG = _init_basic_states(batch, device, dtype, cn_initial)
         xaj_step_params = _prepare_xaj_parameters(xaj_params)
         (
@@ -431,7 +444,13 @@ class SIMHYDWithCemaNeige(BaseHydrologicalModel):
 
         ctg = cn_params["cn_ctg"]
         kf = cn_params["cn_kf"]
-        g_thresh = 0.9 * _estimate_psol_annual(precip, temp)
+        # Optional canonical override (same semantics as the other CN
+        # compositions): ``forcings["cn_psol_annual"]`` fixes the mean annual
+        # solid precipitation from the full record instead of this sequence.
+        psol_annual = forcings.get("cn_psol_annual")
+        if psol_annual is None:
+            psol_annual = _estimate_psol_annual(precip, temp)
+        g_thresh = 0.9 * psol_annual
         G, eTG = _init_basic_states(batch, device, dtype, cn_initial)
         smsc = simhyd_params["simhyd_smsc"]
         soil, groundwater, runoff_uh_buffer = self._simhyd._init_states(
