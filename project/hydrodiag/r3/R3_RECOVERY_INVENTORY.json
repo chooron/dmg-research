@@ -1,0 +1,263 @@
+{
+  "audit": {
+    "title": "R3 recovery inventory",
+    "date": "2026-08-16",
+    "auditor": "read-first recovery audit (no mutations of scientific artifacts)",
+    "git_checkpoint": {
+      "commit": "8ef95484b24f76bfea07ac4a96aa8611f9455b4f",
+      "branch": "hydrodiag/R3-exp",
+      "pushed": false,
+      "origin_master": "d59365ed3198ba147c092394a33ad6c1af74e51f"
+    },
+    "note": "status values: RECOVERED_VERIFIED | INTACT_REMOTE | LOST_REBUILD | NEVER_RUN | MISSING_CODE | BLOCKED_DATA"
+  },
+  "environment": {
+    "repo_root": "/home/jingxin/code/dmg-research",
+    "worktree": "/home/jingxin/orca/workspaces/dmg-research/hydrodiag-R3-exp",
+    "venv": "/home/jingxin/code/dmg-research/.venv",
+    "python": "3.10.20",
+    "torch": "2.9.1+cu128",
+    "cuda": true,
+    "local_gpu": "NVIDIA GeForce RTX 3060 (1 device)",
+    "remote_host": "connect.westb.seetacloud.com:42368 (alive)",
+    "remote_code_root": "/root/dmg-research (git HEAD 7d1132b; project/hydrodiag untracked)",
+    "remote_data_root": "/autodl-fs/data",
+    "remote_r3_root": "/autodl-fs/r3"
+  },
+  "data": [
+    {
+      "artifact": "531 basin list",
+      "path": "/home/jingxin/code/dmg-research/data/531sub_id.txt",
+      "status": "RECOVERED_VERIFIED",
+      "integrity": "sha256 140dd33776049b3c970a2fab0568c36d7a8f72ab12d45521040aef91de68b444 == gstar_manifest fingerprint",
+      "provenance": "shared data root; matches remote /autodl-fs/data/531sub_id.txt"
+    },
+    {
+      "artifact": "CAMELS dataset tensor",
+      "path": "/home/jingxin/code/dmg-research/data/camels_dataset",
+      "status": "RECOVERED_VERIFIED",
+      "integrity": "sha256 2c4666e2ca5ece74028d5d2aa898754abf25e9a877701b218826547cb4e7a264 == gstar_manifest fingerprint",
+      "provenance": "shared data root"
+    },
+    {
+      "artifact": "gage IDs",
+      "path": "/home/jingxin/code/dmg-research/data/gage_id.npy",
+      "status": "RECOVERED_VERIFIED",
+      "integrity": "sha256 81117b75abf870fbc9195a17d663307dba482621b4d81493ddeb282c437a8144 == gstar_manifest fingerprint",
+      "provenance": "shared data root"
+    },
+    {
+      "artifact": "CAMELS dates",
+      "path": "/home/jingxin/code/dmg-research/data/camels_dates.npy",
+      "status": "RECOVERED_VERIFIED",
+      "integrity": "sha256 abd5b0cfff04a3b66a08a5f54557a6974851a2e98e42d7e7e523202783261126 == gstar_manifest fingerprint; restored from remote during audit (was missing locally)",
+      "provenance": "restored from /autodl-fs/data/camels_dates.npy (remote)"
+    }
+  ],
+  "code": [
+    {
+      "artifact": "r3 package (17 modules + protocol + README + HANDOFF + docs/kge_audit.md)",
+      "path": "project/hydrodiag/r3/",
+      "status": "RECOVERED_VERIFIED",
+      "integrity": "committed in 8ef9548; byte-identical to /root/sync_packages/hydrodiag_src_20260814_1806.tar.gz (sha256 b6414227d45559db05e32a1122a5ed6c1bde68a4f3d8251de54199a341d0b662, verified)",
+      "provenance": "authoritative remote snapshot tar"
+    },
+    {
+      "artifact": "models/composed.py (cn_psol_annual override x3 CN compositions)",
+      "path": "project/hydrodiag/models/composed.py",
+      "status": "RECOVERED_VERIFIED",
+      "integrity": "committed; diff vs unpatched local = only the additive override",
+      "provenance": "remote tar"
+    },
+    {
+      "artifact": "models/cemaneige.py (cn_psol_annual override)",
+      "path": "project/hydrodiag/models/cemaneige.py",
+      "status": "RECOVERED_VERIFIED",
+      "integrity": "committed; additive override, default unchanged",
+      "provenance": "remote tar"
+    },
+    {
+      "artifact": "ablation/ic_core/model_adapter.py (cn_psol_annual pass-through)",
+      "path": "project/hydrodiag/ablation/ic_core/model_adapter.py",
+      "status": "RECOVERED_VERIFIED",
+      "integrity": "committed; additive",
+      "provenance": "remote tar"
+    },
+    {
+      "artifact": "ablation/ic_core/runtime.py (canonical cn_psol_annual when flag set)",
+      "path": "project/hydrodiag/ablation/ic_core/runtime.py",
+      "status": "RECOVERED_VERIFIED",
+      "integrity": "committed; flag-gated, default unchanged",
+      "provenance": "remote tar"
+    },
+    {
+      "artifact": "training/dpl/run_dpl_model.py (full-531 normalization + target_override_npz + basin-ID alignment)",
+      "path": "project/hydrodiag/training/dpl/run_dpl_model.py",
+      "status": "RECOVERED_VERIFIED",
+      "integrity": "committed; basin-ID row selection with set-equality guard",
+      "provenance": "remote tar"
+    },
+    {
+      "artifact": "training/ic/run_tgd2_batched_cmaes_531.py (XAJ/XAJ_CN/XAJ_TGD2 + --target-npz)",
+      "path": "project/hydrodiag/training/ic/run_tgd2_batched_cmaes_531.py",
+      "status": "RECOVERED_VERIFIED",
+      "integrity": "committed; XAJ 15, XAJ_CN 17, XAJ_TGD2 17 registered",
+      "provenance": "remote tar"
+    },
+    {
+      "artifact": "tests/test_r3_truth_generator.py (9 tests)",
+      "path": "project/hydrodiag/tests/test_r3_truth_generator.py",
+      "status": "RECOVERED_VERIFIED",
+      "integrity": "9/9 PASS (run from committed worktree)",
+      "provenance": "remote tar"
+    },
+    {
+      "artifact": "tests/test_r3_forward_identity.py (7 tests)",
+      "path": "project/hydrodiag/tests/test_r3_forward_identity.py",
+      "status": "RECOVERED_VERIFIED",
+      "integrity": "4 PASS, 3 SKIP (need truth NPZ locally), 1 BLOCKED (needed camels_dates.npy — now restored)",
+      "provenance": "remote tar"
+    },
+    {
+      "artifact": "repo-root helpers r3_remote_chain.py / r3_watch_remote.sh",
+      "path": "<repo root> (historical worktree)",
+      "status": "MISSING_CODE",
+      "integrity": "n/a",
+      "provenance": "mentioned in HANDOFF only; never committed; functional equivalent remote_misspec_dpl.py exists at /autodl-fs/r3/remote_misspec_dpl.py"
+    }
+  ],
+  "results": [
+    {
+      "artifact": "synthetic truth v1",
+      "path": "/autodl-fs/r3/r3_synthetic_truth_v1/ (remote); expected local results/r3_synthetic_truth_v1/",
+      "status": "INTACT_REMOTE",
+      "integrity": "theta_star [531,17] f64; q_star target_mm_day [531,12418]; x_star 7 states; snow_star 6 vars; final_states [531,9]; roundtrip 0.0 (17 chunks); K=15; alpha=316.2278; cv_r2_total=0.9391; frac_snow_index=3; theta_star_equals_g_star=True; NOT yet fetched locally (~250 MB)",
+      "provenance": "created 2026-08-13; code commit d59365e (dirty); manifest fingerprints verified"
+    },
+    {
+      "artifact": "Base dPL 531 seed 42",
+      "path": "/autodl-fs/r3/results/r3_misspec_dpl_xaj_seed_42/ (remote)",
+      "status": "INTACT_REMOTE",
+      "integrity": "COMPLETE marker; 100 epochs; params [531,15]; basin summary 532 rows (incl header); val KGE median 0.9081, mean 0.7825; config protocol r3_misspec_dpl_synthetic_target_v1",
+      "provenance": "remote chain 2026-08-14, exit_ok in DONE.json"
+    },
+    {
+      "artifact": "Base dPL 531 seed 123",
+      "path": "/autodl-fs/r3/results/r3_misspec_dpl_xaj_seed_123/ (remote)",
+      "status": "INTACT_REMOTE",
+      "integrity": "COMPLETE; 100 epochs; val KGE median 0.9092, mean 0.7840 (report.md), final val_median 0.9071",
+      "provenance": "remote chain, exit_ok"
+    },
+    {
+      "artifact": "Base dPL 531 seed 2026",
+      "path": "/autodl-fs/r3/results/r3_misspec_dpl_xaj_seed_2026/ (remote)",
+      "status": "INTACT_REMOTE",
+      "integrity": "COMPLETE; 100 epochs; val KGE median 0.9092, mean 0.7840 (report.md), final val_median 0.9059",
+      "provenance": "remote chain, exit_ok"
+    },
+    {
+      "artifact": "TGD2 dPL 531 seed 42",
+      "path": "/autodl-fs/r3/results/r3_misspec_dpl_xaj_tgd2_seed_42/ (remote)",
+      "status": "INTACT_REMOTE",
+      "integrity": "COMPLETE; 100 epochs; params [531,17]; val KGE median 0.9443, mean 0.9017",
+      "provenance": "remote chain, exit_ok"
+    },
+    {
+      "artifact": "TGD2 dPL 531 seed 123",
+      "path": "/autodl-fs/r3/results/r3_misspec_dpl_xaj_tgd2_seed_123/ (remote)",
+      "status": "INTACT_REMOTE",
+      "integrity": "COMPLETE; 100 epochs; val KGE median 0.9443, mean 0.9017 (report.md)",
+      "provenance": "remote chain, exit_ok"
+    },
+    {
+      "artifact": "TGD2 dPL 531 seed 2026",
+      "path": "/autodl-fs/r3/results/r3_misspec_dpl_xaj_tgd2_seed_2026/ (remote)",
+      "status": "INTACT_REMOTE",
+      "integrity": "COMPLETE; 100 epochs; val KGE median 0.9443, mean 0.9032",
+      "provenance": "remote chain, exit_ok"
+    },
+    {
+      "artifact": "correct-CN IC gate 531",
+      "path": "results/r3_gate_ic_xaj_cn_531_v1/ (expected; gone)",
+      "status": "LOST_REBUILD",
+      "integrity": "no artifact; numbers only in HANDOFF (median 0.9993, 63.4 min, 5310 records); re-run via run_gate_531.py (10 starts x 300 gens)",
+      "provenance": "was on remote AutoDL per HANDOFF, results 'downloaded & verified' locally; both copies gone"
+    },
+    {
+      "artifact": "correct-CN dPL gate seeds 42/123/2026",
+      "path": "results/r3_gate_dpl_xaj_cn_seed_<s>/ (expected; gone)",
+      "status": "LOST_REBUILD",
+      "integrity": "no artifact; numbers only in HANDOFF (val 0.9953/0.9950/0.9954); re-run via launch_d2_parallel.py",
+      "provenance": "was on remote per HANDOFF; gone"
+    },
+    {
+      "artifact": "Base-no-refit knockout",
+      "path": "results/r3_base_no_refit_v1/ (expected; gone)",
+      "status": "LOST_REBUILD",
+      "integrity": "no artifact; regenerable with r3/run_base_no_refit.py (forwards only, cheap)",
+      "provenance": "recorded in README/HANDOFF as completed"
+    },
+    {
+      "artifact": "oracle identity + dPL audit outputs",
+      "path": "results/r3_gate_v1/oracle_identity.json, oracle_dpl_audit.json (expected; gone)",
+      "status": "LOST_REBUILD",
+      "integrity": "no artifact; regenerable with r3/oracle_identity.py + r3/oracle_dpl_audit.py",
+      "provenance": "recorded in README (IC train 3.8e-6; dPL window median 1.0000)"
+    },
+    {
+      "artifact": "gate analysis outputs (13 files)",
+      "path": "results/r3_gate_v1/{gate_report.json,gate_report.md,gate_manifest.json,gate_input_validation.json,parameters_recoverability.csv,parameter_recovery_summary.csv,ic_restart_parameter_dispersion.csv,dpl_seed_parameter_spread.csv,gate_discharge_metrics.csv,kge_vs_parameter_recovery.csv,kge_deficit_vs_frac_snow.csv,gate_state_metrics_basin.csv,gate_state_summary.json} (expected; gone)",
+      "status": "LOST_REBUILD",
+      "integrity": "no artifact; regenerated by r3/gate_analysis.py once gates exist (CPU, cheap)",
+      "provenance": "script mtimes (gate_analysis.py 09:28, gate_report_md.py 09:11) and protocol citations imply it ran 2026-08-14 morning; outputs gone"
+    },
+    {
+      "artifact": "12-basin engineering pilot",
+      "path": "results/r3_pilot_v1/ + r3_pilot_v1_ic_* / r3_pilot_v1_dpl_* (expected; gone)",
+      "status": "LOST_REBUILD",
+      "integrity": "no artifact; engineering-only; regenerable with r3/pilot.py",
+      "provenance": "HANDOFF: IC stages done, 8/9 dPL complete at stop point"
+    },
+    {
+      "artifact": "Base-IC / TGD2-IC 531 misspec runs",
+      "path": "results/r3_misspec_ic_xaj_531_v1/, r3_misspec_ic_xaj_tgd2_531_v1/ (expected; absent)",
+      "status": "NEVER_RUN",
+      "integrity": "no artifact anywhere (local, remote, git); DONE.json covers dPL only",
+      "provenance": "optional per historical plan; not launched"
+    },
+    {
+      "artifact": "remote chain driver + DONE + log",
+      "path": "/autodl-fs/r3/remote_misspec_dpl.py, DONE.json, chain.log (remote)",
+      "status": "INTACT_REMOTE",
+      "integrity": "DONE.json all 6 exit_ok, completed 2026-08-14T12:18Z; note 'fetch to local results root and verify before shutdown' (NOT done)",
+      "provenance": "remote chain v1"
+    }
+  ],
+  "protocol": [
+    {
+      "artifact": "protocol_misspec_v1.json (predeclared tiers/estimands)",
+      "path": "project/hydrodiag/r3/protocol_misspec_v1.json (committed); /root/dmg-research/... (remote)",
+      "status": "RECOVERED_VERIFIED",
+      "integrity": "frozen 2026-08-14 10:02, first misspec 531 dPL result 16:07 -> frozen ~6h before results; matches task's historical description verbatim (pairs, delta_KGE, e/delta_abs_e/delta_e, tiers, states, wd secondary, wt derived, cn_only diagnostics)",
+      "provenance": "committed in 8ef9548; byte-identical to remote"
+    },
+    {
+      "artifact": "KGE formula audit",
+      "path": "project/hydrodiag/r3/docs/kge_audit.md (committed)",
+      "status": "RECOVERED_VERIFIED",
+      "integrity": "documents standard KGE everywhere; KGE' wording = pre-existing doc discrepancy, not code",
+      "provenance": "committed in 8ef9548"
+    }
+  ],
+  "integrity_checks_run": [
+    "git fsck --lost-found: no dangling commits (R3 code not recoverable from git history)",
+    "git reflog: only d59365e + 8ef9548; historical task/hydrodiag-r3 branch never existed in refs",
+    "R3 test suites from committed tree: 12 passed / 3 skipped (truth NPZ not local) / 1 blocked (resolved by restoring camels_dates.npy)",
+    "truth NPZ/JSON content validated directly (shapes, keys, roundtrip 0.0, gstar numbers)",
+    "6 misspec dPL configs validated from primary config.json (protocol, target, seeds, epochs, periods)",
+    "basin_final_summary.csv row counts (532 incl header) and npz shapes validated per result dir",
+    "data file sha256 == recorded gstar fingerprints (local + remote)",
+    "committed code vs authoritative remote tar: byte-identical for all source files",
+    "local unpatched files vs committed patched files: diff shows only the additive R3 changes"
+  ]
+}

@@ -15,7 +15,7 @@ Last updated: 2026-08-14 (UTC+8). Next session: read this file first, then
   (gitignored; R1/R2 artifacts live here too — never modify them).
 - **Python**: `/home/jingxin/code/dmg-research/.venv` (3.10, torch 2.9.1+cu128).
 - **Remote AutoDL node**: `connect.westb.seetacloud.com` port **20280**,
-  root password `X/efoh7qudSA`, SSH key `~/.ssh/r3_autodl` (installed).
+  root password `<REDACTED — see local secret store / rotate before reuse>`, SSH key `~/.ssh/r3_autodl` (installed).
   **Node is currently POWERED OFF** (shut down after the gate runs completed
   and results were fetched). Code at `/root/dmg-research/project/hydrodiag`,
   run products at `/autodl-fs/r3/`. If the node reboots, the SSH port changes
