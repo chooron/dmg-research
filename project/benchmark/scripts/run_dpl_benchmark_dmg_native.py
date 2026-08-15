@@ -15,6 +15,7 @@ import sys
 import time
 from pathlib import Path
 
+import json
 import numpy as np
 import pandas as pd
 import torch
@@ -41,8 +42,9 @@ from src.data_selection import load_ids
 from src.model_registry import NPARAM_INFO_36, build_model, get_spec
 
 DATA_DIR = BENCHMARK_ROOT.parents[1] / "data"
-RESULTS_DIR = BENCHMARK_ROOT / "results" / "dpl_results"
-CHECKPOINTS_DIR = BENCHMARK_ROOT / "checkpoints" / "dpl_production_20260730"
+# Results follow the canonical layout: results/{method}/{model}/{loss}/{seed}/.
+RESULTS_DIR = BENCHMARK_ROOT / "results" / "dpl"
+CHECKPOINTS_DIR = BENCHMARK_ROOT / "checkpoints" / "dpl"
 
 RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 CHECKPOINTS_DIR.mkdir(parents=True, exist_ok=True)
@@ -322,6 +324,30 @@ class DmgNativeBenchmarkTrainer(BaseTrainer):
     def calc_metrics(self, obs: np.ndarray, sim: np.ndarray) -> Metrics:
         return Metrics(obs, sim)
 
+    def _evaluate_validation(self) -> tuple[float, float, np.ndarray]:
+        """Evaluate frozen parameterizer on the full 1995-2010 validation period.
+
+        Returns (val_kge_median, val_kge_mean, per_basin_kge_np).
+        """
+        warmup_days = int(self.config["model"].get("warmup", 365))
+        self.parameterizer.eval()
+        with torch.no_grad():
+            val_pred_params = self.parameterizer(self.norm_attr)
+            val_raw_params = val_pred_params.unsqueeze(-1)
+            val_x_t = torch.as_tensor(self.val_x, dtype=torch.float32, device=self.device)
+            val_x_t, _ = add_calendar_forcing(
+                val_x_t,
+                self.validation_dates,
+                model_name=self.model_name,
+            )
+            val_y_t = torch.as_tensor(self.val_y, dtype=torch.float32, device=self.device)
+            val_q_sim = self.hydro_model({"x_phy": val_x_t}, (None, val_raw_params))["streamflow"].squeeze(-1).squeeze(-1)
+            _, per_basin_kge = compute_differentiable_kge(val_q_sim, val_y_t, warmup_days=warmup_days)
+            val_kge_np = per_basin_kge.cpu().numpy()
+            val_kge_median = float(np.nanmedian(val_kge_np))
+            val_kge_mean = float(np.nanmean(val_kge_np))
+        return val_kge_median, val_kge_mean, val_kge_np
+
     def train_benchmark(self) -> dict:
         print(f"\n========================================================")
         print(f"   DMG Native dPL Training for [{self.model_name.upper()}]")
@@ -329,8 +355,11 @@ class DmgNativeBenchmarkTrainer(BaseTrainer):
         print(f"   Variance Filter: min_observation_std = {self.config['model'].get('min_observation_std', 0.01)} mm/day")
         print(f"========================================================", flush=True)
 
-        model_ckpt_dir = CHECKPOINTS_DIR / self.model_name
+        # Canonical layout: results|checkpoints/{method}/{model}/{loss}/{seed}/
+        model_ckpt_dir = CHECKPOINTS_DIR / self.model_name / "1-kge" / f"seed{self.config['random_seed']}"
         model_ckpt_dir.mkdir(parents=True, exist_ok=True)
+        result_dir = RESULTS_DIR / self.model_name / "1-kge" / f"seed{self.config['random_seed']}"
+        (result_dir / "final").mkdir(parents=True, exist_ok=True)
 
         history = []
         window_length = self.config["model"]["rho"]  # 730
@@ -338,6 +367,13 @@ class DmgNativeBenchmarkTrainer(BaseTrainer):
 
         t0 = time.time()
 
+        # Early-stopping policy: never stop before min_epochs; afterwards stop
+        # when validation median KGE has not improved for `patience` epochs.
+        min_epochs = int(self.config["train"].get("min_epochs", 50))
+        patience = int(self.config["train"].get("patience", 10))
+        best_val_kge = -float("inf")
+        best_epoch = 0
+        stop_reason = ""
         for epoch in range(1, self.epochs + 1):
             self.parameterizer.train()
             epoch_loss_sum = 0.0
@@ -391,7 +427,23 @@ class DmgNativeBenchmarkTrainer(BaseTrainer):
             avg_epoch_loss = epoch_loss_sum / self.n_minibatch
             history.append({"epoch": epoch, "loss_1_minus_kge": avg_epoch_loss})
 
-            print(f"Epoch [{epoch:02d}/{self.epochs:02d}] Train Loss (1-KGE): {avg_epoch_loss:.4f}", flush=True)
+            # Full-period validation every epoch: drives best-checkpoint selection and early stopping
+            val_kge_median, _, _ = self._evaluate_validation()
+            improved = val_kge_median > best_val_kge
+            if improved:
+                best_val_kge = val_kge_median
+                best_epoch = epoch
+                torch.save({
+                    "epoch": epoch,
+                    "model_name": self.model_name,
+                    "parameterizer_state": self.parameterizer.state_dict(),
+                    "optimizer_state": self.optimizer.state_dict(),
+                    "loss": avg_epoch_loss,
+                    "val_kge_median": val_kge_median,
+                }, model_ckpt_dir / "best.pt")
+            history[-1]["val_median_kge"] = val_kge_median
+
+            print(f"Epoch [{epoch:02d}/{self.epochs:02d}] Train Loss (1-KGE): {avg_epoch_loss:.4f} | Val KGE: {val_kge_median:.4f}{' *' if improved else ''}", flush=True)
             # Save Checkpoints Every 5 Epochs
             if epoch % 5 == 0 or epoch == self.epochs:
                 ckpt_path = model_ckpt_dir / f"epoch_{epoch:02d}.pt"
@@ -401,32 +453,33 @@ class DmgNativeBenchmarkTrainer(BaseTrainer):
                     "parameterizer_state": self.parameterizer.state_dict(),
                     "optimizer_state": self.optimizer.state_dict(),
                     "loss": avg_epoch_loss,
+                    "val_median_kge": val_kge_median,
                 }, ckpt_path)
                 print(f"  --> Checkpoint Saved -> {ckpt_path.name}", flush=True)
 
+            # Early stopping: only after min_epochs, stop after `patience` epochs without improvement
+            if epoch >= min_epochs and (epoch - best_epoch) >= patience:
+                stop_reason = f"early_stop_patience_{patience}_no_improve_since_epoch_{best_epoch}"
+                print(f"  --> Early stopping at epoch {epoch} (best epoch {best_epoch}, val KGE {best_val_kge:.4f})", flush=True)
+                break
+
         elapsed_time = time.time() - t0
+        actual_epochs = history[-1]["epoch"] if history else 0
+
+        # Reload the best checkpoint and re-evaluate for canonical per-basin metrics
+        best_ckpt = model_ckpt_dir / "best.pt"
+        if best_ckpt.exists():
+            payload = torch.load(best_ckpt, map_location=self.device, weights_only=False)
+            self.parameterizer.load_state_dict(payload["parameterizer_state"])
+            best_epoch = int(payload["epoch"])
+            best_val_kge = float(payload.get("val_kge_median", best_val_kge))
+            print(f"Loaded best checkpoint epoch {best_epoch} (val KGE {best_val_kge:.4f})", flush=True)
+        if not stop_reason:
+            stop_reason = "completed_all_epochs"
 
         # Full 15-year Validation Evaluation using DMG Metrics
         print(f"\nEvaluating Model [{self.model_name}] on 1995-2010 Validation Set...", flush=True)
-        self.parameterizer.eval()
-        with torch.no_grad():
-            val_pred_params = self.parameterizer(self.norm_attr)
-            val_raw_params = val_pred_params.unsqueeze(-1)
-
-            val_x_t = torch.as_tensor(self.val_x, dtype=torch.float32, device=self.device)
-            val_x_t, _ = add_calendar_forcing(
-                val_x_t,
-                self.validation_dates,
-                model_name=self.model_name,
-            )
-            val_y_t = torch.as_tensor(self.val_y, dtype=torch.float32, device=self.device)
-
-            val_q_sim = self.hydro_model({"x_phy": val_x_t}, (None, val_raw_params))["streamflow"].squeeze(-1).squeeze(-1)
-            val_loss, per_basin_kge = compute_differentiable_kge(val_q_sim, val_y_t, warmup_days=warmup_days)
-
-            val_kge_np = per_basin_kge.cpu().numpy()
-            val_kge_median = float(np.nanmedian(val_kge_np))
-            val_kge_mean = float(np.nanmean(val_kge_np))
+        val_kge_median, val_kge_mean, val_kge_np = self._evaluate_validation()
 
         print(f"=== DMG Validation Complete for [{self.model_name}] in {elapsed_time:.1f}s ===", flush=True)
         print(f"Validation KGE Median: {val_kge_median:.4f} | Validation KGE Mean: {val_kge_mean:.4f}", flush=True)
@@ -434,16 +487,26 @@ class DmgNativeBenchmarkTrainer(BaseTrainer):
         summary_data = {
             "model_name": self.model_name,
             "epochs": self.epochs,
-            "train_loss_final": history[-1]["loss_1_minus_kge"],
+            "actual_epochs": actual_epochs,
+            "min_epochs": min_epochs,
+            "patience": patience,
+            "best_epoch": best_epoch,
+            "stop_reason": stop_reason,
+            "train_loss_final": history[-1]["loss_1_minus_kge"] if history else None,
             "val_kge_median": val_kge_median,
             "val_kge_mean": val_kge_mean,
+            "val_kge_median_best": best_val_kge,
             "elapsed_seconds": elapsed_time,
         }
 
-        # Save per-basin validation KGE CSV
+        # Save per-basin validation KGE CSV + run summary (canonical layout)
         by_basin_df = pd.DataFrame({"basin_id": [f"{b:08d}" for b in self.ids], "val_kge": val_kge_np})
-        by_basin_csv = RESULTS_DIR / f"dpl_{self.epochs}ep_{self.model_name}_by_basin.csv"
+        by_basin_csv = result_dir / "final" / "basin_metrics.csv"
         by_basin_df.to_csv(by_basin_csv, index=False, float_format="%.4f")
+        pd.DataFrame(history).to_csv(result_dir / "epochs.csv", index=False, float_format="%.4f")
+        (result_dir / "summary.json").write_text(json.dumps(summary_data, indent=2) + "\n")
+        # DONE marker: worker-pool completion signal (replaces epoch-file check)
+        (result_dir / "DONE").write_text(json.dumps(summary_data, indent=2) + "\n")
 
         return summary_data
 
@@ -451,10 +514,12 @@ class DmgNativeBenchmarkTrainer(BaseTrainer):
 def main():
     parser = argparse.ArgumentParser(description="Run DMG Native Production dPL Benchmark for 36 Models")
     parser.add_argument("--model", default="simhyd", help="Target model name or 'all'")
-    parser.add_argument("--epochs", type=int, default=20)
+    parser.add_argument("--epochs", type=int, default=100, help="Maximum epochs (upper budget)")
+    parser.add_argument("--min-epochs", type=int, default=50, help="Early stopping never triggers before this epoch")
+    parser.add_argument("--patience", type=int, default=10, help="Stop after N epochs without validation-KGE improvement (after min-epochs)")
     parser.add_argument("--batch_size", type=int, default=100)
-    parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
+    parser.add_argument("--lr", type=float, default=1e-3)
     args = parser.parse_args()
 
     config = {
@@ -463,6 +528,8 @@ def main():
         "train_time": ["1980/10/01", "1995/09/30"],
         "train": {
             "epochs": args.epochs,
+            "min_epochs": args.min_epochs,
+            "patience": args.patience,
             "batch_size": args.batch_size,
             "lr": args.lr,
         },
@@ -485,8 +552,9 @@ def main():
             print(f"ERROR running DMG Native dPL for model [{m}]: {e}")
 
     if all_summaries:
+        (RESULTS_DIR / "_summary").mkdir(parents=True, exist_ok=True)
         summary_df = pd.DataFrame(all_summaries)
-        summary_csv = RESULTS_DIR / f"dpl_{args.epochs}ep_model_summary.csv"
+        summary_csv = RESULTS_DIR / "_summary" / "dpl_model_summary.csv"
         summary_df.to_csv(summary_csv, index=False, float_format="%.4f")
 
 

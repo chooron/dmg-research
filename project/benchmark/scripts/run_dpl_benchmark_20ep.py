@@ -7,7 +7,7 @@ Features:
 - Input attributes: 35-dimensional Caravan attributes matrix (aligned to 671/531 basins)
 - Training schedule: 20 Epochs, saving PyTorch checkpoints every 5 epochs (epochs 5, 10, 15, 20)
 - Validation: Evaluates frozen MLP parameters on 1995-2010 validation set across 531 basins
-- Results: Saved to project/benchmark/results/dpl_results/ alongside IC (CMA-ES) benchmark
+- Results: Saved to project/benchmark/results/dpl/{model}/1-kge/seed42/ (canonical layout) alongside IC (CMA-ES) benchmark
 """
 import argparse
 import json
@@ -37,8 +37,9 @@ from src.data_selection import load_ids
 from src.model_registry import NPARAM_INFO_36, build_model, get_spec
 
 DATA_DIR = BENCHMARK_ROOT.parents[1] / "data"
-RESULTS_DIR = BENCHMARK_ROOT / "results" / "dpl_results"
-CHECKPOINTS_DIR = BENCHMARK_ROOT / "checkpoints" / "dpl_production_20260730"
+# Results follow the canonical layout: results/{method}/{model}/{loss}/{seed}/.
+RESULTS_DIR = BENCHMARK_ROOT / "results" / "dpl"
+CHECKPOINTS_DIR = BENCHMARK_ROOT / "checkpoints" / "dpl"
 
 RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 CHECKPOINTS_DIR.mkdir(parents=True, exist_ok=True)
@@ -183,8 +184,11 @@ def train_dpl_for_model(
 
     optimizer = optim.AdamW(parameterizer.parameters(), lr=lr, weight_decay=1e-4)
 
-    # Output Checkpoint Folder for Model
-    model_ckpt_dir = CHECKPOINTS_DIR / model_name
+    # Output folders follow the canonical layout: results|checkpoints/{method}/{model}/{loss}/{seed}/
+    seed_dir = RESULTS_DIR / model_name / "1-kge" / "seed42"
+    seed_dir.mkdir(parents=True, exist_ok=True)
+    (seed_dir / "final").mkdir(parents=True, exist_ok=True)
+    model_ckpt_dir = CHECKPOINTS_DIR / model_name / "1-kge" / "seed42"
     model_ckpt_dir.mkdir(parents=True, exist_ok=True)
 
     history = []
@@ -281,10 +285,13 @@ def train_dpl_for_model(
         "elapsed_seconds": elapsed_time,
     }
 
-    # Save per-basin validation KGE CSV
+    # Save per-basin validation KGE CSV + run summary (canonical layout)
     by_basin_df = pd.DataFrame({"basin_id": [f"{b:08d}" for b in ids], "val_kge": val_kge_np})
-    by_basin_csv = RESULTS_DIR / f"dpl_20ep_{model_name}_by_basin.csv"
+    by_basin_csv = seed_dir / "final" / "basin_metrics.csv"
     by_basin_df.to_csv(by_basin_csv, index=False, float_format="%.4f")
+    with (seed_dir / "summary.json").open("w") as fh:
+        json.dump(summary_data, fh, indent=2)
+        fh.write("\n")
 
     return summary_data
 
@@ -313,7 +320,7 @@ def main():
     # Save Overall Summary CSV
     if all_summaries:
         summary_df = pd.DataFrame(all_summaries)
-        summary_csv = RESULTS_DIR / "dpl_20ep_model_summary.csv"
+        summary_csv = RESULTS_DIR / "_summary" / "dpl_model_summary.csv"
         summary_df.to_csv(summary_csv, index=False, float_format="%.4f")
         print(f"\n========================================================")
         print(f"Overall dPL Benchmark Summary Saved -> {summary_csv}")

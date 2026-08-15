@@ -6,7 +6,15 @@ from .hydrology_model import HydrologyModel
 
 
 class TCMModel(HydrologyModel):
-    """Specialized model for TCM, which requires climatological mean precipitation."""
+    """Specialized model for TCM, which requires climatological mean precipitation.
+
+    ``mean_P`` is the basin-level static precipitation mean (CAMELS/Caravan
+    ``p_mean`` attribute, physical mm/d, non-trainable).  The caller supplies
+    it through ``x_dict["p_mean"]`` with shape ``(n_grid,)`` (or
+    ``(n_grid, n_groups)``).  For backward compatibility with legacy direct
+    calls that omit it, a fallback recomputes the window mean from forcing,
+    but production paths must always pass the static attribute.
+    """
 
     def forward(
         self,
@@ -20,7 +28,17 @@ class TCMModel(HydrologyModel):
         params_dict = self._descale_params(raw)
 
         forcing = x_dict["x_phy"]
-        mean_p = forcing[..., 0].mean(dim=0, keepdim=False).unsqueeze(-1).expand(n_grid, n_groups)
+        if "p_mean" in x_dict:
+            # Canonical static basin p_mean (physical mm/d).  Constant,
+            # requires_grad=False, identical across warmup/train/val/test.
+            p_mean = x_dict["p_mean"]
+            if p_mean.dim() == 1:
+                p_mean = p_mean.unsqueeze(-1)
+            mean_p = p_mean.expand(n_grid, n_groups)
+        else:
+            # Legacy fallback: window precipitation mean.  Kept only so that
+            # direct low-level calls keep working; production must pass p_mean.
+            mean_p = forcing[..., 0].mean(dim=0, keepdim=False).unsqueeze(-1).expand(n_grid, n_groups)
         return self._run_model_with_mean_p(forcing, states, params_dict, n_groups, mean_p)
 
     def _run_model_with_mean_p(

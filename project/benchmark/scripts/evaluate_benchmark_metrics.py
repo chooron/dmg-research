@@ -97,7 +97,7 @@ def main() -> None:
     parser.add_argument("--checkpoint-root", required=True, help="Directory containing completed model checkpoint subfolders")
     parser.add_argument("--config", default="configs/full_run_10starts_300gen_warm1980_1981x5.yaml")
     parser.add_argument("--marrmot-dir", default="references/marrmot_obj1")
-    parser.add_argument("--output-dir", default="results")
+    parser.add_argument("--output-dir", default="results", help="Root dir; per-model results go to {root}/ic/{model}/kge/seed{seed}/ and combined tables to {root}/ic/_summary/")
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--backend", choices=["eager", "compile"], default="compile")
     args = parser.parse_args()
@@ -110,7 +110,9 @@ def main() -> None:
     config = load_resolved_config(config_path)
     validate_full_run_config(config)
     out_dir.mkdir(parents=True, exist_ok=True)
-
+    # Canonical IC layout: {root}/ic/{model}/kge/seed{seed}/ per model, combined tables in {root}/ic/_summary/
+    ic_root = out_dir / "ic"
+    seed_label = f"seed{int(config['global_seed'])}"
     completed_dirs = [p for p in sorted(ckpt_root.iterdir()) if p.is_dir() and (p / "DONE").is_file()]
     if not completed_dirs:
         raise RuntimeError(f"No completed model directories found in {ckpt_root}")
@@ -125,6 +127,11 @@ def main() -> None:
             summary["elapsed_s"] = time.perf_counter() - t0
             all_frames.append(frame)
             summaries.append(summary)
+            # Per-model artifacts under the canonical layout
+            model_out = ic_root / mdir.name / "kge" / seed_label
+            model_out.mkdir(parents=True, exist_ok=True)
+            frame.to_csv(model_out / "full300_kge_by_basin.csv", index=False)
+            pd.DataFrame([summary]).to_csv(model_out / "model_summary.csv", index=False)
             print(f"[{idx}/{len(completed_dirs)}] Evaluated [{mdir.name}] in {summary['elapsed_s']:.2f}s | Train KGE: {summary['train_kge_median']:.4f} | Test KGE: {summary['test_kge_median']:.4f}")
         except Exception as exc:
             failures.append({"model": mdir.name, "error": str(exc)})
@@ -136,10 +143,12 @@ def main() -> None:
     by_basin = pd.concat(all_frames, ignore_index=True) if all_frames else pd.DataFrame()
     by_model = pd.DataFrame(summaries).sort_values("model") if summaries else pd.DataFrame()
 
-    by_basin.to_csv(out_dir / "full300_kge_by_basin.csv", index=False)
-    by_model.to_csv(out_dir / "full300_kge_model_summary.csv", index=False)
+    summary_dir = ic_root / "_summary"
+    summary_dir.mkdir(parents=True, exist_ok=True)
+    by_basin.to_csv(summary_dir / "full300_kge_by_basin.csv", index=False)
+    by_model.to_csv(summary_dir / "full300_kge_model_summary.csv", index=False)
     if failures:
-        pd.DataFrame(failures).to_csv(out_dir / "full300_kge_evaluation_failures.csv", index=False)
+        pd.DataFrame(failures).to_csv(summary_dir / "full300_kge_evaluation_failures.csv", index=False)
 
     overall = {
         "selection_rule": "best_of_10_by_train_kge_only; test KGE evaluated after parameters are frozen",
@@ -148,7 +157,7 @@ def main() -> None:
         "model_median_train_kge_median": median_or_nan(by_model["train_kge_median"]) if not by_model.empty else float("nan"),
         "model_median_test_kge_median": median_or_nan(by_model["test_kge_median"]) if not by_model.empty else float("nan"),
     }
-    (out_dir / "full300_kge_overall.json").write_text(json.dumps(overall, indent=2) + "\n")
+    (summary_dir / "full300_kge_overall.json").write_text(json.dumps(overall, indent=2) + "\n")
     print(f"\n=== Overall Evaluation Summary ===")
     print(json.dumps(overall, indent=2))
 

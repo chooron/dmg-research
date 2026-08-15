@@ -379,7 +379,7 @@ STATE_INFO = {
     "penman": 3,
     "plateau": 2,
     # "sacramento": 5,
-    "simhyd": 2,
+    "simhyd": 3,  # canonical 3-store m_18 structure (S1 interception, S2 soil, S3 groundwater)
     "smar": 6,
     "susannah1": 2,
     "susannah2": 2,

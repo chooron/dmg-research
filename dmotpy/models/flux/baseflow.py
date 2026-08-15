@@ -58,7 +58,12 @@ def baseflow_5(
     ratio: (S / Smax)^p2
     """
     ratio = S / (Smax + nearzero)
-    term_flow = p1 * (ratio + nearzero).pow(p2)
+    # Same FP32 power-overflow guard as percolation_5: ratio >> 1 selects S
+    # in the final min either way, so clamping the ratio before the power
+    # only removes the inf intermediate (0*inf backward NaN), never the
+    # finite-domain result.
+    safe_ratio = torch.clamp(ratio + nearzero, max=1e3)
+    term_flow = p1 * safe_ratio.pow(p2)
     return torch.minimum(S, term_flow)
 
 
