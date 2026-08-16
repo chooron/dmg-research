@@ -1,0 +1,126 @@
+{
+  "protocol": "r4_soil_state_consistency_v1",
+  "version": "1.0.0",
+  "created_at": "2026-08-16T12:00:00Z",
+  "scientific_objective": "Test whether missing snow processes and parameter compensation in hydrological models (Base vs CN vs TGD2) produce divergent downstream shared soil-water state trajectories in real catchments, and whether explicit snow physics improves consistency against external soil-state references along a snow-burden gradient.",
+  "dataset": {
+    "basin_list_path": "data/531sub_id.txt",
+    "n_basins": 531,
+    "periods": {
+      "warmup": {
+        "start": "1980-10-01",
+        "end": "1981-09-30",
+        "days": 365
+      },
+      "train": {
+        "start": "1981-10-01",
+        "end": "1995-09-30",
+        "days": 5113
+      },
+      "test": {
+        "start": "1995-10-01",
+        "end": "2010-09-30",
+        "days": 5479,
+        "role": "primary_evaluation_period"
+      },
+      "continuous_forward": {
+        "start": "1980-10-01",
+        "end": "2014-09-30",
+        "days": 12418,
+        "initial_states": "zero"
+      }
+    }
+  },
+  "external_soil_reference": {
+    "source": "Caravan v1.1 CAMELS-US subset (ERA5-Land hourly basin-averaged, non-DST local standard time)",
+    "local_path": "G:\\Dataset\\Caravan\\timeseries\\netcdf\\camels\\",
+    "primary_variable": "SM100",
+    "primary_formula": "0.07 * volumetric_soil_water_layer_1_mean + 0.21 * volumetric_soil_water_layer_2_mean + 0.72 * volumetric_soil_water_layer_3_mean",
+    "primary_depth_range": "0-100 cm depth-weighted composite",
+    "primary_unit": "m3/m3",
+    "sensitivity_variable": "SM289",
+    "sensitivity_formula": "(0.07 * volumetric_soil_water_layer_1_mean + 0.21 * volumetric_soil_water_layer_2_mean + 0.72 * volumetric_soil_water_layer_3_mean + 1.89 * volumetric_soil_water_layer_4_mean) / 2.89",
+    "sensitivity_depth_range": "0-289 cm full-profile depth-weighted composite",
+    "sensitivity_unit": "m3/m3",
+    "semantics": "external process-state consistency reference; NOT ground-truth soil moisture"
+  },
+  "model_soil_state": {
+    "primary_variable": "W_total",
+    "primary_formula": "wu + wl + wd",
+    "unit": "mm (catchment tension water storage)",
+    "component_stores": {
+      "wu": "upper layer tension water store (capacity um)",
+      "wl": "lower layer tension water store (capacity lm)",
+      "wd": "deep layer tension water store (capacity dm)"
+    },
+    "comparability_principles": [
+      "NO absolute storage comparison (mm vs m3/m3 is physically non-convertible)",
+      "NO 1-to-1 depth horizon mapping between conceptual XAJ layers and physical ERA5-Land layers",
+      "Evaluate standardized dynamics, seasonal correlations, deseasonalized anomaly correlations, and seasonal recharge timing"
+    ]
+  },
+  "time_resolutions": {
+    "primary_daily": "raw daily series (test period, 5479 days)",
+    "primary_smoothed": "7-day centered rolling mean (min_periods=4, boundary-padded)",
+    "robustness_monthly": "calendar monthly mean (180 months)"
+  },
+  "anomaly_definition": {
+    "method": "calendar_month_climatology_subtracted",
+    "formula": "x_anom[t] = x[t] - mean_{same_calendar_month}(x)"
+  },
+  "timing_diagnostics": {
+    "soil_peak_timing": "day-of-water-year (Oct 1 = 1) of annual maximum soil moisture / W_total",
+    "spring_wetup_timing": "day-of-water-year of maximum 14-day soil moisture increase (recharge onset)",
+    "validity_rules": {
+      "min_annual_swe_peak_mm": 5.0,
+      "min_annual_model_peak_mm": 0.1,
+      "min_valid_years_per_basin": 5
+    }
+  },
+  "snow_burden_environmental_axes": {
+    "primary": "Snow-17 ensemble median annual maximum SWE [mm] over WY 1996..2010 (r4_swe_reference_v1)",
+    "secondary_duration": "Snow-17 median SWE-positive days over WY 1996..2010",
+    "baseline_attribute": "CAMELS static attribute frac_snow (index 3)"
+  },
+  "models_and_provenance": {
+    "XAJ": {
+      "label": "Base",
+      "model_class": "XAJLite",
+      "dimension": 15
+    },
+    "XAJ_CN": {
+      "label": "CN",
+      "model_class": "XAJWithCemaNeigeLite",
+      "dimension": 17
+    },
+    "XAJ_TGD2": {
+      "label": "TGD2",
+      "model_class": "XAJWithTGD2Lite",
+      "dimension": 17,
+      "status": "TGD2_PENDING"
+    },
+    "estimation_regimes": {
+      "dpl_canonical": {
+        "run_root": "dpl_camels_531_lite_v2",
+        "available_seeds": [42, 123],
+        "missing_seeds": [2026],
+        "tag": "OFFICIAL_DPL_OBSERVATION_TRAINED"
+      },
+      "ic_fused_sensitivity": {
+        "run_root": "ic_cmaes_recalibration_p20_p25_20260728_fused",
+        "protocol": "5 starts x 200 generations, observed discharge",
+        "tag": "IC_FUSED_5x200_SENSITIVITY"
+      }
+    }
+  },
+  "paired_effects": {
+    "primary_contrast": "Delta(CN - Base) = Consistency(CN) - Consistency(Base) per basin",
+    "statistical_methods": [
+      "Spearman rank correlation rho vs snow burden",
+      "Theil-Sen robust slope estimator",
+      "Nonparametric basin-level bootstrap 95% CI (2000 replicates, fixed seed 20260730)",
+      "Snow burden quartile breakdown Q0-Q3"
+    ]
+  },
+  "output_directory": "results/r4_phase1_soil_official/"
+}
