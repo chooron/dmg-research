@@ -148,8 +148,13 @@ def main() -> None:
             missing.append(f"IC-{struct}")
             continue
         est = load_ic_estimates(ic_dir, basin_ids)
-        z_ic = np.stack([z_shared(est, b, names) for b in basin_ids])
-        z_cn = np.stack([z_shared(cn_ic, b, names) for b in basin_ids])
+        # theta_hat is in the fit's OWN parameter order (Base: 15 shared in R2
+        # order; TGD2: tgd_* + shared); map COMMON_XAJ via the fit's names, not
+        # the generating-truth (CN) names.
+        fit_names = est[basin_ids[0]]["parameter_names"]
+        z_ic = np.stack([z_shared(est, b, fit_names) for b in basin_ids])
+        z_cn = np.stack([z_shared(cn_ic, b, cn_ic[basin_ids[0]]["parameter_names"])
+                         for b in basin_ids])
         for k, b in enumerate(basin_ids):
             rows_discharge.append({
                 "basin_id": b, "paradigm": "IC", "structure": struct,
@@ -175,9 +180,11 @@ def main() -> None:
         for s in SEEDS:
             est_s = load_dpl_estimates(dpl_dirs[s], basin_ids)
             cn_s = cn_dpl[s]
+            dpl_names = est_s[basin_ids[0]]["parameter_names"]
+            cn_dpl_names = cn_s[basin_ids[0]]["parameter_names"]
             for k, b in enumerate(basin_ids):
-                z_m = z_shared(est_s, b, names)
-                z_c = z_shared(cn_s, b, names)
+                z_m = z_shared(est_s, b, dpl_names)
+                z_c = z_shared(cn_s, b, cn_dpl_names)
                 rows_discharge.append({
                     "basin_id": b, "paradigm": "dPL", "seed": s, "structure": struct,
                     "kge_train": float("nan"), "kge_test": est_s[b]["test_kge"],

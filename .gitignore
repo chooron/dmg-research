@@ -88,3 +88,4 @@ MARRMoT/
 !.env.template
 # --- Scoped negation (after *.csv): canonical pipeline index/registry CSVs are tracked ---
 !project/benchmark/docs/*.csv
+r3_runlogs/

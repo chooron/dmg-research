@@ -95,7 +95,18 @@ def _utcnow() -> str:
 
 def load_ic_estimates(run_dir: Path, basin_ids: list[str]) -> dict[str, dict]:
     """Best train-KGE restart per basin, plus all per-start theta/z records."""
-    raw_dir = run_dir / "raw" / "xaj_cn"
+    # The IC runner writes per-basin-start records under raw/<model_key>/
+    # (e.g. raw/xaj_cn for XAJ_CN, raw/xaj for XAJ, raw/xaj_tgd2 for
+    # XAJ_TGD2).  Discover the subdirectory instead of assuming the CN key
+    # so the same loader serves the correct-CN gate and the Base/TGD2
+    # misspecification IC runs (analysis mechanics only; no protocol change).
+    raw_candidates = [
+        run_dir / "raw" / "xaj_cn",
+        run_dir / "raw" / "xaj",
+        run_dir / "raw" / "xaj_tgd2",
+        run_dir / "raw",
+    ]
+    raw_dir = next((p for p in raw_candidates if p.is_dir()), raw_candidates[0])
     records: dict[str, list[tuple[float, int, dict]]] = {}
     for path in sorted(raw_dir.glob("*.json")):
         data = json.loads(path.read_text())
@@ -115,6 +126,7 @@ def load_ic_estimates(run_dir: Path, basin_ids: list[str]) -> dict[str, dict]:
             "theta_hat": np.asarray(data["parameters"], dtype=np.float64),
             "restart": start,
             "seed": data.get("seed"),
+            "parameter_names": tuple(data.get("parameter_names", ())),
             "train_kge": _kge,
             "test_kge": float(data.get("test_metrics", {}).get("kge", np.nan)),
             "starts": starts,
@@ -157,6 +169,7 @@ def load_dpl_estimates(run_dir: Path, basin_ids: list[str]) -> dict[str, dict]:
             "theta_hat": params[i].astype(np.float64),
             "restart": None,
             "seed": config.get("training", {}).get("seed"),
+            "parameter_names": names,
             "train_kge": np.nan,
             "test_kge": float(kge_by_basin.get(basin, np.nan)),
             "source_file": str(run_dir / "best_parameters_physical.npz"),
@@ -430,6 +443,18 @@ def main() -> None:
                                    "run": fit_name, "variable": var, "period": season}
                             row.update(state_metrics(sim, truth))
                             state_rows.append(row)
+                    # derived total tension-water storage wt = wu + wl + wd
+                    # (protocol_misspec_v1.json state_estimands; secondary).
+                    for period, (si, ei) in (("train", pi["train"]), ("test", pi["test"])):
+                        wt = (stores["wu"].detach().cpu().numpy()[b, si:ei + 1].astype(np.float64)
+                              + stores["wl"].detach().cpu().numpy()[b, si:ei + 1].astype(np.float64)
+                              + stores["wd"].detach().cpu().numpy()[b, si:ei + 1].astype(np.float64))
+                        wt_truth = (x_star["wu"][k, si:ei + 1] + x_star["wl"][k, si:ei + 1]
+                                    + x_star["wd"][k, si:ei + 1])
+                        row = {"basin_id": basin_ids[k], "paradigm": fit_name.split("_")[0],
+                               "run": fit_name, "variable": "wt", "period": period}
+                        row.update(state_metrics(wt, wt_truth))
+                        state_rows.append(row)
         q_hat[fit_name] = q_full
         for k, basin in enumerate(basin_ids):
             row = {"basin_id": basin, "paradigm": fit_name.split("_")[0], "run": fit_name}
