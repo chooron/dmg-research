@@ -24,7 +24,14 @@ from typing import Any, Optional
 
 import numpy as np
 
-from . import DEV_ONLY, OFFICIAL_OBSERVATION_TRAINED, SYNTHETIC_TRAINED
+from . import (
+    DEV_ONLY,
+    DEV_ONLY_SYNTHETIC_TRAINED,
+    IC_FUSED_5x200_SENSITIVITY,
+    OFFICIAL_DPL_OBSERVATION_TRAINED,
+    OFFICIAL_OBSERVATION_TRAINED,
+    SYNTHETIC_TRAINED,
+)
 from .common import MODEL_KEYS, PERIOD_INDEX, bundle_config, load_bundle, zfill8
 from .state_export import (
     cn_psol_gthresh,
@@ -167,17 +174,28 @@ def export_run(
     validate_subset: int = 8,
     periods: tuple[str, ...] = ("train", "test"),
     csv_basin_subset: Optional[list[str]] = None,
+    save_npz: bool = True,
     extra_notes: Optional[dict[str, Any]] = None,
 ) -> dict[str, Any]:
-    """Run the R4 export pipeline and write daily CSVs + a manifest.
+    """Run the R4 export pipeline and write per-run artifacts + a manifest.
 
     ``tag`` must be one of r4.DEV_ONLY / r4.SYNTHETIC_TRAINED /
     r4.OFFICIAL_OBSERVATION_TRAINED.  ``run_id`` is the output directory
-    name under ``results_root``.
+    name under ``results_root``.  ``save_npz`` (default True) writes the
+    compact full-axis arrays (q + per-day states, float32); daily CSVs are
+    written only when ``csv_basin_subset`` is given.
     """
     import torch
 
-    if tag not in (DEV_ONLY, SYNTHETIC_TRAINED, OFFICIAL_OBSERVATION_TRAINED):
+    ALLOWED_TAGS = (
+        DEV_ONLY,
+        SYNTHETIC_TRAINED,
+        DEV_ONLY_SYNTHETIC_TRAINED,
+        OFFICIAL_OBSERVATION_TRAINED,
+        OFFICIAL_DPL_OBSERVATION_TRAINED,
+        IC_FUSED_5x200_SENSITIVITY,
+    )
+    if tag not in ALLOWED_TAGS:
         raise ValueError(f"unknown output tag: {tag!r}")
     if structure not in MODEL_KEYS:
         raise ValueError(f"unknown structure: {structure!r}")
@@ -213,14 +231,27 @@ def export_run(
     )
 
     dates = bundle.dates
-    csv_basins = [zfill8(b) for b in (csv_basin_subset or expected)]
-    if set(csv_basins) - set(expected):
-        raise ValueError("csv_basin_subset contains basins outside the exported set")
-    tables = build_daily_tables(structure, csv_basins, dates, q_full, states, periods)
-
     out_dir = results_root / f"r4_{run_id}"
     out_dir.mkdir(parents=True, exist_ok=True)
-    csv_paths = write_daily_csv(tables, out_dir, run_id)
+
+    csv_paths: list[Path] = []
+    if csv_basin_subset:
+        csv_basins = [zfill8(b) for b in csv_basin_subset]
+        if set(csv_basins) - set(expected):
+            raise ValueError("csv_basin_subset contains basins outside the exported set")
+        tables = build_daily_tables(structure, csv_basins, dates, q_full, states, periods)
+        csv_paths = write_daily_csv(tables, out_dir, run_id)
+
+    npz_path = None
+    if save_npz:
+        npz_path = out_dir / f"{run_id}_full_arrays.npz"
+        np.savez_compressed(
+            npz_path,
+            basin_ids=np.asarray(expected),
+            dates=np.asarray(dates, dtype="datetime64[D]"),
+            q_full=q_full.astype(np.float32),
+            **{key: states[key].astype(np.float32) for key in states},
+        )
 
     psol = None
     if structure == "XAJ_CN":
@@ -251,6 +282,7 @@ def export_run(
         "pseudo_swe": False,
         "state_columns": list(EXPORT_COLUMNS[structure]),
         "outputs": [str(p) for p in csv_paths],
+        "arrays": str(npz_path) if npz_path is not None else None,
         "n_basins": len(expected),
         "n_days_full": q_full.shape[1],
         "q_finite": bool(np.isfinite(q_full).all()),
