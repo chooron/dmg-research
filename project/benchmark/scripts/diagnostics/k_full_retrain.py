@@ -11,6 +11,7 @@ import argparse
 import csv
 import importlib.util
 import json
+import os
 import sys
 import time
 from pathlib import Path
@@ -30,10 +31,14 @@ from src.data_selection import load_ids
 from src.model_registry import NPARAM_INFO_36, build_model
 
 DEVICE = torch.device("cuda")
-OUT = ROOT / "results/dpl_full_retrain_20260804"
+OUT = ROOT / "results/dpl_full_retrain_20260813"
 MODELS = tuple(NPARAM_INFO_36)
 CONTROL_MODELS = ("collie1", "gr4j", "mopex1", "ihacres", "mopex4", "hillslope")
 BATCH, STEPS, WINDOW, WARMUP, SEED = 100, 169, 730, 365, 42
+BATCH = int(os.environ.get("DPL_BATCH", str(BATCH)))
+MIN_EPOCHS = int(os.environ.get("DPL_MIN_EPOCHS", "50"))
+PATIENCE = int(os.environ.get("DPL_PATIENCE", "10"))
+PLATEAU_EPS = float(os.environ.get("DPL_EPS", "0.001"))
 STOP_ON_PLATEAU = True
 
 
@@ -162,11 +167,11 @@ def run_model(arm: str, model: str, epochs: int, lr: float) -> dict[str, Any]:
         torch.random.set_rng_state(payload["cpu_rng"]); torch.cuda.set_rng_state(payload["cuda_rng"],device=DEVICE)
         start=int(payload["epoch"])+1; invalid_train=int(payload["invalid_train"]); invalid_val=int(payload["invalid_val"])
     epoch_path, gradient_path, status_path, health_path = paths(arm)
-    plateau_values=[]; status="COMPLETED"; final_epoch=start-1
+    plateau_values=[]; status="COMPLETED"; final_epoch=start-1; best_median=float("-inf"); stall=0
     for epoch in range(start, epochs+1):
         network.train(); loss_total=0.; elapsed=0.
         observed=torch.zeros((len(ids),NPARAM_INFO_36[model]),dtype=torch.bool,device=DEVICE)
-        for _ in range(STEPS):
+        for step_i in range(STEPS):
             basins=torch.randperm(len(ids),device=DEVICE)[:BATCH]
             choices=(torch.rand(BATCH,device=DEVICE)*lengths[basins]).long(); starts=catalog[basins,choices]
             x=H1.gather_window(train_x,starts,basins); y=H1.gather_window(train_y,starts,basins)
@@ -174,14 +179,14 @@ def run_model(arm: str, model: str, epochs: int, lr: float) -> dict[str, Any]:
             theta=network(attrs[basins]); theta.retain_grad()
             q=hydro({"x_phy":x},(None,theta.unsqueeze(-1)))["streamflow"].squeeze(-1).squeeze(-1)
             invalid_train += int((~torch.isfinite(q)).sum().detach())
-            loss,_=NATIVE.compute_differentiable_kge(q,y[WARMUP:],warmup_days=0); loss.backward()
+            loss,_kge=NATIVE.compute_differentiable_kge(q,y[WARMUP:],warmup_days=0); loss.backward()
             gradients = [p.grad for p in network.parameters() if p.grad is not None]
             finite_grad = all(bool(torch.isfinite(g).all()) for g in gradients)
             if not finite_grad:
                 bad_theta = theta.grad.detach() if theta.grad is not None else torch.empty(0, device=DEVICE)
                 bad_rows = (torch.nonzero(~torch.isfinite(bad_theta).all(dim=1), as_tuple=False).flatten()
                             if bad_theta.numel() else torch.empty(0, dtype=torch.long, device=DEVICE))
-                append_csv(guard_path(arm), [{"model": model, "epoch": epoch, "batch": int(_),
+                append_csv(guard_path(arm), [{"model": model, "epoch": epoch, "batch": int(step_i),
                     "basin_ids": ";".join(str(int(ids[int(basins[i])])) for i in bad_rows[:64].tolist()),
                     "finite_gradient": False, "action": "SKIP_BATCH"}])
                 optimizer.zero_grad(set_to_none=True)
@@ -205,8 +210,13 @@ def run_model(arm: str, model: str, epochs: int, lr: float) -> dict[str, Any]:
         if epoch%10==0 or epoch==epochs:
             dst=checkpoint(arm,model,epoch); dst.parent.mkdir(parents=True,exist_ok=True)
             torch.save({"epoch":epoch,"network":network.state_dict(),"optimizer":optimizer.state_dict(),"cpu_rng":torch.random.get_rng_state(),"cuda_rng":torch.cuda.get_rng_state(DEVICE),"invalid_train":invalid_train,"invalid_val":invalid_val},dst)
-        if STOP_ON_PLATEAU and len(plateau_values)>=21 and plateau_values[-1]-plateau_values[-21] < .002:
-            status="PLATEAU_STOP"; break
+        if STOP_ON_PLATEAU and epoch >= MIN_EPOCHS:
+            if median > best_median + PLATEAU_EPS:
+                best_median = median; stall = 0
+            else:
+                stall += 1
+            if stall >= PATIENCE:
+                status="PLATEAU_STOP"; break
     summary=summarize_health(arm,model,status,final_epoch,invalid_train,invalid_val)
     append_csv(health_path,[summary]); append_csv(status_path,[{"model":model,"arm":arm,"status":status,"last_epoch":final_epoch,"warmup_grad_mode":warm_mode}])
     del hydro,network,optimizer,train_x,train_y,val_x,val_y; torch.cuda.empty_cache(); return summary
