@@ -209,7 +209,15 @@ class CemaNeige(BaseHydrologicalModel):
 
         ctg = params["cn_ctg"]
         kf = params["cn_kf"]
-        psol_annual = _estimate_psol_annual(precip, temp)
+        # Optional canonical override: when the caller precomputes the mean
+        # annual solid precipitation from a fixed full record
+        # (``forcings["cn_psol_annual"]``, [batch]), use it instead of
+        # re-estimating it from this call's own input sequence.  Absent the
+        # key the historical behavior (estimate from the input sequence) is
+        # unchanged.
+        psol_annual = forcings.get("cn_psol_annual")
+        if psol_annual is None:
+            psol_annual = _estimate_psol_annual(precip, temp)
         g_thresh = 0.9 * psol_annual
         G, eTG = _init_basic_states(batch, device, dtype, initial_states)
 
@@ -281,7 +289,10 @@ class CemaNeigeHyst(BaseHydrologicalModel):
         thacc = params["cn_thacc"]
         rsp = params["cn_rsp"]
 
-        psol_annual = self._estimate_psol_annual(precip, temp)
+        # Optional canonical override (same semantics as CemaNeige.forward).
+        psol_annual = forcings.get("cn_psol_annual")
+        if psol_annual is None:
+            psol_annual = self._estimate_psol_annual(precip, temp)
 
         G, eTG, sca, swe_max = self._init_states(batch, device, dtype, initial_states)
 

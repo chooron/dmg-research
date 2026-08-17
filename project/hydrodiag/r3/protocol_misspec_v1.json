@@ -1,0 +1,92 @@
+{
+  "protocol": "r3_misspecification_v1",
+  "frozen_at": "2026-08-14",
+  "status": "FROZEN before viewing any 531 Base/TGD2 results",
+  "purpose": "Predeclared analysis rules for the Base/TGD2 (misspecified-structure) 531-basin experiment. These rules are fixed and must not be modified after 531 Base/TGD2 results exist.",
+  "scope": "Analysis-only rules; training protocols (IC-CMA-ES / dPL) are the frozen correct-CN gate protocols, reused unchanged with the synthetic target override.",
+
+  "structural_comparisons": {
+    "rule": "All scientific comparisons are within the same parameter-estimation regime.",
+    "pairs": [
+      "Base-IC vs CN-IC",
+      "TGD2-IC vs CN-IC",
+      "Base-dPL vs CN-dPL",
+      "TGD2-dPL vs CN-dPL"
+    ],
+    "note": "R3 is NOT an IC-vs-dPL benchmark; no cross-regime comparison is a primary estimand.",
+    "dpl_seed_matching": {
+      "rule": "dPL comparisons are seed-matched between structures",
+      "pairs": [
+        "Base seed 42 vs CN seed 42",
+        "Base seed 123 vs CN seed 123",
+        "Base seed 2026 vs CN seed 2026",
+        "TGD2 seed 42 vs CN seed 42",
+        "TGD2 seed 123 vs CN seed 123",
+        "TGD2 seed 2026 vs CN seed 2026"
+      ]
+    },
+    "ic_restart_rule": "Existing IC best-restart selection rule per basin (best train-KGE restart, lowest start breaks ties); no restart matching across structures is invented."
+  },
+
+  "discharge_estimands": {
+    "baseline": "absolute KGE vs q_star per basin for each structure",
+    "primary": "delta_KGE[M] = KGE[M] - KGE[CN]  for M in {Base, TGD2}, within regime",
+    "reference": "Base-no-refit remains the raw structural-knockout reference (results/r3_base_no_refit_v1); it is not a fitted-structure comparison."
+  },
+
+  "parameter_estimands": {
+    "normalized_error": "e[M,p,i] = (theta_hat[M,p,i] - theta_star[p,i]) / (upper[p] - lower[p])",
+    "primary_magnitude": "delta_abs_e[M,p,i] = abs(e[M,p,i]) - abs(e[CN,p,i])",
+    "directional_shift": "delta_e[M,p,i] = e[M,p,i] - e[CN,p,i]",
+    "shared_parameters": "the 15 R2 COMMON_XAJ parameters",
+    "snow_gradient": "association of delta_abs_e (primary) and delta_e (secondary) with frac_snow; frac_snow is an environmental diagnostic axis only, no causal claim",
+    "cn_only_diagnostics": ["cn_kf", "cn_ctg"],
+    "cn_only_note": "cn_kf/cn_ctg are CN-only diagnostics, not shared-parameter compensation outcomes; never mixed into shared-parameter aggregates."
+  },
+
+  "predeclared_parameter_tiers": {
+    "rule": "Frozen before reading any 531 Base/TGD2 parameter results. Parameters outside the primary/secondary sets may be reported for completeness but must not be promoted into the primary set after results exist.",
+    "cross_regime_primary_anchor": ["xaj_k"],
+    "ic_primary": ["xaj_k"],
+    "ic_secondary_supporting": ["xaj_b"],
+    "dpl_primary": ["xaj_k", "xaj_theta", "xaj_um", "xaj_cg", "xaj_ci"],
+    "dpl_secondary_supporting": ["xaj_b", "xaj_lm", "xaj_c", "xaj_sm", "xaj_ki"],
+    "interpretation_rule": "Poor IC restart recovery is treated as a mixture of optimization instability and practical non-identifiability/equifinality; it is not described as purely optimization instability unless additional evidence separates them."
+  },
+
+  "state_estimands": {
+    "primary_common_variables": ["wu", "wl", "s", "qi", "qg"],
+    "secondary": ["wd"],
+    "wd_reason": "correct-CN recovery of wd is already poor (gate NRMSE ~1.5-2.5), so it is secondary",
+    "derived_total_tension_storage": {
+      "name": "wt",
+      "definition": "wt = wu + wl + wd (total tension-water storage)",
+      "registered": true,
+      "justification": "XAJ defines the total tension-water capacity as wm = um + lm + dm (models/xaj.py); the three layer states wu/wl/wd are the layer storages of that same capacity, so wu+wl+wd is the repository-consistent total tension-water storage. Computed for all structures; reported as a secondary state variable.",
+      "primary": false
+    },
+    "paired_cost": "delta_E[M] = E[M] - E[CN] for every state metric E, within regime; association of delta_E with frac_snow reported",
+    "prohibition": "TGD2 storage (tgd_storage) is never compared directly with CN snow storage (G) as the same physical state; TGD2 memory is a temperature-conditioned generic precipitation-memory state."
+  },
+
+  "metrics": {
+    "kge": "standard KGE (repository formula, see r3/docs/kge_audit.md)",
+    "state_metrics": ["RMSE", "NRMSE = RMSE/(std(truth)+1e-8)", "temporal Pearson correlation", "mean bias"],
+    "periods": "train 1981-10-01..1995-09-30, test 1995-10-01..2010-09-30, warm-up 365 days; full-axis recorded-forward export"
+  },
+
+  "analysis_outputs": {
+    "one_command": "python r3/misspec_analysis.py (after Base/TGD2 531 results exist)",
+    "tables": [
+      "basin-level paired discharge table (KGE, delta_KGE)",
+      "parameter e / delta_abs_e / delta_e per basin per shared parameter",
+      "seed-matched dPL summaries",
+      "IC restart summaries",
+      "state/flux truth-error and delta_E",
+      "frac_snow associations/regressions for paired excess errors",
+      "Base-no-refit reference",
+      "primary vs secondary labels from this protocol"
+    ],
+    "formats": ["machine-readable CSV/JSON", "concise Markdown report"]
+  }
+}

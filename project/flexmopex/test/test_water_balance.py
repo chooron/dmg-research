@@ -74,7 +74,7 @@ def _check_balance(P, Q_total, ET_total, S1_new, S2_new, Sc1_new, Sc2_new, Sn_ne
     }
 
 
-def test_water_balance_step(params, weights, inputs, states, tolerance=1e-4):
+def _eval_water_balance_step(params, weights, inputs, states, tolerance=1e-4):
     Q, ET, S1n, S2n, Sc1n, Sc2n, Snn = mopex_step(
         P=inputs["P"], T=inputs["T"], PET=inputs["PET"], doy=inputs["doy"],
         w_phen=weights["w_phen"], w_int=weights["w_int"],
@@ -89,7 +89,7 @@ def test_water_balance_step(params, weights, inputs, states, tolerance=1e-4):
     return _check_balance(inputs["P"], Q, ET, S1n, S2n, Sc1n, Sc2n, Snn, states, tolerance)
 
 
-def test_water_balance_step_static(params, inputs, states, tolerance=1e-4):
+def _eval_water_balance_step_static(params, inputs, states, tolerance=1e-4):
     Q, ET, S1n, S2n, Sc1n, Sc2n, Snn = mopex_step_static(
         P=inputs["P"], T=inputs["T"], PET=inputs["PET"], doy=inputs["doy"],
         Sb1=params["Sb1"], tw=params["tw"], tu=params["tu"], Se=params["Se"],
@@ -122,8 +122,8 @@ def run_comprehensive_tests(num_tests=100, batch_size=10, device="cpu", toleranc
         states  = initialize_states(batch_size, device)
 
         for fn_name, res in [
-            ("mopex_step",        test_water_balance_step(params, weights, inputs, states, tolerance)),
-            ("mopex_step_static", test_water_balance_step_static(params, inputs, states, tolerance)),
+            ("mopex_step",        _eval_water_balance_step(params, weights, inputs, states, tolerance)),
+            ("mopex_step_static", _eval_water_balance_step_static(params, inputs, states, tolerance)),
         ]:
             errs = res["error"].cpu().numpy()
             results_by_fn[fn_name]["errors"].extend(errs)
@@ -152,6 +152,11 @@ def run_comprehensive_tests(num_tests=100, batch_size=10, device="cpu", toleranc
 
     return all_passed
 
+
+def test_water_balance_comprehensive():
+    torch.manual_seed(42)
+    np.random.seed(42)
+    assert run_comprehensive_tests(num_tests=20, batch_size=10, device="cpu", tolerance=1e-4)
 
 if __name__ == "__main__":
     torch.manual_seed(42)
