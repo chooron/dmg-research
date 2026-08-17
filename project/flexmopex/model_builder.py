@@ -11,11 +11,21 @@ PHY_MODEL_MODULES: dict[str, str] = {
     "StaticMopex": "project.flexmopex.models.static_mopex",
     "FixedWeightMopex": "project.flexmopex.models.fixed_weight_mopex",
     "LearnedWeightMopex": "project.flexmopex.models.learned_weight_mopex",
+    # --- Experimental interception 2x2 study (never used by production configs) ---
+    "LearnedWeightMopexV1": "project.flexmopex.models.learned_weight_mopex_v1",
+    "LearnedWeightMopexDecoupled": "project.flexmopex.models.learned_weight_mopex_v1",
+    "LearnedWeightMopexV1Decoupled": "project.flexmopex.models.learned_weight_mopex_v1",
+    # --- Interception candidates E/F (formula screening; semantics via config) ---
+    "LearnedWeightMopexE": "project.flexmopex.models.learned_weight_mopex_candidates",
+    "LearnedWeightMopexF": "project.flexmopex.models.learned_weight_mopex_candidates",
 }
 
 NN_MODEL_MODULES: dict[str, str] = {
     "ParamRoutingNet": "project.flexmopex.models.parameter_nets",
     "LearnedStructureNet": "project.flexmopex.models.parameter_nets",
+    "LearnedStructureNetCF": "project.flexmopex.models.learned_weight_mopex_candidates",
+    "LearnedStructureNetDirectAttr": "project.flexmopex.models.learned_weight_mopex_candidates",
+    "LearnedStructureNetHybridEncoder": "project.flexmopex.models.learned_weight_mopex_candidates",
 }
 
 

@@ -372,7 +372,15 @@ def apply_runtime_overrides(
             fixed_weights = _fixed_weight_dict(list(args.fixed_weights))
         config["delta_model"]["phy_model"]["fixed_weights"] = fixed_weights
     else:  # flex / binary
-        config.setdefault("delta_model", {}).setdefault("phy_model", {})["model"] = ["LearnedWeightMopex"]
+        # Default 'flex' selects LearnedWeightMopex unless the config already
+        # names a different (experimental) phy model, e.g. the interception
+        # 2x2 variants. Production configs name LearnedWeightMopex themselves,
+        # so default behavior is unchanged.
+        _phy_model_cfg = config.setdefault("delta_model", {}).setdefault("phy_model", {})
+        _configured_names = list(_phy_model_cfg.get("model") or [])
+        _STANDARD_FLEX_NAMES = {"LearnedWeightMopex", "BinaryWeightMopex", "FixedWeightMopex"}
+        if not _configured_names or set(_configured_names) <= _STANDARD_FLEX_NAMES:
+            _phy_model_cfg["model"] = ["LearnedWeightMopex"]
 
     if model_type == "binary":
         config.setdefault("delta_model", {}).setdefault("phy_model", {})["model"] = ["BinaryWeightMopex"]
@@ -501,13 +509,52 @@ def run_train(config: dict[str, Any], verbose: bool, *, preflight_only: bool = F
     _run_model_preflight(model, loss_func, data_loader.train_dataset, config)
     if preflight_only:
         return
-    trainer = MyTrainer(
-        config,
-        model,
-        train_dataset=data_loader.train_dataset,
-        loss_func=loss_func,
-        verbose=verbose,
+    # Epoch-aware training: use WarmupTrainer (pushes set_current_epoch) when
+    # the config enables structure_warmup_epochs > 0 (full-process parameter
+    # warm-up) or gate_aic_delay_epochs > 0 (delayed gate-AIC gradient
+    # exposure); otherwise the standard MyTrainer path is byte-identical.
+    _epoch_cfg = (
+        config.get("model", {}).get("phy", {}).get("structure_warmup_epochs", 0)
+        or config.get("delta_model", {}).get("phy_model", {}).get("structure_warmup_epochs", 0)
+        or 0
     )
+    _delay_cfg = (
+        config.get("model", {}).get("phy", {}).get("gate_aic_delay_epochs", 0)
+        or config.get("delta_model", {}).get("phy_model", {}).get("gate_aic_delay_epochs", 0)
+        or 0
+    )
+    _cf_cfg = (
+        config.get("model", {}).get("phy", {}).get("counterfactual_supervision", False)
+        or config.get("delta_model", {}).get("phy_model", {}).get("counterfactual_supervision", False)
+        or config.get("counterfactual_supervision", False)
+        or config.get("trainer") == "CFTrainer"
+    )
+    if _cf_cfg:
+        from project.flexmopex.models.cf_trainer import CFTrainer
+        trainer = CFTrainer(
+            config,
+            model,
+            train_dataset=data_loader.train_dataset,
+            loss_func=loss_func,
+            verbose=verbose,
+        )
+    elif int(_epoch_cfg) > 0 or int(_delay_cfg) > 0:
+        from project.flexmopex.models.warmup_trainer import WarmupTrainer
+        trainer = WarmupTrainer(
+            config,
+            model,
+            train_dataset=data_loader.train_dataset,
+            loss_func=loss_func,
+            verbose=verbose,
+        )
+    else:
+        trainer = MyTrainer(
+            config,
+            model,
+            train_dataset=data_loader.train_dataset,
+            loss_func=loss_func,
+            verbose=verbose,
+        )
     trainer.sampler = FlexMopexSampler(config)
     print("Training model...")
     trainer.train()
