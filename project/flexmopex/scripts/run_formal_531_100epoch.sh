@@ -5,9 +5,9 @@
 # Runs:
 #   1. Base:        Fixed w=[0,0,0,0], Candidate E-S0, ParamRoutingNet, MyTrainer
 #   2. Full:        Fixed w=[1,1,1,1], Candidate E-S0, ParamRoutingNet, MyTrainer
-#   3. Flex-0.005:  Learned w, Candidate E-S0, HybridEncoder, CFTrainer, lambda=0.005
-#   4. Flex-0.007:  Learned w, Candidate E-S0, HybridEncoder, CFTrainer, lambda=0.007
-#   5. Flex-0.010:  Learned w, Candidate E-S0, HybridEncoder, CFTrainer, lambda=0.010
+#   3. Flex-0.005:  Learned w, Candidate E-S0, PureAttrEncoder, CFTrainer, lambda=0.005
+#   4. Flex-0.007:  Learned w, Candidate E-S0, PureAttrEncoder, CFTrainer, lambda=0.007
+#   5. Flex-0.010:  Learned w, Candidate E-S0, PureAttrEncoder, CFTrainer, lambda=0.010
 #
 # Protocol:
 #   - CAMELS-US 531 Basins (data/531sub_id.txt)
