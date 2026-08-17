@@ -106,13 +106,8 @@ class CounterfactualTargetGenerator:
         routing = phy._descale_routing_params(p_raw["gamma_uh"])
         base_w = w_learn.detach().clone()
 
-        # Vectorized counterfactual evaluation across all 4 processes (S=8)
-        S = 8
-        w_cf = base_w.repeat(S, 1)
-        for p_idx in range(4):
-            w_cf[(2 * p_idx) * B:(2 * p_idx + 1) * B, p_idx] = 0.0      # OFF
-            w_cf[(2 * p_idx + 1) * B:(2 * p_idx + 2) * B, p_idx] = 1.0  # ON
-
+        # Process-wise counterfactual evaluation (S=2 per process for low VRAM footprint)
+        S = 2
         params_rep = {k: v.repeat(S, 1) for k, v in mopex_params.items()}
         routing_rep = {k: v.repeat(S) for k, v in routing.items()}
         sample_rep = {
@@ -121,25 +116,36 @@ class CounterfactualTargetGenerator:
             "c_nn_norm": attrs.repeat(S, 1).to(self.device),
         }
 
-        P, T_forcing, PET, doy, n_steps, _ = phy._prepare_forcings(sample_rep)
-        Q = phy._run_weighted_loop(P, T_forcing, PET, doy, params_rep, w_cf, n_steps, B * S)
-        Qr = phy._apply_routing(Q.mean(-1), routing_rep)  # [n_out, B * S, 1]
-        n_out = Qr.shape[0]
+        L_fit_off_list = []
+        L_fit_on_list = []
+        std_dev = std_t.view(1, 1, B)
 
-        # Reshape to [n_out, 4 (proc), 2 (off/on), B]
-        Qr_arr = Qr[:, :B * S, 0].view(n_out, 4, 2, B)
-        obs_t = y_t_dev[phy.warm_up:phy.warm_up + n_out].view(n_out, 1, 1, B)
-        # Compute per-basin fit loss for OFF and ON
-        # fit = mean((Q - obs)^2 / std^2) over valid timesteps
-        sq_res = (Qr_arr - obs_t) ** 2 / (std_t.view(1, 1, 1, B) ** 2)
-        mask = ~torch.isnan(obs_t)
-        n_valid_rep = mask.sum(dim=0).clamp(min=1)
-        sq_res = torch.where(mask, sq_res, torch.zeros_like(sq_res))
-        fit_arr = sq_res.sum(dim=0) / n_valid_rep  # [4, 2, B]
+        for p_idx in range(4):
+            w_cf = base_w.repeat(S, 1)
+            w_cf[0:B, p_idx] = 0.0      # OFF
+            w_cf[B:2*B, p_idx] = 1.0    # ON
 
-        L_fit_off = fit_arr[:, 0, :]  # [4, B]
-        L_fit_on = fit_arr[:, 1, :]   # [4, B]
+            P, T_forcing, PET, doy, n_steps, _ = phy._prepare_forcings(sample_rep)
+            Q = phy._run_weighted_loop(P, T_forcing, PET, doy, params_rep, w_cf, n_steps, B * S)
+            Qr = phy._apply_routing(Q.mean(-1), routing_rep)  # [n_out, B * S, 1]
+            n_out = Qr.shape[0]
 
+            Qr_arr = Qr[:, :B * S, 0].view(n_out, 2, B)  # [n_out, 2 (off/on), B]
+            obs_t = y_t_dev[phy.warm_up:phy.warm_up + n_out].view(n_out, 1, B)
+
+            sq_res = (Qr_arr - obs_t) ** 2 / (std_dev ** 2)
+            mask = ~torch.isnan(obs_t)
+            n_valid_rep = mask.sum(dim=0).clamp(min=1)
+            sq_res = torch.where(mask, sq_res, torch.zeros_like(sq_res))
+            fit_arr = sq_res.sum(dim=0) / n_valid_rep  # [2, B]
+
+            L_fit_off_list.append(fit_arr[0].unsqueeze(0))
+            L_fit_on_list.append(fit_arr[1].unsqueeze(0))
+
+        L_fit_off = torch.cat(L_fit_off_list, dim=0)  # [4, B]
+        L_fit_on = torch.cat(L_fit_on_list, dim=0)    # [4, B]
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
         # Compute DeltaJ per process
         # aic_penalty = AIC_ALPHA * cost * (N / (B * n_valid_b))
         q_list = []
