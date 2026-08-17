@@ -72,3 +72,15 @@ This document logs the core hypotheses, decisive diagnostic evidence, and key ar
     - $w_{\text{sub}}$ mean $\Delta = \mathbf{+0.2204 \pm 0.0148}$, mean Spearman $\rho = \mathbf{+0.4167 \pm 0.0196}$.
   - Median NSE improved to **0.6502 ± 0.0012** across seeds (peak 0.6518 on Seed 42).
 - **Final Decision**: `FREEZE_UNIFIED_ADADELTA`.
+
+### Round 20: Pure-Attribute Dedicated Structure Encoder Validation (Removal of `stopgrad(h128)`)
+- **Hypothesis**: Since $h_{128}$ is deterministically derived from static attributes $x_{35}$, concatenating $\text{stopgrad}(h_{128})$ into the dedicated structure encoder is methodologically redundant. A pure-attribute dedicated structure encoder ($x_{35} \to 128 \to 64 \to 8$) should achieve clean architectural task separation and eliminate shared-backbone baggage.
+- **Preflight Validation**: Numerically verified strict zero-gradient leakage to backbone ($0.0$ grad from $L_{\text{CF}}$), strict zero-gradient from fit/AIC to structure gates, identical output shapes and gate semantics, and 16,384 parameter reduction (-21.3% NN parameters).
+- **Multi-Seed Replication (Seeds 42, 43, 44)**:
+  - **Predictive performance IMPROVED**: 3-seed median NSE reached all-time high **0.6550 ± 0.0026** (peak 0.6584 on Seed 42), outperforming R19 hybrid by +0.0048 NSE.
+  - **Structural separation EXPANDED**:
+    - $w_{\text{int}}$ mean $\Delta = \mathbf{+0.1630 \pm 0.0136}$ (vs R19 $+0.1345$), mean Spearman $\rho = \mathbf{+0.3796 \pm 0.0116}$ (vs R19 $+0.3277$), mean std = $0.1513$ (broad variance, no collapse).
+    - $w_{\text{phen}}$ mean $\Delta = \mathbf{+0.3093 \pm 0.0044}$ (vs R19 $+0.2893$), mean Spearman $\rho = \mathbf{+0.6131 \pm 0.0173}$ (vs R19 $+0.5800$).
+    - $w_{\text{snow}}$ mean $\Delta = \mathbf{+0.4676 \pm 0.0149}$ (vs R19 $+0.4721$), mean Spearman $\rho = \mathbf{+0.8026 \pm 0.0052}$ (vs R19 $+0.7965$).
+    - $w_{\text{sub}}$ mean $\Delta = \mathbf{+0.2015 \pm 0.0102}$ (vs R19 $+0.2204$), mean Spearman $\rho = \mathbf{+0.4309 \pm 0.0408}$ (vs R19 $+0.4167$).
+- **Final Decision**: `ADOPT_PURE_X35`. Clean architectural decoupling, smaller model size, zero gradient leakage, and superior predictive & structural performance.

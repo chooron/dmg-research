@@ -27,8 +27,14 @@ log = logging.getLogger(__name__)
 PROCESSES = ["w_phen", "w_int", "w_snow", "w_sub"]
 GATE_IDX = {"w_phen": 0, "w_int": 1, "w_snow": 2, "w_sub": 3}
 COSTS = {"w_phen": 2.0, "w_int": 2.0, "w_snow": 2.0, "w_sub": 1.0}
-AIC_ALPHA = 0.01
 EPS = 1e-12
+
+
+def _extract_aic_alpha(config: dict[str, Any]) -> float:
+    loss_cfg = config.get("loss_function") or config.get("train", {}).get("loss_function") or {}
+    if isinstance(loss_cfg, dict):
+        return float(loss_cfg.get("aic_alpha", 0.01))
+    return 0.01
 
 
 def per_basin_fit(q: torch.Tensor, obs: torch.Tensor, std: torch.Tensor) -> torch.Tensor:
@@ -43,12 +49,19 @@ def per_basin_fit(q: torch.Tensor, obs: torch.Tensor, std: torch.Tensor) -> torc
 class CounterfactualTargetGenerator:
     """Computes detached counterfactual structural targets q for all training basins."""
 
-    def __init__(self, config: dict[str, Any], device: str | torch.device = "cuda:0") -> None:
+    def __init__(
+        self,
+        config: dict[str, Any],
+        device: str | torch.device = "cuda:0",
+        aic_alpha: float | None = None,
+    ) -> None:
         self.config = config
         self.device = torch.device(device)
-        self.aic_alpha = AIC_ALPHA
+        if aic_alpha is not None:
+            self.aic_alpha = float(aic_alpha)
+        else:
+            self.aic_alpha = _extract_aic_alpha(config)
         self.costs = COSTS
-
     @torch.no_grad()
     def generate_targets(
         self,
@@ -204,6 +217,7 @@ class CFTrainer(WarmupTrainer):
             self.config,
             device=self.config.get("device", "cuda:0"),
         )
+        print(f"[CFTrainer] Structural complexity lambda (aic_alpha) = {self.cf_generator.aic_alpha}")
         self.cached_q: Optional[torch.Tensor] = None
         self.epoch_cf_diag: Dict[str, Any] = {}
         self.cf_loss_weight: float = float(self.config.get("cf_loss_weight", 1.0))
@@ -221,7 +235,9 @@ class CFTrainer(WarmupTrainer):
         for model in getattr(self.model, "model_dict", {}).values():
             nn_m = getattr(model, "nn_model", None)
             if nn_m is not None:
-                if hasattr(nn_m, "structure_encoder"):
+                if hasattr(nn_m, "structure_parameters"):
+                    self.weights_head_params.extend(list(nn_m.structure_parameters()))
+                elif hasattr(nn_m, "structure_encoder"):
                     self.weights_head_params.extend(list(nn_m.structure_encoder.parameters()))
                 elif hasattr(nn_m, "heads") and "weights" in nn_m.heads:
                     self.weights_head_params.extend(list(nn_m.heads["weights"].parameters()))
@@ -315,17 +331,17 @@ class CFTrainer(WarmupTrainer):
             # In LearnedStructureNetCF, nn.heads["weights"] already receives shared.detach()
             # If standard LearnedStructureNet is used, we ensure stopgrad explicitly:
             attrs_b = dataset_sample["xc_nn_norm"][0, :, -nn.backbone[0].in_features:].to(self.cached_q.device) if "xc_nn_norm" in dataset_sample else dataset_sample["c_nn_norm"].to(self.cached_q.device)
-            if hasattr(nn, "structure_encoder"):
-                with torch.no_grad():
-                    shared_detached = nn.backbone(attrs_b)
-                struct_input = torch.cat([attrs_b, shared_detached], dim=-1)
-                raw_weights = nn.structure_encoder(struct_input)
-            elif hasattr(nn, "heads") and "weights" in nn.heads and nn.heads["weights"].in_features == attrs_b.shape[-1]:
-                raw_weights = nn.heads["weights"](attrs_b)
-            else:
+            # Model owns structure-logit extraction from static attributes
+            if hasattr(nn, "get_structure_logits"):
+                raw_weights = nn.get_structure_logits(attrs_b)
+            elif hasattr(nn, "structure_encoder"):
+                raw_weights = nn.structure_encoder(attrs_b)
+            elif hasattr(nn, "heads") and "weights" in nn.heads:
                 with torch.no_grad():
                     shared_detached = nn.backbone(attrs_b)
                 raw_weights = nn.heads["weights"](shared_detached)
+            else:
+                raise ValueError(f"NN model {type(nn)} does not support structure logit extraction.")
             raw_weights = torch.clamp(raw_weights, min=-10.0, max=10.0)
             logits = raw_weights.view(raw_weights.shape[0], 4, 2)
             # Contrast z_on - z_off

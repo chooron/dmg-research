@@ -26,6 +26,7 @@ NN_MODEL_MODULES: dict[str, str] = {
     "LearnedStructureNetCF": "project.flexmopex.models.learned_weight_mopex_candidates",
     "LearnedStructureNetDirectAttr": "project.flexmopex.models.learned_weight_mopex_candidates",
     "LearnedStructureNetHybridEncoder": "project.flexmopex.models.learned_weight_mopex_candidates",
+    "LearnedStructureNetPureAttrEncoder": "project.flexmopex.models.learned_weight_mopex_candidates",
 }
 
 

@@ -28,15 +28,16 @@ The method resolves the longstanding structural gate collapse and representation
 - **Hydrological parameter head**: Linear(128, $N_{\text{mopex}}$) with physical parameter descaling.
 - **Routing head**: Linear(128, 1) mapping to Unit Hydrograph parameter $\gamma_{\text{uh}}$.
 
-### 2.3 Dedicated Hybrid Structure Encoder (`LearnedStructureNetHybridEncoder`)
-- **Motivation**: Resolves *Shared-Backbone Representation Entanglement* (R16/R18), where the shared $h_{128}$ representation is dominated by bulk runoff flow tasks and lacks interception-aligned sub-spaces.
-- **Input**: Concatenation of raw normalized basin attributes and detached hydrological representation:
-  $$\mathbf{z}_{\text{struct}} = [\mathbf{x}_{35}, \text{stop\_gradient}(\mathbf{h}_{128})] \in \mathbb{R}^{B \times 163}$$
+### 2.3 Dedicated Pure-Attribute Structure Encoder (`LearnedStructureNetPureAttrEncoder`)
+- **Motivation**: Resolves *Shared-Backbone Representation Entanglement* (R16/R18), where the shared $h_{128}$ representation is dominated by bulk runoff flow tasks and lacks interception-aligned sub-spaces. By passing pure static basin attributes $x_{35}$ directly to a dedicated structure encoder, we eliminate the need for `stopgrad(h128)` concatenation and achieve clean architectural decoupling.
+- **Input**: Raw normalized basin attributes directly:
+  $$\mathbf{z}_{\text{struct}} = \mathbf{x}_{35} \in \mathbb{R}^{B \times 35}$$
 - **Encoder layers**:
-  $$\mathbf{z}_1 = \text{Tanh}(\text{Linear}(163, 128)(\mathbf{z}_{\text{struct}}))$$
+  $$\mathbf{z}_1 = \text{Tanh}(\text{Linear}(35, 128)(\mathbf{z}_{\text{struct}}))$$
   $$\mathbf{z}_2 = \text{Tanh}(\text{Linear}(128, 64)(\mathbf{z}_1))$$
   $$\mathbf{logits}_{\text{struct}} = \text{Linear}(64, 8)(\mathbf{z}_2) \in \mathbb{R}^{B \times 4 \times 2}$$
-- **Zero Gradient Leakage**: The $\text{stop\_gradient}$ on $h_{128}$ guarantees that structural loss $L_{\text{CF}}$ propagates strictly into the structure encoder (6 parameter tensors) and transmits zero gradient to the hydrological backbone.
+- **Zero Gradient Leakage**: Because the structure encoder ingests static basin attributes directly without passing through the shared hydrologic backbone, structural loss $L_{\text{CF}}$ propagates strictly into the structure encoder (6 parameter tensors) and transmits strictly zero gradient to the hydrological backbone by construction.
+- **Backward Compatibility**: `LearnedStructureNetHybridEncoder` (hybrid $[x_{35}, \text{stopgrad}(h_{128})] \to 163 \to 128 \to 64 \to 8$) is fully preserved in the codebase for historical comparisons and ablation studies.
 
 ---
 
@@ -86,25 +87,25 @@ $$\mathcal{L}_{\text{total}} = L_{\text{fit\_aic}}(Q_{\text{sim}}(\mathbf{w}_{\t
 
 ---
 
-## 5. Canonical Replication Evidence (R19 Three-Seed Benchmark)
+## 5. Canonical Replication Evidence (Pure-Attribute Architecture Benchmark)
 
 Evaluated on the canonical 5114-day out-of-sample window across 671 CAMELS basins at Epoch 10:
 
 ### 5.1 Streamflow Predictive Accuracy
-| Metric | Seed 42 | Seed 43 | Seed 44 | 3-Seed Aggregate | Baseline Reference |
-|:---|:---:|:---:|:---:|:---:|:---:|
-| **Median NSE** | **0.6518** | **0.6493** | **0.6494** | **0.6502 ± 0.0012** | 0.6317 (+0.0185) |
-| **Mean NSE** | 0.5761 | 0.5744 | 0.5706 | 0.5737 ± 0.0023 | 0.5544 (+0.0193) |
-| **Fraction NSE > 0** | 97.0% | 96.9% | 97.0% | 97.0% | 95.8% |
-| **Fraction NSE > 0.5** | 74.5% | 74.4% | 74.4% | 74.4% | 71.2% |
+| Metric | Seed 42 | Seed 43 | Seed 44 | Pure-x35 Aggregate | R19 Hybrid Benchmark | Baseline Reference |
+|:---|:---:|:---:|:---:|:---:|:---:|:---:|
+| **Median NSE** | **0.6584** | **0.6547** | **0.6519** | **0.6550 ± 0.0026** | 0.6502 ± 0.0012 | 0.6317 (+0.0233) |
+| **Mean NSE** | 0.5770 | 0.5789 | 0.5747 | 0.5769 ± 0.0017 | 0.5737 ± 0.0023 | 0.5544 (+0.0225) |
+| **Fraction NSE > 0** | 96.6% | 97.5% | 96.7% | 96.9% | 97.0% | 95.8% |
+| **Fraction NSE > 0.5** | 76.6% | 76.3% | 75.1% | 76.0% | 74.4% | 71.2% |
 
 ### 5.2 Four-Process Structural Gate Separation ($\Delta = \bar{w}_{\text{pos}} - \bar{w}_{\text{zero}}$)
-| Process Gate | $\Delta$ (Seed 42) | $\Delta$ (Seed 43) | $\Delta$ (Seed 44) | Mean $\Delta$ | Mean Spearman $\rho$ |
-|:---|:---:|:---:|:---:|:---:|:---:|
-| **Vegetation Phenology (`w_phen`)** | +0.3009 | +0.2839 | +0.2831 | **+0.2893 ± 0.0082** | **+0.5800 ± 0.0233** |
-| **Canopy Interception (`w_int`)** | **+0.1381** | **+0.1357** | **+0.1295** | **+0.1345 ± 0.0036** | **+0.3277 ± 0.0165** |
-| **Snow Accum / Melt (`w_snow`)** | +0.4929 | +0.4633 | +0.4600 | **+0.4721 ± 0.0148** | **+0.7965 ± 0.0088** |
-| **Subsurface Baseflow (`w_sub`)** | +0.2399 | +0.2041 | +0.2171 | **+0.2204 ± 0.0148** | **+0.4167 ± 0.0196** |
+| Process Gate | $\Delta$ (Seed 42) | $\Delta$ (Seed 43) | $\Delta$ (Seed 44) | Pure Mean $\Delta$ | Pure Mean Spearman $\rho$ | Hybrid Mean $\Delta$ |
+|:---|:---:|:---:|:---:|:---:|:---:|:---:|
+| **Vegetation Phenology (`w_phen`)** | +0.3142 | +0.3101 | +0.3035 | **+0.3093 ± 0.0044** | **+0.6131 ± 0.0173** | +0.2893 ± 0.0082 |
+| **Canopy Interception (`w_int`)** | **+0.1455** | **+0.1648** | **+0.1786** | **+0.1630 ± 0.0136** | **+0.3796 ± 0.0116** | +0.1345 ± 0.0036 |
+| **Snow Accum / Melt (`w_snow`)** | +0.4694 | +0.4485 | +0.4849 | **+0.4676 ± 0.0149** | **+0.8026 ± 0.0052** | +0.4721 ± 0.0148 |
+| **Subsurface Baseflow (`w_sub`)** | +0.1888 | +0.2137 | +0.2021 | **+0.2015 ± 0.0102** | **+0.4309 ± 0.0408** | +0.2204 ± 0.0148 |
 
 *All four processes demonstrate 100% sign-consistent positive separation and rank correlation across all seeds.*
 
@@ -123,8 +124,8 @@ python run_model.py \
 
 ### 6.2 Canonical Evaluation
 ```bash
-python scripts/evaluate_r19_adadelta_seed.py 42
-python scripts/synthesize_r19_results.py
+python scripts/evaluate_pure_x35_seed.py 42
+python scripts/synthesize_pure_x35_results.py
 ```
 
 ---

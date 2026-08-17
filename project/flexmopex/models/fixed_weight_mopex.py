@@ -5,7 +5,9 @@ from typing import Any
 import torch
 
 from project.flexmopex.models import mopex_core
+from project.flexmopex.models import mopex_core_candidates as cand
 from project.flexmopex.models.base_mopex import BaseMopex
+from project.flexmopex.models.learned_weight_mopex_candidates import _SEMANTICS_TO_STEP
 
 
 class FixedWeightMopex(BaseMopex):
@@ -22,7 +24,13 @@ class FixedWeightMopex(BaseMopex):
             "fixed_weight_values",
             torch.tensor(values, dtype=torch.float32, device=self.device),
         )
-        self.step_fn = self._compile_step(mopex_core.mopex_step)
+        semantics = str(self.config.get("interception_semantics", "S0")).upper()
+        if semantics in _SEMANTICS_TO_STEP:
+            kwargs = _SEMANTICS_TO_STEP[semantics]
+            step = cand._make_step("linear", **kwargs)
+        else:
+            step = mopex_core.mopex_step
+        self.step_fn = self._compile_step(step)
 
     def forward(
         self,

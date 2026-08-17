@@ -492,6 +492,14 @@ class LearnedStructureNetDirectAttr(LearnedStructureNet):
             "weights": self.heads["weights"](attrs),  # Direct from raw 35-D static attributes!
         }
 
+    def get_structure_logits(self, attrs: torch.Tensor) -> torch.Tensor:
+        """Compute 8 structure gate logits directly from static basin attributes."""
+        return self.heads["weights"](attrs)
+
+    def structure_parameters(self):
+        """Iterator over parameters belonging to the structure prediction branch."""
+        return self.heads["weights"].parameters()
+
 
 class LearnedStructureNetHybridEncoder(LearnedStructureNet):
     """LearnedStructureNet with Hybrid Dedicated Structure Encoder (R18).
@@ -548,3 +556,79 @@ class LearnedStructureNetHybridEncoder(LearnedStructureNet):
             "gamma_uh": self.heads["gamma_uh"](shared),
             "weights": weights,
         }
+
+    def get_structure_logits(self, attrs: torch.Tensor) -> torch.Tensor:
+        """Compute 8 structure gate logits from hybrid [attrs, stopgrad(h128)] input (legacy R18)."""
+        with torch.no_grad():
+            shared_detached = self.backbone(attrs)
+        struct_input = torch.cat([attrs, shared_detached], dim=-1)
+        return self.structure_encoder(struct_input)
+
+    def structure_parameters(self):
+        """Iterator over parameters belonging to the structure prediction branch."""
+        return self.structure_encoder.parameters()
+
+
+class LearnedStructureNetPureAttrEncoder(LearnedStructureNet):
+    """LearnedStructureNet with Pure-Attribute Dedicated Nonlinear Structure Encoder (Canonical).
+
+    Architecture:
+      Hydrologic branch: x35_norm -> shared backbone (128-D) -> params_head (192) / gamma_head (2)
+      Structure branch : x35_norm -> dedicated MLP (35 -> 128 -> 64 -> 8) -> 8 logits
+
+    Zero Shared-Backbone Leakage:
+      The structure encoder directly ingests normalized basin attributes x35_norm without
+      detouring through or concatenating stopgrad(h128). L_CF gradient updates the dedicated
+      structure MLP only, with strictly zero gradient path to the shared hydrologic backbone.
+    """
+
+    def __init__(
+        self,
+        input_dim: int = 27,
+        hidden_dim: int = 128,
+        dropout: float = 0.0,
+        nmul: int = 1,
+        device: str | torch.device = "cpu",
+    ) -> None:
+        super().__init__(
+            input_dim=input_dim,
+            hidden_dim=hidden_dim,
+            dropout=dropout,
+            nmul=nmul,
+            device=device,
+        )
+        # Dedicated pure-attribute nonlinear structure encoder: input_dim (35) -> 128 -> 64 -> 8
+        self.structure_encoder = torch.nn.Sequential(
+            torch.nn.Linear(input_dim, 128),
+            torch.nn.Tanh(),
+            torch.nn.Linear(128, 64),
+            torch.nn.Tanh(),
+            torch.nn.Linear(64, 8),
+        )
+        # Initialize hidden layers with xavier_uniform, final output layer with normal(0, 0.001)
+        torch.nn.init.xavier_uniform_(self.structure_encoder[0].weight)
+        torch.nn.init.constant_(self.structure_encoder[0].bias, 0.0)
+        torch.nn.init.xavier_uniform_(self.structure_encoder[2].weight)
+        torch.nn.init.constant_(self.structure_encoder[2].bias, 0.0)
+        torch.nn.init.normal_(self.structure_encoder[4].weight, mean=0.0, std=0.001)
+        torch.nn.init.constant_(self.structure_encoder[4].bias, 0.0)
+        self.to(device)
+
+    def forward(self, x: dict[str, torch.Tensor]) -> dict[str, torch.Tensor]:
+        attrs = x["c_nn_norm"]
+        shared = self.backbone(attrs)
+        # Pure-attribute input: direct from raw normalized static attributes
+        weights = self.structure_encoder(attrs)  # [B, 8]
+        return {
+            "params": self.heads["params"](shared),
+            "gamma_uh": self.heads["gamma_uh"](shared),
+            "weights": weights,
+        }
+
+    def get_structure_logits(self, attrs: torch.Tensor) -> torch.Tensor:
+        """Compute 8 structure gate logits directly from normalized static basin attributes (canonical)."""
+        return self.structure_encoder(attrs)
+
+    def structure_parameters(self):
+        """Iterator over parameters belonging to the structure prediction branch."""
+        return self.structure_encoder.parameters()
