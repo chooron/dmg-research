@@ -67,7 +67,12 @@ manuscriptv2/
 !project/hydrodiag/manuscript/
 project/hydrodiag/manuscript/*
 !project/hydrodiag/manuscript/scripts/
-
+!project/hydrodiag/manuscript/README.md
+!project/hydrodiag/manuscript/r3/
+!project/hydrodiag/manuscript/r3/**
+!project/hydrodiag/manuscript/r4/
+!project/hydrodiag/manuscript/r4/**
+!project/hydrodiag/manuscript/scripts/**
 # --- Local LLM / agent tooling ---
 .pi-subagents/
 .codex/

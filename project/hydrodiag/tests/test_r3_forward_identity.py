@@ -30,7 +30,7 @@ try:
 except (ImportError, AttributeError):
     pass
 
-from r3.common import (  # noqa: E402
+from manuscript.r3.common import (  # noqa: E402
     DEFAULT_DATA_ROOT,
     DEFAULT_RESULTS_ROOT,
     load_bundle,
@@ -96,9 +96,12 @@ def test_cn_model_override_identity_and_effect():
 def test_cn_override_preserves_recorded_forward_identity():
     """With the canonical override present, the recorded forward still
     matches the production forward exactly."""
+    from manuscript.r3.recorded_forward import (
+        recorded_cn_forward,
+        validate_recorded_forward,
+    )
     from models import XAJWithCemaNeigeLite
     from models.cemaneige import _estimate_psol_annual
-    from r3.recorded_forward import recorded_cn_forward, validate_recorded_forward
 
     torch.manual_seed(22)
     model = XAJWithCemaNeigeLite()
@@ -122,7 +125,7 @@ def test_theta_star_ic_path_reproduces_q_star():
     import torch as _torch
     from ablation.ic_core.parameter_adapter import physical_to_normalized
     from ablation.ic_core.runtime import ICObjectiveRuntime
-    from r3.common import bundle_with_synthetic_target
+    from manuscript.r3.common import bundle_with_synthetic_target
 
     device = _torch.device("cuda" if _torch.cuda.is_available() else "cpu")
     bundle, _ = load_bundle()
@@ -161,7 +164,7 @@ def test_theta_star_dpl_window_path_reproduces_q_star_window():
     corresponding q_star window; the residual is bounded by the frozen
     365-day warm-up convention (measured <= ~2 mm/day even for snowy basins;
     we assert a conservative 5 mm/day bound)."""
-    from r3.recorded_forward import build_forcing_dict
+    from manuscript.r3.recorded_forward import build_forcing_dict
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     bundle, _ = load_bundle()
@@ -250,7 +253,7 @@ def test_target_override_row_alignment_with_reordered_basin_list():
     still pair every basin with its own Q* row (basin-ID based selection)."""
     import tempfile
 
-    from r3.common import pilot_basin_subset, reordered_531_list
+    from manuscript.r3.common import pilot_basin_subset, reordered_531_list
     from training.dpl.run_dpl_model import gate_time_index, load_data
 
     bundle, _ = load_bundle()
@@ -287,7 +290,7 @@ def test_target_override_row_alignment_with_reordered_basin_list():
 
 
 def frac_snow(bundle):
-    from r3.common import frac_snow_series
+    from manuscript.r3.common import frac_snow_series
 
     return list(frac_snow_series(bundle)["frac_snow"])
 

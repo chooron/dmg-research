@@ -28,7 +28,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 try:
-    from manuscript.scripts.r1_plot_style import (
+    from manuscript.scripts.shared.r1_plot_style import (
         apply_clean_spines,
         setup_publication_style,
     )

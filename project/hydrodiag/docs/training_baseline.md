@@ -29,7 +29,7 @@ Before a production run:
 ```bash
 cd project/hydrodiag
 python training/dpl/launch_models.py --dry-run
-python scripts/run_model_test_suite.py
+python manuscript/scripts/shared/run_model_test_suite.py
 ```
 
 Production IC requires CUDA and writes resumable per-model checkpoints. Do not

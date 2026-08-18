@@ -18,5 +18,5 @@ test = [
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["ablation*", "evotorch*", "models*", "optimization*", "r3*", "r4*", "training*"]
+include = ["ablation*", "evotorch*", "models*", "optimization*", "training*", "manuscript", "manuscript.r3*", "manuscript.r4*", "manuscript.scripts*"]
 namespaces = true

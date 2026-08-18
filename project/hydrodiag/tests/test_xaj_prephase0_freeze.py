@@ -6,6 +6,7 @@ import math
 
 import pytest
 import torch
+from manuscript.scripts.shared.freeze_native_subsurface_scale import compute_global_z0
 from models import (
     XAJ,
     XAJDE,
@@ -34,7 +35,6 @@ from models.structure_response import (
     summarize_response_conditioning,
 )
 from models.xaj import _prepare_xaj_parameters
-from scripts.freeze_native_subsurface_scale import compute_global_z0
 
 from tests.test_xaj_structure_variants import _active_params, _forcing, _initial
 

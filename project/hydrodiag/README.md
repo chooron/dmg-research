@@ -44,8 +44,8 @@ future Codex work are defined in [`local-agent-setting.md`](local-agent-setting.
 ## Testing
 
 ```bash
-python scripts/run_model_test_suite.py
-python scripts/run_model_test_suite.py --full
+python manuscript/scripts/shared/run_model_test_suite.py
+python manuscript/scripts/shared/run_model_test_suite.py --full
 ```
 
 The frozen model/test baseline and the responsibility of each test file are
@@ -61,7 +61,7 @@ are retained in `archive/project_cleanup_20260730/`.
 
 - Active scientific code: `models/`, `training/`, `ablation/`,
   `optimization/`.
-- Tests and maintained tooling: `tests/`, `scripts/`, `configs/`, `docs/`.
+- Tests and maintained tooling: `tests/`, `manuscript/scripts/`, `configs/`, `docs/`.
 - Result source of truth: `results/`.
 - Inactive code and exact remote snapshots: `archive/`.
 - Manuscript and supplement tooling: `manuscript/`.
@@ -134,7 +134,7 @@ next; it does not launch five processes concurrently:
 
 ```bash
 for i in 0 1 2 3 4; do
-  python manuscript/scripts/build_r1_statistics.py \
+  python manuscript/scripts/r1/build_r1_statistics.py \
     --mode daily-inference --models XAJ_TGD2 --paradigm dpl \
     --tgd2-epoch 100 --device cuda --batch-size 64 \
     --partition-count 5 --partition-index "$i" --partition-suffix "_part_$i" \
@@ -149,7 +149,7 @@ Then rebuild the complete R1 statistical package from the existing daily
 exports and online partition summaries:
 
 ```bash
-python manuscript/scripts/build_r1_statistics.py \
+python manuscript/scripts/r1/build_r1_statistics.py \
   --mode merge-partitions --partition-count 5 --tgd2-epoch 100 \
   --partition-root /home/jingxin/code/dmg-research/project/hydrodiag/manuscript/results/R1/epoch100_partitions \
   --project-root /home/jingxin/code/dmg-research/project/hydrodiag \

@@ -28,7 +28,7 @@ PROJECT_ROOT = HERE.parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from manuscript.scripts.r1_plot_style import (  # noqa: E402
+from manuscript.scripts.shared.r1_plot_style import (  # noqa: E402
     MODEL_COLORS,
     apply_clean_spines,
     setup_publication_style,
