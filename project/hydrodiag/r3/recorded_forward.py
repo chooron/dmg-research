@@ -193,6 +193,8 @@ def recorded_tgd2_forward(model, forcings: dict[str, torch.Tensor],
         model._runoff, {"precip": effective, "pet": pet, "temp": temp},
         xaj_params, device, dtype,
     )
+    # Expose the already-computed delayed input for deterministic diagnostics.
+    stores["effective_precip"] = effective
     stores["tgd_storage"] = storage_trace
     stores["tgd_tau"] = tau_trace
     stores["tgd_retention"] = retention_trace
