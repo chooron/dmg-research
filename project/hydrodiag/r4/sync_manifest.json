@@ -1,0 +1,412 @@
+{
+  "entries": [
+    {
+      "file_type": "dpl_seed_dir",
+      "integrity": {
+        "checks": [
+          "sha256 match",
+          "config.model_name == model",
+          "checkpoint keys: model_name/lite_mode/state_dict",
+          "epoch_history.csv 100 rows",
+          "basin_final_summary.csv 531 rows",
+          "attribute_normalization.npz shape (35,)+(35,)"
+        ],
+        "expected_sha256": {
+          "dpl_camels_531_lite_v2/XAJ/seed_42/COMPLETE": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "dpl_camels_531_lite_v2/XAJ/seed_42/attribute_normalization.npz": "d6e0227819c498c64a66db76ee60cd77322ad2572e750c79303c3044596dca0b",
+          "dpl_camels_531_lite_v2/XAJ/seed_42/basin_final_summary.csv": "9783f946485c5700173d9696b9fa2884f015af144df9db83151b39f7c741be88",
+          "dpl_camels_531_lite_v2/XAJ/seed_42/best_checkpoint.pt": "a0af00ee119ded96e996d1483161bc1de60726c58cdf9288001f5e7667c9d78f",
+          "dpl_camels_531_lite_v2/XAJ/seed_42/best_parameters_normalized.npz": "24ce71dbf4f8fa708bff7ee4ba416b1d3b534dc0d942d5e3eda607b73e565e7d",
+          "dpl_camels_531_lite_v2/XAJ/seed_42/best_parameters_physical.npz": "82247570f3d2f889018a5761c58a83e4e742ae7ba595cc0be4cb058fb37a054e",
+          "dpl_camels_531_lite_v2/XAJ/seed_42/checkpoint_epoch_090.pt": "28d1ef51b8feb52e7eb9130c2aab8a483b497791f97f1a2d8f415fe800cd8d1c",
+          "dpl_camels_531_lite_v2/XAJ/seed_42/checkpoint_epoch_100.pt": "12b41d66531d59f7b04ba1163415f106abcdae6efb966731efa828d8aaa1c4d2",
+          "dpl_camels_531_lite_v2/XAJ/seed_42/config.json": "96c89ed41d9cbb8801649764571032fcae553dba1185178a95ce4b3d0f9bccd4",
+          "dpl_camels_531_lite_v2/XAJ/seed_42/epoch_history.csv": "304a2a57ab7fbae65ec6b6a21f735c669b00bc71ef27e39a58a7b9d582418152"
+        },
+        "n_files": 10
+      },
+      "local_target": "results/dpl_camels_531_lite_v2/XAJ/seed_42/",
+      "remote": "dpl_camels_531_lite_v2/XAJ/seed_42/ (essential files: 10)",
+      "required_for_r4": true,
+      "role": "dPL Base seed 42 (observation-trained, Q_obs)"
+    },
+    {
+      "file_type": "dpl_seed_dir",
+      "integrity": {
+        "checks": [
+          "sha256 match",
+          "config.model_name == model",
+          "checkpoint keys: model_name/lite_mode/state_dict",
+          "epoch_history.csv 100 rows",
+          "basin_final_summary.csv 531 rows",
+          "attribute_normalization.npz shape (35,)+(35,)"
+        ],
+        "expected_sha256": {
+          "dpl_camels_531_lite_v2/XAJ/seed_123/COMPLETE": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "dpl_camels_531_lite_v2/XAJ/seed_123/attribute_normalization.npz": "d6e0227819c498c64a66db76ee60cd77322ad2572e750c79303c3044596dca0b",
+          "dpl_camels_531_lite_v2/XAJ/seed_123/basin_final_summary.csv": "545e8b77a1b52e1b6be3e6b6244b8da1d2983116e0f13baded8e7529f60682ce",
+          "dpl_camels_531_lite_v2/XAJ/seed_123/best_checkpoint.pt": "e2df5533d27f4d493a05cfd4f6f8255e82461b3098ae701fbb17f29ebc46a79d",
+          "dpl_camels_531_lite_v2/XAJ/seed_123/best_parameters_normalized.npz": "eb37dfc724d37d7bcbb2df4dc5a348830170de43898fd4fe8e7560e68cd6d9a4",
+          "dpl_camels_531_lite_v2/XAJ/seed_123/best_parameters_physical.npz": "b2006beccdbc474513ad73447c48a6933ddfe1bae8ac8e68b24ba4fc36b15ea3",
+          "dpl_camels_531_lite_v2/XAJ/seed_123/checkpoint_epoch_090.pt": "a54f0e883695b2173ef0dbe096e18fc3bf743e76693c7c5635ede82759c8edec",
+          "dpl_camels_531_lite_v2/XAJ/seed_123/checkpoint_epoch_100.pt": "84b03751abf9116e8b39c36b2ed019befd9c74f8f4744c9f8f6691b7fd628a06",
+          "dpl_camels_531_lite_v2/XAJ/seed_123/config.json": "8fcc99abcee4472bc7bd77d2c375ebaefd8ce8d58e82ea9ecd8175c57dbc9c54",
+          "dpl_camels_531_lite_v2/XAJ/seed_123/epoch_history.csv": "8db99958a230c53e07aecb6cad6d167c19275f5d693807d8383e92458ea52fc6"
+        },
+        "n_files": 10
+      },
+      "local_target": "results/dpl_camels_531_lite_v2/XAJ/seed_123/",
+      "remote": "dpl_camels_531_lite_v2/XAJ/seed_123/ (essential files: 10)",
+      "required_for_r4": true,
+      "role": "dPL Base seed 123 (observation-trained, Q_obs)"
+    },
+    {
+      "file_type": "dpl_seed_dir",
+      "integrity": {
+        "checks": [
+          "sha256 match",
+          "config.model_name == model",
+          "checkpoint keys: model_name/lite_mode/state_dict",
+          "epoch_history.csv 100 rows",
+          "basin_final_summary.csv 531 rows",
+          "attribute_normalization.npz shape (35,)+(35,)"
+        ],
+        "expected_sha256": {
+          "dpl_camels_531_lite_v2/XAJ/seed_2026/COMPLETE": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "dpl_camels_531_lite_v2/XAJ/seed_2026/attribute_normalization.npz": "d6e0227819c498c64a66db76ee60cd77322ad2572e750c79303c3044596dca0b",
+          "dpl_camels_531_lite_v2/XAJ/seed_2026/basin_final_summary.csv": "45f1dd212a83aac2370d19b4e38df4955aff202ec3da597430fc93b8f494d517",
+          "dpl_camels_531_lite_v2/XAJ/seed_2026/best_checkpoint.pt": "8087d842c08158c46edd36b2e1219b2e5d0cfeb8aa7451014657b46bd14195a1",
+          "dpl_camels_531_lite_v2/XAJ/seed_2026/best_parameters_normalized.npz": "9fb26246e133f01d9c58abf3fd23f97c8d41afa9519a71c5efff96d3e7201991",
+          "dpl_camels_531_lite_v2/XAJ/seed_2026/best_parameters_physical.npz": "801ad79cf7a9e964ae8ac4204b076fa6f3620d8549f37791689dfdc56a359828",
+          "dpl_camels_531_lite_v2/XAJ/seed_2026/checkpoint_epoch_090.pt": "8fb6794764409e2c52a255b4bc887cfe2ec80ec49337deab8c2843b940caa2c9",
+          "dpl_camels_531_lite_v2/XAJ/seed_2026/checkpoint_epoch_100.pt": "1f08a221244c7c789082549dfe7d78546a32c58609d78aef48b50257cfd5602a",
+          "dpl_camels_531_lite_v2/XAJ/seed_2026/config.json": "884f4465d62f4175a10e71a05fe60f40250402d48540ccb5cc2003b62eaa4cad",
+          "dpl_camels_531_lite_v2/XAJ/seed_2026/epoch_history.csv": "80ac14c6bbca594a2a6a7cf9789eaba844b30540bae770e75ca7c9a2dadada41"
+        },
+        "n_files": 10
+      },
+      "local_target": "results/dpl_camels_531_lite_v2/XAJ/seed_2026/",
+      "remote": "dpl_camels_531_lite_v2/XAJ/seed_2026/ (essential files: 10)",
+      "required_for_r4": true,
+      "role": "dPL Base seed 2026 (observation-trained, Q_obs)"
+    },
+    {
+      "file_type": "dpl_seed_dir",
+      "integrity": {
+        "checks": [
+          "sha256 match",
+          "config.model_name == model",
+          "checkpoint keys: model_name/lite_mode/state_dict",
+          "epoch_history.csv 100 rows",
+          "basin_final_summary.csv 531 rows",
+          "attribute_normalization.npz shape (35,)+(35,)"
+        ],
+        "expected_sha256": {
+          "dpl_camels_531_lite_v2/XAJ_CN/seed_42/COMPLETE": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "dpl_camels_531_lite_v2/XAJ_CN/seed_42/attribute_normalization.npz": "d6e0227819c498c64a66db76ee60cd77322ad2572e750c79303c3044596dca0b",
+          "dpl_camels_531_lite_v2/XAJ_CN/seed_42/basin_final_summary.csv": "aeb8fd4fce8dbf0d7d309c544b9df8f60405b9d550ffd2c6a4d5f52016d6811b",
+          "dpl_camels_531_lite_v2/XAJ_CN/seed_42/best_checkpoint.pt": "c226a38667dca4874f7858160325dd44fe567f975786f4ff09d8324f0e2d30b1",
+          "dpl_camels_531_lite_v2/XAJ_CN/seed_42/best_parameters_normalized.npz": "819cfd3ebb952a6999a984f848cf65e218850ad75f7f77b8dfb69d56bb3b8bae",
+          "dpl_camels_531_lite_v2/XAJ_CN/seed_42/best_parameters_physical.npz": "f4ded00b6ee23b17813f7fea60fced43b9cb1735ce9a80de538207dd42d89acf",
+          "dpl_camels_531_lite_v2/XAJ_CN/seed_42/checkpoint_epoch_090.pt": "0449282fe1b8abedf99fe69d029ccc082c893371804c698962372eda70a01e9f",
+          "dpl_camels_531_lite_v2/XAJ_CN/seed_42/checkpoint_epoch_100.pt": "59fa084584b898293edb8492d422959d7907905676de1c8ec4c89d50c938a7c7",
+          "dpl_camels_531_lite_v2/XAJ_CN/seed_42/config.json": "c7e4eaaf449f5d7ca320961488bb8790ed2aa9e5f4b30341de37d1e7ff5a3b7d",
+          "dpl_camels_531_lite_v2/XAJ_CN/seed_42/epoch_history.csv": "47361b8b374ad26642d82af5d36e1a731ae787eaaa7629a16e82dad695961cfc"
+        },
+        "n_files": 10
+      },
+      "local_target": "results/dpl_camels_531_lite_v2/XAJ_CN/seed_42/",
+      "remote": "dpl_camels_531_lite_v2/XAJ_CN/seed_42/ (essential files: 10)",
+      "required_for_r4": true,
+      "role": "dPL CN seed 42 (observation-trained, Q_obs)"
+    },
+    {
+      "file_type": "dpl_seed_dir",
+      "integrity": {
+        "checks": [
+          "sha256 match",
+          "config.model_name == model",
+          "checkpoint keys: model_name/lite_mode/state_dict",
+          "epoch_history.csv 100 rows",
+          "basin_final_summary.csv 531 rows",
+          "attribute_normalization.npz shape (35,)+(35,)"
+        ],
+        "expected_sha256": {
+          "dpl_camels_531_lite_v2/XAJ_CN/seed_123/COMPLETE": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "dpl_camels_531_lite_v2/XAJ_CN/seed_123/attribute_normalization.npz": "d6e0227819c498c64a66db76ee60cd77322ad2572e750c79303c3044596dca0b",
+          "dpl_camels_531_lite_v2/XAJ_CN/seed_123/basin_final_summary.csv": "dad59a9eb4d75a39185be0c8f19fdc80597f15047910562c2190fc39556f4e5c",
+          "dpl_camels_531_lite_v2/XAJ_CN/seed_123/best_checkpoint.pt": "125c8add8c725190ad534fee88c34b0df8e36941597c21fb41b21121367bd26f",
+          "dpl_camels_531_lite_v2/XAJ_CN/seed_123/best_parameters_normalized.npz": "1c3755c647134afe389eefcdf2205417bedb4b169a1c2d2fc9d70018033f65d3",
+          "dpl_camels_531_lite_v2/XAJ_CN/seed_123/best_parameters_physical.npz": "6c2c4713627193b1656769383d0ca474dea6b6122995a7ff716ddc9cdda93299",
+          "dpl_camels_531_lite_v2/XAJ_CN/seed_123/checkpoint_epoch_090.pt": "ada70cac7dca52d6c71f538dd990659bab62f8f07eb3ba082cae4fd5652a81c1",
+          "dpl_camels_531_lite_v2/XAJ_CN/seed_123/checkpoint_epoch_100.pt": "fa91d24fbcfb80651fd1d6b3bfd37f83ae7831ef3436ceff70f24ec10608846b",
+          "dpl_camels_531_lite_v2/XAJ_CN/seed_123/config.json": "1303fb953177ed1cd3947ca4fb8bb0ee7dfab602d99a9d7759a2819f269ce39c",
+          "dpl_camels_531_lite_v2/XAJ_CN/seed_123/epoch_history.csv": "329da3e3f7e41bf50c08762f18dcb42dd844327b430cb2b24285a215ae43cbdc"
+        },
+        "n_files": 10
+      },
+      "local_target": "results/dpl_camels_531_lite_v2/XAJ_CN/seed_123/",
+      "remote": "dpl_camels_531_lite_v2/XAJ_CN/seed_123/ (essential files: 10)",
+      "required_for_r4": true,
+      "role": "dPL CN seed 123 (observation-trained, Q_obs)"
+    },
+    {
+      "file_type": "dpl_seed_dir",
+      "integrity": {
+        "checks": [
+          "sha256 match",
+          "config.model_name == model",
+          "checkpoint keys: model_name/lite_mode/state_dict",
+          "epoch_history.csv 100 rows",
+          "basin_final_summary.csv 531 rows",
+          "attribute_normalization.npz shape (35,)+(35,)"
+        ],
+        "expected_sha256": {
+          "dpl_camels_531_lite_v2/XAJ_CN/seed_2026/COMPLETE": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "dpl_camels_531_lite_v2/XAJ_CN/seed_2026/attribute_normalization.npz": "d6e0227819c498c64a66db76ee60cd77322ad2572e750c79303c3044596dca0b",
+          "dpl_camels_531_lite_v2/XAJ_CN/seed_2026/basin_final_summary.csv": "7ea3e7b78bae9a6f6d3c5a97da60643adc3324078da5135417a410988b9d3994",
+          "dpl_camels_531_lite_v2/XAJ_CN/seed_2026/best_checkpoint.pt": "c033ab1b212ff87746cd2198894e74a850c1f0ce272598d003eb24ef629ab962",
+          "dpl_camels_531_lite_v2/XAJ_CN/seed_2026/best_parameters_normalized.npz": "983afc0b66b87bfb8ec9b8c84428c6829a4102e27cec0613e06c750835960b7e",
+          "dpl_camels_531_lite_v2/XAJ_CN/seed_2026/best_parameters_physical.npz": "247332ed2138c41b3b77e0282000c308efae3e94acdb1048398229de01b36cc4",
+          "dpl_camels_531_lite_v2/XAJ_CN/seed_2026/checkpoint_epoch_090.pt": "89378eb4bd3b362c8b8ee74a9602cc74cc7e18f9bcbfd8697d7992d2f7a2cd68",
+          "dpl_camels_531_lite_v2/XAJ_CN/seed_2026/checkpoint_epoch_100.pt": "9878e499b3f8c430e6a857a7769b17475e96749afe58ed66a994e5170954834e",
+          "dpl_camels_531_lite_v2/XAJ_CN/seed_2026/config.json": "a0d58d45108c98491b0e424e4c9ed42a4a0b22e143bfc58b5e504f265092b5f5",
+          "dpl_camels_531_lite_v2/XAJ_CN/seed_2026/epoch_history.csv": "701893ef91cf68e652ab25f36f7aef822cc9ab8347547e849612195449dae87f"
+        },
+        "n_files": 10
+      },
+      "local_target": "results/dpl_camels_531_lite_v2/XAJ_CN/seed_2026/",
+      "remote": "dpl_camels_531_lite_v2/XAJ_CN/seed_2026/ (essential files: 10)",
+      "required_for_r4": true,
+      "role": "dPL CN seed 2026 (observation-trained, Q_obs)"
+    },
+    {
+      "file_type": "ic_fused_run",
+      "integrity": {
+        "checks": [
+          "sha256 match",
+          "per_basin.csv 532 lines (531 basins + header)",
+          "per_start.csv 2656 lines (531x5 + header)",
+          "train_kge finite",
+          "COMPLETE marker present",
+          "physical p_* columns match model param count"
+        ],
+        "expected_sha256": {
+          "results/ic_cmaes_recalibration_p20_p25_20260728_fused/XAJ/COMPLETE": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "results/ic_cmaes_recalibration_p20_p25_20260728_fused/XAJ/convergence_audit.json": "a86c0dc958570ddefa5f45997b650daea80d4afddb27891756c705e34f2e053d",
+          "results/ic_cmaes_recalibration_p20_p25_20260728_fused/XAJ/per_basin.csv": "0ecdfe5bdeb2710113a030c863510c1dfdd5e984ee048f875caaa54bfa3e3cef",
+          "results/ic_cmaes_recalibration_p20_p25_20260728_fused/XAJ/per_start.csv": "92c5ffe458499b3ba3a227f7c30d3b19bd1ef7d0dc90dc6a2621d67c05e81156",
+          "results/ic_cmaes_recalibration_p20_p25_20260728_fused/XAJ/runtime.json": "56b721f84e007e753c2f4764defec401f04d25c873350985cb7076ab2a44ea8e",
+          "results/ic_cmaes_recalibration_p20_p25_20260728_fused/XAJ/snow_stratified_summary.csv": "46e9e7a0996376599afa5398074670ae160a38ca89bb220688ecfbc8435b586c"
+        },
+        "n_files": 6
+      },
+      "local_target": "results/ic_cmaes_recalibration_p20_p25_20260728_fused/XAJ/",
+      "remote": "results/ic_cmaes_recalibration_p20_p25_20260728_fused/XAJ/ (per_basin.csv + per_start.csv + runtime.json + convergence_audit.json + snow_stratified_summary.csv + COMPLETE)",
+      "required_for_r4": true,
+      "role": "IC Base (fused CMA-ES, 5 starts x 200 gens, Q_obs)"
+    },
+    {
+      "file_type": "ic_fused_run",
+      "integrity": {
+        "checks": [
+          "sha256 match",
+          "per_basin.csv 532 lines (531 basins + header)",
+          "per_start.csv 2656 lines (531x5 + header)",
+          "train_kge finite",
+          "COMPLETE marker present",
+          "physical p_* columns match model param count"
+        ],
+        "expected_sha256": {
+          "results/ic_cmaes_recalibration_p20_p25_20260728_fused/XAJ_CN/COMPLETE": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "results/ic_cmaes_recalibration_p20_p25_20260728_fused/XAJ_CN/convergence_audit.json": "9f591dd281e4febf4803e0f87aa211880f8cf29d2a500cc7d6aad07b82c1784f",
+          "results/ic_cmaes_recalibration_p20_p25_20260728_fused/XAJ_CN/per_basin.csv": "1fda94c8ed9451fac03ca356c1aed72b6e7cb52cee1e4e40de9262f9314acb56",
+          "results/ic_cmaes_recalibration_p20_p25_20260728_fused/XAJ_CN/per_start.csv": "83eed5b86f43b622c1a259a77829184c3f096b5f490289fbacecd2c15a857ea0",
+          "results/ic_cmaes_recalibration_p20_p25_20260728_fused/XAJ_CN/runtime.json": "731f3109181ecc9571d4a597f4b25fdb191572846c7f45a59a6c25137aa3de84",
+          "results/ic_cmaes_recalibration_p20_p25_20260728_fused/XAJ_CN/snow_stratified_summary.csv": "119224da02629c5922069e98f02dd3bdfd3327eb33b32993ee727c1f94b3588b"
+        },
+        "n_files": 6
+      },
+      "local_target": "results/ic_cmaes_recalibration_p20_p25_20260728_fused/XAJ_CN/",
+      "remote": "results/ic_cmaes_recalibration_p20_p25_20260728_fused/XAJ_CN/ (per_basin.csv + per_start.csv + runtime.json + convergence_audit.json + snow_stratified_summary.csv + COMPLETE)",
+      "required_for_r4": true,
+      "role": "IC CN (fused CMA-ES, 5 starts x 200 gens, Q_obs)"
+    },
+    {
+      "file_type": "ic_fused_run",
+      "integrity": {
+        "checks": [
+          "sha256 match",
+          "per_basin.csv 532 lines (531 basins + header)",
+          "per_start.csv 2656 lines (531x5 + header)",
+          "train_kge finite",
+          "COMPLETE marker present",
+          "physical p_* columns match model param count"
+        ],
+        "expected_sha256": {
+          "results/ic_cmaes_recalibration_p20_p25_20260729_tgd_fused/XAJ_TGD/COMPLETE": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "results/ic_cmaes_recalibration_p20_p25_20260729_tgd_fused/XAJ_TGD/convergence_audit.json": "8d1540c081bea54681cdd8dbef4bbbf4748a1a7f369512c64fb7e93a3ec6130f",
+          "results/ic_cmaes_recalibration_p20_p25_20260729_tgd_fused/XAJ_TGD/per_basin.csv": "5869d6929c64212f0161fd8ec78c3d37570a107674e03feb673eaf09b460fe2d",
+          "results/ic_cmaes_recalibration_p20_p25_20260729_tgd_fused/XAJ_TGD/per_start.csv": "c0e45a05b282d4cae2ac9bfe1ad8d8cc828aa4503360c3a049732cc3b816276e",
+          "results/ic_cmaes_recalibration_p20_p25_20260729_tgd_fused/XAJ_TGD/runtime.json": "fff943d1a897100e3a595341d2c69b1806e3fe8225955cbe416bdf9a97d8bb0f",
+          "results/ic_cmaes_recalibration_p20_p25_20260729_tgd_fused/XAJ_TGD/snow_stratified_summary.csv": "1bc51757067f5ee8b12ff7e97180c6de226bf4a6297a104d8dfed35af7f7237f"
+        },
+        "n_files": 6
+      },
+      "local_target": "results/ic_cmaes_recalibration_p20_p25_20260729_tgd_fused/XAJ_TGD/",
+      "remote": "results/ic_cmaes_recalibration_p20_p25_20260729_tgd_fused/XAJ_TGD/ (per_basin.csv + per_start.csv + runtime.json + convergence_audit.json + snow_stratified_summary.csv + COMPLETE)",
+      "required_for_r4": false,
+      "role": "IC legacy-TGD (fused, NOT canonical TGD2; optional)"
+    },
+    {
+      "file_type": "r1_kge_csv",
+      "integrity": {
+        "checks": [
+          "sha256 match",
+          "531 rows",
+          "columns basin_id,train_kge,test_kge"
+        ],
+        "expected_sha256": null
+      },
+      "local_target": "results/dpl_camels_531_lite_v2/XAJ/seed_42/train_test_kge_by_basin.csv",
+      "remote": "results/dpl_camels_531_lite_v2/XAJ/seed_42/train_test_kge_by_basin.csv",
+      "required_for_r4": true,
+      "role": "R1 stats input: XAJ seed 42 train/test KGE table"
+    },
+    {
+      "file_type": "r1_kge_csv",
+      "integrity": {
+        "checks": [
+          "sha256 match",
+          "531 rows",
+          "columns basin_id,train_kge,test_kge"
+        ],
+        "expected_sha256": null
+      },
+      "local_target": "results/dpl_camels_531_lite_v2/XAJ/seed_123/train_test_kge_by_basin.csv",
+      "remote": "results/dpl_camels_531_lite_v2/XAJ/seed_123/train_test_kge_by_basin.csv",
+      "required_for_r4": true,
+      "role": "R1 stats input: XAJ seed 123 train/test KGE table"
+    },
+    {
+      "file_type": "r1_kge_csv",
+      "integrity": {
+        "checks": [
+          "sha256 match",
+          "531 rows",
+          "columns basin_id,train_kge,test_kge"
+        ],
+        "expected_sha256": null
+      },
+      "local_target": "results/dpl_camels_531_lite_v2/XAJ_CN/seed_42/train_test_kge_by_basin.csv",
+      "remote": "results/dpl_camels_531_lite_v2/XAJ_CN/seed_42/train_test_kge_by_basin.csv",
+      "required_for_r4": true,
+      "role": "R1 stats input: XAJ_CN seed 42 train/test KGE table"
+    },
+    {
+      "file_type": "r1_kge_csv",
+      "integrity": {
+        "checks": [
+          "sha256 match",
+          "531 rows",
+          "columns basin_id,train_kge,test_kge"
+        ],
+        "expected_sha256": null
+      },
+      "local_target": "results/dpl_camels_531_lite_v2/XAJ_CN/seed_123/train_test_kge_by_basin.csv",
+      "remote": "results/dpl_camels_531_lite_v2/XAJ_CN/seed_123/train_test_kge_by_basin.csv",
+      "required_for_r4": true,
+      "role": "R1 stats input: XAJ_CN seed 123 train/test KGE table"
+    },
+    {
+      "file_type": "r1_kge_csv",
+      "integrity": {
+        "checks": [
+          "sha256 match",
+          "531 rows",
+          "columns basin_id,train_kge,test_kge"
+        ],
+        "expected_sha256": null
+      },
+      "local_target": "results/dpl_camels_531_lite_v2/HBV/seed_42/train_test_kge_by_basin.csv",
+      "remote": "results/dpl_camels_531_lite_v2/HBV/seed_42/train_test_kge_by_basin.csv",
+      "required_for_r4": false,
+      "role": "R1 stats input: HBV seed 42 train/test KGE table"
+    },
+    {
+      "file_type": "r1_kge_csv",
+      "integrity": {
+        "checks": [
+          "sha256 match",
+          "531 rows",
+          "columns basin_id,train_kge,test_kge"
+        ],
+        "expected_sha256": null
+      },
+      "local_target": "results/dpl_camels_531_lite_v2/HBV/seed_123/train_test_kge_by_basin.csv",
+      "remote": "results/dpl_camels_531_lite_v2/HBV/seed_123/train_test_kge_by_basin.csv",
+      "required_for_r4": false,
+      "role": "R1 stats input: HBV seed 123 train/test KGE table"
+    }
+  ],
+  "estimated_size": {
+    "dpl_xaj_xajcn_3seeds": "~114 MB (57 MB x 2)",
+    "fused_ic_base_cn": "~23 MB",
+    "fused_ic_tgd_optional": "~12 MB",
+    "kge_csvs": "< 1 MB",
+    "total_required": "~140 MB"
+  },
+  "gaps": [
+    {
+      "fallback": "fused IC entries below are observation-trained and sufficient for R4; canonical R1 IC reproduction additionally requires the original paired_v2 runs (check original machine/backups)",
+      "remote_status": "NOT FOUND on this node (only fused 5-start x 200-gen runs exist)",
+      "role": "IC canonical 10-start x 300-gen (xaj_base_cmaes_531_batched_paired_v2 / xaj_cn_cmaes_531_batched_paired_v2 / xaj_tgd2_cmaes_531_batched_v1)"
+    },
+    {
+      "fallback": "R4 TGD2 track blocked until TGD2 dPL/IC artifacts are recovered; Base/CN tracks unaffected",
+      "remote_status": "NOT FOUND on this node; node only has legacy XAJ_TGD (tgd_alpha/tgd_tau/tgd_beta, 18 params) which is NOT the canonical TGD2",
+      "role": "dPL TGD2 (dpl_camels_531_lite_v3_tgd2_dpl_audited)"
+    },
+    {
+      "fallback": "regenerate seed_2026 KGE CSV post-hoc from checkpoint (no retraining) or reproduce R1 stats with 2-seed CSVs + 3-seed checkpoints",
+      "remote_status": "only seeds 42/123 KGE CSVs exist (results/dpl_camels_531_lite_v2); seed_2026 full checkpoint exists (top-level dpl_camels_531_lite_v2)",
+      "role": "dPL seed_2026 train_test_kge_by_basin.csv"
+    },
+    {
+      "fallback": "regenerate with manuscript/scripts/build_r1_statistics.py after IC/dPL artifacts are synced",
+      "remote_status": "NOT FOUND on this node (computed on the original machine)",
+      "role": "R1/R2 statistics tables (results/R1, results/R2, manuscript/results/R1)"
+    }
+  ],
+  "generated_at": "2026-08-16",
+  "generated_by": "r4 audit (read-only remote inventory; no files modified)",
+  "optional_entries": [
+    {
+      "local_target": "results/phase0_controlled_531_v1/<MODEL>/",
+      "note": "not part of R1/R2 canonical trio; only if R4/R5 needs the controlled model family",
+      "remote": "/autodl-fs/data/phase0_controlled_531_v1/<MODEL>/ (raw/<m>/*.json x5310, checkpoints, summaries, DONE.json)",
+      "required_for_r4": false,
+      "role": "phase0 controlled IC (N/D_E/G_E/D_R/G_R, 10 starts x 100 gens, canonical batched format)"
+    },
+    {
+      "local_target": "results/dpl_camels_531_lite_v2/",
+      "note": "only XAJ/XAJ_CN (+HBV KGE CSVs) needed for R1/R2/R4; other families only for R5 cross-structure work",
+      "remote": "/autodl-fs/data/dmg_hydro_structure_diagnosis/dpl_camels_531_lite_v2/",
+      "required_for_r4": false,
+      "role": "dPL lite_v2 other families (GR4J, GR4J_CN, SIMHYD, SIMHYD_CN, XAJ_TGD, ...) and multiseed_v1 trees"
+    }
+  ],
+  "policy": {
+    "dpl": "sync complete seed directories (checkpoint + config + normalization + epoch history); checkpoint is required to regenerate physical parameters and for seed-level audit.",
+    "no_ssh_credentials_embedded": true,
+    "sync_full_raw_restarts": "IC fused runs: per_start.csv contains ALL restart rows (5 starts x 531 basins) incl. theta_normalized + fitness history; sync the CSV, not derived parameters, to keep auditability of best-restart selection."
+  },
+  "purpose": "minimal artifacts to (a) run official R4 post-hoc snow-state export from R1/R2 observation-trained models, and (b) reproduce R1/R2 canonical daily inference. No retraining needed after sync.",
+  "remote_node": {
+    "host": "connect.westb.seetacloud.com",
+    "note": "AutoDL container; persistent disk /autodl-fs (survives reboot); /root is ephemeral",
+    "port": "SEE SSH PORT PROVIDED SEPARATELY (node ports change on reboot)",
+    "verified": "connection OK; /autodl-fs/data/dmg_hydro_structure_diagnosis present"
+  },
+  "schema_version": 1
+}

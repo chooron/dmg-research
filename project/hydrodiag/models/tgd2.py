@@ -20,9 +20,14 @@ def tgd2_step(precip_t: torch.Tensor, temp_t: torch.Tensor, storage: torch.Tenso
     cold_gate = torch.sigmoid((TGD2_T_REF_C - temp_t) / TGD2_T_SCALE_C)
     tau = tau_warm + delta_tau_cold * cold_gate
     retention = torch.exp(-1.0 / tau.clamp_min(TGD2_EPS_DAYS))
-    available = storage + precip_t
-    effective = (1.0 - retention) * available
-    storage_new = retention * available
+    # Physical precipitation and storage are non-negative.  Explicit clamps
+    # keep long dry sequences from propagating tiny negative round-off values
+    # into the continuous state export.
+    precip_t = precip_t.clamp_min(0.0)
+    storage = storage.clamp_min(0.0)
+    available = (storage + precip_t).clamp_min(0.0)
+    effective = ((1.0 - retention) * available).clamp_min(0.0)
+    storage_new = (retention * available).clamp_min(0.0)
     return effective, storage_new, tau, retention
 
 
