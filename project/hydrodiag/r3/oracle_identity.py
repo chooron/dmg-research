@@ -61,19 +61,24 @@ def canonical_psol(bundle) -> np.ndarray:
 
     forcing = torch.from_numpy(bundle.forcing)
     with torch.no_grad():
-        return _estimate_psol_annual(forcing[:, :, 0], forcing[:, :, 1]).numpy().astype(
-            np.float32, copy=False
+        return (
+            _estimate_psol_annual(forcing[:, :, 0], forcing[:, :, 1])
+            .numpy()
+            .astype(np.float32, copy=False)
         )
 
 
-def _model_forward(model, forcing_np, params_np, names, device, dtype,
-                   psol_annual_np):
+def _model_forward(model, forcing_np, params_np, names, device, dtype, psol_annual_np):
     """Run XAJ_CN through the production adapter-compatible path."""
     fc = build_forcing_dict(forcing_np, device, dtype)
     if psol_annual_np is not None:
-        fc["cn_psol_annual"] = torch.from_numpy(psol_annual_np).to(device=device, dtype=dtype)
-    p = {name: torch.from_numpy(params_np[:, i]).to(device=device, dtype=dtype)
-         for i, name in enumerate(names)}
+        fc["cn_psol_annual"] = torch.from_numpy(psol_annual_np).to(
+            device=device, dtype=dtype
+        )
+    p = {
+        name: torch.from_numpy(params_np[:, i]).to(device=device, dtype=dtype)
+        for i, name in enumerate(names)
+    }
     with torch.no_grad():
         q, _ = model(forcings=fc, params=p)
     return q.detach().cpu().numpy()
@@ -86,7 +91,9 @@ def main() -> None:
     parser.add_argument("--results-root", type=Path, default=DEFAULT_RESULTS_ROOT)
     parser.add_argument("--truth-run-id", default="r3_synthetic_truth_v1")
     parser.add_argument("--run-id", default="r3_gate_v1")
-    parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
+    parser.add_argument(
+        "--device", default="cuda" if torch.cuda.is_available() else "cpu"
+    )
     parser.add_argument("--batch-basins", type=int, default=64)
     parser.add_argument("--max-basins", type=int, default=None, help="smoke limit")
     args = parser.parse_args()
@@ -100,7 +107,9 @@ def main() -> None:
     theta = np.load(truth_dir / "theta_star.npz")
     theta_star = theta["parameters"]
     names = [str(n) for n in theta["parameter_names"]]
-    q_star = np.asarray(np.load(truth_dir / "q_star.npz")["target_mm_day"], dtype=np.float64)
+    q_star = np.asarray(
+        np.load(truth_dir / "q_star.npz")["target_mm_day"], dtype=np.float64
+    )
 
     n_all = len(bundle.basin_ids)
     n = n_all if args.max_basins is None else min(args.max_basins, n_all)
@@ -122,50 +131,81 @@ def main() -> None:
         psol_b = psol[left:right]
 
         # --- Path 1: canonical full-axis (recorded vs production) ---
-        fc = build_forcing_dict(bundle.forcing[left:right].astype(np.float32), device, dtype)
-        p1 = {name: torch.from_numpy(theta_b[:, i]).to(device=device, dtype=dtype)
-              for i, name in enumerate(names)}
+        fc = build_forcing_dict(
+            bundle.forcing[left:right].astype(np.float32), device, dtype
+        )
+        p1 = {
+            name: torch.from_numpy(theta_b[:, i]).to(device=device, dtype=dtype)
+            for i, name in enumerate(names)
+        }
         recorded = recorded_cn_forward(model, fc, p1, device, dtype)
         diffs = validate_recorded_forward(model, recorded, fc, p1)
 
         # one row per basin; all paths fill into it
-        chunk_rows = [{"basin_id": str(bundle.basin_ids[b]),
-                       "path1_q_abs_max": diffs["q_abs_max"]} for b in idx]
+        chunk_rows = [
+            {
+                "basin_id": str(bundle.basin_ids[b]),
+                "path1_q_abs_max": diffs["q_abs_max"],
+            }
+            for b in idx
+        ]
 
         # --- Path 2: IC objective path (train/test splits) ---
         for split, (f_si, f_ei, si, ei) in (
-            ("train", (p.train_forcing_start_index, p.train_forcing_end_index,
-                       p.train.start_index, p.train.end_index)),
-            ("test", (p.test_forcing_start_index, p.test_forcing_end_index,
-                      p.test.start_index, p.test.end_index)),
+            (
+                "train",
+                (
+                    p.train_forcing_start_index,
+                    p.train_forcing_end_index,
+                    p.train.start_index,
+                    p.train.end_index,
+                ),
+            ),
+            (
+                "test",
+                (
+                    p.test_forcing_start_index,
+                    p.test_forcing_end_index,
+                    p.test.start_index,
+                    p.test.end_index,
+                ),
+            ),
         ):
             forcing_np = bundle.forcing[left:right, f_si:f_ei].astype(np.float32)
-            q_c = _model_forward(model, forcing_np, theta_b, names, device, dtype, psol_b)
+            q_c = _model_forward(
+                model, forcing_np, theta_b, names, device, dtype, psol_b
+            )
             q_s = _model_forward(model, forcing_np, theta_b, names, device, dtype, None)
             for v, q in (("canonical", q_c), ("split_gthresh", q_s)):
                 q_eval = q[:, warmup:]
                 for k, b in enumerate(idx):
-                    obs = q_star[b, si:ei + 1]
+                    obs = q_star[b, si : ei + 1]
                     diff = np.abs(q_eval[k].astype(np.float64) - obs)
                     chunk_rows[k][f"path2_{split}_{v}_abs_max"] = float(diff.max())
                     chunk_rows[k][f"path2_{split}_{v}_abs_mean"] = float(diff.mean())
-                    chunk_rows[k][f"path2_{split}_{v}_kge"] = standard_kge(q_eval[k], obs)
+                    chunk_rows[k][f"path2_{split}_{v}_kge"] = standard_kge(
+                        q_eval[k], obs
+                    )
 
         # --- Path 3: dPL training-window path (fixed offsets) ---
         for kwin, offset in enumerate(WINDOW_START_OFFSETS):
             s = p.train.start_index + offset
             f_si = s - warmup
-            forcing_np = bundle.forcing[left:right, f_si:s + 365].astype(np.float32)
-            q_c = _model_forward(model, forcing_np, theta_b, names, device, dtype, psol_b)
+            forcing_np = bundle.forcing[left:right, f_si : s + 365].astype(np.float32)
+            q_c = _model_forward(
+                model, forcing_np, theta_b, names, device, dtype, psol_b
+            )
             q_s = _model_forward(model, forcing_np, theta_b, names, device, dtype, None)
             for v, q in (("canonical", q_c), ("split_gthresh", q_s)):
                 q_scored = q[:, warmup:]
                 for k, b in enumerate(idx):
-                    obs = q_star[b, s:s + 365]
+                    obs = q_star[b, s : s + 365]
                     diff = np.abs(q_scored[k].astype(np.float64) - obs)
                     chunk_rows[k][f"path3_win{kwin}_{v}_abs_max"] = float(diff.max())
                     chunk_rows[k][f"path3_win{kwin}_{v}_abs_mean"] = float(diff.mean())
-                    chunk_rows[k][f"path3_win{kwin}_{v}_kge"] = standard_kge(q_scored[k], obs)
+                    chunk_rows[k][f"path3_win{kwin}_{v}_kge"] = standard_kge(
+                        q_scored[k], obs
+                    )
 
         # --- Path 4: dPL evaluation path ---
         f_si = p.test_forcing_start_index
@@ -177,7 +217,7 @@ def main() -> None:
         for v, q in (("canonical", q_c), ("split_gthresh", q_s)):
             q_eval = q[:, warmup:]
             for k, b in enumerate(idx):
-                obs = q_star[b, si:ei + 1]
+                obs = q_star[b, si : ei + 1]
                 diff = np.abs(q_eval[k].astype(np.float64) - obs)
                 chunk_rows[k][f"path4_{v}_abs_max"] = float(diff.max())
                 chunk_rows[k][f"path4_{v}_abs_mean"] = float(diff.mean())
@@ -226,7 +266,9 @@ def main() -> None:
         ),
     }
     write_json(output_dir / "oracle_identity.json", report)
-    print(f"COMPLETE oracle identity -> {output_dir / 'oracle_identity.json'}", flush=True)
+    print(
+        f"COMPLETE oracle identity -> {output_dir / 'oracle_identity.json'}", flush=True
+    )
 
 
 def load_bundle(project_root: Path, data_root: Path):

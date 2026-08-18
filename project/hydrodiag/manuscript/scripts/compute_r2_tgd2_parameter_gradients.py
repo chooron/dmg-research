@@ -25,6 +25,7 @@ Statistical protocol (identical to the frozen Base-CN pipeline):
     bootstrap calls, then 30 slope bootstrap calls in the frozen group order) and
     the reproduction is asserted at 1e-12 before any Base-TGD2 value is accepted.
 """
+
 from __future__ import annotations
 
 import sys
@@ -41,15 +42,38 @@ N_BOOT = 10000
 SEED = 20260730
 
 PARAM_ORDER = [
-    "xaj_k", "xaj_b", "xaj_im", "xaj_um", "xaj_lm", "xaj_dm", "xaj_c",
-    "xaj_sm", "xaj_ex", "xaj_ki", "xaj_kg", "xaj_ci", "xaj_cg", "xaj_a",
+    "xaj_k",
+    "xaj_b",
+    "xaj_im",
+    "xaj_um",
+    "xaj_lm",
+    "xaj_dm",
+    "xaj_c",
+    "xaj_sm",
+    "xaj_ex",
+    "xaj_ki",
+    "xaj_kg",
+    "xaj_ci",
+    "xaj_cg",
+    "xaj_a",
     "xaj_theta",
 ]
 DISPLAY = {
-    "xaj_k": "k", "xaj_b": "b", "xaj_im": "im", "xaj_um": "um",
-    "xaj_lm": "lm", "xaj_dm": "dm", "xaj_c": "c", "xaj_sm": "sm",
-    "xaj_ex": "ex", "xaj_ki": "ki", "xaj_kg": "kg", "xaj_ci": "ci",
-    "xaj_cg": "cg", "xaj_a": "a (UH shape)", "xaj_theta": "theta (UH scale)",
+    "xaj_k": "k",
+    "xaj_b": "b",
+    "xaj_im": "im",
+    "xaj_um": "um",
+    "xaj_lm": "lm",
+    "xaj_dm": "dm",
+    "xaj_c": "c",
+    "xaj_sm": "sm",
+    "xaj_ex": "ex",
+    "xaj_ki": "ki",
+    "xaj_kg": "kg",
+    "xaj_ci": "ci",
+    "xaj_cg": "cg",
+    "xaj_a": "a (UH shape)",
+    "xaj_theta": "theta (UH scale)",
 }
 
 
@@ -64,12 +88,18 @@ def build_paired_tgd2(canonical: pd.DataFrame) -> pd.DataFrame:
     Base-CN paired file, so that within-group basin order is identical and the
     frozen bootstrap resamples apply positionally."""
     base = canonical[canonical["structure"] == "Base"].rename(
-        columns={"z": "z_base", "value_physical": "value_base"})
+        columns={"z": "z_base", "value_physical": "value_base"}
+    )
     gd = canonical[canonical["structure"] == "GD"].rename(
-        columns={"z": "z_gd", "value_physical": "value_gd"})
-    paired = base.merge(gd[["paradigm", "basin_id", "parameter", "z_gd", "value_gd"]],
-                        on=["paradigm", "basin_id", "parameter"],
-                        how="outer", validate="one_to_one", indicator=True)
+        columns={"z": "z_gd", "value_physical": "value_gd"}
+    )
+    paired = base.merge(
+        gd[["paradigm", "basin_id", "parameter", "z_gd", "value_gd"]],
+        on=["paradigm", "basin_id", "parameter"],
+        how="outer",
+        validate="one_to_one",
+        indicator=True,
+    )
     if not (paired["_merge"] == "both").all():
         raise ValueError("Base/GD pair alignment failure")
     paired["delta_base_minus_tgd2"] = paired["z_base"] - paired["z_gd"]
@@ -87,9 +117,13 @@ def main() -> None:
     paired_tg = build_paired_tgd2(canonical)
 
     # --- sanity: basin order within every (paradigm, parameter) group matches ---
-    for (paradigm, parameter), g in paired_tg.groupby(["paradigm", "parameter"], sort=False):
-        g2 = frozen_paired[(frozen_paired["paradigm"] == paradigm)
-                           & (frozen_paired["parameter"] == parameter)]
+    for (paradigm, parameter), g in paired_tg.groupby(
+        ["paradigm", "parameter"], sort=False
+    ):
+        g2 = frozen_paired[
+            (frozen_paired["paradigm"] == paradigm)
+            & (frozen_paired["parameter"] == parameter)
+        ]
         if not (g["basin_id"].to_numpy() == g2["basin_id"].to_numpy()).all():
             raise ValueError(f"basin order mismatch: {paradigm} {parameter}")
     # --- sanity: TGD2 dPL strictly interior, IC on bounds (audit convention) ---
@@ -101,7 +135,9 @@ def main() -> None:
     # --- replicate the frozen RNG stream on the frozen Base-CN paired file ---
     rng = np.random.default_rng(SEED)
     # Phase A: 30 primary-median bootstrap calls (consume, discard).
-    for (paradigm, parameter), g in frozen_paired.groupby(["paradigm", "parameter"], sort=False):
+    for (paradigm, parameter), g in frozen_paired.groupby(
+        ["paradigm", "parameter"], sort=False
+    ):
         vals = g["delta_base_minus_cn"].to_numpy(float)
         idx = rng.integers(0, len(vals), size=(N_BOOT, len(vals)))
         boot = np.asarray([np.median(vals[i]) for i in idx], dtype=float)
@@ -109,11 +145,14 @@ def main() -> None:
 
     # Phase B: slope bootstraps; capture idx, validate Base-CN, compute Base-TGD2.
     rows = []
-    for (paradigm, parameter), g in frozen_paired.groupby(["paradigm", "parameter"], sort=False):
+    for (paradigm, parameter), g in frozen_paired.groupby(
+        ["paradigm", "parameter"], sort=False
+    ):
         x = g["frac_snow"].to_numpy(float)
         y_cn = g["delta_base_minus_cn"].to_numpy(float)
-        g_tg = paired_tg[(paired_tg["paradigm"] == paradigm)
-                         & (paired_tg["parameter"] == parameter)]
+        g_tg = paired_tg[
+            (paired_tg["paradigm"] == paradigm) & (paired_tg["parameter"] == parameter)
+        ]
         y_tg = g_tg["delta_base_minus_tgd2"].to_numpy(float)
         assert len(x) == len(y_tg) == 531
 
@@ -123,28 +162,46 @@ def main() -> None:
 
         beta_cn = slope(x, y_cn)
         lo_cn, hi_cn = np.quantile(boot_cn, [0.025, 0.975])
-        fr = frozen_grad[(frozen_grad["paradigm"] == paradigm)
-                         & (frozen_grad["parameter"] == parameter)].iloc[0]
-        assert abs(beta_cn - fr["beta"]) < 1e-12, f"beta mismatch {paradigm} {parameter}"
-        assert abs(lo_cn - fr["ci95_low"]) < 1e-12 and abs(hi_cn - fr["ci95_high"]) < 1e-12, \
-            f"CI mismatch {paradigm} {parameter}"
+        fr = frozen_grad[
+            (frozen_grad["paradigm"] == paradigm)
+            & (frozen_grad["parameter"] == parameter)
+        ].iloc[0]
+        assert abs(beta_cn - fr["beta"]) < 1e-12, (
+            f"beta mismatch {paradigm} {parameter}"
+        )
+        assert (
+            abs(lo_cn - fr["ci95_low"]) < 1e-12 and abs(hi_cn - fr["ci95_high"]) < 1e-12
+        ), f"CI mismatch {paradigm} {parameter}"
 
         beta_tg = slope(x, y_tg)
         lo_tg, hi_tg = np.quantile(boot_tg, [0.025, 0.975])
-        rows.append({
-            "paradigm": paradigm, "parameter": parameter,
-            "parameter_display": DISPLAY[parameter], "contrast": "Base-TGD2",
-            "n": len(x), "beta": beta_tg, "ci95_low": lo_tg, "ci95_high": hi_tg,
-            "bootstrap_n": N_BOOT, "bootstrap_seed": SEED,
-            "validation_base_cn_max_abs_diff": 0.0,
-        })
+        rows.append(
+            {
+                "paradigm": paradigm,
+                "parameter": parameter,
+                "parameter_display": DISPLAY[parameter],
+                "contrast": "Base-TGD2",
+                "n": len(x),
+                "beta": beta_tg,
+                "ci95_low": lo_tg,
+                "ci95_high": hi_tg,
+                "bootstrap_n": N_BOOT,
+                "bootstrap_seed": SEED,
+                "validation_base_cn_max_abs_diff": 0.0,
+            }
+        )
 
     out = pd.DataFrame(rows)
-    out.to_csv(RESULTS_R2 / "r2_snow_gradients_base_tgd2_summary.csv",
-               index=False, float_format="%.17g")
+    out.to_csv(
+        RESULTS_R2 / "r2_snow_gradients_base_tgd2_summary.csv",
+        index=False,
+        float_format="%.17g",
+    )
     print(f"wrote r2_snow_gradients_base_tgd2_summary.csv ({len(out)} rows)")
-    print("Base-CN frozen gradients reproduced exactly (asserted at 1e-12); "
-          "Base-TGD2 gradients evaluated on the same 10,000 resamples.")
+    print(
+        "Base-CN frozen gradients reproduced exactly (asserted at 1e-12); "
+        "Base-TGD2 gradients evaluated on the same 10,000 resamples."
+    )
 
 
 if __name__ == "__main__":

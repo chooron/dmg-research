@@ -569,7 +569,11 @@ class SinglePopulationAlgorithmMixin:
             for reportable in reportables:
                 if reportable not in self.__exclude:
                     self.add_status_getters(
-                        {reportable: ObjectiveStatusReporter(self, obj_index=single_obj, to_report=reportable)}
+                        {
+                            reportable: ObjectiveStatusReporter(
+                                self, obj_index=single_obj, to_report=reportable
+                            )
+                        }
                     )
         else:
             for i_obj in range(len(self.problem.senses)):

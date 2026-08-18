@@ -94,9 +94,14 @@ def main() -> None:
     parser.add_argument("--tgd2-dpl-prefix", default="r3_misspec_dpl_xaj_tgd2_seed_")
     parser.add_argument("--base-no-refit-run-id", default="r3_base_no_refit_v1")
     parser.add_argument("--run-id", default="r3_misspec_analysis_v1")
-    parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
-    parser.add_argument("--allow-incomplete", action="store_true",
-                        help="Report on whatever is present (engineering smoke only).")
+    parser.add_argument(
+        "--device", default="cuda" if torch.cuda.is_available() else "cpu"
+    )
+    parser.add_argument(
+        "--allow-incomplete",
+        action="store_true",
+        help="Report on whatever is present (engineering smoke only).",
+    )
     args = parser.parse_args()
 
     truth_dir = args.results_root / args.truth_run_id
@@ -110,7 +115,9 @@ def main() -> None:
     theta_npz = np.load(truth_dir / "theta_star.npz")
     theta_star = theta_npz["parameters"]
     names = [str(x) for x in theta_npz["parameter_names"]]
-    q_star = np.asarray(np.load(truth_dir / "q_star.npz")["target_mm_day"], dtype=np.float64)
+    q_star = np.asarray(
+        np.load(truth_dir / "q_star.npz")["target_mm_day"], dtype=np.float64
+    )
     snow = frac_snow_series(bundle).set_index("basin_id")["frac_snow"]
 
     from models.parameter_specs import XAJ_PARAM_SPECS
@@ -123,16 +130,20 @@ def main() -> None:
 
     # --- load correct-CN references ---
     cn_ic = load_ic_estimates(args.results_root / args.cn_ic_run_id, basin_ids)
-    cn_dpl = {s: load_dpl_estimates(args.results_root / f"{args.cn_dpl_prefix}{s}", basin_ids)
-              for s in SEEDS}
+    cn_dpl = {
+        s: load_dpl_estimates(args.results_root / f"{args.cn_dpl_prefix}{s}", basin_ids)
+        for s in SEEDS
+    }
 
     def z_shared(est_map, basin, names_) -> np.ndarray:
         th = est_map[basin]["theta_hat"]
         idx = [names_.index(p) for p in COMMON_XAJ]
         return (th[idx] - lower) / (upper - lower)
 
-    structures = {"Base": (args.base_ic_run_id, args.base_dpl_prefix),
-                  "TGD2": (args.tgd2_ic_run_id, args.tgd2_dpl_prefix)}
+    structures = {
+        "Base": (args.base_ic_run_id, args.base_dpl_prefix),
+        "TGD2": (args.tgd2_ic_run_id, args.tgd2_dpl_prefix),
+    }
 
     rows_discharge, rows_param, rows_state = [], [], []
     missing: list[str] = []
@@ -153,27 +164,41 @@ def main() -> None:
         # the generating-truth (CN) names.
         fit_names = est[basin_ids[0]]["parameter_names"]
         z_ic = np.stack([z_shared(est, b, fit_names) for b in basin_ids])
-        z_cn = np.stack([z_shared(cn_ic, b, cn_ic[basin_ids[0]]["parameter_names"])
-                         for b in basin_ids])
+        z_cn = np.stack(
+            [
+                z_shared(cn_ic, b, cn_ic[basin_ids[0]]["parameter_names"])
+                for b in basin_ids
+            ]
+        )
         for k, b in enumerate(basin_ids):
-            rows_discharge.append({
-                "basin_id": b, "paradigm": "IC", "structure": struct,
-                "kge_train": est[b]["train_kge"],
-                "kge_test": est[b]["test_kge"],
-                "delta_kge_train": est[b]["train_kge"] - cn_ic[b]["train_kge"],
-                "delta_kge_test": est[b]["test_kge"] - cn_ic[b]["test_kge"],
-            })
+            rows_discharge.append(
+                {
+                    "basin_id": b,
+                    "paradigm": "IC",
+                    "structure": struct,
+                    "kge_train": est[b]["train_kge"],
+                    "kge_test": est[b]["test_kge"],
+                    "delta_kge_train": est[b]["train_kge"] - cn_ic[b]["train_kge"],
+                    "delta_kge_test": est[b]["test_kge"] - cn_ic[b]["test_kge"],
+                }
+            )
             for j, p in enumerate(COMMON_XAJ):
                 e_m = z_ic[k, j] - z_star[k, j]
                 e_cn = z_cn[k, j] - z_star[k, j]
-                rows_param.append({
-                    "basin_id": b, "paradigm": "IC", "structure": struct, "parameter": p,
-                    "tier": tier_label("IC", p),
-                    "e": float(e_m), "e_cn": float(e_cn),
-                    "delta_abs_e": float(abs(e_m) - abs(e_cn)),
-                    "delta_e": float(e_m - e_cn),
-                    "frac_snow": float(snow[b]),
-                })
+                rows_param.append(
+                    {
+                        "basin_id": b,
+                        "paradigm": "IC",
+                        "structure": struct,
+                        "parameter": p,
+                        "tier": tier_label("IC", p),
+                        "e": float(e_m),
+                        "e_cn": float(e_cn),
+                        "delta_abs_e": float(abs(e_m) - abs(e_cn)),
+                        "delta_e": float(e_m - e_cn),
+                        "frac_snow": float(snow[b]),
+                    }
+                )
         if not dpl_ok:
             missing.append(f"dPL-{struct}")
             continue
@@ -185,30 +210,48 @@ def main() -> None:
             for k, b in enumerate(basin_ids):
                 z_m = z_shared(est_s, b, dpl_names)
                 z_c = z_shared(cn_s, b, cn_dpl_names)
-                rows_discharge.append({
-                    "basin_id": b, "paradigm": "dPL", "seed": s, "structure": struct,
-                    "kge_train": float("nan"), "kge_test": est_s[b]["test_kge"],
-                    "delta_kge_train": float("nan"),
-                    "delta_kge_test": est_s[b]["test_kge"] - cn_s[b]["test_kge"],
-                })
+                rows_discharge.append(
+                    {
+                        "basin_id": b,
+                        "paradigm": "dPL",
+                        "seed": s,
+                        "structure": struct,
+                        "kge_train": float("nan"),
+                        "kge_test": est_s[b]["test_kge"],
+                        "delta_kge_train": float("nan"),
+                        "delta_kge_test": est_s[b]["test_kge"] - cn_s[b]["test_kge"],
+                    }
+                )
                 for j, p in enumerate(COMMON_XAJ):
                     e_m = z_m[j] - z_star[k, j]
                     e_cn = z_c[j] - z_star[k, j]
-                    rows_param.append({
-                        "basin_id": b, "paradigm": "dPL", "seed": s,
-                        "structure": struct, "parameter": p,
-                        "tier": tier_label("dPL", p),
-                        "e": float(e_m), "e_cn": float(e_cn),
-                        "delta_abs_e": float(abs(e_m) - abs(e_cn)),
-                        "delta_e": float(e_m - e_cn),
-                        "frac_snow": float(snow[b]),
-                    })
+                    rows_param.append(
+                        {
+                            "basin_id": b,
+                            "paradigm": "dPL",
+                            "seed": s,
+                            "structure": struct,
+                            "parameter": p,
+                            "tier": tier_label("dPL", p),
+                            "e": float(e_m),
+                            "e_cn": float(e_cn),
+                            "delta_abs_e": float(abs(e_m) - abs(e_cn)),
+                            "delta_e": float(e_m - e_cn),
+                            "frac_snow": float(snow[b]),
+                        }
+                    )
 
     # Base-no-refit reference (raw knockout): join by basin ID
-    ref = pd.read_csv(args.results_root / args.base_no_refit_run_id / "base_no_refit_basin_metrics.csv")
+    ref = pd.read_csv(
+        args.results_root
+        / args.base_no_refit_run_id
+        / "base_no_refit_basin_metrics.csv"
+    )
     ref["basin_id"] = ref["basin_id"].astype(str).str.zfill(8)
 
-    pd.DataFrame(rows_discharge).to_csv(output_dir / "paired_discharge.csv", index=False)
+    pd.DataFrame(rows_discharge).to_csv(
+        output_dir / "paired_discharge.csv", index=False
+    )
     pd.DataFrame(rows_param).to_csv(output_dir / "paired_parameters.csv", index=False)
     ref.to_csv(output_dir / "base_no_refit_reference.csv", index=False)
 

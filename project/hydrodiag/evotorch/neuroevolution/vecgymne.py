@@ -47,7 +47,9 @@ def _is_numpy_array_entirely_negative_inf(x: np.ndarray) -> bool:
 
 
 def _numpy_arrays_specify_no_bounds(low: np.ndarray, high: np.ndarray) -> bool:
-    return _is_numpy_array_entirely_negative_inf(low) and _is_numpy_array_entirely_positive_inf(high)
+    return _is_numpy_array_entirely_negative_inf(
+        low
+    ) and _is_numpy_array_entirely_positive_inf(high)
 
 
 def _numpy_arrays_specify_bounds(low: np.ndarray, high: np.ndarray) -> bool:
@@ -299,7 +301,9 @@ class VecGymNE(BaseNEProblem):
         self._num_envs: Optional[int] = None
 
         # Store the upper bound (if any) regarding how many environments can exist at the same time.
-        self._max_num_envs: Optional[int] = None if max_num_envs is None else int(max_num_envs)
+        self._max_num_envs: Optional[int] = (
+            None if max_num_envs is None else int(max_num_envs)
+        )
 
         # Actor-specific upper bound regarding how many environments can exist at the same time.
         # This variable will be filled by the `_parallelize(...)` method.
@@ -328,7 +332,9 @@ class VecGymNE(BaseNEProblem):
             # `act_length`, and `obs_space`. To obtain those values, we use our helper function
             # `_env_constants_for_str_net(...)` which temporarily instantiates the specified environment and returns
             # its needed constants.
-            env_constants = _env_constants_for_str_net(self._env_maker, **(self._env_config))
+            env_constants = _env_constants_for_str_net(
+                self._env_maker, **(self._env_config)
+            )
         elif isinstance(network, nn.Module):
             # If the network is an already instantiated nn.Module, then we do not prepare any pre-defined constants.
             env_constants = {}
@@ -337,7 +343,9 @@ class VecGymNE(BaseNEProblem):
             # `act_length`, and `obs_space`. To obtain those values, we use our helper function
             # `_env_constants_for_callable_net(...)` which temporarily instantiates the specified environment and
             # returns its needed constants.
-            env_constants = _env_constants_for_callable_net(self._env_maker, **(self._env_config))
+            env_constants = _env_constants_for_callable_net(
+                self._env_maker, **(self._env_config)
+            )
 
         # Build a `Policy` instance according to the given architecture, and store it.
         if isinstance(network, str):
@@ -345,7 +353,9 @@ class VecGymNE(BaseNEProblem):
         elif isinstance(network, nn.Module):
             instantiated_net = network
         else:
-            instantiated_net = pass_info_if_needed(network, env_constants)(**network_args)
+            instantiated_net = pass_info_if_needed(network, env_constants)(
+                **network_args
+            )
         self._policy = Policy(instantiated_net)
 
         # Store the boolean which indicates whether or not there will be observation normalization.
@@ -359,7 +369,9 @@ class VecGymNE(BaseNEProblem):
         self._num_episodes = int(num_episodes)
 
         # Store the `decrease_rewards_by` configuration given by the user.
-        self._decrease_rewards_by = None if decrease_rewards_by is None else float(decrease_rewards_by)
+        self._decrease_rewards_by = (
+            None if decrease_rewards_by is None else float(decrease_rewards_by)
+        )
 
         if alive_bonus_schedule is None:
             # If `alive_bonus_schedule` argument is None, then we store it as None as well.
@@ -394,7 +406,9 @@ class VecGymNE(BaseNEProblem):
                 )
 
         # If `action_noise_stdev` is specified, store it.
-        self._action_noise_stdev = None if action_noise_stdev is None else float(action_noise_stdev)
+        self._action_noise_stdev = (
+            None if action_noise_stdev is None else float(action_noise_stdev)
+        )
 
         # Initialize the counters for the number of simulator interactions and the number of episodes.
         self._interaction_count: int = 0
@@ -445,9 +459,14 @@ class VecGymNE(BaseNEProblem):
                     self._actor_max_num_envs = self._max_num_envs
                 else:
                     if self._max_num_envs is not None:
-                        max_num_envs_per_actor = split_workload(self._max_num_envs, len(self._actors))
+                        max_num_envs_per_actor = split_workload(
+                            self._max_num_envs, len(self._actors)
+                        )
                         for i_actor, actor in enumerate(self._actors):
-                            actor.call.remote("_set_actor_max_num_envs", max_num_envs_per_actor[i_actor])
+                            actor.call.remote(
+                                "_set_actor_max_num_envs",
+                                max_num_envs_per_actor[i_actor],
+                            )
                 self._actor_max_num_envs_ready = True
 
     def _set_actor_max_num_envs(self, n: int):
@@ -455,7 +474,10 @@ class VecGymNE(BaseNEProblem):
         self._actor_max_num_envs_ready = True
 
     def _extra_status(self, batch: SolutionBatch):
-        return dict(total_interaction_count=self.interaction_count, total_episode_count=self.episode_count)
+        return dict(
+            total_interaction_count=self.interaction_count,
+            total_episode_count=self.episode_count,
+        )
 
     @property
     def observation_normalization(self) -> bool:
@@ -591,9 +613,15 @@ class VecGymNE(BaseNEProblem):
         # Make a new RunningNorm instance according to the observation tensor.
         # The dtype and the device of the new RunningNorm is taken from the observation.
         # This new RunningNorm is empty (i.e. does not contain any stats yet).
-        return RunningNorm(shape=observation.shape[1:], dtype=observation.dtype, device=observation.device)
+        return RunningNorm(
+            shape=observation.shape[1:],
+            dtype=observation.dtype,
+            device=observation.device,
+        )
 
-    def _transfer_running_norm(self, rn: RunningNorm, observation: torch.Tensor) -> RunningNorm:
+    def _transfer_running_norm(
+        self, rn: RunningNorm, observation: torch.Tensor
+    ) -> RunningNorm:
         # Transfer (if necessary) the RunningNorm to the device of the observation tensor.
         # The returned RunningNorm may be the RunningNorm itself (if the device did not change)
         # or a new copy (if the device did change).
@@ -602,7 +630,11 @@ class VecGymNE(BaseNEProblem):
         return rn
 
     def _normalize_observation(
-        self, observation: torch.Tensor, *, mask: Optional[torch.Tensor] = None, update_stats: bool = True
+        self,
+        observation: torch.Tensor,
+        *,
+        mask: Optional[torch.Tensor] = None,
+        update_stats: bool = True,
     ) -> torch.Tensor:
         # This function normalizes the received observation batch.
         # If a mask is given (as a tensor of booleans), only observations with corresponding mask value set as True
@@ -618,7 +650,9 @@ class VecGymNE(BaseNEProblem):
                 self._obs_stats = self._make_running_norm(observation)
             else:
                 # If we already have observation stats, we make sure that it is in the correct device.
-                self._obs_stats = self._transfer_running_norm(self._obs_stats, observation)
+                self._obs_stats = self._transfer_running_norm(
+                    self._obs_stats, observation
+                )
 
             if update_stats:
                 # This is the case where the `update_stats` argument was encountered as True.
@@ -629,7 +663,9 @@ class VecGymNE(BaseNEProblem):
                 else:
                     # If the RunningNorm responsible to collect new stats already exists, then we make sure
                     # that it is in the correct device.
-                    self._collected_stats = self._transfer_running_norm(self._collected_stats, observation)
+                    self._collected_stats = self._transfer_running_norm(
+                        self._collected_stats, observation
+                    )
 
                 # We first update the RunningNorm responsible for collecting the new stats.
                 self._collected_stats.update(observation, mask)
@@ -648,7 +684,9 @@ class VecGymNE(BaseNEProblem):
 
     def _ensure_obsnorm(self):
         if not self.observation_normalization:
-            raise ValueError("This feature can only be used when observation_normalization=True.")
+            raise ValueError(
+                "This feature can only be used when observation_normalization=True."
+            )
 
     def get_observation_stats(self) -> RunningNorm:
         """Get the observation stats"""
@@ -682,7 +720,9 @@ class VecGymNE(BaseNEProblem):
         return result
 
     def _make_sync_data_for_main(self) -> Any:
-        result = dict(episode_count=self.episode_count, interaction_count=self.interaction_count)
+        result = dict(
+            episode_count=self.episode_count, interaction_count=self.interaction_count
+        )
 
         if self.observation_normalization:
             collected = self.pop_observation_stats()
@@ -718,7 +758,9 @@ class VecGymNE(BaseNEProblem):
         # For when the main Problem object (the non-remote one) gets pickled,
         # this function returns the counters of this remote Problem instance,
         # to be sent to the main one.
-        return dict(interaction_count=self.interaction_count, episode_count=self.episode_count)
+        return dict(
+            interaction_count=self.interaction_count, episode_count=self.episode_count
+        )
 
     def _use_pickle_data_from_main(self, state: dict):
         # For when a newly unpickled Problem object gets (re)parallelized,
@@ -731,7 +773,9 @@ class VecGymNE(BaseNEProblem):
             elif k == "interaction_count":
                 self.set_interaction_count(v)
             else:
-                raise ValueError(f"When restoring the inner state of a remote worker, unrecognized state key: {k}")
+                raise ValueError(
+                    f"When restoring the inner state of a remote worker, unrecognized state key: {k}"
+                )
 
     def _evaluate_batch(self, batch: SolutionBatch):
         if self._actor_max_num_envs is None:
@@ -764,11 +808,17 @@ class VecGymNE(BaseNEProblem):
             # If the number of solutions is equal to the number of environments, then we declare all of the solutions
             # as the network parameters, and we declare all of these environments active.
             params_per_env = batch_values
-            active_per_env = torch.ones(num_solutions, dtype=torch.bool, device=self._simulator_device)
+            active_per_env = torch.ones(
+                num_solutions, dtype=torch.bool, device=self._simulator_device
+            )
         elif num_solutions < num_envs:
             # If the number of solutions is less than the number of environments, then we allocate a new empty
             # tensor to represent the network parameters.
-            params_per_env = torch.empty((num_envs, solution_length), dtype=batch.dtype, device=self._simulator_device)
+            params_per_env = torch.empty(
+                (num_envs, solution_length),
+                dtype=batch.dtype,
+                device=self._simulator_device,
+            )
 
             # The first `num_solutions` rows of this new parameters tensor is filled with the values of the solutions.
             params_per_env[:num_solutions, :] = batch_values
@@ -777,7 +827,9 @@ class VecGymNE(BaseNEProblem):
             params_per_env[num_solutions:, :] = batch_values[0]
 
             # At first, all the environments are declared as inactive.
-            active_per_env = torch.zeros(num_envs, dtype=torch.bool, device=self._simulator_device)
+            active_per_env = torch.zeros(
+                num_envs, dtype=torch.bool, device=self._simulator_device
+            )
 
             # Now, the first `num_solutions` amount of environments is declared as active.
             # The remaining ones remain inactive.
@@ -793,10 +845,14 @@ class VecGymNE(BaseNEProblem):
         total_timesteps = 0
 
         # Declare the counters (one for each environment) storing the number of episodes completed.
-        num_eps_per_env = torch.zeros(num_envs, dtype=torch.int64, device=self._simulator_device)
+        num_eps_per_env = torch.zeros(
+            num_envs, dtype=torch.int64, device=self._simulator_device
+        )
 
         # Declare the scores (one for each environment).
-        score_per_env = torch.zeros(num_envs, dtype=torch.float32, device=self._simulator_device)
+        score_per_env = torch.zeros(
+            num_envs, dtype=torch.float32, device=self._simulator_device
+        )
 
         if self._alive_bonus_schedule is not None:
             # If an alive_bonus_schedule was provided, then we extract the timesteps.
@@ -817,9 +873,13 @@ class VecGymNE(BaseNEProblem):
 
             # To properly give the alive bonus for each solution, we need to keep track of the timesteps for all
             # the running solutions. So, we declare the following variable.
-            t_per_env = torch.zeros(num_envs, dtype=torch.int64, device=self._simulator_device)
+            t_per_env = torch.zeros(
+                num_envs, dtype=torch.int64, device=self._simulator_device
+            )
 
-        def normalize(observations: torch.Tensor, *, mask: torch.Tensor) -> torch.Tensor:
+        def normalize(
+            observations: torch.Tensor, *, mask: torch.Tensor
+        ) -> torch.Tensor:
             original_observations = observations
             observations = observations[mask]
             if observations.shape[0] == 0:
@@ -836,12 +896,16 @@ class VecGymNE(BaseNEProblem):
 
         while True:
             # Pass the observations through the policy and get the actions to perform.
-            action_per_env = policy(torch.as_tensor(obs_per_env, dtype=params_per_env.dtype))
+            action_per_env = policy(
+                torch.as_tensor(obs_per_env, dtype=params_per_env.dtype)
+            )
 
             if self._action_noise_stdev is not None:
                 # If we are to apply action noise, we sample from a Gaussian distribution and add the noise onto
                 # the actions.
-                action_per_env = action_per_env + (torch.rand_like(action_per_env) * self._action_noise_stdev)
+                action_per_env = action_per_env + (
+                    torch.rand_like(action_per_env) * self._action_noise_stdev
+                )
 
             # Apply the actions, get the observations, rewards, and the 'done' flags.
             obs_per_env, reward_per_env, done_per_env, _ = env.step(action_per_env)
@@ -863,11 +927,18 @@ class VecGymNE(BaseNEProblem):
                 if add_partial_alive_bonus:
                     # Here we handle the partial alive bonus time window.
                     # We first determine which environments are in the partial alive bonus time window.
-                    in_partial_bonus_t_per_env = active_per_env & (t_per_env >= bonus_t0) & (t_per_env < bonus_t1)
+                    in_partial_bonus_t_per_env = (
+                        active_per_env
+                        & (t_per_env >= bonus_t0)
+                        & (t_per_env < bonus_t1)
+                    )
 
                     # Here we compute the partial alive bonuses and add those bonuses to the scores.
                     score_per_env[in_partial_bonus_t_per_env] += alive_bonus * (
-                        torch.as_tensor(t_per_env[in_partial_bonus_t_per_env] - bonus_t0, dtype=torch.float32)
+                        torch.as_tensor(
+                            t_per_env[in_partial_bonus_t_per_env] - bonus_t0,
+                            dtype=torch.float32,
+                        )
                         / bonus_t_gap_as_float
                     )
 
@@ -924,7 +995,9 @@ class VecGymNE(BaseNEProblem):
         """
         return self._env
 
-    def to_policy(self, solution: Iterable, *, with_wrapper_modules: bool = True) -> nn.Module:
+    def to_policy(
+        self, solution: Iterable, *, with_wrapper_modules: bool = True
+    ) -> nn.Module:
         """
         Convert the given solution to a policy.
 

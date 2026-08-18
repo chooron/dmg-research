@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Launch local three-seed XAJ-TGD2 dPL retraining under the lite-v2 protocol."""
+
 from __future__ import annotations
 
 import json
@@ -8,7 +9,6 @@ import subprocess
 import sys
 import time
 from pathlib import Path
-
 
 HERE = Path(__file__).resolve().parent
 PROJECT = HERE.parents[1]
@@ -32,8 +32,12 @@ def config_for(seed: int) -> Path:
     config["data_basin_ids"] = str(data / "531sub_id.txt")
     config["output_dir"] = f"{OUTPUT_ROOT}/seed_{seed}"
     config["model_name"] = "XAJ_TGD2"
-    config["network"]["parameter_mapping"] = "sigmoid_to_physical_range_with_log_tgd2_residence_times"
-    config["network"]["tgd_structure_version"] = "temperature_dependent_generic_delay2_v1"
+    config["network"]["parameter_mapping"] = (
+        "sigmoid_to_physical_range_with_log_tgd2_residence_times"
+    )
+    config["network"]["tgd_structure_version"] = (
+        "temperature_dependent_generic_delay2_v1"
+    )
     config.pop("parameter_names", None)
     config.pop("parameter_specs", None)
     target = HERE / "generated_configs" / f"xaj_tgd2_lite_v3_seed_{seed}.json"
@@ -43,20 +47,46 @@ def config_for(seed: int) -> Path:
 
 
 def main() -> None:
-    logs = HERE / "logs"; logs.mkdir(parents=True, exist_ok=True)
+    logs = HERE / "logs"
+    logs.mkdir(parents=True, exist_ok=True)
     active = []
     for seed in SEEDS:
         output = PROJECT / f"{OUTPUT_ROOT}/seed_{seed}"
         if (output / "COMPLETE").exists():
-            print(f"SKIP seed={seed}: COMPLETE", flush=True); continue
-        command = [sys.executable, str(HERE / "run_dpl_model.py"), "--config", str(config_for(seed)),
-                   "--model", "XAJ_TGD2", "--lite", "--resume"]
+            print(f"SKIP seed={seed}: COMPLETE", flush=True)
+            continue
+        command = [
+            sys.executable,
+            str(HERE / "run_dpl_model.py"),
+            "--config",
+            str(config_for(seed)),
+            "--model",
+            "XAJ_TGD2",
+            "--lite",
+            "--resume",
+        ]
         env = os.environ.copy()
-        env.update({"CUDA_VISIBLE_DEVICES": "0", "OMP_NUM_THREADS": "1", "MKL_NUM_THREADS": "1",
-                    "OPENBLAS_NUM_THREADS": "1", "NUMEXPR_NUM_THREADS": "1", "TORCHINDUCTOR_COMPILE_THREADS": "1"})
+        env.update(
+            {
+                "CUDA_VISIBLE_DEVICES": "0",
+                "OMP_NUM_THREADS": "1",
+                "MKL_NUM_THREADS": "1",
+                "OPENBLAS_NUM_THREADS": "1",
+                "NUMEXPR_NUM_THREADS": "1",
+                "TORCHINDUCTOR_COMPILE_THREADS": "1",
+            }
+        )
         handle = (logs / f"xaj_tgd2_lite_v3_seed_{seed}.out").open("a")
-        handle.write("COMMAND: " + " ".join(command) + "\n"); handle.flush()
-        process = subprocess.Popen(command, cwd=PROJECT, env=env, stdout=handle, stderr=subprocess.STDOUT, text=True)
+        handle.write("COMMAND: " + " ".join(command) + "\n")
+        handle.flush()
+        process = subprocess.Popen(
+            command,
+            cwd=PROJECT,
+            env=env,
+            stdout=handle,
+            stderr=subprocess.STDOUT,
+            text=True,
+        )
         active.append((seed, process, handle))
         print(f"START seed={seed} pid={process.pid}", flush=True)
     while active:
@@ -66,10 +96,14 @@ def main() -> None:
             if status is None:
                 remaining.append((seed, process, handle))
             else:
-                handle.close(); print(f"DONE seed={seed} code={status}", flush=True)
+                handle.close()
+                print(f"DONE seed={seed} code={status}", flush=True)
         active = remaining
-        if active: time.sleep(5)
-    if any(not (PROJECT / f"{OUTPUT_ROOT}/seed_{seed}/COMPLETE").exists() for seed in SEEDS):
+        if active:
+            time.sleep(5)
+    if any(
+        not (PROJECT / f"{OUTPUT_ROOT}/seed_{seed}/COMPLETE").exists() for seed in SEEDS
+    ):
         raise SystemExit("one or more dPL seeds did not complete")
 
 

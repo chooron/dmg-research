@@ -22,12 +22,14 @@ def extract_params(
     """
     result = []
     for name in param_specs:
-        key = name if not prefix else name[len(prefix):]
+        key = name if not prefix else name[len(prefix) :]
         result.append(params[name].reshape(-1, 1))
     return torch.cat(result, dim=1)
 
 
-def validate_forcings(forcings: dict[str, torch.Tensor]) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+def validate_forcings(
+    forcings: dict[str, torch.Tensor],
+) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
     """Validate and extract forcing tensors.
 
     Args:

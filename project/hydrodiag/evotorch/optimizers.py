@@ -23,7 +23,14 @@ from typing import Callable, Optional, Type
 
 import torch
 
-from .tools.misc import Device, DType, RealOrVector, ensure_tensor_length_and_dtype, message_from, to_torch_dtype
+from .tools.misc import (
+    Device,
+    DType,
+    RealOrVector,
+    ensure_tensor_length_and_dtype,
+    message_from,
+    to_torch_dtype,
+)
 
 _evolog = logging.getLogger(__name__)
 
@@ -54,11 +61,15 @@ class TorchOptimizer:
             dtype: The dtype of the problem.
             device: The device on which the solutions are kept.
         """
-        self._data = torch.empty(int(solution_length), dtype=to_torch_dtype(dtype), device=device)
+        self._data = torch.empty(
+            int(solution_length), dtype=to_torch_dtype(dtype), device=device
+        )
         self._optim = torch_optimizer([self._data], **config)
 
     @torch.no_grad()
-    def ascent(self, globalg: RealOrVector, *, cloned_result: bool = True) -> torch.Tensor:
+    def ascent(
+        self, globalg: RealOrVector, *, cloned_result: bool = True
+    ) -> torch.Tensor:
         """
         Compute the ascent, i.e. the step to follow.
 
@@ -162,7 +173,13 @@ class Adam(TorchOptimizer):
         if amsgrad is not None:
             config["amsgrad"] = bool(amsgrad)
 
-        super().__init__(torch.optim.Adam, solution_length=solution_length, dtype=dtype, device=device, config=config)
+        super().__init__(
+            torch.optim.Adam,
+            solution_length=solution_length,
+            dtype=dtype,
+            device=device,
+            config=config,
+        )
 
 
 class SGD(TorchOptimizer):
@@ -225,7 +242,13 @@ class SGD(TorchOptimizer):
         if nesterov is not None:
             config["nesterov"] = bool(nesterov)
 
-        super().__init__(torch.optim.SGD, solution_length=solution_length, dtype=dtype, device=device, config=config)
+        super().__init__(
+            torch.optim.SGD,
+            solution_length=solution_length,
+            dtype=dtype,
+            device=device,
+            config=config,
+        )
 
 
 class ClipUp:
@@ -240,7 +263,11 @@ class ClipUp:
         Springer, Cham.
     """
 
-    _param_group_items = {"lr": "_stepsize", "max_speed": "_max_speed", "momentum": "_momentum"}
+    _param_group_items = {
+        "lr": "_stepsize",
+        "max_speed": "_max_speed",
+        "momentum": "_momentum",
+    }
     _param_group_item_lb = {"lr": 0.0, "max_speed": 0.0, "momentum": 0.0}
     _param_group_item_ub = {"momentum": 1.0}
 
@@ -317,7 +344,9 @@ class ClipUp:
                 return x
 
     @torch.no_grad()
-    def ascent(self, globalg: RealOrVector, *, cloned_result: bool = True) -> torch.Tensor:
+    def ascent(
+        self, globalg: RealOrVector, *, cloned_result: bool = True
+    ) -> torch.Tensor:
         """
         Compute the ascent, i.e. the step to follow.
 
@@ -347,7 +376,9 @@ class ClipUp:
 
         grad = (globalg / torch.norm(globalg)) * self._stepsize
 
-        self._velocity = self._clip((self._momentum * self._velocity) + grad, self._max_speed)
+        self._velocity = self._clip(
+            (self._momentum * self._velocity) + grad, self._max_speed
+        )
 
         result = self._velocity
 

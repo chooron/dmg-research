@@ -5,7 +5,6 @@ from __future__ import annotations
 import math
 
 import numpy as np
-
 from training.dpl.run_dpl_model import (
     bettermodel_training_iterations,
     build_valid_window_catalog,
@@ -17,9 +16,11 @@ def test_iteration_count_matches_bettermodel_grid() -> None:
     n_basins, n_time, batch, warmup, prediction = 531, 5478, 128, 365, 365
     probability = batch * prediction / (n_basins * (n_time - warmup))
     expected = math.ceil(math.log(0.01) / math.log(1.0 - probability))
-    assert bettermodel_training_iterations(
-        n_basins, n_time, batch, warmup, prediction
-    ) == expected == 266
+    assert (
+        bettermodel_training_iterations(n_basins, n_time, batch, warmup, prediction)
+        == expected
+        == 266
+    )
 
 
 def test_random_window_is_730_days_and_targets_prediction_suffix() -> None:
@@ -50,10 +51,13 @@ def test_random_window_is_730_days_and_targets_prediction_suffix() -> None:
 
 
 def test_valid_window_catalog_preserves_uniform_basin_sampling() -> None:
-    observations = np.array([
-        [0.0] * 8 + [1.0] * 8,
-        [np.nan, 1.0, 0.0, 2.0] * 4,
-    ], dtype=np.float32)
+    observations = np.array(
+        [
+            [0.0] * 8 + [1.0] * 8,
+            [np.nan, 1.0, 0.0, 2.0] * 4,
+        ],
+        dtype=np.float32,
+    )
     catalog, summary = build_valid_window_catalog(
         observations,
         warmup_days=2,

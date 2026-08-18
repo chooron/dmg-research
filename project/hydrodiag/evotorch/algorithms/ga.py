@@ -19,7 +19,13 @@ Genetic algorithm variants: GeneticAlgorithm, Cosyne.
 from typing import Callable, Iterable, Optional, Union
 
 from ..core import Problem, SolutionBatch
-from ..operators import CosynePermutation, CrossOver, GaussianMutation, OnePointCrossOver, SimulatedBinaryCrossOver
+from ..operators import (
+    CosynePermutation,
+    CrossOver,
+    GaussianMutation,
+    OnePointCrossOver,
+    SimulatedBinaryCrossOver,
+)
 from .searchalgorithm import SearchAlgorithm, SinglePopulationAlgorithmMixin
 
 
@@ -119,7 +125,9 @@ class ExtendedPopulationMixin:
         """
         self._operators = [] if operators is None else list(operators)
         if (not allow_empty_operators_list) and (len(self._operators) == 0):
-            raise ValueError("Received `operators` as an empty sequence. Please provide at least one operator.")
+            raise ValueError(
+                "Received `operators` as an empty sequence. Please provide at least one operator."
+            )
 
         self._using_cross_over: bool = False
         for operator in self._operators:
@@ -142,7 +150,9 @@ class ExtendedPopulationMixin:
 
         self._first_iter: bool = True
 
-    def _make_extended_population(self, split: bool = False) -> Union[SolutionBatch, tuple]:
+    def _make_extended_population(
+        self, split: bool = False
+    ) -> Union[SolutionBatch, tuple]:
         """
         Make and return a new extended population that is evaluated.
 
@@ -263,7 +273,9 @@ class ExtendedPopulationMixin:
             return None
 
 
-class GeneticAlgorithm(SearchAlgorithm, SinglePopulationAlgorithmMixin, ExtendedPopulationMixin):
+class GeneticAlgorithm(
+    SearchAlgorithm, SinglePopulationAlgorithmMixin, ExtendedPopulationMixin
+):
     """
     A genetic algorithm implementation.
 
@@ -784,7 +796,11 @@ class SteadyStateGA(GeneticAlgorithm):
         self._forbid_use_method: bool = False
         self._prepare_ops: bool = False
 
-        if (len(operators) == 0) and re_evaluate and (re_evaluate_parents_first is None):
+        if (
+            (len(operators) == 0)
+            and re_evaluate
+            and (re_evaluate_parents_first is None)
+        ):
             re_evaluate_parents_first = True
 
         super().__init__(
@@ -976,7 +992,9 @@ class Cosyne(SearchAlgorithm, SinglePopulationAlgorithmMixin):
         if eta is None:
             self._cross_over_op = OnePointCrossOver(self._problem, **cross_over_kwargs)
         else:
-            self._cross_over_op = SimulatedBinaryCrossOver(self._problem, eta=eta, **cross_over_kwargs)
+            self._cross_over_op = SimulatedBinaryCrossOver(
+                self._problem, eta=eta, **cross_over_kwargs
+            )
 
         self._permutation_op = CosynePermutation(self._problem, permute_all=permute_all)
 
@@ -993,7 +1011,9 @@ class Cosyne(SearchAlgorithm, SinglePopulationAlgorithmMixin):
                 "Received both `num_elites` and `elitism_ratio`. Please provide only one of them, or none of them."
             )
 
-        self._population = SolutionBatch(problem, device=problem.device, popsize=self._popsize)
+        self._population = SolutionBatch(
+            problem, device=problem.device, popsize=self._popsize
+        )
         self._first_generation: bool = True
 
         # GAStatusMixin.__init__(self)

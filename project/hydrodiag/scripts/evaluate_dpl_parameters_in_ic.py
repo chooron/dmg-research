@@ -22,14 +22,14 @@ import torch
 
 PROJECT_DIR = Path(__file__).resolve().parent.parent
 import sys
+
 sys.path.insert(0, str(PROJECT_DIR))
 
 from models import XAJ
 from models.composed import XAJWithCemaNeige
-from models.parameter_specs import XAJ_PARAM_SPECS, XAJ_CN_PARAM_SPECS
+from models.parameter_specs import XAJ_CN_PARAM_SPECS, XAJ_PARAM_SPECS
 from optimization.pycma_calibrator_v3 import compute_kge_fp64
 from training.data_contract import FORCING_NAMES, load_dates
-
 
 CASES = {
     "XAJ": {
@@ -61,14 +61,16 @@ def load_evaluation(config: dict, warmup_days: int):
     assert eval_end_i - eval_start_i + 1 == 4018
     forcing_start = eval_start_i - warmup_days
     assert forcing_start >= 0
-    axis = {"precip": FORCING_NAMES.index("P"),
-            "temp": FORCING_NAMES.index("T"),
-            "pet": FORCING_NAMES.index("PET")}
+    axis = {
+        "precip": FORCING_NAMES.index("P"),
+        "temp": FORCING_NAMES.index("T"),
+        "pet": FORCING_NAMES.index("PET"),
+    }
     fc = {
-        key: forcing[forcing_start:eval_end_i + 1, :, axis[key]].transpose().copy()
+        key: forcing[forcing_start : eval_end_i + 1, :, axis[key]].transpose().copy()
         for key in ("precip", "pet", "temp")
     }
-    obs = target[eval_start_i:eval_end_i + 1, :, 0].transpose().copy()
+    obs = target[eval_start_i : eval_end_i + 1, :, 0].transpose().copy()
     with open(config["data_basin_ids"]) as f:
         basin_ids = [str(v).zfill(8) for v in json.load(f)]
     n = len(basin_ids)
@@ -76,8 +78,13 @@ def load_evaluation(config: dict, warmup_days: int):
     return fc, obs, basin_ids
 
 
-def evaluate_case(case_name: str, config: dict, warmup_days: int, device: torch.device,
-                  batch_size: int):
+def evaluate_case(
+    case_name: str,
+    config: dict,
+    warmup_days: int,
+    device: torch.device,
+    batch_size: int,
+):
     case = CASES[case_name]
     params_path = case["dpl_output"] / "best_parameters_physical.npz"
     dpl_params = np.asarray(np.load(params_path)["params"], dtype=np.float64)
@@ -96,11 +103,15 @@ def evaluate_case(case_name: str, config: dict, warmup_days: int, device: torch.
             stop = min(start + batch_size, n)
             params_np = dpl_params[start:stop]
             params = {
-                name: torch.from_numpy(params_np[:, j]).to(device=device, dtype=torch.float64)
+                name: torch.from_numpy(params_np[:, j]).to(
+                    device=device, dtype=torch.float64
+                )
                 for j, name in enumerate(names)
             }
             forcings = {
-                key: torch.from_numpy(value[start:stop]).to(device=device, dtype=torch.float64)
+                key: torch.from_numpy(value[start:stop]).to(
+                    device=device, dtype=torch.float64
+                )
                 for key, value in fc.items()
             }
             qsim, _ = model(forcings=forcings, params=params)
@@ -118,14 +129,22 @@ def evaluate_case(case_name: str, config: dict, warmup_days: int, device: torch.
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config", type=Path,
-                        default=PROJECT_DIR / "configs/ic_xnes_production_v1.json")
-    parser.add_argument("--output-dir", type=Path,
-                        default=PROJECT_DIR / "outputs/dpl_parameters_ic_reproduction_uh90")
+    parser.add_argument(
+        "--config",
+        type=Path,
+        default=PROJECT_DIR / "configs/ic_xnes_production_v1.json",
+    )
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=PROJECT_DIR / "outputs/dpl_parameters_ic_reproduction_uh90",
+    )
     # 64 keeps the compiled XAJ+CemaNeige FP64 path below the available GPU
     # memory while preserving the same per-basin computation.
     parser.add_argument("--batch-size", type=int, default=64)
-    parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
+    parser.add_argument(
+        "--device", default="cuda" if torch.cuda.is_available() else "cpu"
+    )
     args = parser.parse_args()
     config = json.loads(args.config.read_text())
     args.output_dir.mkdir(parents=True, exist_ok=True)
@@ -141,7 +160,8 @@ def main():
         for label, warmup in (("dpl_exact_365d", 365), ("ic_protocol_366d", 366)):
             print(f"Evaluating {case_name}, {label}, device={device}...", flush=True)
             basin_ids, params, kges = evaluate_case(
-                case_name, config, warmup, device, args.batch_size)
+                case_name, config, warmup, device, args.batch_size
+            )
             report_lines.append(
                 f"## {case_name} / {label}\n\n"
                 f"Warmup: {warmup} days\n\n"
@@ -150,16 +170,21 @@ def main():
             )
             np.savez_compressed(
                 args.output_dir / f"{case_name}_{label}_kge.npz",
-                kge=kges, params=params, basin_ids=np.asarray(basin_ids))
+                kge=kges,
+                params=params,
+                basin_ids=np.asarray(basin_ids),
+            )
             for i, bid in enumerate(basin_ids):
-                all_rows.append({
-                    "model": case_name,
-                    "evaluation_path": label,
-                    "warmup_days": warmup,
-                    "basin_id": bid,
-                    "basin_index": i,
-                    "kge": float(kges[i]),
-                })
+                all_rows.append(
+                    {
+                        "model": case_name,
+                        "evaluation_path": label,
+                        "warmup_days": warmup,
+                        "basin_id": bid,
+                        "basin_index": i,
+                        "kge": float(kges[i]),
+                    }
+                )
 
     with (args.output_dir / "basin_kge.csv").open("w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=list(all_rows[0]))

@@ -1,6 +1,7 @@
 import dataclasses
 from typing import List
 
+
 @dataclasses.dataclass
 class Phase1Task:
     basin_id: str
@@ -14,5 +15,6 @@ class Phase1Task:
     model_key: str
     center_init: list
     compute_test_metric: bool
+
 
 SEEDS = [101, 202, 303]

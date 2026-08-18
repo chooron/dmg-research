@@ -33,17 +33,29 @@ _BASIN_RE = re.compile(r"usgs_(\d{8})")
 # Candidate layouts, probed in order.  Each entry is (label, candidate file
 # pattern) where {id} is the 8-digit gauge id.
 LAYOUT_CANDIDATES: tuple[tuple[str, str], ...] = (
-    ("camels_us_v1p2_model_output", "basin_dataset_public_v1p2/model_output/usgs_{id}_model_output.txt"),
+    (
+        "camels_us_v1p2_model_output",
+        "basin_dataset_public_v1p2/model_output/usgs_{id}_model_output.txt",
+    ),
     ("model_output_top", "model_output/usgs_{id}_model_output.txt"),
     ("per_basin_folder", "usgs_{id}/usgs_{id}_model_output.txt"),
     ("basins_folder", "basins/usgs_{id}/usgs_{id}_model_output.txt"),
     ("per_basin_flat", "usgs_{id}_model_output.txt"),
-    ("basin_mean_forcing_sibling", "basin_dataset_public_v1p2/usgs_{id}/usgs_{id}_model_output.txt"),
+    (
+        "basin_mean_forcing_sibling",
+        "basin_dataset_public_v1p2/usgs_{id}/usgs_{id}_model_output.txt",
+    ),
 )
 
 _SWE_COLUMN_PRIORITY = (
-    "snow17_swe", "swe_snow17", "swe", "sac_sma_swe", "swe_sac_sma",
-    "snow_water_equivalent", "snwe", "SWE",
+    "snow17_swe",
+    "swe_snow17",
+    "swe",
+    "sac_sma_swe",
+    "swe_sac_sma",
+    "snow_water_equivalent",
+    "snwe",
+    "SWE",
 )
 
 
@@ -54,9 +66,9 @@ class SnowReferenceUnavailable(RuntimeError):
 @dataclass
 class BasinSnow:
     basin_id: str
-    dates: np.ndarray                 # np.datetime64[D] on the file axis
-    swe_ensemble: np.ndarray          # [n_days, n_members] float64, mm
-    swe_median: np.ndarray            # [n_days] float64, mm
+    dates: np.ndarray  # np.datetime64[D] on the file axis
+    swe_ensemble: np.ndarray  # [n_days, n_members] float64, mm
+    swe_median: np.ndarray  # [n_days] float64, mm
     swe_source_column: str
     n_members: int
     layout: str
@@ -73,7 +85,9 @@ class BasinSnow:
                 out[j] = self.swe_median[i]
         return out
 
-    def annual_metrics(self, water_year_start_month: int = 10) -> dict[str, dict[str, float]]:
+    def annual_metrics(
+        self, water_year_start_month: int = 10
+    ) -> dict[str, dict[str, float]]:
         """Per water year: annual max SWE, SWE-positive duration (days), peak
         and depletion timing (day of water year, fractional when ambiguous)."""
         from pandas import DataFrame
@@ -87,8 +101,15 @@ class BasinSnow:
         wy = np.where(month >= water_year_start_month, year + 1, year).astype(int)
         df["wy"] = wy
         # water-year day-of-year (Oct 1 = 1), per-row start date
-        starts = np.array([np.datetime64(f"{int(w) - 1}-{water_year_start_month:02d}-01", "D") for w in wy])
-        wy_doy = ((df["date"].values - starts) / np.timedelta64(1, "D")).astype(float) + 1
+        starts = np.array(
+            [
+                np.datetime64(f"{int(w) - 1}-{water_year_start_month:02d}-01", "D")
+                for w in wy
+            ]
+        )
+        wy_doy = ((df["date"].values - starts) / np.timedelta64(1, "D")).astype(
+            float
+        ) + 1
 
         metrics: dict[str, dict[str, float]] = {}
         for w in np.unique(wy):
@@ -119,7 +140,9 @@ class BasinSnow:
 class SnowReferenceReader:
     """Target-basin CAMELS-US Snow-17/SAC-SMA SWE reader."""
 
-    def __init__(self, root: Path, *, members: int = 10, water_year_start_month: int = 10):
+    def __init__(
+        self, root: Path, *, members: int = 10, water_year_start_month: int = 10
+    ):
         self.root = Path(root)
         self.members = members
         self.water_year_start_month = water_year_start_month
@@ -246,8 +269,12 @@ def cn_swe_consistency(
 
     common = np.isfinite(cn_snow_pack) & np.isfinite(swe)
     if int(common.sum()) < min_overlap_days:
-        return {"n_valid_days": int(common.sum()), "anomaly_corr": np.nan,
-                "seasonal_phase_shift_days": np.nan, "annual_peak_timing_corr": np.nan}
+        return {
+            "n_valid_days": int(common.sum()),
+            "anomaly_corr": np.nan,
+            "seasonal_phase_shift_days": np.nan,
+            "annual_peak_timing_corr": np.nan,
+        }
     g = cn_snow_pack[common].astype(np.float64)
     s = swe[common].astype(np.float64)
     months = np.asarray(cn_dates, dtype="datetime64[M]").astype(int)[common]
@@ -257,8 +284,12 @@ def cn_swe_consistency(
     if int(active.sum()) < min_overlap_days:
         anomaly_corr = np.nan
     else:
-        g_a = g[active] - np.array([g[months[active] == m].mean() for m in months[active]])
-        s_a = s[active] - np.array([s[months[active] == m].mean() for m in months[active]])
+        g_a = g[active] - np.array(
+            [g[months[active] == m].mean() for m in months[active]]
+        )
+        s_a = s[active] - np.array(
+            [s[months[active] == m].mean() for m in months[active]]
+        )
         if g_a.std() == 0 or s_a.std() == 0:
             anomaly_corr = np.nan
         else:
@@ -283,7 +314,13 @@ def cn_swe_consistency(
     try:
         from pandas import DataFrame
 
-        df = DataFrame({"g": g, "s": s, "date": np.asarray(cn_dates, dtype="datetime64[D]")[common]})
+        df = DataFrame(
+            {
+                "g": g,
+                "s": s,
+                "date": np.asarray(cn_dates, dtype="datetime64[D]")[common],
+            }
+        )
         year = df["date"].dt.year.values
         month = df["date"].dt.month.values
         df["wy"] = np.where(month >= 10, year + 1, year).astype(int)

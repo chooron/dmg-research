@@ -1,5 +1,9 @@
 import re
-with open('/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/ablation/diagnostics/xnes_baseline_audit/audit_main.py', 'r') as f:
+
+with open(
+    "/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/ablation/diagnostics/xnes_baseline_audit/audit_main.py",
+    "r",
+) as f:
     content = f.read()
 
 # find and replace the args
@@ -15,5 +19,8 @@ new_args = """                forcing_tensor,
 
 content = content.replace(old_args, new_args)
 
-with open('/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/ablation/diagnostics/xnes_baseline_audit/audit_main.py', 'w') as f:
+with open(
+    "/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/ablation/diagnostics/xnes_baseline_audit/audit_main.py",
+    "w",
+) as f:
     f.write(content)

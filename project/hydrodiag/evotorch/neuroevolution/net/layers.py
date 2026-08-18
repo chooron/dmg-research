@@ -174,8 +174,12 @@ class RNN(nn.Module):
         hidden_size = int(hidden_size)
         nonlinearity = str(nonlinearity)
 
-        self.W1 = nn.Parameter(torch.randn(hidden_size, input_size, dtype=dtype, device=device))
-        self.W2 = nn.Parameter(torch.randn(hidden_size, hidden_size, dtype=dtype, device=device))
+        self.W1 = nn.Parameter(
+            torch.randn(hidden_size, input_size, dtype=dtype, device=device)
+        )
+        self.W2 = nn.Parameter(
+            torch.randn(hidden_size, hidden_size, dtype=dtype, device=device)
+        )
         self.b1 = nn.Parameter(torch.zeros(hidden_size, dtype=dtype, device=device))
         self.b2 = nn.Parameter(torch.zeros(hidden_size, dtype=dtype, device=device))
 
@@ -224,13 +228,23 @@ class LSTM(nn.Module):
         self.hidden_size = hidden_size
 
         def input_weight():
-            return nn.Parameter(torch.randn(self.hidden_size, self.input_size, dtype=dtype, device=device))
+            return nn.Parameter(
+                torch.randn(
+                    self.hidden_size, self.input_size, dtype=dtype, device=device
+                )
+            )
 
         def weight():
-            return nn.Parameter(torch.randn(self.hidden_size, self.hidden_size, dtype=dtype, device=device))
+            return nn.Parameter(
+                torch.randn(
+                    self.hidden_size, self.hidden_size, dtype=dtype, device=device
+                )
+            )
 
         def bias():
-            return nn.Parameter(torch.zeros(self.hidden_size, dtype=dtype, device=device))
+            return nn.Parameter(
+                torch.zeros(self.hidden_size, dtype=dtype, device=device)
+            )
 
         self.W_ii = input_weight()
         self.W_if = input_weight()
@@ -273,7 +287,9 @@ class LSTM(nn.Module):
 
     def __repr__(self) -> str:
         clsname = type(self).__name__
-        return f"{clsname}(input_size={self.input_size}, hidden_size={self.hidden_size})"
+        return (
+            f"{clsname}(input_size={self.input_size}, hidden_size={self.hidden_size})"
+        )
 
 
 RecurrentNet = RNN
@@ -308,7 +324,9 @@ class FeedForwardNet(nn.Module):
     LengthActTuple = Tuple[int, Union[str, Callable]]
     LengthActBiasTuple = Tuple[int, Union[str, Callable], Union[bool]]
 
-    def __init__(self, input_size: int, layers: List[Union[LengthActTuple, LengthActBiasTuple]]):
+    def __init__(
+        self, input_size: int, layers: List[Union[LengthActTuple, LengthActBiasTuple]]
+    ):
         """`__init__(...)`: Initialize the FeedForward network.
 
         Args:
@@ -421,13 +439,18 @@ class StructuredControlNet(nn.Module):
         self._nonlinearity = nonlinearity
 
         self._linear_component = nn.Linear(
-            in_features=self._in_features, out_features=self._out_features, bias=self._bias
+            in_features=self._in_features,
+            out_features=self._out_features,
+            bias=self._bias,
         )
 
         self._nonlinear_component = FeedForwardNet(
             input_size=self._in_features,
             layers=(
-                list((self._hidden_size, self._nonlinearity) for _ in range(self._num_layers))
+                list(
+                    (self._hidden_size, self._nonlinearity)
+                    for _ in range(self._num_layers)
+                )
                 + [(self._out_features, self._nonlinearity)]
             ),
         )
@@ -491,7 +514,14 @@ class LocomotorNet(nn.Module):
         Structured Control Nets for Deep Reinforcement Learning.
     """
 
-    def __init__(self, *, in_features: int, out_features: int, bias: bool = True, num_sinusoids=16):
+    def __init__(
+        self,
+        *,
+        in_features: int,
+        out_features: int,
+        bias: bool = True,
+        num_sinusoids=16,
+    ):
         """`__init__(...)`: Initialize the LocomotorNet.
 
         Args:
@@ -509,7 +539,9 @@ class LocomotorNet(nn.Module):
         self._num_sinusoids = num_sinusoids
 
         self._linear_component = nn.Linear(
-            in_features=self._in_features, out_features=self._out_features, bias=self._bias
+            in_features=self._in_features,
+            out_features=self._out_features,
+            bias=self._bias,
         )
 
         self._amplitudes = nn.ParameterList()
@@ -518,7 +550,9 @@ class LocomotorNet(nn.Module):
 
         for _ in range(self._num_sinusoids):
             for paramlist in (self._amplitudes, self._frequencies, self._phases):
-                paramlist.append(nn.Parameter(torch.randn(self._out_features, dtype=torch.float32)))
+                paramlist.append(
+                    nn.Parameter(torch.randn(self._out_features, dtype=torch.float32))
+                )
 
         self.reset()
 

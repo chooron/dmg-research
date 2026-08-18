@@ -4,27 +4,50 @@ from typing import Any
 
 import torch
 import torch.nn as nn
-
 from models import (
-    GR4J, GR4JLite, GR4JWithCemaNeige, GR4JWithCemaNeigeLite,
-    GR4JWithPrecipitationDelay, GR4JWithPrecipitationDelayLite,
-    GR4JWithTGD2, GR4JWithTGD2Lite,
-    HBV, HBVLite, SIMHYD, SIMHYDLite, SIMHYDWithCemaNeige,
-    SIMHYDWithCemaNeigeLite, SIMHYDWithPrecipitationDelay,
-    SIMHYDWithPrecipitationDelayLite, XAJ, XAJLite,
-    SIMHYDWithTGD2, SIMHYDWithTGD2Lite,
-    XAJWithCemaNeige, XAJWithCemaNeigeLite, XAJWithPrecipitationDelay,
-    XAJWithPrecipitationDelayLite, XAJWithTGD2, XAJWithTGD2Lite,
-    XAJ2SWithCemaNeige, XAJ2SWithCemaNeigeLite,
-    XAJControlledNWithCemaNeige, XAJControlledNWithCemaNeigeLite,
-    XAJDEWithCemaNeige, XAJDEWithCemaNeigeLite,
-    XAJGEWithCemaNeige, XAJGEWithCemaNeigeLite,
-    XAJDRWithCemaNeige, XAJDRWithCemaNeigeLite,
-    XAJGRWithCemaNeige, XAJGRWithCemaNeigeLite,
-    XAJRWPEWithCemaNeige, XAJRWPEWithCemaNeigeLite,
+    GR4J,
+    HBV,
+    SIMHYD,
+    XAJ,
+    GR4JLite,
+    GR4JWithCemaNeige,
+    GR4JWithCemaNeigeLite,
+    GR4JWithPrecipitationDelay,
+    GR4JWithPrecipitationDelayLite,
+    GR4JWithTGD2,
+    GR4JWithTGD2Lite,
+    HBVLite,
+    SIMHYDLite,
+    SIMHYDWithCemaNeige,
+    SIMHYDWithCemaNeigeLite,
+    SIMHYDWithPrecipitationDelay,
+    SIMHYDWithPrecipitationDelayLite,
+    SIMHYDWithTGD2,
+    SIMHYDWithTGD2Lite,
+    XAJ2SWithCemaNeige,
+    XAJ2SWithCemaNeigeLite,
+    XAJControlledNWithCemaNeige,
+    XAJControlledNWithCemaNeigeLite,
+    XAJDEWithCemaNeige,
+    XAJDEWithCemaNeigeLite,
+    XAJDRWithCemaNeige,
+    XAJDRWithCemaNeigeLite,
+    XAJGEWithCemaNeige,
+    XAJGEWithCemaNeigeLite,
+    XAJGRWithCemaNeige,
+    XAJGRWithCemaNeigeLite,
+    XAJLite,
+    XAJRWPEWithCemaNeige,
+    XAJRWPEWithCemaNeigeLite,
+    XAJWithCemaNeige,
+    XAJWithCemaNeigeLite,
+    XAJWithPrecipitationDelay,
+    XAJWithPrecipitationDelayLite,
+    XAJWithTGD2,
+    XAJWithTGD2Lite,
 )
-from .parameter_adapter import get_parameter_spec
 
+from .parameter_adapter import get_parameter_spec
 
 MODEL_CLASSES: dict[str, type[nn.Module]] = {
     "XAJ": XAJ,
@@ -88,11 +111,15 @@ def model_variant_inventory() -> list[dict[str, str | bool]]:
     ]
 
 
-def _forcing_dict(forcing: torch.Tensor, forcing_names: tuple[str, ...]) -> dict[str, torch.Tensor]:
+def _forcing_dict(
+    forcing: torch.Tensor, forcing_names: tuple[str, ...]
+) -> dict[str, torch.Tensor]:
     if forcing.ndim == 2:
         forcing = forcing.unsqueeze(0)
     if forcing.ndim != 3:
-        raise ValueError(f"forcing must have shape [T,F] or [B,T,F], got {tuple(forcing.shape)}")
+        raise ValueError(
+            f"forcing must have shape [T,F] or [B,T,F], got {tuple(forcing.shape)}"
+        )
     if len(forcing_names) != forcing.shape[-1]:
         raise ValueError("forcing_names do not match forcing feature dimension")
     indexes = {name: forcing_names.index(name) for name in forcing_names}
@@ -123,7 +150,11 @@ class ModelAdapter:
         self.variant = variant
         self.device = torch.device(device)
         self.dtype = dtype
-        model_class = MODEL_CLASSES[model_key] if variant == "full" else LITE_MODEL_CLASSES[model_key]
+        model_class = (
+            MODEL_CLASSES[model_key]
+            if variant == "full"
+            else LITE_MODEL_CLASSES[model_key]
+        )
         self.model_class = model_class
         self.model = model_class().to(device=self.device, dtype=dtype).eval()
         self.parameter_names = tuple(get_parameter_spec(model_key))
@@ -141,7 +172,9 @@ class ModelAdapter:
     ) -> tuple[torch.Tensor, dict[str, Any]]:
         if physical_parameters.ndim == 1:
             physical_parameters = physical_parameters.unsqueeze(0)
-        if physical_parameters.ndim != 2 or physical_parameters.shape[-1] != len(self.parameter_names):
+        if physical_parameters.ndim != 2 or physical_parameters.shape[-1] != len(
+            self.parameter_names
+        ):
             raise ValueError("physical_parameters must have shape [N,D]")
         forcing = forcing.to(device=self.device, dtype=self.dtype)
         if forcing.ndim == 2:
@@ -152,25 +185,37 @@ class ModelAdapter:
             forcing = forcing.expand(n_params, -1, -1)
         elif n_forcing != n_params:
             if n_params % n_forcing != 0:
-                raise ValueError(f"forcing batch {n_forcing} cannot align with parameter batch {n_params}")
+                raise ValueError(
+                    f"forcing batch {n_forcing} cannot align with parameter batch {n_params}"
+                )
             forcing = forcing.repeat_interleave(n_params // n_forcing, dim=0)
         model_forcing = _forcing_dict(forcing, forcing_names)
         if temp_mean_train is not None:
-            temp_mean_train = temp_mean_train.to(device=self.device, dtype=self.dtype).reshape(-1)
+            temp_mean_train = temp_mean_train.to(
+                device=self.device, dtype=self.dtype
+            ).reshape(-1)
             if temp_mean_train.shape[0] == 1 and n_params > 1:
                 temp_mean_train = temp_mean_train.expand(n_params)
             elif temp_mean_train.shape[0] != n_params:
-                temp_mean_train = temp_mean_train.repeat_interleave(n_params // temp_mean_train.shape[0])
+                temp_mean_train = temp_mean_train.repeat_interleave(
+                    n_params // temp_mean_train.shape[0]
+                )
             model_forcing["temp_mean_train"] = temp_mean_train
         if temp_std_train is not None:
-            temp_std_train = temp_std_train.to(device=self.device, dtype=self.dtype).reshape(-1)
+            temp_std_train = temp_std_train.to(
+                device=self.device, dtype=self.dtype
+            ).reshape(-1)
             if temp_std_train.shape[0] == 1 and n_params > 1:
                 temp_std_train = temp_std_train.expand(n_params)
             elif temp_std_train.shape[0] != n_params:
-                temp_std_train = temp_std_train.repeat_interleave(n_params // temp_std_train.shape[0])
+                temp_std_train = temp_std_train.repeat_interleave(
+                    n_params // temp_std_train.shape[0]
+                )
             model_forcing["temp_std_train"] = temp_std_train
         if cn_psol_annual is not None:
-            cn_psol_annual = cn_psol_annual.to(device=self.device, dtype=self.dtype).reshape(-1)
+            cn_psol_annual = cn_psol_annual.to(
+                device=self.device, dtype=self.dtype
+            ).reshape(-1)
             if cn_psol_annual.shape[0] == 1 and n_params > 1:
                 cn_psol_annual = cn_psol_annual.expand(n_params)
             elif cn_psol_annual.shape[0] != n_params:
@@ -183,4 +228,6 @@ class ModelAdapter:
             for index, name in enumerate(self.parameter_names)
         }
         with torch.no_grad():
-            return self.model(forcings=model_forcing, params=params, return_states=return_states)
+            return self.model(
+                forcings=model_forcing, params=params, return_states=return_states
+            )

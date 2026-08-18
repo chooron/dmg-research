@@ -1,4 +1,5 @@
 """Regression test for the released Lite-v2 dPL 730-day sampling protocol."""
+
 import numpy as np
 
 
@@ -13,6 +14,10 @@ def test_random_window_has_365_warmup_and_365_scored_days():
 
     assert forcing_index.shape == (2, 730)
     assert target_index.shape == (2, 365)
-    assert np.array_equal(forcing_index[:, :365], target_start[:, None] - 365 + np.arange(365))
-    assert np.array_equal(forcing_index[:, 365:], target_start[:, None] + np.arange(365))
+    assert np.array_equal(
+        forcing_index[:, :365], target_start[:, None] - 365 + np.arange(365)
+    )
+    assert np.array_equal(
+        forcing_index[:, 365:], target_start[:, None] + np.arange(365)
+    )
     assert np.array_equal(target_index, target_start[:, None] - 365 + np.arange(365))

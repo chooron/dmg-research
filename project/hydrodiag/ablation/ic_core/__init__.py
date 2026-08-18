@@ -6,4 +6,10 @@ from .objective_adapter import KGEObjective
 from .optimizer_protocol import OptimizerAdapter
 from .runtime import ICObjectiveRuntime
 
-__all__ = ["ICObjectiveRuntime", "KGEObjective", "OptimizerAdapter", "load_531_bundle", "load_resolved_config"]
+__all__ = [
+    "ICObjectiveRuntime",
+    "KGEObjective",
+    "OptimizerAdapter",
+    "load_531_bundle",
+    "load_resolved_config",
+]

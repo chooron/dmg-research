@@ -9,12 +9,10 @@ from __future__ import annotations
 
 import pytest
 import torch
-
 from models import SIMHYD
 from models.parameter_specs import SIMHYD_PARAM_SPECS
 from models.simhyd import SIMHYD_MIN_SMSC, SIMHYD_UH_MAX_LEN, _simhyd_step
 from training.dpl.run_dpl_model import kge_per_basin
-
 
 BATCH = 2
 TIME = 96
@@ -25,9 +23,7 @@ MAX_GRAD = 1e6
 
 def _degenerate_forcing() -> tuple[dict[str, torch.Tensor], torch.Tensor]:
     precip = torch.zeros(BATCH, TIME, dtype=torch.float32, requires_grad=True)
-    pet = torch.full(
-        (BATCH, TIME), 1e-8, dtype=torch.float32, requires_grad=True
-    )
+    pet = torch.full((BATCH, TIME), 1e-8, dtype=torch.float32, requires_grad=True)
     temp = torch.zeros(BATCH, TIME, dtype=torch.float32)
     qobs = torch.linspace(0.1, 4.0, TIME, dtype=torch.float32).expand(BATCH, -1)
     return {"precip": precip, "pet": pet, "temp": temp}, qobs
@@ -119,8 +115,10 @@ def test_simhyd_compiled_degenerate_kge_backward_matches_eager(
     )
     for name in eager_grads:
         torch.testing.assert_close(
-            compiled_grads[name], eager_grads[name],
-            rtol=RTOL_GRAD, atol=ATOL_GRAD,
+            compiled_grads[name],
+            eager_grads[name],
+            rtol=RTOL_GRAD,
+            atol=ATOL_GRAD,
         )
     print(
         f"[compiled A/B] smsc={smsc:.3e}: finite=True, "
@@ -151,9 +149,7 @@ def test_simhyd_min_smsc_covers_default_initializer_and_backward(
         "default soil initializer bypasses SIMHYD_MIN_SMSC"
     )
     assert torch.equal(groundwater, torch.zeros(BATCH))
-    assert torch.equal(
-        routing_buffer, torch.zeros(BATCH, SIMHYD_UH_MAX_LEN - 1)
-    )
+    assert torch.equal(routing_buffer, torch.zeros(BATCH, SIMHYD_UH_MAX_LEN - 1))
 
     forcings, qobs = _degenerate_forcing()
     qsim, _ = model(forcings, params, initial_states=None)
@@ -211,8 +207,15 @@ def _simhyd_step_without_new_floors(
     runoff = direct_runoff + interflow + baseflow
     evap = interception + soil_evap
     return (
-        runoff, evap, soil_new, groundwater_new, interception,
-        direct_runoff, interflow, recharge_total, baseflow,
+        runoff,
+        evap,
+        soil_new,
+        groundwater_new,
+        interception,
+        direct_runoff,
+        interflow,
+        recharge_total,
+        baseflow,
     )
 
 
@@ -253,8 +256,7 @@ def _run_normal(step) -> tuple[torch.Tensor, dict[str, torch.Tensor]]:
     loss = (1.0 - kge_per_basin(qsim, qobs, eps=1e-6)).mean()
     loss.backward()
     grads = {
-        name: parameter.grad.detach().clone()
-        for name, parameter in params.items()
+        name: parameter.grad.detach().clone() for name, parameter in params.items()
     }
     return qsim.detach(), grads
 

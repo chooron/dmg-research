@@ -26,12 +26,10 @@ from .tools import (
     device_of_container,
     dtype_of_container,
     make_batched_false_for_vmap,
+    to_torch_dtype,
 )
 from .tools import multiply_rows_by_scalars as dot
 from .tools import rowwise_sum as total
-from .tools import (
-    to_torch_dtype,
-)
 from .tools.cloning import Serializable, deep_clone
 from .tools.ranking import rank
 from .tools.tensormaker import TensorMakerMixin
@@ -49,7 +47,12 @@ class Distribution(TensorMakerMixin, Serializable):
     functional_sample = NotImplemented
 
     def __init__(
-        self, *, solution_length: int, parameters: dict, dtype: Optional[DType] = None, device: Optional[Device] = None
+        self,
+        *,
+        solution_length: int,
+        parameters: dict,
+        dtype: Optional[DType] = None,
+        device: Optional[Device] = None,
     ):
         """
         `__init__(...)`: Initialize the Distribution.
@@ -132,7 +135,11 @@ class Distribution(TensorMakerMixin, Serializable):
             return self
         else:
             cls = self.__class__
-            return cls(solution_length=self.solution_length, parameters=self.parameters, device=device)
+            return cls(
+                solution_length=self.solution_length,
+                parameters=self.parameters,
+                device=device,
+            )
 
     def _fill(self, out: torch.Tensor, *, generator: Optional[torch.Generator] = None):
         """
@@ -215,7 +222,9 @@ class Distribution(TensorMakerMixin, Serializable):
         self._fill(out, generator=generator)
         return out
 
-    def _compute_gradients(self, samples: torch.Tensor, weights: torch.Tensor, ranking_used: Optional[str]) -> dict:
+    def _compute_gradients(
+        self, samples: torch.Tensor, weights: torch.Tensor, ranking_used: Optional[str]
+    ) -> dict:
         """
         Compute the gradients out of the samples (sampled solutions)
         and weights (i.e. weights or ranks of the solutions, better
@@ -292,10 +301,13 @@ class Distribution(TensorMakerMixin, Serializable):
         [num_fitnesses] = fitnesses.shape
         if num_samples != num_fitnesses:
             raise ValueError(
-                f"The number of samples and the number of fitnesses do not match:" f" {num_samples} != {num_fitnesses}."
+                f"The number of samples and the number of fitnesses do not match:"
+                f" {num_samples} != {num_fitnesses}."
             )
 
-        weights = rank(fitnesses, ranking_method=ranking_method, higher_is_better=higher_is_better)
+        weights = rank(
+            fitnesses, ranking_method=ranking_method, higher_is_better=higher_is_better
+        )
         return self._compute_gradients(samples, weights, ranking_method)
 
     def update_parameters(
@@ -326,7 +338,11 @@ class Distribution(TensorMakerMixin, Serializable):
         raise NotImplementedError
 
     def modified_copy(
-        self, *, dtype: Optional[DType] = None, device: Optional[Device] = None, **parameters
+        self,
+        *,
+        dtype: Optional[DType] = None,
+        device: Optional[Device] = None,
+        **parameters,
     ) -> "Distribution":
         """
         Return a modified copy of this distribution.
@@ -378,7 +394,9 @@ class Distribution(TensorMakerMixin, Serializable):
         optimizers: Optional[dict] = None,
     ) -> torch.Tensor:
         x = torch.as_tensor(x, dtype=self.dtype, device=self.device)
-        learning_rate, optimizer = self._get_learning_rate_and_optimizer(param_name, learning_rates, optimizers)
+        learning_rate, optimizer = self._get_learning_rate_and_optimizer(
+            param_name, learning_rates, optimizers
+        )
         if (learning_rate is None) and (optimizer is None):
             return x
         elif (learning_rate is not None) and (optimizer is None):
@@ -414,15 +432,23 @@ class SeparableGaussian(Distribution):
     """Separable Multivariate Gaussian, as used by PGPE"""
 
     MANDATORY_PARAMETERS = {"mu", "sigma"}
-    OPTIONAL_PARAMETERS = {"divide_mu_grad_by", "divide_sigma_grad_by", "parenthood_ratio"}
+    OPTIONAL_PARAMETERS = {
+        "divide_mu_grad_by",
+        "divide_sigma_grad_by",
+        "parenthood_ratio",
+    }
     PARAMETER_NDIMS = {"mu": 1, "sigma": 1}
 
     @classmethod
-    def _unbatched_functional_sample(cls, num_solutions: int, mu: torch.Tensor, sigma: torch.Tensor) -> torch.Tensor:
+    def _unbatched_functional_sample(
+        cls, num_solutions: int, mu: torch.Tensor, sigma: torch.Tensor
+    ) -> torch.Tensor:
         [L] = mu.shape
         [sigma_L] = sigma.shape
         if L != sigma_L:
-            raise ValueError(f"The lengths of `mu` ({L}) and `sigma` ({sigma_L}) do not match.")
+            raise ValueError(
+                f"The lengths of `mu` ({L}) and `sigma` ({sigma_L}) do not match."
+            )
         mu = mu.expand(int(num_solutions), L)
         return torch.normal(mu, sigma)
 
@@ -452,13 +478,17 @@ class SeparableGaussian(Distribution):
         from .decorators import expects_ndim
 
         for k in parameters.keys():
-            if (k not in cls.MANDATORY_PARAMETERS) and (k not in cls.OPTIONAL_PARAMETERS):
-                raise ValueError(f"{cls.__name__} encountered an unrecognized parameter: {repr(k)}")
+            if (k not in cls.MANDATORY_PARAMETERS) and (
+                k not in cls.OPTIONAL_PARAMETERS
+            ):
+                raise ValueError(
+                    f"{cls.__name__} encountered an unrecognized parameter: {repr(k)}"
+                )
         mu = parameters["mu"]
         sigma = parameters["sigma"]
-        return expects_ndim(cls._unbatched_functional_sample, (None, 1, 1), randomness="different")(
-            num_solutions, mu, sigma
-        )
+        return expects_ndim(
+            cls._unbatched_functional_sample, (None, 1, 1), randomness="different"
+        )(num_solutions, mu, sigma)
 
     def __init__(
         self,
@@ -501,7 +531,9 @@ class SeparableGaussian(Distribution):
 
     @mu.setter
     def mu(self, new_mu: Iterable):
-        self.parameters["mu"] = torch.as_tensor(new_mu, dtype=self.dtype, device=self.device)
+        self.parameters["mu"] = torch.as_tensor(
+            new_mu, dtype=self.dtype, device=self.device
+        )
 
     @property
     def sigma(self) -> torch.Tensor:
@@ -509,12 +541,18 @@ class SeparableGaussian(Distribution):
 
     @sigma.setter
     def sigma(self, new_sigma: Iterable):
-        self.parameters["sigma"] = torch.as_tensor(new_sigma, dtype=self.dtype, device=self.device)
+        self.parameters["sigma"] = torch.as_tensor(
+            new_sigma, dtype=self.dtype, device=self.device
+        )
 
     def _fill(self, out: torch.Tensor, *, generator: Optional[torch.Generator] = None):
-        self.make_gaussian(out=out, center=self.mu, stdev=self.sigma, generator=generator)
+        self.make_gaussian(
+            out=out, center=self.mu, stdev=self.sigma, generator=generator
+        )
 
-    def _divide_grad(self, param_name: str, grad: torch.Tensor, weights: torch.Tensor) -> torch.Tensor:
+    def _divide_grad(
+        self, param_name: str, grad: torch.Tensor, weights: torch.Tensor
+    ) -> torch.Tensor:
         option = f"divide_{param_name}_grad_by"
         if option in self.parameters:
             div_by_what = self.parameters[option]
@@ -532,10 +570,14 @@ class SeparableGaussian(Distribution):
                 weight_stdev = torch.std(weights)
                 grad = grad / weight_stdev
             else:
-                raise ValueError(f"The parameter {option} has an unrecognized value: {div_by_what}")
+                raise ValueError(
+                    f"The parameter {option} has an unrecognized value: {div_by_what}"
+                )
         return grad
 
-    def _compute_gradients_via_parenthood_ratio(self, samples: torch.Tensor, weights: torch.Tensor) -> dict:
+    def _compute_gradients_via_parenthood_ratio(
+        self, samples: torch.Tensor, weights: torch.Tensor
+    ) -> dict:
         [num_samples, _] = samples.shape
         num_elites = math.floor(num_samples * self.parameters["parenthood_ratio"])
         elite_indices = weights.argsort(descending=True)[:num_elites]
@@ -545,7 +587,9 @@ class SeparableGaussian(Distribution):
             "sigma": torch.std(elites, dim=0) - self.parameters["sigma"],
         }
 
-    def _compute_gradients(self, samples: torch.Tensor, weights: torch.Tensor, ranking_used: Optional[str]) -> dict:
+    def _compute_gradients(
+        self, samples: torch.Tensor, weights: torch.Tensor, ranking_used: Optional[str]
+    ) -> dict:
         if "parenthood_ratio" in self.parameters:
             return self._compute_gradients_via_parenthood_ratio(samples, weights)
         else:
@@ -588,14 +632,18 @@ class SeparableGaussian(Distribution):
         mu_grad = gradients["mu"]
         sigma_grad = gradients["sigma"]
 
-        new_mu = self.mu + self._follow_gradient("mu", mu_grad, learning_rates=learning_rates, optimizers=optimizers)
+        new_mu = self.mu + self._follow_gradient(
+            "mu", mu_grad, learning_rates=learning_rates, optimizers=optimizers
+        )
         new_sigma = self.sigma + self._follow_gradient(
             "sigma", sigma_grad, learning_rates=learning_rates, optimizers=optimizers
         )
 
         return self.modified_copy(mu=new_mu, sigma=new_sigma)
 
-    def relative_entropy(dist_0: "SeparableGaussian", dist_1: "SeparableGaussian") -> float:
+    def relative_entropy(
+        dist_0: "SeparableGaussian", dist_1: "SeparableGaussian"
+    ) -> float:
         mu_0 = dist_0.parameters["mu"]
         mu_1 = dist_1.parameters["mu"]
         sigma_0 = dist_0.parameters["sigma"]
@@ -643,11 +691,17 @@ class SymmetricSeparableGaussian(SeparableGaussian):
     """
 
     MANDATORY_PARAMETERS = {"mu", "sigma"}
-    OPTIONAL_PARAMETERS = {"divide_mu_grad_by", "divide_sigma_grad_by", "parenthood_ratio"}
+    OPTIONAL_PARAMETERS = {
+        "divide_mu_grad_by",
+        "divide_sigma_grad_by",
+        "parenthood_ratio",
+    }
     PARAMETER_NDIMS = {"mu": 1, "sigma": 1}
 
     @classmethod
-    def _unbatched_functional_sample(cls, num_solutions: int, mu: torch.Tensor, sigma: torch.Tensor) -> torch.Tensor:
+    def _unbatched_functional_sample(
+        cls, num_solutions: int, mu: torch.Tensor, sigma: torch.Tensor
+    ) -> torch.Tensor:
         zeros = torch.zeros_like(mu)
         num_solutions = int(num_solutions)
         if (num_solutions % 2) != 0:
@@ -657,13 +711,17 @@ class SymmetricSeparableGaussian(SeparableGaussian):
             )
         num_directions = num_solutions // 2
 
-        positive_ends = SeparableGaussian._unbatched_functional_sample(num_directions, zeros, sigma)
+        positive_ends = SeparableGaussian._unbatched_functional_sample(
+            num_directions, zeros, sigma
+        )
         negative_ends = -positive_ends
 
         positive_ends += mu
         negative_ends += mu
 
-        combined_samples = vmap(torch.stack)([positive_ends, negative_ends]).reshape(-1, positive_ends.shape[-1])
+        combined_samples = vmap(torch.stack)([positive_ends, negative_ends]).reshape(
+            -1, positive_ends.shape[-1]
+        )
 
         return combined_samples
 
@@ -694,16 +752,26 @@ class SymmetricSeparableGaussian(SeparableGaussian):
         from .decorators import expects_ndim
 
         for k in parameters.keys():
-            if (k not in cls.MANDATORY_PARAMETERS) and (k not in cls.OPTIONAL_PARAMETERS):
-                raise ValueError(f"{cls.__name__} encountered an unrecognized parameter: {repr(k)}")
+            if (k not in cls.MANDATORY_PARAMETERS) and (
+                k not in cls.OPTIONAL_PARAMETERS
+            ):
+                raise ValueError(
+                    f"{cls.__name__} encountered an unrecognized parameter: {repr(k)}"
+                )
         mu = parameters["mu"]
         sigma = parameters["sigma"]
-        return expects_ndim(cls._unbatched_functional_sample, (None, 1, 1), randomness="different")(
-            num_solutions, mu, sigma
-        )
+        return expects_ndim(
+            cls._unbatched_functional_sample, (None, 1, 1), randomness="different"
+        )(num_solutions, mu, sigma)
 
     def _fill(self, out: torch.Tensor, *, generator: Optional[torch.Generator] = None):
-        self.make_gaussian(out=out, center=self.mu, stdev=self.sigma, symmetric=True, generator=generator)
+        self.make_gaussian(
+            out=out,
+            center=self.mu,
+            stdev=self.sigma,
+            symmetric=True,
+            generator=generator,
+        )
 
     def _compute_gradients(
         self,
@@ -760,10 +828,17 @@ class SymmetricSeparableGaussian(SeparableGaussian):
 
             # ... and so on...
 
-            grad_mu = self._divide_grad("mu", total(dot((fdplus - fdminus) / 2, scaled_noises)), weights)
+            grad_mu = self._divide_grad(
+                "mu", total(dot((fdplus - fdminus) / 2, scaled_noises)), weights
+            )
             grad_sigma = self._divide_grad(
                 "sigma",
-                total(dot(((fdplus + fdminus) / 2), ((scaled_noises**2) - (sigma**2)) / sigma)),
+                total(
+                    dot(
+                        ((fdplus + fdminus) / 2),
+                        ((scaled_noises**2) - (sigma**2)) / sigma,
+                    )
+                ),
                 weights,
             )
 
@@ -780,7 +855,9 @@ class ExpSeparableGaussian(SeparableGaussian):
     OPTIONAL_PARAMETERS = set()
     PARAMETER_NDIMS = {"mu": 1, "sigma": 1}
 
-    def _compute_gradients(self, samples: torch.Tensor, weights: torch.Tensor, ranking_used: Optional[str]) -> dict:
+    def _compute_gradients(
+        self, samples: torch.Tensor, weights: torch.Tensor, ranking_used: Optional[str]
+    ) -> dict:
         if ranking_used != "nes":
             weights = weights / torch.sum(torch.abs(weights))
 
@@ -802,9 +879,17 @@ class ExpSeparableGaussian(SeparableGaussian):
         mu_grad = gradients["mu"]
         sigma_grad = gradients["sigma"]
 
-        new_mu = self.mu + self._follow_gradient("mu", mu_grad, learning_rates=learning_rates, optimizers=optimizers)
+        new_mu = self.mu + self._follow_gradient(
+            "mu", mu_grad, learning_rates=learning_rates, optimizers=optimizers
+        )
         new_sigma = self.sigma * torch.exp(
-            0.5 * self._follow_gradient("sigma", sigma_grad, learning_rates=learning_rates, optimizers=optimizers)
+            0.5
+            * self._follow_gradient(
+                "sigma",
+                sigma_grad,
+                learning_rates=learning_rates,
+                optimizers=optimizers,
+            )
         )
 
         return self.modified_copy(mu=new_mu, sigma=new_sigma)
@@ -881,7 +966,9 @@ class ExpGaussian(Distribution):
         Args:
             new_mu (torch.Tensor): The new value of mu
         """
-        self.parameters["mu"] = torch.as_tensor(new_mu, dtype=self.dtype, device=self.device)
+        self.parameters["mu"] = torch.as_tensor(
+            new_mu, dtype=self.dtype, device=self.device
+        )
 
     @property
     def cov(self) -> torch.Tensor:
@@ -923,7 +1010,9 @@ class ExpGaussian(Distribution):
         Args:
             new_sigma (torch.Tensor): The new value of sigma, the square root of the covariance matrix
         """
-        self.parameters["sigma"] = torch.as_tensor(new_sigma, dtype=self.dtype, device=self.device)
+        self.parameters["sigma"] = torch.as_tensor(
+            new_sigma, dtype=self.dtype, device=self.device
+        )
 
     def to_global_coordinates(self, local_coordinates: torch.Tensor) -> torch.Tensor:
         """Map samples from local coordinate space N(0, I_d) to global coordinate space N(mu, A^T A)
@@ -960,7 +1049,9 @@ class ExpGaussian(Distribution):
         # Map local coordinates to global coordinate system
         out[:] = self.to_global_coordinates(out)
 
-    def _compute_gradients(self, samples: torch.Tensor, weights: torch.Tensor, ranking_used: Optional[str]) -> dict:
+    def _compute_gradients(
+        self, samples: torch.Tensor, weights: torch.Tensor, ranking_used: Optional[str]
+    ) -> dict:
         """Compute the gradients with respect to a given set of samples and weights
         Args:
             samples (torch.Tensor): Samples drawn from N(mu, A^T A), ideally using self._fill
@@ -978,9 +1069,13 @@ class ExpGaussian(Distribution):
             weights = weights - torch.mean(weights)
 
         d_grad = total(dot(weights, local_coordinates))
-        local_coordinates_outer = local_coordinates.unsqueeze(1) * local_coordinates.unsqueeze(2)
+        local_coordinates_outer = local_coordinates.unsqueeze(
+            1
+        ) * local_coordinates.unsqueeze(2)
         M_grad = torch.sum(
-            weights.unsqueeze(-1).unsqueeze(-1) * (local_coordinates_outer - self.eye.unsqueeze(0)), dim=0
+            weights.unsqueeze(-1).unsqueeze(-1)
+            * (local_coordinates_outer - self.eye.unsqueeze(0)),
+            dim=0,
         )
 
         return {
@@ -1004,8 +1099,12 @@ class ExpGaussian(Distribution):
             learning_rates["M"] = learning_rates["sigma"]
 
         # Follow gradients for d, and M
-        update_d = self._follow_gradient("d", d_grad, learning_rates=learning_rates, optimizers=optimizers)
-        update_M = self._follow_gradient("M", M_grad, learning_rates=learning_rates, optimizers=optimizers)
+        update_d = self._follow_gradient(
+            "d", d_grad, learning_rates=learning_rates, optimizers=optimizers
+        )
+        update_M = self._follow_gradient(
+            "M", M_grad, learning_rates=learning_rates, optimizers=optimizers
+        )
 
         # Fold into parameters mu, A and A inv
         new_mu = self.mu + torch.mv(self.A, update_d)
@@ -1029,7 +1128,11 @@ class FunctionalSampler:
     """
 
     def __init__(
-        self, distribution_class: Type, *, required_parameters: Iterable, fixed_parameters: Optional[dict] = None
+        self,
+        distribution_class: Type,
+        *,
+        required_parameters: Iterable,
+        fixed_parameters: Optional[dict] = None,
     ):
         from .decorators import expects_ndim
 
@@ -1038,34 +1141,50 @@ class FunctionalSampler:
         if len(self.__required_parameters) == 0:
             raise TypeError("`required_parameters` cannot be empty")
         self.__required_param_pos = {
-            required_parameter: i_parameter for i_parameter, required_parameter in enumerate(self.__required_parameters)
+            required_parameter: i_parameter
+            for i_parameter, required_parameter in enumerate(self.__required_parameters)
         }
         self.__num_required_parameters = len(self.__required_parameters)
 
         self.__fixed_parameters = {} if fixed_parameters is None else fixed_parameters
         self.__sample_batch = expects_ndim(
             self.__sample,
-            (None,) + tuple(_get_param_ndim(distribution_class, p) for p in self.__required_parameters),
+            (None,)
+            + tuple(
+                _get_param_ndim(distribution_class, p)
+                for p in self.__required_parameters
+            ),
             randomness="different",
         )
 
     def __sample(self, num_solutions: int, *parameters) -> torch.Tensor:
-        parameters = {**dict(zip(self.__required_parameters, parameters)), **(self.__fixed_parameters)}
+        parameters = {
+            **dict(zip(self.__required_parameters, parameters)),
+            **(self.__fixed_parameters),
+        }
         if self.__distribution_class.functional_sample is NotImplemented:
             distribution = self.__distribution_class(parameters)
             return distribution.sample(num_solutions)
         else:
-            return self.__distribution_class.functional_sample(num_solutions, parameters)
+            return self.__distribution_class.functional_sample(
+                num_solutions, parameters
+            )
 
-    def __call__(self, num_samples: int, *parameter_args, **parameter_kwargs) -> torch.Tensor:
+    def __call__(
+        self, num_samples: int, *parameter_args, **parameter_kwargs
+    ) -> torch.Tensor:
         num_parameter_args = len(parameter_args)
         num_parameter_kwargs = len(parameter_kwargs)
-        if (num_parameter_args == 0) and (num_parameter_kwargs == self.__num_required_parameters):
+        if (num_parameter_args == 0) and (
+            num_parameter_kwargs == self.__num_required_parameters
+        ):
             parameters = [None] * self.__num_required_parameters
             for parameter_name, parameter_value in parameter_kwargs.items():
                 parameter_pos = self.__required_param_pos[parameter_name]
                 parameters[parameter_pos] = parameter_value
-        elif (num_parameter_args == self.__num_required_parameters) and (num_parameter_kwargs == 0):
+        elif (num_parameter_args == self.__num_required_parameters) and (
+            num_parameter_kwargs == 0
+        ):
             parameters = parameter_args
         elif (num_parameter_args == 0) and (num_parameter_kwargs == 0):
             raise TypeError("Missing parameter arguments")
@@ -1082,7 +1201,10 @@ class FunctionalSampler:
 
 
 def make_functional_sampler(
-    distribution_class, *, required_parameters: Iterable, fixed_parameters: Optional[dict] = None
+    distribution_class,
+    *,
+    required_parameters: Iterable,
+    fixed_parameters: Optional[dict] = None,
 ) -> Callable:
     """
     Make a stateless function that samples from a distribution.
@@ -1189,7 +1311,9 @@ def make_functional_sampler(
         specified distribution.
     """
     return FunctionalSampler(
-        distribution_class, required_parameters=required_parameters, fixed_parameters=fixed_parameters
+        distribution_class,
+        required_parameters=required_parameters,
+        fixed_parameters=fixed_parameters,
     )
 
 
@@ -1232,13 +1356,16 @@ class FunctionalGradEstimator:
         from .decorators import expects_ndim
 
         self.__function = function
-        self.__objective_sense = None if objective_sense is None else str(objective_sense)
+        self.__objective_sense = (
+            None if objective_sense is None else str(objective_sense)
+        )
         self.__distribution_class = distribution_class
         self.__required_parameters = [str(element) for element in required_parameters]
         if len(self.__required_parameters) == 0:
             raise TypeError("`required_parameters` cannot be empty")
         self.__required_param_pos = {
-            required_parameter: i_parameter for i_parameter, required_parameter in enumerate(self.__required_parameters)
+            required_parameter: i_parameter
+            for i_parameter, required_parameter in enumerate(self.__required_parameters)
         }
         self.__num_required_parameters = len(self.__required_parameters)
 
@@ -1258,7 +1385,11 @@ class FunctionalGradEstimator:
 
         self.__grad_batch = expects_ndim(
             self.__grad,
-            leftmost_ndims + tuple(_get_param_ndim(distribution_class, p) for p in self.__required_parameters),
+            leftmost_ndims
+            + tuple(
+                _get_param_ndim(distribution_class, p)
+                for p in self.__required_parameters
+            ),
             randomness="different",
         )
 
@@ -1273,14 +1404,19 @@ class FunctionalGradEstimator:
             [num_solutions, _] = samples.shape
             [num_fitnesses] = fitnesses.shape
             if num_solutions != num_fitnesses:
-                raise ValueError("The length of the fitness vector does not match the number of samples")
+                raise ValueError(
+                    "The length of the fitness vector does not match the number of samples"
+                )
         else:
             num_solutions = args[2]
             vectors = args[3:]
             samples = None
             fitnesses = None
 
-        parameters = {**dict(zip(self.__required_parameters, vectors)), **(self.__fixed_parameters)}
+        parameters = {
+            **dict(zip(self.__required_parameters, vectors)),
+            **(self.__fixed_parameters),
+        }
         distribution = self.__distribution_class(parameters)
 
         if samples is None:
@@ -1288,11 +1424,16 @@ class FunctionalGradEstimator:
             fitnesses = self.__function(samples)
 
         grads = distribution.compute_gradients(
-            samples, fitnesses, objective_sense=objective_sense, ranking_method=ranking_method
+            samples,
+            fitnesses,
+            objective_sense=objective_sense,
+            ranking_method=ranking_method,
         )
 
         if self.__return_samples and self.__return_fitnesses:
-            return GradsWithSamplesAndFitnesses(grads=grads, samples=samples, fitnesses=fitnesses)
+            return GradsWithSamplesAndFitnesses(
+                grads=grads, samples=samples, fitnesses=fitnesses
+            )
         elif self.__return_samples:
             return GradsWithSamples(grads=grads, samples=samples)
         elif self.__return_fitnesses:
@@ -1321,7 +1462,9 @@ class FunctionalGradEstimator:
 
         if parameters_need_filtering:
             parameter_kwargs = {
-                k: v for k, v in parameter_kwargs.items() if k not in ("objective_sense", "ranking_method")
+                k: v
+                for k, v in parameter_kwargs.items()
+                if k not in ("objective_sense", "ranking_method")
             }
 
         if self.__function is None:
@@ -1337,12 +1480,16 @@ class FunctionalGradEstimator:
 
         num_parameter_args = len(parameter_args)
         num_parameter_kwargs = len(parameter_kwargs)
-        if (num_parameter_args == 0) and (num_parameter_kwargs == self.__num_required_parameters):
+        if (num_parameter_args == 0) and (
+            num_parameter_kwargs == self.__num_required_parameters
+        ):
             parameters = [None] * self.__num_required_parameters
             for parameter_name, parameter_value in parameter_kwargs.items():
                 parameter_pos = self.__required_param_pos[parameter_name]
                 parameters[parameter_pos] = parameter_value
-        elif (num_parameter_args == self.__num_required_parameters) and (num_parameter_kwargs == 0):
+        elif (num_parameter_args == self.__num_required_parameters) and (
+            num_parameter_kwargs == 0
+        ):
             parameters = parameter_args
         elif (num_parameter_args == 0) and (num_parameter_kwargs == 0):
             raise TypeError("Missing parameter arguments")
@@ -1357,9 +1504,13 @@ class FunctionalGradEstimator:
             raise TypeError("Invalid number of arguments")
 
         if self.__function is None:
-            return self.__grad_batch(objective_sense, ranking_method, samples, fitnesses, *parameters)
+            return self.__grad_batch(
+                objective_sense, ranking_method, samples, fitnesses, *parameters
+            )
         else:
-            return self.__grad_batch(objective_sense, ranking_method, num_solutions, *parameters)
+            return self.__grad_batch(
+                objective_sense, ranking_method, num_solutions, *parameters
+            )
 
 
 def make_functional_grad_estimator(

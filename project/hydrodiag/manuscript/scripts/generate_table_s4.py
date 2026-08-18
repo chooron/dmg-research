@@ -59,19 +59,26 @@ def panel_a_rows(reg, diff):
             row_md = {"Regime": paradigm, "Subset": label, "n": n}
             row_tex = [paradigm, label, str(n)]
             for contrast in ["Base-CN", "Base-TGD2"]:
-                r = reg[(reg["paradigm"] == paradigm) & (reg["contrast"] == contrast)
-                        & (reg["stratum"] == stratum)]
+                r = reg[
+                    (reg["paradigm"] == paradigm)
+                    & (reg["contrast"] == contrast)
+                    & (reg["stratum"] == stratum)
+                ]
                 assert len(r) == 1, f"missing {paradigm} {contrast} {stratum}"
                 r = r.iloc[0]
                 beta = fmt(r["slope"], 3, force_sign=True)
-                ci = fmt_ci(r["slope_ci_lower"], r["slope_ci_upper"], 3, force_sign=True)
+                ci = fmt_ci(
+                    r["slope_ci_lower"], r["slope_ci_upper"], 3, force_sign=True
+                )
                 row_md[f"beta_{contrast}"] = f"{beta} {ci}"
                 row_tex.append(f"{beta} {ci}")
             d = diff[(diff["paradigm"] == paradigm) & (diff["stratum"] == stratum)]
             assert len(d) == 1, f"missing delta {paradigm} {stratum}"
             d = d.iloc[0]
             db = fmt(d["delta_beta"], 3, force_sign=True)
-            dci = fmt_ci(d["delta_beta_ci_lower"], d["delta_beta_ci_upper"], 3, force_sign=True)
+            dci = fmt_ci(
+                d["delta_beta_ci_lower"], d["delta_beta_ci_upper"], 3, force_sign=True
+            )
             row_md["delta_beta"] = f"{db} {dci}"
             row_tex.append(f"{db} {dci}")
             out_md.append(row_md)
@@ -82,31 +89,52 @@ def panel_a_rows(reg, diff):
 def panel_b_rows(grad_full, grad_rob):
     """One row per parameter x regime x subset (Full / Excl. S5)."""
     params = ["xaj_um", "xaj_ki", "xaj_ci", "xaj_im"]
-    display = {"xaj_um": "$u_m$", "xaj_ki": "$k_i$", "xaj_ci": "$c_i$",
-               "xaj_im": "$i_m$"}
+    display = {
+        "xaj_um": "$u_m$",
+        "xaj_ki": "$k_i$",
+        "xaj_ci": "$c_i$",
+        "xaj_im": "$i_m$",
+    }
     out_md, out_tex = [], []
     for p in params:
         for paradigm in ["IC", "dPL"]:
             for subset, n in [("full_531", 531), ("exclude_S5", 476)]:
                 if subset == "full_531":
-                    r = grad_full[(grad_full["paradigm"] == paradigm)
-                                  & (grad_full["parameter"] == p)]
+                    r = grad_full[
+                        (grad_full["paradigm"] == paradigm)
+                        & (grad_full["parameter"] == p)
+                    ]
                     bcol, locol, hicol = "beta", "ci95_low", "ci95_high"
                 else:
-                    r = grad_rob[(grad_rob["paradigm"] == paradigm)
-                                 & (grad_rob["parameter"] == p)
-                                 & (grad_rob["subset"] == subset)]
+                    r = grad_rob[
+                        (grad_rob["paradigm"] == paradigm)
+                        & (grad_rob["parameter"] == p)
+                        & (grad_rob["subset"] == subset)
+                    ]
                     bcol, locol, hicol = "slope", "ci95_low", "ci95_high"
                 assert len(r) == 1, f"missing {p} {paradigm} {subset}"
                 r = r.iloc[0]
                 beta = fmt(r[bcol], 3, force_sign=True)
                 ci = fmt_ci(r[locol], r[hicol], 3, force_sign=True)
-                out_md.append({"Parameter": display[p], "Regime": paradigm,
-                               "Subset": "Full" if subset == "full_531" else "Excl. S5",
-                               "n": n, "beta": f"{beta} {ci}"})
-                out_tex.append([display[p], paradigm,
-                                "Full" if subset == "full_531" else "Excl. S5",
-                                str(n), f"{beta} {ci}", ""])
+                out_md.append(
+                    {
+                        "Parameter": display[p],
+                        "Regime": paradigm,
+                        "Subset": "Full" if subset == "full_531" else "Excl. S5",
+                        "n": n,
+                        "beta": f"{beta} {ci}",
+                    }
+                )
+                out_tex.append(
+                    [
+                        display[p],
+                        paradigm,
+                        "Full" if subset == "full_531" else "Excl. S5",
+                        str(n),
+                        f"{beta} {ci}",
+                        "",
+                    ]
+                )
     return out_md, out_tex
 
 
@@ -123,8 +151,10 @@ def main():
 | :--- | :--- | :---: | :---: | :---: | :---: |
 """
     for r in pa_md:
-        md += (f"| {r['Regime']} | {r['Subset']} | {r['n']} | "
-               f"{r['beta_Base-CN']} | {r['beta_Base-TGD2']} | {r['delta_beta']} |\n")
+        md += (
+            f"| {r['Regime']} | {r['Subset']} | {r['n']} | "
+            f"{r['beta_Base-CN']} | {r['beta_Base-TGD2']} | {r['delta_beta']} |\n"
+        )
 
     md += """
 ### Panel B: Parameter-Level Snow Gradients Underlying Figure 4
@@ -133,8 +163,10 @@ def main():
 | :--- | :--- | :--- | :---: | :---: |
 """
     for r in pb_md:
-        md += (f"| {r['Parameter']} | {r['Regime']} | {r['Subset']} | "
-               f"{r['n']} | {r['beta']} |\n")
+        md += (
+            f"| {r['Parameter']} | {r['Regime']} | {r['Subset']} | "
+            f"{r['n']} | {r['beta']} |\n"
+        )
 
     md += """
 *Note*: Panel A reports the OLS slope of the basin-level excess distance
@@ -156,7 +188,8 @@ S4 $[0.30, 0.50)$ ($n=34$), S5 $[0.50, 1.00]$ ($n=55$).
     pa_tex_body = "\n".join(" & ".join(r) + " \\\\" for r in pa_tex)
     pb_tex_body = "\n".join(" & ".join(r) + " \\\\" for r in pb_tex)
 
-    tex = r"""\begin{table*}[t]
+    tex = (
+        r"""\begin{table*}[t]
 \centering
 \caption{Exact estimates underlying Figures 3 and 4 (R2). Panel A: structure-level OLS snow gradients of the basin-level excess distance ($\mathrm{excess} = \mathrm{between\_all} - \mathrm{within\_pooled}$) against basin snow fraction $f_{\mathrm{snow}}$, for the Base--CN and Base--TGD2 structural contrasts under the IC and dPL parameter-constraint regimes and Full / Excl.\ S5 subsets, with 95\% basin-level bootstrap confidence intervals and the basin-paired slope difference $\Delta\beta = \beta(\mathrm{Base\text{--}CN}) - \beta(\mathrm{Base\text{--}TGD2})$. Panel B: parameter-level OLS snow gradients of the canonical paired shift $\Delta z = z_{\mathrm{Base}} - z_{\mathrm{CN}}$ against $f_{\mathrm{snow}}$ for the parameters highlighted in Figure 4 and the qualified parameter $i_m$, with the same bootstrap CI protocol.}
 \label{tab:tables4_exact_estimates_f3_f4}
@@ -167,13 +200,17 @@ S4 $[0.30, 0.50)$ ($n=34$), S5 $[0.50, 1.00]$ ($n=55$).
 \midrule
 Regime & Subset & $n$ & Base $-$ CN $\beta$ [95\% CI] & Base $-$ TGD2 $\beta$ [95\% CI] & $\Delta\beta$ [95\% CI] \\
 \midrule
-""" + pa_tex_body + r"""
+"""
+        + pa_tex_body
+        + r"""
 \midrule
 \multicolumn{6}{l}{\textbf{Panel B: Parameter-level snow gradients underlying Figure 4}} \\
 \midrule
 Parameter & Regime & Subset & $n$ & $\beta$ [95\% CI] & \\
 \midrule
-""" + pb_tex_body + r"""
+"""
+        + pb_tex_body
+        + r"""
 \bottomrule
 \end{tabular}
 \begin{tablenotes}[flushleft]
@@ -183,6 +220,7 @@ Parameter & Regime & Subset & $n$ & $\beta$ [95\% CI] & \\
 \end{threeparttable}
 \end{table*}
 """
+    )
 
     for d in OUT_DIRS:
         d.mkdir(parents=True, exist_ok=True)

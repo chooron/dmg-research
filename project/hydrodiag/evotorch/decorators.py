@@ -29,7 +29,9 @@ except ImportError:
 
 
 def _simple_decorator(
-    decorator: Union[str, Callable], args: Iterable, decorator_name: Optional[str] = None
+    decorator: Union[str, Callable],
+    args: Iterable,
+    decorator_name: Optional[str] = None,
 ) -> Callable:
     """
     Internal helper function for writing decorators.
@@ -164,7 +166,9 @@ def _simple_decorator(
         # This is the case where the outer decorator received an unexpected number of arguments.
         # We raise a TypeError to let the user know.
         subject = "function" if decorator_name is None else f"`{decorator_name}`"
-        raise TypeError(f"The decorator {subject} received unexpected positional arguments")
+        raise TypeError(
+            f"The decorator {subject} received unexpected positional arguments"
+        )
 
 
 def pass_info(*args) -> Callable:
@@ -543,7 +547,9 @@ def on_aux_device(*args) -> Callable:
             solutions.set_evals(fitnesses)
     ```
     """
-    return _simple_decorator("__evotorch_on_aux_device__", args, decorator_name="on_aux_device")
+    return _simple_decorator(
+        "__evotorch_on_aux_device__", args, decorator_name="on_aux_device"
+    )
 
 
 def vectorized(*args) -> Callable:
@@ -607,7 +613,9 @@ def vectorized(*args) -> Callable:
     In this last example, `p2` will realize that `f2` is decorated via `@vectorized`,
     and will send it `n` solutions, and will receive and process `n` fitnesses.
     """
-    return _simple_decorator("__evotorch_vectorized__", args, decorator_name="vectorized")
+    return _simple_decorator(
+        "__evotorch_vectorized__", args, decorator_name="vectorized"
+    )
 
 
 def expects_ndim(  # noqa: C901
@@ -685,12 +693,21 @@ def expects_ndim(  # noqa: C901
     mentioned above, and immediately call it with the arguments `a` and `b`.
     """
 
-    if (len(expected_ndims) == 2) and isinstance(expected_ndims[0], Callable) and isinstance(expected_ndims[1], tuple):
+    if (
+        (len(expected_ndims) == 2)
+        and isinstance(expected_ndims[0], Callable)
+        and isinstance(expected_ndims[1], tuple)
+    ):
         func_to_wrap, expected_ndims = expected_ndims
-        return expects_ndim(*expected_ndims, allow_smaller_ndim=allow_smaller_ndim, randomness=randomness)(func_to_wrap)
+        return expects_ndim(
+            *expected_ndims,
+            allow_smaller_ndim=allow_smaller_ndim,
+            randomness=randomness,
+        )(func_to_wrap)
 
     expected_ndims = tuple(
-        (None if expected_arg_ndim is None else int(expected_arg_ndim)) for expected_arg_ndim in expected_ndims
+        (None if expected_arg_ndim is None else int(expected_arg_ndim))
+        for expected_arg_ndim in expected_ndims
     )
 
     def expects_ndim_decorator(fn: Callable):
@@ -708,11 +725,15 @@ def expects_ndim(  # noqa: C901
                 @classmethod
                 def update(cls):
                     # Collect and fill the dtype and device information if it is not filled yet.
-                    if (cls.encountered_dtypes is None) or (cls.encountered_devices is None):
+                    if (cls.encountered_dtypes is None) or (
+                        cls.encountered_devices is None
+                    ):
                         cls.encountered_dtypes = set()
                         cls.encountered_devices = set()
                         for expected_arg_ndim, arg in zip(expected_ndims, args):
-                            if (expected_arg_ndims is not None) and isinstance(arg, torch.Tensor):
+                            if (expected_arg_ndims is not None) and isinstance(
+                                arg, torch.Tensor
+                            ):
                                 # If the argument has a declared expected ndim, and also if it is a PyTorch tensor,
                                 # then we add its dtype and device information to the sets `encountered_dtypes` and
                                 # `encountered_devices`.
@@ -788,7 +809,9 @@ def expects_ndim(  # noqa: C901
             # of the original positional arguments.
             new_args = []
 
-            for i_arg, (expected_arg_ndims, arg) in enumerate(zip(expected_ndims, args)):
+            for i_arg, (expected_arg_ndims, arg) in enumerate(
+                zip(expected_ndims, args)
+            ):
                 if (expected_arg_ndims is None) or isinstance(arg, torch.Tensor):
                     # In this case, either the expected number of dimensions is given as None (indicating that the user
                     # does not wish any batching nor any conversion for this argument), or the argument is already
@@ -806,9 +829,15 @@ def expects_ndim(  # noqa: C901
                     # This is the case where an object of an unrecognized type is received. We do not know how to
                     # process this argument, and, naively trying to convert it to a PyTorch tensor could fail, or
                     # could generate an unexpected result. So, we raise an error.
-                    raise TypeError(f"Received an argument of unexpected type: {arg} (of type {type(arg)})")
+                    raise TypeError(
+                        f"Received an argument of unexpected type: {arg} (of type {type(arg)})"
+                    )
 
-                if (expected_arg_ndims is not None) and (arg.ndim < expected_arg_ndims) and (not allow_smaller_ndim):
+                if (
+                    (expected_arg_ndims is not None)
+                    and (arg.ndim < expected_arg_ndims)
+                    and (not allow_smaller_ndim)
+                ):
                     # This is the case where the currently analyzed positional argument has less-than-expected number
                     # of dimensions, and we are not in the allow-smaller-ndim mode. So, we raise an error.
                     raise ValueError(
@@ -837,7 +866,9 @@ def expects_ndim(  # noqa: C901
                     # For each positional argument with index `i_arg`, we check whether or not there are extra leftmost
                     # dimensions.
 
-                    if (wrapped_ndims[i_arg] is not None) and (wrapped_ndims[i_arg] > expected_ndims[i_arg]):
+                    if (wrapped_ndims[i_arg] is not None) and (
+                        wrapped_ndims[i_arg] > expected_ndims[i_arg]
+                    ):
                         # This is the case where the number of dimensions associated with this positional argument is
                         # greater than its expected number of dimensions.
 
@@ -858,7 +889,9 @@ def expects_ndim(  # noqa: C901
                     # Note that, after this `vmap` wrapping, if some of the positional arguments still have extra
                     # leftmost dimensions, another level of `vmap`-wrapping will be done by the next iteration of this
                     # `while` loop.
-                    wrapped_fn = vmap(wrapped_fn, in_dims=tuple(in_dims), randomness=randomness)
+                    wrapped_fn = vmap(
+                        wrapped_fn, in_dims=tuple(in_dims), randomness=randomness
+                    )
                 else:
                     # This is the case where no positional argument with extra leftmost dimension was found.
                     # Either the positional arguments were non-batched to begin with, or the `vmap`-wrapping of the

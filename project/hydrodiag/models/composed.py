@@ -13,16 +13,20 @@ from .cemaneige import (
     _init_basic_states,
 )
 from .gr4j import GR4J, _gr4j_step
+from .parameter_specs import (
+    GR4J_CN_PARAM_SPECS,
+    SIMHYD_CN_PARAM_SPECS,
+    XAJ_CN_PARAM_SPECS,
+)
+from .simhyd import SIMHYD, _route_simhyd_runoff, _simhyd_step
+from .unit_hydro import compute_gr4j_uh_ordinates
+from .utils import validate_forcings, validate_params
 from .xaj import (
     XAJ,
     _prepare_xaj_parameters,
     _route_xaj_surface_runoff,
     _xaj_step,
 )
-from .simhyd import SIMHYD, _route_simhyd_runoff, _simhyd_step
-from .unit_hydro import compute_gr4j_uh_ordinates
-from .parameter_specs import GR4J_CN_PARAM_SPECS, XAJ_CN_PARAM_SPECS, SIMHYD_CN_PARAM_SPECS
-from .utils import validate_forcings, validate_params
 
 
 def _cemaneige_xaj_fused_step(
@@ -44,11 +48,21 @@ def _cemaneige_xaj_fused_step(
     day.
     """
     effective, G, eTG, sca, rain, melt = _cemaneige_step(
-        precip_t, temp_t, cn_state[0], cn_state[1],
-        cn_params[0], cn_params[1], cn_params[2], nearzero,
+        precip_t,
+        temp_t,
+        cn_state[0],
+        cn_state[1],
+        cn_params[0],
+        cn_params[1],
+        cn_params[2],
+        nearzero,
     )
     xaj_out = _xaj_step(
-        effective, pet_t, *xaj_state, *xaj_params, nearzero,
+        effective,
+        pet_t,
+        *xaj_state,
+        *xaj_params,
+        nearzero,
     )
     return (effective, G, eTG, sca, rain, melt, *xaj_out)
 
@@ -64,11 +78,21 @@ def _cemaneige_gr4j_fused_step(
     nearzero: float,
 ) -> tuple[torch.Tensor, ...]:
     effective, G, eTG, sca, rain, melt = _cemaneige_step(
-        precip_t, temp_t, cn_state[0], cn_state[1],
-        cn_params[0], cn_params[1], cn_params[2], nearzero,
+        precip_t,
+        temp_t,
+        cn_state[0],
+        cn_state[1],
+        cn_params[0],
+        cn_params[1],
+        cn_params[2],
+        nearzero,
     )
     gr4j_out = _gr4j_step(
-        effective, pet_t, *gr4j_state, *gr4j_params, nearzero,
+        effective,
+        pet_t,
+        *gr4j_state,
+        *gr4j_params,
+        nearzero,
     )
     return (effective, G, eTG, sca, rain, melt, *gr4j_out)
 
@@ -84,11 +108,21 @@ def _cemaneige_simhyd_fused_step(
     nearzero: float,
 ) -> tuple[torch.Tensor, ...]:
     effective, G, eTG, sca, rain, melt = _cemaneige_step(
-        precip_t, temp_t, cn_state[0], cn_state[1],
-        cn_params[0], cn_params[1], cn_params[2], nearzero,
+        precip_t,
+        temp_t,
+        cn_state[0],
+        cn_state[1],
+        cn_params[0],
+        cn_params[1],
+        cn_params[2],
+        nearzero,
     )
     simhyd_out = _simhyd_step(
-        effective, pet_t, *simhyd_state, *simhyd_params, nearzero,
+        effective,
+        pet_t,
+        *simhyd_state,
+        *simhyd_params,
+        nearzero,
     )
     return (effective, G, eTG, sca, rain, melt, *simhyd_out)
 
@@ -147,8 +181,12 @@ class GR4JWithCemaNeige(BaseHydrologicalModel):
         cn_initial = None
         gr4j_initial = None
         if initial_states is not None:
-            cn_initial = {k[3:]: v for k, v in initial_states.items() if k.startswith("cn_")}
-            gr4j_initial = {k[5:]: v for k, v in initial_states.items() if k.startswith("gr4j_")}
+            cn_initial = {
+                k[3:]: v for k, v in initial_states.items() if k.startswith("cn_")
+            }
+            gr4j_initial = {
+                k[5:]: v for k, v in initial_states.items() if k.startswith("gr4j_")
+            }
 
         ctg = cn_params["cn_ctg"]
         kf = cn_params["cn_kf"]
@@ -168,7 +206,12 @@ class GR4JWithCemaNeige(BaseHydrologicalModel):
         uh1_ord, _ = compute_gr4j_uh_ordinates(x4, self._gr4j.UH1_MAX)
         uh2_ord = compute_gr4j_uh_ordinates(x4, self._gr4j.UH2_MAX)[1]
         s_prod, s_route, uh1_buf, uh2_buf = self._gr4j._init_states(
-            batch, device, dtype, gr4j_initial, x1, x3,
+            batch,
+            device,
+            dtype,
+            gr4j_initial,
+            x1,
+            x3,
         )
 
         compact = self.compact_output and not return_states
@@ -182,13 +225,26 @@ class GR4JWithCemaNeige(BaseHydrologicalModel):
             qsim = torch.zeros_like(precip)
         for t in range(nsteps):
             (
-                effective_t, G, eTG, sca_t, rain_t, melt_t,
-                q_t, s_prod, s_route, uh1_buf, uh2_buf,
+                effective_t,
+                G,
+                eTG,
+                sca_t,
+                rain_t,
+                melt_t,
+                q_t,
+                s_prod,
+                s_route,
+                uh1_buf,
+                uh2_buf,
             ) = self._fused_step(
-                precip[:, t], temp[:, t], pet[:, t],
-                (G, eTG), (s_prod, s_route, uh1_buf, uh2_buf),
+                precip[:, t],
+                temp[:, t],
+                pet[:, t],
+                (G, eTG),
+                (s_prod, s_route, uh1_buf, uh2_buf),
                 (ctg, kf, g_thresh),
-                (uh1_ord, uh2_ord, x1, x2, x3), self.nearzero,
+                (uh1_ord, uh2_ord, x1, x2, x3),
+                self.nearzero,
             )
             if compact:
                 q_values.append(q_t)
@@ -203,15 +259,20 @@ class GR4JWithCemaNeige(BaseHydrologicalModel):
             return torch.stack(q_values, dim=1), {}
 
         cn_aux = {
-            "snow_pack": G, "thermal_state": eTG,
-            "sca": sca_store, "rain": rain_store, "melt": melt_store,
+            "snow_pack": G,
+            "thermal_state": eTG,
+            "sca": sca_store,
+            "rain": rain_store,
+            "melt": melt_store,
         }
         gr4j_aux = {"s_prod": s_prod, "s_route": s_route}
         if return_states:
             cn_aux["final_states"] = {"G": G, "eTG": eTG}
             gr4j_aux["final_states"] = {
-                "s_prod": s_prod, "s_route": s_route,
-                "uh1_buf": uh1_buf, "uh2_buf": uh2_buf,
+                "s_prod": s_prod,
+                "s_route": s_route,
+                "uh1_buf": uh1_buf,
+                "uh2_buf": uh2_buf,
             }
 
         aux = {k: v for k, v in cn_aux.items() if k != "final_states"}
@@ -280,8 +341,12 @@ class XAJWithCemaNeige(BaseHydrologicalModel):
         cn_initial = None
         xaj_initial = None
         if initial_states is not None:
-            cn_initial = {k[3:]: v for k, v in initial_states.items() if k.startswith("cn_")}
-            xaj_initial = {k[4:]: v for k, v in initial_states.items() if k.startswith("xaj_")}
+            cn_initial = {
+                k[3:]: v for k, v in initial_states.items() if k.startswith("cn_")
+            }
+            xaj_initial = {
+                k[4:]: v for k, v in initial_states.items() if k.startswith("xaj_")
+            }
 
         # Run snow/melt and runoff generation in one shared time loop.  The
         # unit-hydrograph routing remains a sequence-level operation after the
@@ -298,11 +363,31 @@ class XAJWithCemaNeige(BaseHydrologicalModel):
         G, eTG = _init_basic_states(batch, device, dtype, cn_initial)
         xaj_step_params = _prepare_xaj_parameters(xaj_params)
         (
-            k, b, im, um, lm, dm, c, sm, ex, ki, kg, ci, cg,
-            a_uh, theta_uh,
+            k,
+            b,
+            im,
+            um,
+            lm,
+            dm,
+            c,
+            sm,
+            ex,
+            ki,
+            kg,
+            ci,
+            cg,
+            a_uh,
+            theta_uh,
         ) = xaj_step_params
         (wu, wl, wd, s, fr, qi, qg, rs_uh_buffer) = self._xaj._init_states(
-            batch, device, dtype, xaj_initial, um, lm, dm, sm,
+            batch,
+            device,
+            dtype,
+            xaj_initial,
+            um,
+            lm,
+            dm,
+            sm,
         )
 
         compact = self.compact_output and not return_states
@@ -321,12 +406,32 @@ class XAJWithCemaNeige(BaseHydrologicalModel):
 
         for t in range(nsteps):
             (
-                effective_t, G, eTG, sca_t, rain_t, melt_t,
-                _q_out, rs_adj_t, qi_t, qg_t, evap_t,
-                wu, wl, wd, s, fr,
-                _rs, _ri, _rg, _eu, _el, _ed,
+                effective_t,
+                G,
+                eTG,
+                sca_t,
+                rain_t,
+                melt_t,
+                _q_out,
+                rs_adj_t,
+                qi_t,
+                qg_t,
+                evap_t,
+                wu,
+                wl,
+                wd,
+                s,
+                fr,
+                _rs,
+                _ri,
+                _rg,
+                _eu,
+                _el,
+                _ed,
             ) = self._fused_step(
-                precip[:, t], temp[:, t], pet[:, t],
+                precip[:, t],
+                temp[:, t],
+                pet[:, t],
                 (G, eTG),
                 (wu, wl, wd, s, fr, qi, qg),
                 (ctg, kf, g_thresh),
@@ -352,7 +457,12 @@ class XAJWithCemaNeige(BaseHydrologicalModel):
             qi_store = torch.stack(baseflow_values, dim=1)
             qg_store = torch.zeros_like(qi_store)
         rs_routed, rs_uh_buffer = _route_xaj_surface_runoff(
-            rs_store, rs_uh_buffer, a_uh, theta_uh, device, dtype,
+            rs_store,
+            rs_uh_buffer,
+            a_uh,
+            theta_uh,
+            device,
+            dtype,
         )
         qsim = rs_routed + qi_store + qg_store
 
@@ -372,14 +482,22 @@ class XAJWithCemaNeige(BaseHydrologicalModel):
             "rs_routed": rs_routed,
             "qi": qi_store,
             "qg": qg_store,
-            "wu": wu, "wl": wl, "wd": wd,
-            "s": s, "fr": fr,
+            "wu": wu,
+            "wl": wl,
+            "wd": wd,
+            "s": s,
+            "fr": fr,
         }
         if return_states:
             cn_aux["final_states"] = {"G": G, "eTG": eTG}
             xaj_aux["final_states"] = {
-                "wu": wu, "wl": wl, "wd": wd, "s": s, "fr": fr,
-                "qi": qi_store[:, -1], "qg": qg_store[:, -1],
+                "wu": wu,
+                "wl": wl,
+                "wd": wd,
+                "s": s,
+                "fr": fr,
+                "qi": qi_store[:, -1],
+                "qg": qg_store[:, -1],
                 "rs_uh_buffer": rs_uh_buffer,
             }
 
@@ -424,7 +542,9 @@ class SIMHYDWithCemaNeige(BaseHydrologicalModel):
         dtype = precip.dtype
         validate_params(params, self.parameter_specs, batch, device, dtype)
 
-        cn_params = {key: value for key, value in params.items() if key.startswith("cn_")}
+        cn_params = {
+            key: value for key, value in params.items() if key.startswith("cn_")
+        }
         simhyd_params = {
             key: value for key, value in params.items() if key.startswith("simhyd_")
         }
@@ -454,14 +574,21 @@ class SIMHYDWithCemaNeige(BaseHydrologicalModel):
         G, eTG = _init_basic_states(batch, device, dtype, cn_initial)
         smsc = simhyd_params["simhyd_smsc"]
         soil, groundwater, runoff_uh_buffer = self._simhyd._init_states(
-            batch, device, dtype, smsc,
+            batch,
+            device,
+            dtype,
+            smsc,
             simhyd_initial,
         )
         simhyd_step_params = (
-            simhyd_params["simhyd_insc"], simhyd_params["simhyd_coeff"],
-            simhyd_params["simhyd_sq"], simhyd_params["simhyd_smsc"],
-            simhyd_params["simhyd_sub"], simhyd_params["simhyd_crak"],
-            simhyd_params["simhyd_k"], simhyd_params["simhyd_etmul"],
+            simhyd_params["simhyd_insc"],
+            simhyd_params["simhyd_coeff"],
+            simhyd_params["simhyd_sq"],
+            simhyd_params["simhyd_smsc"],
+            simhyd_params["simhyd_sub"],
+            simhyd_params["simhyd_crak"],
+            simhyd_params["simhyd_k"],
+            simhyd_params["simhyd_etmul"],
         )
 
         compact = self.compact_output and not return_states
@@ -481,13 +608,30 @@ class SIMHYDWithCemaNeige(BaseHydrologicalModel):
             baseflow = torch.zeros_like(precip)
         for t in range(precip.shape[1]):
             (
-                effective_t, G, eTG, sca_t, rain_t, melt_t,
-                runoff_t, evap_t, soil, groundwater,
-                interception_t, direct_t, interflow_t, recharge_t, baseflow_t,
+                effective_t,
+                G,
+                eTG,
+                sca_t,
+                rain_t,
+                melt_t,
+                runoff_t,
+                evap_t,
+                soil,
+                groundwater,
+                interception_t,
+                direct_t,
+                interflow_t,
+                recharge_t,
+                baseflow_t,
             ) = self._fused_step(
-                precip[:, t], temp[:, t], pet[:, t],
-                (G, eTG), (soil, groundwater),
-                (ctg, kf, g_thresh), simhyd_step_params, self.nearzero,
+                precip[:, t],
+                temp[:, t],
+                pet[:, t],
+                (G, eTG),
+                (soil, groundwater),
+                (ctg, kf, g_thresh),
+                simhyd_step_params,
+                self.nearzero,
             )
             if compact:
                 runoff_values.append(runoff_t)
@@ -507,16 +651,22 @@ class SIMHYDWithCemaNeige(BaseHydrologicalModel):
             runoff_instant = torch.stack(runoff_values, dim=1)
 
         qsim, runoff_uh_buffer, uh_ordinates, routing_storage = _route_simhyd_runoff(
-            runoff_instant, runoff_uh_buffer,
-            simhyd_params["simhyd_a"], simhyd_params["simhyd_theta"],
-            device, dtype,
+            runoff_instant,
+            runoff_uh_buffer,
+            simhyd_params["simhyd_a"],
+            simhyd_params["simhyd_theta"],
+            device,
+            dtype,
         )
 
         if compact:
             return qsim, {}
         cn_aux = {
-            "snow_pack": G, "thermal_state": eTG,
-            "sca": sca_store, "rain": rain_store, "melt": melt_store,
+            "snow_pack": G,
+            "thermal_state": eTG,
+            "sca": sca_store,
+            "rain": rain_store,
+            "melt": melt_store,
         }
         simhyd_aux = {
             "routing_method": self.routing_method,
@@ -536,7 +686,8 @@ class SIMHYDWithCemaNeige(BaseHydrologicalModel):
         if return_states:
             cn_aux["final_states"] = {"G": G, "eTG": eTG}
             simhyd_aux["final_states"] = {
-                "soil": soil, "groundwater": groundwater,
+                "soil": soil,
+                "groundwater": groundwater,
                 "runoff_uh_buffer": runoff_uh_buffer,
             }
 
@@ -547,10 +698,7 @@ class SIMHYDWithCemaNeige(BaseHydrologicalModel):
         aux["effective_precip"] = effective_precip
         if return_states:
             aux["final_states"] = {
-                **{
-                    f"cn_{key}": value
-                    for key, value in cn_aux["final_states"].items()
-                },
+                **{f"cn_{key}": value for key, value in cn_aux["final_states"].items()},
                 **{
                     f"simhyd_{key}": value
                     for key, value in simhyd_aux["final_states"].items()

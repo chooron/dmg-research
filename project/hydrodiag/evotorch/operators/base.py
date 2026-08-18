@@ -210,7 +210,9 @@ class CrossOver(CopyingOperator):
         """
         super().__init__(problem)
 
-        self._obj_index = None if obj_index is None else problem.normalize_obj_index(obj_index)
+        self._obj_index = (
+            None if obj_index is None else problem.normalize_obj_index(obj_index)
+        )
         self._tournament_size = int(tournament_size)
 
         if num_children is not None and cross_over_rate is not None:
@@ -221,7 +223,9 @@ class CrossOver(CopyingOperator):
             )
 
         self._num_children = None if num_children is None else int(num_children)
-        self._cross_over_rate = None if cross_over_rate is None else float(cross_over_rate)
+        self._cross_over_rate = (
+            None if cross_over_rate is None else float(cross_over_rate)
+        )
 
     def _compute_num_tournaments(self, batch: SolutionBatch) -> int:
         if self._num_children is None and self._cross_over_rate is None:
@@ -286,7 +290,12 @@ class CrossOver(CopyingOperator):
             # To ensure that a randomized selection will be made when comparing two
             # solutions with the same rank, we add random noise to the ranks
             # (between 0.0 and 0.1).
-            ranks += self._problem.make_uniform(len(batch), dtype=self._problem.eval_dtype, device=batch.device) * 0.1
+            ranks += (
+                self._problem.make_uniform(
+                    len(batch), dtype=self._problem.eval_dtype, device=batch.device
+                )
+                * 0.1
+            )
         else:
             # Rank the solutions. Worst gets -0.5, best gets 0.5
             ranks = batch.utility(self._obj_index, ranking_method="centered")
@@ -325,7 +334,9 @@ class CrossOver(CopyingOperator):
         #   In tournament 1, left-candidate has rank 0.5, and right-candidate has 0.2; and so on.
 
         tournament_rows = torch.arange(0, num_tournaments, device=indata.device)
-        parents = tournament_indices[tournament_rows, torch.argmax(tournament_ranks, dim=-1)]
+        parents = tournament_indices[
+            tournament_rows, torch.argmax(tournament_ranks, dim=-1)
+        ]
 
         # Continuing from the [ worst, bad, best, good ] example, we end up with:
         #
@@ -397,8 +408,15 @@ class CrossOver(CopyingOperator):
         """
         raise NotImplementedError
 
-    def _make_children_batch(self, child_values: Union[torch.Tensor, ObjectArray]) -> SolutionBatch:
-        result = SolutionBatch(self.problem, device=child_values.device, empty=True, popsize=child_values.shape[0])
+    def _make_children_batch(
+        self, child_values: Union[torch.Tensor, ObjectArray]
+    ) -> SolutionBatch:
+        result = SolutionBatch(
+            self.problem,
+            device=child_values.device,
+            empty=True,
+            popsize=child_values.shape[0],
+        )
         result._data = child_values
         return result
 

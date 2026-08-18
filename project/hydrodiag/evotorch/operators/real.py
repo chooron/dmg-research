@@ -37,7 +37,13 @@ class GaussianMutation(CopyingOperator):
         available for free at http://cs.gmu.edu/~sean/book/metaheuristics/
     """
 
-    def __init__(self, problem: Problem, *, stdev: float, mutation_probability: Optional[float] = None):
+    def __init__(
+        self,
+        problem: Problem,
+        *,
+        stdev: float,
+        mutation_probability: Optional[float] = None,
+    ):
         """
         `__init__(...)`: Initialize the GaussianMutation.
 
@@ -53,15 +59,21 @@ class GaussianMutation(CopyingOperator):
         """
 
         super().__init__(problem)
-        self._mutation_probability = 1.0 if mutation_probability is None else float(mutation_probability)
+        self._mutation_probability = (
+            1.0 if mutation_probability is None else float(mutation_probability)
+        )
         self._stdev = float(stdev)
 
     @torch.no_grad()
     def _do(self, batch: SolutionBatch) -> SolutionBatch:
         result = deepcopy(batch)
         data = result.access_values()
-        mutation_matrix = self.problem.make_uniform_shaped_like(data) <= self._mutation_probability
-        data[mutation_matrix] += self._stdev * self.problem.make_gaussian_shaped_like(data[mutation_matrix])
+        mutation_matrix = (
+            self.problem.make_uniform_shaped_like(data) <= self._mutation_probability
+        )
+        data[mutation_matrix] += self._stdev * self.problem.make_gaussian_shaped_like(
+            data[mutation_matrix]
+        )
         data[:] = self._respect_bounds(data)
         return result
 
@@ -142,7 +154,9 @@ class MultiPointCrossOver(CrossOver):
             )
 
     @torch.no_grad()
-    def _do_cross_over(self, parents1: torch.Tensor, parents2: torch.Tensor) -> SolutionBatch:
+    def _do_cross_over(
+        self, parents1: torch.Tensor, parents2: torch.Tensor
+    ) -> SolutionBatch:
         # What we expect here is this:
         #
         #    parents1      parents2
@@ -166,12 +180,19 @@ class MultiPointCrossOver(CrossOver):
 
         # For each pairing, generate all gene indices (i.e. [0, 1, 2, ...] for each pairing)
         gene_indices = (
-            torch.arange(0, solution_length, device=device).unsqueeze(0).expand(num_pairings, solution_length)
+            torch.arange(0, solution_length, device=device)
+            .unsqueeze(0)
+            .expand(num_pairings, solution_length)
         )
 
         if num_points == 1:
             # For each pairing, generate a gene index at which the parent solutions will be cut and recombined
-            crossover_point = self.problem.make_randint((num_pairings, 1), n=(solution_length - 1), device=device) + 1
+            crossover_point = (
+                self.problem.make_randint(
+                    (num_pairings, 1), n=(solution_length - 1), device=device
+                )
+                + 1
+            )
 
             # Make a mask for crossing over
             # (False: take the value from one parent, True: take the value from the other parent).
@@ -185,10 +206,14 @@ class MultiPointCrossOver(CrossOver):
             )
 
             # From `crossover_points`, extract each cutting point for each solution.
-            cutting_points = [crossover_points[:, i].reshape(-1, 1) for i in range(num_points)]
+            cutting_points = [
+                crossover_points[:, i].reshape(-1, 1) for i in range(num_points)
+            ]
 
             # Initialize `crossover_mask` as a tensor filled with False.
-            crossover_mask = torch.zeros((num_pairings, solution_length), dtype=torch.bool, device=device)
+            crossover_mask = torch.zeros(
+                (num_pairings, solution_length), dtype=torch.bool, device=device
+            )
 
             # For each cutting point p, toggle the boolean values of `crossover_mask`
             # for indices bigger than the index pointed to by p
@@ -453,12 +478,16 @@ class SimulatedBinaryCrossOver(CrossOver):
         )
         self._eta = float(eta)
 
-    def _do_cross_over(self, parents1: torch.Tensor, parents2: torch.Tensor) -> SolutionBatch:
+    def _do_cross_over(
+        self, parents1: torch.Tensor, parents2: torch.Tensor
+    ) -> SolutionBatch:
         # Generate u_i values which determine the spread
         u = self.problem.make_uniform_shaped_like(parents1)
 
         # Compute beta_i values from u_i values as the actual spread per dimension
-        betas = (2 * u).pow(1.0 / (self._eta + 1.0))  # Compute all values for u_i < 0.5 first
+        betas = (2 * u).pow(
+            1.0 / (self._eta + 1.0)
+        )  # Compute all values for u_i < 0.5 first
         betas[u > 0.5] = (1.0 / (2 * (1.0 - u[u > 0.5]))).pow(
             1.0 / (self._eta + 1.0)
         )  # Replace the values for u_i >= 0.5
@@ -535,9 +564,13 @@ class PolynomialMutation(CopyingOperator):
             )
 
         if torch.any(self.problem.lower_bounds > self.problem.upper_bounds):
-            raise ValueError("Some of the `lower_bounds` appear greater than their `upper_bounds`")
+            raise ValueError(
+                "Some of the `lower_bounds` appear greater than their `upper_bounds`"
+            )
 
-        self._prob = None if mutation_probability is None else float(mutation_probability)
+        self._prob = (
+            None if mutation_probability is None else float(mutation_probability)
+        )
         self._eta = 20.0 if eta is None else float(eta)
         self._lb = self.problem.lower_bounds
         self._ub = self.problem.upper_bounds
@@ -619,7 +652,13 @@ class CosynePermutation(CopyingOperator):
         Journal of Machine Learning Research 9, 937-965
     """
 
-    def __init__(self, problem: Problem, obj_index: Optional[int] = None, *, permute_all: bool = False):
+    def __init__(
+        self,
+        problem: Problem,
+        obj_index: Optional[int] = None,
+        *,
+        permute_all: bool = False,
+    ):
         """
         `__init__(...)`: Initialize the CosynePermutation.
 
@@ -672,25 +711,33 @@ class CosynePermutation(CopyingOperator):
             # ranks = rank(
             #    fitnesses, ranking_method="centered", higher_is_better=(self.problem.senses[self.obj_index] == "max")
             # )
-            prob_permute = (1 - (ranks + 0.5).pow(1 / float(n))).unsqueeze(1).expand(len(batch), batch.solution_length)
+            prob_permute = (
+                (1 - (ranks + 0.5).pow(1 / float(n)))
+                .unsqueeze(1)
+                .expand(len(batch), batch.solution_length)
+            )
         else:
             prob_permute = torch.ones_like(indata)
 
         perm_mask = self.problem.make_uniform_shaped_like(prob_permute) <= prob_permute
 
-        perm_mask_sorted = torch.sort(perm_mask.to(torch.long), descending=True, dim=0)[0].to(
-            torch.bool
-        )  # Sort permutations
+        perm_mask_sorted = torch.sort(perm_mask.to(torch.long), descending=True, dim=0)[
+            0
+        ].to(torch.bool)  # Sort permutations
 
         perm_rand = self.problem.make_uniform_shaped_like(prob_permute)
         perm_rand[torch.logical_not(perm_mask)] = 1.0
         permutations = torch.argsort(perm_rand, dim=0)  # Generate permutations
 
         perm_sort = (
-            torch.arange(0, perm_mask.shape[0], device=indata.device).unsqueeze(-1).repeat(1, perm_mask.shape[1])
+            torch.arange(0, perm_mask.shape[0], device=indata.device)
+            .unsqueeze(-1)
+            .repeat(1, perm_mask.shape[1])
         )
         perm_sort[torch.logical_not(perm_mask)] += perm_mask.shape[0] + 1
-        perm_sort = torch.sort(perm_sort, dim=0)[0]  # Generate the origin of permutations
+        perm_sort = torch.sort(perm_sort, dim=0)[
+            0
+        ]  # Generate the origin of permutations
 
         _, permutation_columns = torch.nonzero(perm_mask_sorted, as_tuple=True)
         permutation_origin_indices = perm_sort[perm_mask_sorted]

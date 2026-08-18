@@ -18,7 +18,10 @@ import torch
 
 from ablation.ic_core.config import load_resolved_config
 from ablation.ic_core.data_adapter import load_531_bundle, sha256_file
-from ablation.ic_core.parameter_adapter import get_parameter_spec, normalized_to_physical
+from ablation.ic_core.parameter_adapter import (
+    get_parameter_spec,
+    normalized_to_physical,
+)
 from ablation.ic_core.runtime import ICObjectiveRuntime
 from ablation.optimizers.registry import get_optimizer_class
 
@@ -30,7 +33,11 @@ def get_git_commit(cwd: Path) -> str:
         import subprocess
 
         res = subprocess.run(
-            ["git", "rev-parse", "HEAD"], cwd=cwd, capture_output=True, text=True, check=True
+            ["git", "rev-parse", "HEAD"],
+            cwd=cwd,
+            capture_output=True,
+            text=True,
+            check=True,
         )
         return res.stdout.strip()
     except Exception:
@@ -42,7 +49,11 @@ def get_git_dirty(cwd: Path) -> dict[str, Any]:
         import subprocess
 
         res = subprocess.run(
-            ["git", "status", "--porcelain"], cwd=cwd, capture_output=True, text=True, check=True
+            ["git", "status", "--porcelain"],
+            cwd=cwd,
+            capture_output=True,
+            text=True,
+            check=True,
         )
         dirty_files = [line.strip() for line in res.stdout.splitlines() if line.strip()]
         return {"is_dirty": len(dirty_files) > 0, "dirty_files": dirty_files}
@@ -50,13 +61,17 @@ def get_git_dirty(cwd: Path) -> dict[str, Any]:
         return {"is_dirty": False, "dirty_files": []}
 
 
-def get_effective_task_seed(global_seed: int, basin_id: str, model_key: str, opt_seed: int, start_id: int) -> int:
+def get_effective_task_seed(
+    global_seed: int, basin_id: str, model_key: str, opt_seed: int, start_id: int
+) -> int:
     s = f"{global_seed}_{basin_id}_{model_key}_{opt_seed}_{start_id}"
     h = hashlib.sha256(s.encode()).hexdigest()
     return int(h, 16) % (2**31 - 1)
 
 
-def generate_freeze_manifest(config: dict[str, Any], output_dir: Path) -> dict[str, Any]:
+def generate_freeze_manifest(
+    config: dict[str, Any], output_dir: Path
+) -> dict[str, Any]:
     import evotorch
 
     dataset_manifest_path = Path(config["dataset_manifest"])
@@ -98,7 +113,9 @@ def generate_freeze_manifest(config: dict[str, Any], output_dir: Path) -> dict[s
         "parameter_spec_fingerprint": param_spec_hash,
         "runner_fingerprint": sha256_file(runner_path),
         "xnes_adapter_fingerprint": sha256_file(xnes_adapter_path),
-        "config_fingerprint": hashlib.sha256(json.dumps(config, sort_keys=True).encode()).hexdigest(),
+        "config_fingerprint": hashlib.sha256(
+            json.dumps(config, sort_keys=True).encode()
+        ).hexdigest(),
         "creation_timestamp": datetime.now(timezone.utc).isoformat(),
     }
 
@@ -127,7 +144,9 @@ def generate_freeze_manifest(config: dict[str, Any], output_dir: Path) -> dict[s
 def run_dry_run(config: dict[str, Any], output_dir: Path) -> dict[str, Any]:
     with open(config["basin_manifest"]) as f:
         basin_json = json.load(f)
-    basins = [b for b in basin_json["basins"] if b.get("split") == config.get("split", "A")]
+    basins = [
+        b for b in basin_json["basins"] if b.get("split") == config.get("split", "A")
+    ]
     if config.get("basin_limit"):
         basins = basins[: config["basin_limit"]]
 
@@ -173,9 +192,9 @@ def run_dry_run(config: dict[str, Any], output_dir: Path) -> dict[str, Any]:
     md_content = f"""# XNES Baseline Dry Run Plan
 
 ## Summary
-- **Experiment**: `{config.get('experiment_name')}`
-- **Model**: `{config.get('model_key')}`
-- **Split**: `{config.get('split')}`
+- **Experiment**: `{config.get("experiment_name")}`
+- **Model**: `{config.get("model_key")}`
+- **Split**: `{config.get("split")}`
 - **Basins Planned**: `{n_basins}`
 - **Starts per Basin**: `{starts}`
 - **Population**: `{pop}`
@@ -188,11 +207,11 @@ def run_dry_run(config: dict[str, Any], output_dir: Path) -> dict[str, Any]:
 ## Verification Checks
 | Requirement | Expected | Actual | Validated |
 |---|---|---|---|
-| Basins | 32 | {n_basins} | {'YES' if n_basins == 32 else 'NO'} |
-| Total Tasks | 96 | {total_tasks} | {'YES' if total_tasks == 96 else 'NO'} |
-| Evaluations / Task | 19,200 | {evals_per_task:,} | {'YES' if evals_per_task == 19200 else 'NO'} |
-| Evaluations / Basin | 57,600 | {evals_per_basin:,} | {'YES' if evals_per_basin == 57600 else 'NO'} |
-| Total Evaluations | 1,843,200 | {total_evals:,} | {'YES' if total_evals == 1843200 else 'NO'} |
+| Basins | 32 | {n_basins} | {"YES" if n_basins == 32 else "NO"} |
+| Total Tasks | 96 | {total_tasks} | {"YES" if total_tasks == 96 else "NO"} |
+| Evaluations / Task | 19,200 | {evals_per_task:,} | {"YES" if evals_per_task == 19200 else "NO"} |
+| Evaluations / Basin | 57,600 | {evals_per_basin:,} | {"YES" if evals_per_basin == 57600 else "NO"} |
+| Total Evaluations | 1,843,200 | {total_evals:,} | {"YES" if total_evals == 1843200 else "NO"} |
 """
     with open(output_dir / "dry_run_plan.md", "w") as f:
         f.write(md_content)
@@ -200,7 +219,9 @@ def run_dry_run(config: dict[str, Any], output_dir: Path) -> dict[str, Any]:
     return dry_plan
 
 
-def generate_task_seed_manifest(config: dict[str, Any], basins: list[dict[str, Any]], output_dir: Path) -> list[dict[str, Any]]:
+def generate_task_seed_manifest(
+    config: dict[str, Any], basins: list[dict[str, Any]], output_dir: Path
+) -> list[dict[str, Any]]:
     global_seed = config.get("global_seed", 20260723)
     model_key = config.get("model_key", "XAJ")
     opt_seeds = config["optimizer"]["optimizer_seeds"]
@@ -211,37 +232,58 @@ def generate_task_seed_manifest(config: dict[str, Any], basins: list[dict[str, A
         b_id = b["basin_id"]
         for o_seed in opt_seeds:
             for s_id in range(starts):
-                eff_seed = get_effective_task_seed(global_seed, b_id, model_key, o_seed, s_id)
-                rows.append({
-                    "basin_id": b_id,
-                    "model_key": model_key,
-                    "optimizer_seed": o_seed,
-                    "start_id": s_id,
-                    "effective_seed": eff_seed,
-                    "global_seed": global_seed,
-                })
+                eff_seed = get_effective_task_seed(
+                    global_seed, b_id, model_key, o_seed, s_id
+                )
+                rows.append(
+                    {
+                        "basin_id": b_id,
+                        "model_key": model_key,
+                        "optimizer_seed": o_seed,
+                        "start_id": s_id,
+                        "effective_seed": eff_seed,
+                        "global_seed": global_seed,
+                    }
+                )
 
     output_dir.mkdir(parents=True, exist_ok=True)
     with open(output_dir / "task_seed_manifest.csv", "w", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=["basin_id", "model_key", "optimizer_seed", "start_id", "effective_seed", "global_seed"])
+        writer = csv.DictWriter(
+            f,
+            fieldnames=[
+                "basin_id",
+                "model_key",
+                "optimizer_seed",
+                "start_id",
+                "effective_seed",
+                "global_seed",
+            ],
+        )
         writer.writeheader()
         writer.writerows(rows)
 
     return rows
 
 
-def execute_ablation_batch(config: dict[str, Any], output_dir: Path, basin_limit: int | None = None) -> dict[str, Any]:
+def execute_ablation_batch(
+    config: dict[str, Any], output_dir: Path, basin_limit: int | None = None
+) -> dict[str, Any]:
     freeze_manifest = generate_freeze_manifest(config, output_dir)
     dry_plan = run_dry_run(config, output_dir)
 
     with open(config["basin_manifest"]) as f:
         basin_json = json.load(f)
-    basins = [b for b in basin_json["basins"] if b.get("split") == config.get("split", "A")]
+    basins = [
+        b for b in basin_json["basins"] if b.get("split") == config.get("split", "A")
+    ]
     if basin_limit:
         basins = basins[:basin_limit]
 
     task_seeds = generate_task_seed_manifest(config, basins, output_dir)
-    seed_map = {(r["basin_id"], r["optimizer_seed"], r["start_id"]): r["effective_seed"] for r in task_seeds}
+    seed_map = {
+        (r["basin_id"], r["optimizer_seed"], r["start_id"]): r["effective_seed"]
+        for r in task_seeds
+    }
 
     lhs_npz = np.load(config["lhs_manifest"])
     lhs_basin_ids = lhs_npz["basin_ids"].tolist()
@@ -282,7 +324,9 @@ def execute_ablation_batch(config: dict[str, Any], output_dir: Path, basin_limit
 
         for opt_seed in config["optimizer"]["optimizer_seeds"]:
             for start_id in range(config["optimizer"]["starts"]):
-                task_dir = tasks_dir / b_id / f"seed_{opt_seed:03d}" / f"start_{start_id:02d}"
+                task_dir = (
+                    tasks_dir / b_id / f"seed_{opt_seed:03d}" / f"start_{start_id:02d}"
+                )
                 task_dir.mkdir(parents=True, exist_ok=True)
 
                 completed_marker = task_dir / "COMPLETED"
@@ -304,7 +348,9 @@ def execute_ablation_batch(config: dict[str, Any], output_dir: Path, basin_limit
 
                 if trace_jsonl_path.exists() and not completed_marker.exists():
                     timestamp_str = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
-                    iso_dir = failed_dir / f"{b_id}_s{opt_seed}_st{start_id}_{timestamp_str}"
+                    iso_dir = (
+                        failed_dir / f"{b_id}_s{opt_seed}_st{start_id}_{timestamp_str}"
+                    )
                     iso_dir.mkdir(parents=True, exist_ok=True)
                     for p in task_dir.glob("*"):
                         if p.is_file():
@@ -360,8 +406,8 @@ def execute_ablation_batch(config: dict[str, Any], output_dir: Path, basin_limit
                             split="train",
                         )
 
-                        fitnesses = eval_res.fitness.squeeze(0) # shape [P]
-                        valid_mask = eval_res.valid.squeeze(0) # shape [P]
+                        fitnesses = eval_res.fitness.squeeze(0)  # shape [P]
+                        valid_mask = eval_res.valid.squeeze(0)  # shape [P]
                         invalid_count = np.sum(~valid_mask)
                         total_invalid_candidates += invalid_count
 
@@ -394,9 +440,13 @@ def execute_ablation_batch(config: dict[str, Any], output_dir: Path, basin_limit
                             "median_fitness_generation": float(np.median(fitnesses)),
                             "valid_candidate_fraction": float(np.mean(valid_mask)),
                             "invalid_candidate_fraction": float(invalid_count / pop),
-                            "clipped_candidate_fraction": float(clipped_count / (pop * len(center_01))),
+                            "clipped_candidate_fraction": float(
+                                clipped_count / (pop * len(center_01))
+                            ),
                             "center_fitness": None,
-                            "distribution_stdev_summary": float(config["optimizer"]["stdev_init"]),
+                            "distribution_stdev_summary": float(
+                                config["optimizer"]["stdev_init"]
+                            ),
                             "reset_count_cumulative": reset_count,
                             "runtime_seconds_cumulative": cumulative_runtime,
                         }
@@ -409,13 +459,19 @@ def execute_ablation_batch(config: dict[str, Any], output_dir: Path, basin_limit
 
                 peak_gpu_mb = 0.0
                 if torch.cuda.is_available():
-                    peak_gpu_mb = float(torch.cuda.max_memory_allocated() / (1024 * 1024))
+                    peak_gpu_mb = float(
+                        torch.cuda.max_memory_allocated() / (1024 * 1024)
+                    )
 
                 total_possible_candidates = gens * pop
                 total_possible_params = total_possible_candidates * len(center_01)
 
                 best_cand_01, best_fit = optimizer.get_best()
-                best_cand_phys = normalized_to_physical(config["model_key"], best_cand_01, clip=True).squeeze().tolist()
+                best_cand_phys = (
+                    normalized_to_physical(config["model_key"], best_cand_01, clip=True)
+                    .squeeze()
+                    .tolist()
+                )
                 final_center_01 = optimizer.get_center().tolist()
 
                 res = {
@@ -424,7 +480,9 @@ def execute_ablation_batch(config: dict[str, Any], output_dir: Path, basin_limit
                     "model_key": config["model_key"],
                     "optimizer_seed": opt_seed,
                     "start_id": start_id,
-                    "initial_center_hash": hashlib.sha256(np.array(center_01).tobytes()).hexdigest()[:16],
+                    "initial_center_hash": hashlib.sha256(
+                        np.array(center_01).tobytes()
+                    ).hexdigest()[:16],
                     "best_train_kge": float(best_fit),
                     "best_generation": gens,
                     "best_theta_normalized": best_cand_01.tolist(),
@@ -434,8 +492,16 @@ def execute_ablation_batch(config: dict[str, Any], output_dir: Path, basin_limit
                     "total_evaluations": evals_cum,
                     "runtime_seconds": cumulative_runtime,
                     "peak_gpu_memory_mb": peak_gpu_mb,
-                    "invalid_candidate_fraction": float(total_invalid_candidates / total_possible_candidates) if total_possible_candidates > 0 else 0.0,
-                    "clipped_candidate_fraction": float(total_clipped_candidates / total_possible_params) if total_possible_params > 0 else 0.0,
+                    "invalid_candidate_fraction": float(
+                        total_invalid_candidates / total_possible_candidates
+                    )
+                    if total_possible_candidates > 0
+                    else 0.0,
+                    "clipped_candidate_fraction": float(
+                        total_clipped_candidates / total_possible_params
+                    )
+                    if total_possible_params > 0
+                    else 0.0,
                     "reset_count": reset_count,
                     "all_invalid_generations": all_invalid_gens,
                     "status": "completed" if not task_failed else "failed",
@@ -451,7 +517,14 @@ def execute_ablation_batch(config: dict[str, Any], output_dir: Path, basin_limit
                         json.dump(res, f, indent=2)
 
                     with open(task_dir / "completed.json", "w") as f:
-                        json.dump({"completed_at": datetime.now(timezone.utc).isoformat(), "run_id": run_id}, f, indent=2)
+                        json.dump(
+                            {
+                                "completed_at": datetime.now(timezone.utc).isoformat(),
+                                "run_id": run_id,
+                            },
+                            f,
+                            indent=2,
+                        )
 
                     completed_marker.touch()
 
@@ -460,12 +533,31 @@ def execute_ablation_batch(config: dict[str, Any], output_dir: Path, basin_limit
                     task_stats["completed"] += 1
                 else:
                     with open(task_dir / "failed.json", "w") as f:
-                        json.dump({"failed_at": datetime.now(timezone.utc).isoformat(), "reason": failure_reason}, f, indent=2)
+                        json.dump(
+                            {
+                                "failed_at": datetime.now(timezone.utc).isoformat(),
+                                "reason": failure_reason,
+                            },
+                            f,
+                            indent=2,
+                        )
                     all_start_results.append(res)
                     task_stats["failed"] += 1
 
-    generate_summaries_and_reports(config, output_dir, all_start_results, all_trace_rows, basins, task_stats, freeze_manifest, dry_plan)
-    return {"status": "SUCCESS" if task_stats["failed"] == 0 else "PARTIAL", "stats": task_stats}
+    generate_summaries_and_reports(
+        config,
+        output_dir,
+        all_start_results,
+        all_trace_rows,
+        basins,
+        task_stats,
+        freeze_manifest,
+        dry_plan,
+    )
+    return {
+        "status": "SUCCESS" if task_stats["failed"] == 0 else "PARTIAL",
+        "stats": task_stats,
+    }
 
 
 def generate_summaries_and_reports(
@@ -483,11 +575,24 @@ def generate_summaries_and_reports(
 
     # 1. per_start.csv
     per_start_fields = [
-        "basin_id", "optimizer_seed", "start_id", "initial_center_hash",
-        "best_train_kge", "best_generation", "best_theta_normalized", "best_theta_physical",
-        "final_center", "final_stdev_summary", "total_evaluations", "runtime_seconds",
-        "peak_gpu_memory_mb", "invalid_candidate_fraction", "clipped_candidate_fraction",
-        "reset_count", "status", "failure_reason"
+        "basin_id",
+        "optimizer_seed",
+        "start_id",
+        "initial_center_hash",
+        "best_train_kge",
+        "best_generation",
+        "best_theta_normalized",
+        "best_theta_physical",
+        "final_center",
+        "final_stdev_summary",
+        "total_evaluations",
+        "runtime_seconds",
+        "peak_gpu_memory_mb",
+        "invalid_candidate_fraction",
+        "clipped_candidate_fraction",
+        "reset_count",
+        "status",
+        "failure_reason",
     ]
     with open(summaries_dir / "per_start.csv", "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=per_start_fields)
@@ -510,18 +615,26 @@ def generate_summaries_and_reports(
         b_id = b_info["basin_id"]
         starts = basin_map.get(b_id, [])
         completed_starts = [s for s in starts if s.get("status") == "completed"]
-        
+
         if completed_starts:
             kges = [s["best_train_kge"] for s in completed_starts]
             best_kge = max(kges)
             median_kge = float(np.median(kges))
             worst_kge = min(kges)
             spread = best_kge - worst_kge
-            best_s_id = [s["start_id"] for s in completed_starts if s["best_train_kge"] == best_kge][0]
+            best_s_id = [
+                s["start_id"]
+                for s in completed_starts
+                if s["best_train_kge"] == best_kge
+            ][0]
             tot_evals = sum(s["total_evaluations"] for s in starts)
             tot_time = sum(s["runtime_seconds"] for s in starts)
             all_comp = len(completed_starts) == config["optimizer"]["starts"]
-            status = "completed" if all_comp else ("partial" if len(completed_starts) > 0 else "failed")
+            status = (
+                "completed"
+                if all_comp
+                else ("partial" if len(completed_starts) > 0 else "failed")
+            )
         else:
             best_kge = median_kge = worst_kge = spread = -999.0
             best_s_id = -1
@@ -529,23 +642,32 @@ def generate_summaries_and_reports(
             all_comp = False
             status = "failed"
 
-        per_basin_rows.append({
-            "basin_id": b_id,
-            "best_of_3_train_kge": best_kge,
-            "median_start_train_kge": median_kge,
-            "worst_start_train_kge": worst_kge,
-            "start_spread": spread,
-            "best_start_id": best_s_id,
-            "total_evaluations": tot_evals,
-            "total_runtime_seconds": tot_time,
-            "all_starts_completed": all_comp,
-            "status": status,
-        })
+        per_basin_rows.append(
+            {
+                "basin_id": b_id,
+                "best_of_3_train_kge": best_kge,
+                "median_start_train_kge": median_kge,
+                "worst_start_train_kge": worst_kge,
+                "start_spread": spread,
+                "best_start_id": best_s_id,
+                "total_evaluations": tot_evals,
+                "total_runtime_seconds": tot_time,
+                "all_starts_completed": all_comp,
+                "status": status,
+            }
+        )
 
     per_basin_fields = [
-        "basin_id", "best_of_3_train_kge", "median_start_train_kge", "worst_start_train_kge",
-        "start_spread", "best_start_id", "total_evaluations", "total_runtime_seconds",
-        "all_starts_completed", "status"
+        "basin_id",
+        "best_of_3_train_kge",
+        "median_start_train_kge",
+        "worst_start_train_kge",
+        "start_spread",
+        "best_start_id",
+        "total_evaluations",
+        "total_runtime_seconds",
+        "all_starts_completed",
+        "status",
     ]
     with open(summaries_dir / "per_basin.csv", "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=per_basin_fields)
@@ -563,26 +685,52 @@ def generate_summaries_and_reports(
     # 4. failure_summary.csv
     failed_tasks = [s for s in start_results if s.get("status") == "failed"]
     with open(summaries_dir / "failure_summary.csv", "w", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=["basin_id", "optimizer_seed", "start_id", "failure_reason"])
+        writer = csv.DictWriter(
+            f, fieldnames=["basin_id", "optimizer_seed", "start_id", "failure_reason"]
+        )
         writer.writeheader()
         for ft in failed_tasks:
-            writer.writerow({
-                "basin_id": ft["basin_id"],
-                "optimizer_seed": ft["optimizer_seed"],
-                "start_id": ft["start_id"],
-                "failure_reason": ft.get("failure_reason", "unknown"),
-            })
+            writer.writerow(
+                {
+                    "basin_id": ft["basin_id"],
+                    "optimizer_seed": ft["optimizer_seed"],
+                    "start_id": ft["start_id"],
+                    "failure_reason": ft.get("failure_reason", "unknown"),
+                }
+            )
 
     # 5. runtime_summary.csv
     runtimes = [s["runtime_seconds"] for s in start_results if s.get("runtime_seconds")]
-    peak_mems = [s["peak_gpu_memory_mb"] for s in start_results if "peak_gpu_memory_mb" in s]
+    peak_mems = [
+        s["peak_gpu_memory_mb"] for s in start_results if "peak_gpu_memory_mb" in s
+    ]
     with open(summaries_dir / "runtime_summary.csv", "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=["metric", "value"])
         writer.writeheader()
-        writer.writerow({"metric": "total_runtime_seconds", "value": sum(runtimes) if runtimes else 0})
-        writer.writerow({"metric": "mean_task_runtime_seconds", "value": float(np.mean(runtimes)) if runtimes else 0})
-        writer.writerow({"metric": "max_task_runtime_seconds", "value": float(np.max(runtimes)) if runtimes else 0})
-        writer.writerow({"metric": "peak_gpu_memory_mb", "value": float(np.max(peak_mems)) if peak_mems else 0})
+        writer.writerow(
+            {
+                "metric": "total_runtime_seconds",
+                "value": sum(runtimes) if runtimes else 0,
+            }
+        )
+        writer.writerow(
+            {
+                "metric": "mean_task_runtime_seconds",
+                "value": float(np.mean(runtimes)) if runtimes else 0,
+            }
+        )
+        writer.writerow(
+            {
+                "metric": "max_task_runtime_seconds",
+                "value": float(np.max(runtimes)) if runtimes else 0,
+            }
+        )
+        writer.writerow(
+            {
+                "metric": "peak_gpu_memory_mb",
+                "value": float(np.max(peak_mems)) if peak_mems else 0,
+            }
+        )
 
     # 6. boundary_summary.csv
     invalids = [s.get("invalid_candidate_fraction", 0.0) for s in start_results]
@@ -590,8 +738,18 @@ def generate_summaries_and_reports(
     with open(summaries_dir / "boundary_summary.csv", "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=["metric", "value"])
         writer.writeheader()
-        writer.writerow({"metric": "mean_invalid_candidate_fraction", "value": float(np.mean(invalids)) if invalids else 0})
-        writer.writerow({"metric": "mean_clipped_candidate_fraction", "value": float(np.mean(clippeds)) if clippeds else 0})
+        writer.writerow(
+            {
+                "metric": "mean_invalid_candidate_fraction",
+                "value": float(np.mean(invalids)) if invalids else 0,
+            }
+        )
+        writer.writerow(
+            {
+                "metric": "mean_clipped_candidate_fraction",
+                "value": float(np.mean(clippeds)) if clippeds else 0,
+            }
+        )
 
     # 7. convergence_checkpoints.csv
     checkpoint_rows = []
@@ -603,7 +761,7 @@ def generate_summaries_and_reports(
 
         pop = config["optimizer"]["population"]
         target_evals = [4800, 9600, 14400, 19200]
-        
+
         for key, trs in trace_by_task.items():
             trs_sorted = sorted(trs, key=lambda x: x["generation"])
             b_id, opt_seed, s_id = key
@@ -611,22 +769,42 @@ def generate_summaries_and_reports(
                 target_gen = (te // pop) - 1
                 matched = [t for t in trs_sorted if t["generation"] <= target_gen]
                 best_so_far = matched[-1]["best_fitness_so_far"] if matched else -999.0
-                checkpoint_rows.append({
-                    "basin_id": b_id,
-                    "optimizer_seed": opt_seed,
-                    "start_id": s_id,
-                    "budget_percentage": te / 19200 * 100,
-                    "cumulative_evaluations": te,
-                    "best_fitness_so_far": best_so_far,
-                })
+                checkpoint_rows.append(
+                    {
+                        "basin_id": b_id,
+                        "optimizer_seed": opt_seed,
+                        "start_id": s_id,
+                        "budget_percentage": te / 19200 * 100,
+                        "cumulative_evaluations": te,
+                        "best_fitness_so_far": best_so_far,
+                    }
+                )
 
     with open(summaries_dir / "convergence_checkpoints.csv", "w", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=["basin_id", "optimizer_seed", "start_id", "budget_percentage", "cumulative_evaluations", "best_fitness_so_far"])
+        writer = csv.DictWriter(
+            f,
+            fieldnames=[
+                "basin_id",
+                "optimizer_seed",
+                "start_id",
+                "budget_percentage",
+                "cumulative_evaluations",
+                "best_fitness_so_far",
+            ],
+        )
         writer.writeheader()
         writer.writerows(checkpoint_rows)
 
     # 8. Generate XNES_BASELINE_REPORT.md
-    generate_markdown_report(config, output_dir, per_basin_rows, start_results, task_stats, freeze_manifest, dry_plan)
+    generate_markdown_report(
+        config,
+        output_dir,
+        per_basin_rows,
+        start_results,
+        task_stats,
+        freeze_manifest,
+        dry_plan,
+    )
 
 
 def generate_markdown_report(
@@ -638,8 +816,14 @@ def generate_markdown_report(
     freeze_manifest: dict[str, Any],
     dry_plan: dict[str, Any],
 ) -> None:
-    best_of_3_kges = [r["best_of_3_train_kge"] for r in per_basin_rows if r["best_of_3_train_kge"] > -900]
-    spreads = [r["start_spread"] for r in per_basin_rows if r["best_of_3_train_kge"] > -900]
+    best_of_3_kges = [
+        r["best_of_3_train_kge"]
+        for r in per_basin_rows
+        if r["best_of_3_train_kge"] > -900
+    ]
+    spreads = [
+        r["start_spread"] for r in per_basin_rows if r["best_of_3_train_kge"] > -900
+    ]
 
     med_kge = float(np.median(best_of_3_kges)) if best_of_3_kges else 0.0
     mean_kge = float(np.mean(best_of_3_kges)) if best_of_3_kges else 0.0
@@ -665,7 +849,9 @@ def generate_markdown_report(
     expected_evals = dry_plan["total_evaluations_planned"]
     actual_evals = sum(s.get("total_evaluations", 0) for s in start_results)
 
-    status_str = "COMPLETE" if (n_completed == n_planned and t_failed == 0) else "PARTIAL"
+    status_str = (
+        "COMPLETE" if (n_completed == n_planned and t_failed == 0) else "PARTIAL"
+    )
 
     report_md = f"""# Stage 1 XNES Baseline Report
 
@@ -674,14 +860,14 @@ def generate_markdown_report(
 - **Main reason**: All {t_completed}/{t_planned} tasks completed successfully across {n_completed}/{n_planned} basins using standard XNES protocol.
 
 ## 2. Frozen protocol
-- **Git commit**: `{freeze_manifest['git_commit']}` (Dirty: {freeze_manifest['git_dirty']['is_dirty']})
-- **Config hash**: `{freeze_manifest['config_fingerprint'][:16]}`
+- **Git commit**: `{freeze_manifest["git_commit"]}` (Dirty: {freeze_manifest["git_dirty"]["is_dirty"]})
+- **Config hash**: `{freeze_manifest["config_fingerprint"][:16]}`
 - **Manifest hashes**:
-  - Basin manifest: `{freeze_manifest['basin_manifest_fingerprint'][:16]}`
-  - LHS manifest: `{freeze_manifest['lhs_manifest_fingerprint'][:16]}`
-  - Seed manifest: `{freeze_manifest['seed_manifest_fingerprint'][:16]}`
-- **Data source**: CAMELS 531 dataset (`{config['dataset_path']}`)
-- **Model**: {config['model_key']} (15 parameters)
+  - Basin manifest: `{freeze_manifest["basin_manifest_fingerprint"][:16]}`
+  - LHS manifest: `{freeze_manifest["lhs_manifest_fingerprint"][:16]}`
+  - Seed manifest: `{freeze_manifest["seed_manifest_fingerprint"][:16]}`
+- **Data source**: CAMELS 531 dataset (`{config["dataset_path"]}`)
+- **Model**: {config["model_key"]} (15 parameters)
 - **Optimizer**: EvoTorch XNES (pop=48, generations=400, starts=3, stdev_init=0.25)
 - **Budget**: 57,600 candidate evaluations per basin (1,843,200 total)
 - **Resume mode**: `restart_incomplete_task`
@@ -725,7 +911,7 @@ def generate_markdown_report(
 
 ## 9. Reproducibility
 - **Seed protocol**: Deterministic effective task seeds derived via SHA256 of `(global_seed, basin_id, model_key, optimizer_seed, start_id)`.
-- **LHS hashes**: `{freeze_manifest['lhs_manifest_fingerprint'][:16]}`
+- **LHS hashes**: `{freeze_manifest["lhs_manifest_fingerprint"][:16]}`
 - **Resume mode**: `restart_incomplete_task` (atomic COMPLETED marker).
 - **Limitations**: EvoTorch internal generator state is not exact-resumed across restarts; incomplete tasks are re-run cleanly from gen 0 with identical task seed.
 
@@ -747,7 +933,9 @@ def generate_markdown_report(
         f.write(report_md)
 
 
-def load_stage_config(path: str | Path, device_override: str | None = None) -> dict[str, Any]:
+def load_stage_config(
+    path: str | Path, device_override: str | None = None
+) -> dict[str, Any]:
     p = Path(path).resolve()
     with open(p) as f:
         config = json.load(f)
@@ -768,12 +956,20 @@ def load_stage_config(path: str | Path, device_override: str | None = None) -> d
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Formal IC Ablation Stage 1 XNES Baseline Runner")
+    parser = argparse.ArgumentParser(
+        description="Formal IC Ablation Stage 1 XNES Baseline Runner"
+    )
     parser.add_argument("--config", required=True, help="Path to config json")
     parser.add_argument("--split", type=str, default="A", help="Dataset split (A/B/C)")
     parser.add_argument("--basin-limit", type=int, help="Limit number of basins")
-    parser.add_argument("--dry-run", action="store_true", help="Perform dry run plan without forward pass")
-    parser.add_argument("--short-run", action="store_true", help="Perform short-run validation")
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Perform dry run plan without forward pass",
+    )
+    parser.add_argument(
+        "--short-run", action="store_true", help="Perform short-run validation"
+    )
     parser.add_argument("--device", type=str, help="Override torch device")
 
     args = parser.parse_args()

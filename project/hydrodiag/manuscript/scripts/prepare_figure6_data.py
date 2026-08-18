@@ -24,6 +24,7 @@ Usage: python manuscript/scripts/prepare_figure6_data.py
        [--results-root RES] [--run-id r3_misspec_analysis_v1]
        [--manuscript-root PROJECT/manuscript] [--n-boot 2000] [--seed 20260730]
 """
+
 from __future__ import annotations
 
 import argparse
@@ -89,9 +90,14 @@ def main() -> None:
     p_sum = src / "posthoc_summary.json"
     p_val = src / "posthoc_validation_summary.json"
 
-    for p, label in [(p_basin, "basin table"), (p_red, "TGD2 reduction"),
-                     (p_res, "CN residual"), (p_proc, "process errors"),
-                     (p_sum, "posthoc summary"), (p_val, "validation summary")]:
+    for p, label in [
+        (p_basin, "basin table"),
+        (p_red, "TGD2 reduction"),
+        (p_res, "CN residual"),
+        (p_proc, "process errors"),
+        (p_sum, "posthoc summary"),
+        (p_val, "validation summary"),
+    ]:
         require(p, label)
 
     bt = pd.read_csv(p_basin)
@@ -118,10 +124,20 @@ def main() -> None:
     for b in bt["basin_id"].unique():
         row = {"basin_id": b, "paradigm": "IC", "seed": ""}
         for cond in ["snow_active", "no_snow_active", "melt_active"]:
-            cn_r = proc_test[(proc_test["basin_id"] == b) & (proc_test["fit"] == "CN_IC") & (proc_test["condition"] == cond)]
-            tg_r = proc_test[(proc_test["basin_id"] == b) & (proc_test["fit"] == "TGD2_IC") & (proc_test["condition"] == cond)]
+            cn_r = proc_test[
+                (proc_test["basin_id"] == b)
+                & (proc_test["fit"] == "CN_IC")
+                & (proc_test["condition"] == cond)
+            ]
+            tg_r = proc_test[
+                (proc_test["basin_id"] == b)
+                & (proc_test["fit"] == "TGD2_IC")
+                & (proc_test["condition"] == cond)
+            ]
             if len(cn_r) == 1 and len(tg_r) == 1:
-                row[f"delta_rmse_{cond}"] = float(tg_r["rmse"].iloc[0] - cn_r["rmse"].iloc[0])
+                row[f"delta_rmse_{cond}"] = float(
+                    tg_r["rmse"].iloc[0] - cn_r["rmse"].iloc[0]
+                )
                 row[f"rmse_cn_{cond}"] = float(cn_r["rmse"].iloc[0])
                 row[f"rmse_tgd2_{cond}"] = float(tg_r["rmse"].iloc[0])
             else:
@@ -134,10 +150,20 @@ def main() -> None:
         for b in bt["basin_id"].unique():
             row = {"basin_id": b, "paradigm": "dPL", "seed": str(s)}
             for cond in ["snow_active", "no_snow_active", "melt_active"]:
-                cn_r = proc_test[(proc_test["basin_id"] == b) & (proc_test["fit"] == f"CN_dPL_s{s}") & (proc_test["condition"] == cond)]
-                tg_r = proc_test[(proc_test["basin_id"] == b) & (proc_test["fit"] == f"TGD2_dPL_s{s}") & (proc_test["condition"] == cond)]
+                cn_r = proc_test[
+                    (proc_test["basin_id"] == b)
+                    & (proc_test["fit"] == f"CN_dPL_s{s}")
+                    & (proc_test["condition"] == cond)
+                ]
+                tg_r = proc_test[
+                    (proc_test["basin_id"] == b)
+                    & (proc_test["fit"] == f"TGD2_dPL_s{s}")
+                    & (proc_test["condition"] == cond)
+                ]
                 if len(cn_r) == 1 and len(tg_r) == 1:
-                    row[f"delta_rmse_{cond}"] = float(tg_r["rmse"].iloc[0] - cn_r["rmse"].iloc[0])
+                    row[f"delta_rmse_{cond}"] = float(
+                        tg_r["rmse"].iloc[0] - cn_r["rmse"].iloc[0]
+                    )
                     row[f"rmse_cn_{cond}"] = float(cn_r["rmse"].iloc[0])
                     row[f"rmse_tgd2_{cond}"] = float(tg_r["rmse"].iloc[0])
                 else:
@@ -148,15 +174,27 @@ def main() -> None:
     df_proc_piv = pd.DataFrame(proc_rows)
 
     # ---------------- 3. Tidy long table (test period focus) ----------------
-    tidy = bt[bt["period"] == "test"].merge(
-        red[["basin_id", "paradigm", "seed", "R_theta_tgd2", "R_state_tgd2"]],
-        on=["basin_id", "paradigm", "seed"], how="left"
-    ).merge(
-        res[res["period"] == "test"][["basin_id", "paradigm", "seed", "G_CN_over_TGD2", "F_explicit_residual"]],
-        on=["basin_id", "paradigm", "seed"], how="left"
-    ).merge(
-        df_proc_piv,
-        on=["basin_id", "paradigm", "seed"], how="left"
+    tidy = (
+        bt[bt["period"] == "test"]
+        .merge(
+            red[["basin_id", "paradigm", "seed", "R_theta_tgd2", "R_state_tgd2"]],
+            on=["basin_id", "paradigm", "seed"],
+            how="left",
+        )
+        .merge(
+            res[res["period"] == "test"][
+                [
+                    "basin_id",
+                    "paradigm",
+                    "seed",
+                    "G_CN_over_TGD2",
+                    "F_explicit_residual",
+                ]
+            ],
+            on=["basin_id", "paradigm", "seed"],
+            how="left",
+        )
+        .merge(df_proc_piv, on=["basin_id", "paradigm", "seed"], how="left")
     )
     tidy = tidy.sort_values(["paradigm", "seed", "basin_id"]).reset_index(drop=True)
     tidy.to_csv(out_dir / "figure6_basin_table.csv", index=False)
@@ -219,15 +257,22 @@ def main() -> None:
         check_errors.append(f"G_CN_over_TGD2 IC: {gcn_ic} != {gcn_ic_frozen}")
 
     if check_errors:
-        raise SystemExit("Figure 6 sanity check FAILED:\n  " + "\n  ".join(check_errors))
-    print(f"[check] Figure 6 recomputed IC medians match frozen values exactly (1e-9)", flush=True)
+        raise SystemExit(
+            "Figure 6 sanity check FAILED:\n  " + "\n  ".join(check_errors)
+        )
+    print(
+        f"[check] Figure 6 recomputed IC medians match frozen values exactly (1e-9)",
+        flush=True,
+    )
 
     # ---------------- 6. Figure-facing summary JSON ----------------
     summary: dict = {
         "protocol": "figure6_prepare_v1",
         "source_run": args.run_id,
-        "inputs": [str(p.relative_to(args.results_root)) for p in
-                   [p_basin, p_red, p_res, p_proc, p_sum, p_val]],
+        "inputs": [
+            str(p.relative_to(args.results_root))
+            for p in [p_basin, p_red, p_res, p_proc, p_sum, p_val]
+        ],
         "code": git_commit(PROJECT),
         "n_basins": n_basins,
         "n_boot": args.n_boot,
@@ -261,11 +306,12 @@ def main() -> None:
             "n_valid": int(len(vals)),
             "frac_gt_0": float((vals > 0).mean()),
             "frac_ge_0p5": float((vals >= 0.5).mean()),
-            "frac_outside_display_window": float((((vals < -0.4) | (vals > 1.4))).mean()),
+            "frac_outside_display_window": float(((vals < -0.4) | (vals > 1.4)).mean()),
         }
         if reg == "dPL":
-            entry["seed_medians"] = [float(frozen_sum[f"dPL_{s}_test"]["F_tgd2"]["median"])
-                                     for s in SEEDS]
+            entry["seed_medians"] = [
+                float(frozen_sum[f"dPL_{s}_test"]["F_tgd2"]["median"]) for s in SEEDS
+            ]
         else:
             entry["frozen_median"] = f_ic_frozen
         pb[reg] = entry
@@ -284,14 +330,22 @@ def main() -> None:
             "boot_ci_median_display": list(ci),
             "n_valid": int(len(vals)),
             "frac_gt_0": float((vals > 0).mean()),
-            "frac_outside_display_window": float((((vals < -0.03) | (vals > 0.07))).mean()),
+            "frac_outside_display_window": float(
+                ((vals < -0.03) | (vals > 0.07)).mean()
+            ),
         }
         if reg == "IC":
-            entry["boot_ci_frozen"] = frozen_val["V3"]["IC"]["R_theta_tgd2"]["boot_ci_median"]
-            entry["frac_gt_0_frozen"] = frozen_val["V3"]["IC"]["R_theta_tgd2"]["frac_gt_0"]
+            entry["boot_ci_frozen"] = frozen_val["V3"]["IC"]["R_theta_tgd2"][
+                "boot_ci_median"
+            ]
+            entry["frac_gt_0_frozen"] = frozen_val["V3"]["IC"]["R_theta_tgd2"][
+                "frac_gt_0"
+            ]
         else:
-            entry["seed_medians"] = [float(frozen_val["V3"][f"dPL_{s}"]["R_theta_tgd2"]["median"])
-                                     for s in SEEDS]
+            entry["seed_medians"] = [
+                float(frozen_val["V3"][f"dPL_{s}"]["R_theta_tgd2"]["median"])
+                for s in SEEDS
+            ]
         pc[reg] = entry
     summary["panel_c_r_theta"] = pc
 
@@ -308,14 +362,20 @@ def main() -> None:
             "boot_ci_median_display": list(ci),
             "n_valid": int(len(vals)),
             "frac_gt_0": float((vals > 0).mean()),
-            "frac_outside_display_window": float((((vals < -0.3) | (vals > 0.9))).mean()),
+            "frac_outside_display_window": float(((vals < -0.3) | (vals > 0.9)).mean()),
         }
         if reg == "IC":
-            entry["boot_ci_frozen"] = frozen_val["V3"]["IC"]["R_state_tgd2"]["boot_ci_median"]
-            entry["frac_gt_0_frozen"] = frozen_val["V3"]["IC"]["R_state_tgd2"]["frac_gt_0"]
+            entry["boot_ci_frozen"] = frozen_val["V3"]["IC"]["R_state_tgd2"][
+                "boot_ci_median"
+            ]
+            entry["frac_gt_0_frozen"] = frozen_val["V3"]["IC"]["R_state_tgd2"][
+                "frac_gt_0"
+            ]
         else:
-            entry["seed_medians"] = [float(frozen_val["V3"][f"dPL_{s}"]["R_state_tgd2"]["median"])
-                                     for s in SEEDS]
+            entry["seed_medians"] = [
+                float(frozen_val["V3"][f"dPL_{s}"]["R_state_tgd2"]["median"])
+                for s in SEEDS
+            ]
         pd_[reg] = entry
     summary["panel_d_r_state"] = pd_
 
@@ -323,8 +383,12 @@ def main() -> None:
     pe = {}
     fs_all = np.sort(seedmed[seedmed["paradigm"] == "IC"]["frac_snow"].to_numpy())
     q_bins = np.quantile(fs_all, [0.25, 0.5, 0.75])
-    bins = [(-np.inf, q_bins[0]), (q_bins[0], q_bins[1]),
-            (q_bins[1], q_bins[2]), (q_bins[2], np.inf)]
+    bins = [
+        (-np.inf, q_bins[0]),
+        (q_bins[0], q_bins[1]),
+        (q_bins[1], q_bins[2]),
+        (q_bins[2], np.inf),
+    ]
 
     for reg in REGIMES:
         sub = seedmed[seedmed["paradigm"] == reg]
@@ -339,21 +403,33 @@ def main() -> None:
             if m.sum() < 10:
                 continue
             bm = y[m]
-            bin_entries.append({
-                "bin": k + 1,
-                "frac_snow_range": [float(lo), float(hi)],
-                "n": int(m.sum()),
-                "frac_snow_median": float(np.median(x[m])),
-                "median": float(np.median(bm)),
-                "boot_ci_median_display": list(boot_ci(bm, np.median, args.n_boot,
-                                                       args.seed + 20 + k)),
-            })
-        sp_frozen = (frozen_val["V4"]["IC_test"]["G_CN_over_TGD2"]["spearman_vs_frac_snow"] if reg == "IC"
-                     else [frozen_val["V4"][f"dPL_{s}_test"]["G_CN_over_TGD2"]["spearman_vs_frac_snow"]
-                           for s in SEEDS])
+            bin_entries.append(
+                {
+                    "bin": k + 1,
+                    "frac_snow_range": [float(lo), float(hi)],
+                    "n": int(m.sum()),
+                    "frac_snow_median": float(np.median(x[m])),
+                    "median": float(np.median(bm)),
+                    "boot_ci_median_display": list(
+                        boot_ci(bm, np.median, args.n_boot, args.seed + 20 + k)
+                    ),
+                }
+            )
+        sp_frozen = (
+            frozen_val["V4"]["IC_test"]["G_CN_over_TGD2"]["spearman_vs_frac_snow"]
+            if reg == "IC"
+            else [
+                frozen_val["V4"][f"dPL_{s}_test"]["G_CN_over_TGD2"][
+                    "spearman_vs_frac_snow"
+                ]
+                for s in SEEDS
+            ]
+        )
         pe[reg] = {
             "median": float(np.median(y)),
-            "spearman_frozen": sp_frozen if isinstance(sp_frozen, list) else [float(sp_frozen)],
+            "spearman_frozen": sp_frozen
+            if isinstance(sp_frozen, list)
+            else [float(sp_frozen)],
             "quartile_bins": bin_entries,
             "y_display_limits": [-0.05, 0.35],
             "frac_beyond_y_display": float((y > 0.35).mean()),
@@ -383,8 +459,13 @@ def main() -> None:
     write_json(out_dir / "figure6_summary.json", summary)
 
     print(f"COMPLETE Figure 6 data -> {out_dir}", flush=True)
-    print(f"  figure6_basin_table.csv      (tidy, per seed: {len(tidy)} rows)", flush=True)
-    print(f"  figure6_basin_seedmedian.csv (dPL seed-aggregated: {len(seedmed)} rows)", flush=True)
+    print(
+        f"  figure6_basin_table.csv      (tidy, per seed: {len(tidy)} rows)", flush=True
+    )
+    print(
+        f"  figure6_basin_seedmedian.csv (dPL seed-aggregated: {len(seedmed)} rows)",
+        flush=True,
+    )
     print(f"  figure6_summary.json         (panel-level numbers)", flush=True)
 
 

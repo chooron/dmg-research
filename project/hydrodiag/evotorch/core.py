@@ -109,14 +109,22 @@ BoundsPairLike = Union[Iterable[Bounds], BoundsPair]
 IndicesOrSlice = Union[int, Iterable[int], slice]
 MaybeIndicesOrSlice = Optional[IndicesOrSlice]
 
-ActorSeeds = NamedTuple("ActorSeeds", py_global=int, np_global=int, torch_global=int, problem=int)
+ActorSeeds = NamedTuple(
+    "ActorSeeds", py_global=int, np_global=int, torch_global=int, problem=int
+)
 
 
 @ray.remote
 class EvaluationActor:
     """An actor class for remotely evaluating solutions"""
 
-    def __init__(self, problem: "Problem", index: int, seeds: Union[ActorSeeds, tuple], state: dict):
+    def __init__(
+        self,
+        problem: "Problem",
+        index: int,
+        seeds: Union[ActorSeeds, tuple],
+        state: dict,
+    ):
         """
         `__init__(...)`: Initialize the actor.
 
@@ -140,7 +148,9 @@ class EvaluationActor:
             self._problem.seed(probseed)
         self._problem._use_pickle_data_from_main(state)
         self._problem.remote_hook(self._problem)
-        if isinstance(self._problem._num_gpus_per_actor, str) and (self._problem._num_gpus_per_actor == "all"):
+        if isinstance(self._problem._num_gpus_per_actor, str) and (
+            self._problem._num_gpus_per_actor == "all"
+        ):
             if "CUDA_VISIBLE_DEVICES" in os.environ:
                 del os.environ["CUDA_VISIBLE_DEVICES"]
 
@@ -155,7 +165,9 @@ class EvaluationActor:
         self._problem.evaluate(solution_batch)
         return solution_batch.access_evals()
 
-    def evaluate_batch_piece(self, piece_index: int, batch_piece: "SolutionBatch") -> tuple:
+    def evaluate_batch_piece(
+        self, piece_index: int, batch_piece: "SolutionBatch"
+    ) -> tuple:
         """Evaluate a solution batch, which is considered to be a piece
         (most probably a slice) of a bigger batch.
         Call this function for unordered parallelization, as this function
@@ -1006,7 +1018,12 @@ class Problem(TensorMakerMixin, Serializable):
         else:
             self._dtype = to_torch_dtype(dtype)
 
-        _evolog.info(message_from(self, f"The `dtype` for the problem's decision variables is set as {self._dtype}"))
+        _evolog.info(
+            message_from(
+                self,
+                f"The `dtype` for the problem's decision variables is set as {self._dtype}",
+            )
+        )
 
         # Set the dtype for the solution evaluations (i.e. fitnesses and evaluation data)
         if eval_dtype is not None:
@@ -1025,13 +1042,16 @@ class Problem(TensorMakerMixin, Serializable):
 
             _evolog.info(
                 message_from(
-                    self, f"`eval_dtype` (the dtype of the fitnesses and evaluation data) is set as {self._eval_dtype}"
+                    self,
+                    f"`eval_dtype` (the dtype of the fitnesses and evaluation data) is set as {self._eval_dtype}",
                 )
             )
 
         # Set the main device of the Problem object
         self._device = torch.device("cpu") if device is None else torch.device(device)
-        _evolog.info(message_from(self, f"The `device` of the problem is set as {self._device}"))
+        _evolog.info(
+            message_from(self, f"The `device` of the problem is set as {self._device}")
+        )
 
         # Declare the internal variable that might store the random number generator
         self._generator: Optional[torch.Generator] = None
@@ -1105,7 +1125,9 @@ class Problem(TensorMakerMixin, Serializable):
 
                 # Below is an internal helper function for some common operations for the (strict) bounds
                 # and for the initial bounds.
-                def process_bounds(bounds_tuple: BoundsPairLike, tuple_name: str) -> BoundsPair:
+                def process_bounds(
+                    bounds_tuple: BoundsPairLike, tuple_name: str
+                ) -> BoundsPair:
                     # This function receives the bounds_tuple (a tuple containing lower and upper bounds),
                     # and the string name of the bounds argument ("bounds" or "initial_bounds").
                     # What is returned is the bounds expressed as PyTorch tensors in the correct dtype and device.
@@ -1257,7 +1279,9 @@ class Problem(TensorMakerMixin, Serializable):
 
         # If the evaluation data length is explicitly stated, then convert it to an integer and store it.
         # Otherwise, store the evaluation data length as 0.
-        self._eval_data_length = 0 if eval_data_length is None else int(eval_data_length)
+        self._eval_data_length = (
+            0 if eval_data_length is None else int(eval_data_length)
+        )
 
         # Initialize the actor index.
         # If the problem is configured to be parallelized and the parallelization is triggered, then each remote
@@ -1277,7 +1301,9 @@ class Problem(TensorMakerMixin, Serializable):
 
         # Store the ray actor configuration dictionary provided by the user (if any).
         # When (or if) the parallelization is triggered, each actor will be created with this given configuration.
-        self._actor_config: Optional[dict] = None if actor_config is None else deepcopy(dict(actor_config))
+        self._actor_config: Optional[dict] = (
+            None if actor_config is None else deepcopy(dict(actor_config))
+        )
 
         # If given, store the sub-batch size or number of sub-batches.
         # When the problem is parallelized, a sub-batch size determines the maximum size for a SolutionBatch
@@ -1291,8 +1317,12 @@ class Problem(TensorMakerMixin, Serializable):
                 f" num_subbatches={num_subbatches}, subbatch_size={subbatch_size}."
                 f" Having both of them as values other than None cannot be accepted."
             )
-        self._num_subbatches: Optional[int] = None if num_subbatches is None else int(num_subbatches)
-        self._subbatch_size: Optional[int] = None if subbatch_size is None else int(subbatch_size)
+        self._num_subbatches: Optional[int] = (
+            None if num_subbatches is None else int(num_subbatches)
+        )
+        self._subbatch_size: Optional[int] = (
+            None if subbatch_size is None else int(subbatch_size)
+        )
 
         # Initialize the additional states to be loaded by the remote actor as None.
         # If there are such additional states for remote actors, the inheriting class can fill this as a list
@@ -1463,7 +1493,8 @@ class Problem(TensorMakerMixin, Serializable):
 
         _evolog.info(
             message_from(
-                self, f"The number of actors that will be allocated for parallelized evaluation is {self._num_actors}"
+                self,
+                f"The number of actors that will be allocated for parallelized evaluation is {self._num_actors}",
             )
         )
 
@@ -1534,7 +1565,11 @@ class Problem(TensorMakerMixin, Serializable):
         # Annotate the variable which will determine how many GPUs are to be assigned to each actor.
         self._num_gpus_per_actor: Optional[Union[str, int, float]]
 
-        if (actor_config is not None) and ("num_gpus" in actor_config) and (num_gpus_per_actor is not None):
+        if (
+            (actor_config is not None)
+            and ("num_gpus" in actor_config)
+            and (num_gpus_per_actor is not None)
+        ):
             # If `actor_config` dictionary has the item "num_gpus" and also `num_gpus_per_actor` is not None,
             # then there is a conflicting (or redundant) configuration. We raise an error here.
             raise ValueError(
@@ -1591,7 +1626,10 @@ class Problem(TensorMakerMixin, Serializable):
 
         if self._num_actors > 0:
             _evolog.info(
-                message_from(self, f"Number of GPUs that will be allocated per actor is {self._num_gpus_per_actor}")
+                message_from(
+                    self,
+                    f"Number of GPUs that will be allocated per actor is {self._num_gpus_per_actor}",
+                )
             )
 
         # Initialize the Hook instances (and the related status dictionary for the `_after_eval_hook`)
@@ -1603,7 +1641,9 @@ class Problem(TensorMakerMixin, Serializable):
         self._after_grad_hook: Hook = Hook()
 
         # Initialize various stats regarding the solutions encountered by this Problem instance.
-        self._store_solution_stats = None if store_solution_stats is None else bool(store_solution_stats)
+        self._store_solution_stats = (
+            None if store_solution_stats is None else bool(store_solution_stats)
+        )
         self._best: Optional[list] = None
         self._worst: Optional[list] = None
         self._best_evals: Optional[torch.Tensor] = None
@@ -1682,7 +1722,11 @@ class Problem(TensorMakerMixin, Serializable):
         cpu_device = torch.device("cpu")
         if torch.device(self.device) == cpu_device:
             if torch.cuda.is_available():
-                if isinstance(self._num_gpus_per_actor, str) and (self._num_gpus_per_actor == "all") and self.is_remote:
+                if (
+                    isinstance(self._num_gpus_per_actor, str)
+                    and (self._num_gpus_per_actor == "all")
+                    and self.is_remote
+                ):
                     return torch.device("cuda", self.actor_index)
                 else:
                     return torch.device("cuda")
@@ -1893,7 +1937,9 @@ class Problem(TensorMakerMixin, Serializable):
                 " method `_fill(...)` needs to be provided by the inheriting class."
             )
         else:
-            if (self.initial_lower_bounds is None) or (self.initial_upper_bounds is None):
+            if (self.initial_lower_bounds is None) or (
+                self.initial_upper_bounds is None
+            ):
                 raise RuntimeError(
                     "The default implementation of the method `_fill(...)` does not know how to initialize solutions"
                     " because it appears that this Problem object was not given neither `initial_bounds` nor `bounds`"
@@ -1965,7 +2011,12 @@ class Problem(TensorMakerMixin, Serializable):
                     f" However, the received value for `empty` is {empty}."
                 )
             result = SolutionBatch(self, popsize, device=self.device, empty=True)
-            self.make_gaussian(out=result.access_values(), center=center, stdev=stdev, symmetric=symmetric)
+            self.make_gaussian(
+                out=result.access_values(),
+                center=center,
+                stdev=stdev,
+                symmetric=symmetric,
+            )
             return result
         else:
             raise ValueError(
@@ -2040,10 +2091,15 @@ class Problem(TensorMakerMixin, Serializable):
 
         # Generate the actors, each with a unique seed.
         if config_per_actor is None:
-            actors = [EvaluationActor.remote(self, i, all_seeds[i], remote_states[i]) for i in range(number_of_actors)]
+            actors = [
+                EvaluationActor.remote(self, i, all_seeds[i], remote_states[i])
+                for i in range(number_of_actors)
+            ]
         else:
             actors = [
-                EvaluationActor.options(**config_per_actor).remote(self, i, all_seeds[i], remote_states[i])
+                EvaluationActor.options(**config_per_actor).remote(
+                    self, i, all_seeds[i], remote_states[i]
+                )
                 for i in range(number_of_actors)
             ]
 
@@ -2319,7 +2375,12 @@ class Problem(TensorMakerMixin, Serializable):
             return False
 
         if to_send is not None:
-            ray.get([actor.call.remote("_use_sync_data_from_main", [to_send], {}) for actor in self._actors])
+            ray.get(
+                [
+                    actor.call.remote("_use_sync_data_from_main", [to_send], {})
+                    for actor in self._actors
+                ]
+            )
 
         return True
 
@@ -2327,7 +2388,12 @@ class Problem(TensorMakerMixin, Serializable):
         if self._actors is None:
             return
 
-        received = ray.get([actor.call.remote("_make_sync_data_for_main", [], {}) for actor in self._actors])
+        received = ray.get(
+            [
+                actor.call.remote("_make_sync_data_for_main", [], {})
+                for actor in self._actors
+            ]
+        )
 
         self._use_sync_data_from_actors(received)
 
@@ -2343,8 +2409,12 @@ class Problem(TensorMakerMixin, Serializable):
         nobjs = len(senses)
 
         if self._best is None:
-            self._best_evals = self.make_empty(nobjs, device=batch.device, use_eval_dtype=True)
-            self._worst_evals = self.make_empty(nobjs, device=batch.device, use_eval_dtype=True)
+            self._best_evals = self.make_empty(
+                nobjs, device=batch.device, use_eval_dtype=True
+            )
+            self._worst_evals = self.make_empty(
+                nobjs, device=batch.device, use_eval_dtype=True
+            )
             for i_obj in range(nobjs):
                 if senses[i_obj] == "min":
                     self._best_evals[i_obj] = float("inf")
@@ -2399,7 +2469,9 @@ class Problem(TensorMakerMixin, Serializable):
         else:
             return {"best": self._best, "worst": self._worst}
 
-    def compare_solutions(self, a: "Solution", b: "Solution", obj_index: Optional[int] = None) -> float:
+    def compare_solutions(
+        self, a: "Solution", b: "Solution", obj_index: Optional[int] = None
+    ) -> float:
         """
         Compare two solutions.
         It is assumed that both solutions are already evaluated.
@@ -2429,7 +2501,9 @@ class Problem(TensorMakerMixin, Serializable):
         else:
             raise ValueError("Unrecognized sense: " + repr(sense))
 
-    def is_better(self, a: "Solution", b: "Solution", obj_index: Optional[int] = None) -> bool:
+    def is_better(
+        self, a: "Solution", b: "Solution", obj_index: Optional[int] = None
+    ) -> bool:
         """
         Check whether or not the first solution is better.
         It is assumed that both solutions are already evaluated.
@@ -2445,7 +2519,9 @@ class Problem(TensorMakerMixin, Serializable):
         """
         return self.compare_solutions(a, b, obj_index) > 0
 
-    def is_worse(self, a: "Solution", b: "Solution", obj_index: Optional[int] = None) -> bool:
+    def is_worse(
+        self, a: "Solution", b: "Solution", obj_index: Optional[int] = None
+    ) -> bool:
         """
         Check whether or not the first solution is worse.
         It is assumed that both solutions are already evaluated.
@@ -2490,7 +2566,11 @@ class Problem(TensorMakerMixin, Serializable):
             for attrib_name in self._shared_attribs:
                 obj_ref = ray.put(getattr(self, attrib_name))
                 for actor in self.actors:
-                    actor.call.remote("put_ray_object", [], {"obj_ref": obj_ref, "attrib_name": attrib_name})
+                    actor.call.remote(
+                        "put_ray_object",
+                        [],
+                        {"obj_ref": obj_ref, "attrib_name": attrib_name},
+                    )
 
     def put_ray_object(self, obj_ref: ray.ObjectRef, attrib_name: str) -> None:
         setattr(self, attrib_name, ray.get(obj_ref))
@@ -2504,14 +2584,22 @@ class Problem(TensorMakerMixin, Serializable):
             if fn is None:
                 return None
             else:
-                if hasattr(fn, "__evotorch_on_aux_device__") and fn.__evotorch_on_aux_device__:
+                if (
+                    hasattr(fn, "__evotorch_on_aux_device__")
+                    and fn.__evotorch_on_aux_device__
+                ):
                     return self.aux_device
                 elif hasattr(fn, "device"):
                     return fn.device
                 else:
                     return None
 
-        for candidate_fn in (self._objective_func, self._evaluate_all, self._evaluate_batch, self._evaluate):
+        for candidate_fn in (
+            self._objective_func,
+            self._evaluate_all,
+            self._evaluate_batch,
+            self._evaluate,
+        ):
             device = device_of_fn(candidate_fn)
             if device is not None:
                 if candidate_fn is self._evaluate_all:
@@ -2593,7 +2681,8 @@ class Problem(TensorMakerMixin, Serializable):
             #    batch._evdata[row_begin:row_end, :] = evals
 
             mapresult = self._actor_pool.map_unordered(
-                lambda a, v: a.evaluate_batch_piece.remote(v[0], v[1]), list(enumerate(pieces))
+                lambda a, v: a.evaluate_batch_piece.remote(v[0], v[1]),
+                list(enumerate(pieces)),
             )
             for i, evals in mapresult:
                 row_begin, row_end = pieces.indices_of(i)
@@ -2646,7 +2735,9 @@ class Problem(TensorMakerMixin, Serializable):
             ValueError: if the problem has a non-numeric dtype.
         """
         if is_dtype_object(self.dtype):
-            raise ValueError("Expected a problem with numeric dtype, but the dtype is object.")
+            raise ValueError(
+                "Expected a problem with numeric dtype, but the dtype is object."
+            )
 
     def ensure_unbounded(self):
         """
@@ -2656,7 +2747,9 @@ class Problem(TensorMakerMixin, Serializable):
             ValueError: if the problem has strict lower and upper bounds.
         """
         if not (self.lower_bounds is None and self.upper_bounds is None):
-            raise ValueError("Expected an unbounded problem, but this problem has lower and/or upper bounds.")
+            raise ValueError(
+                "Expected an unbounded problem, but this problem has lower and/or upper bounds."
+            )
 
     def ensure_single_objective(self):
         """
@@ -2667,7 +2760,9 @@ class Problem(TensorMakerMixin, Serializable):
         """
         n = len(self.senses)
         if n > 1:
-            raise ValueError(f"Expected a single-objective problem, but this problem has {n} objectives.")
+            raise ValueError(
+                f"Expected a single-objective problem, but this problem has {n} objectives."
+            )
 
     def normalize_obj_index(self, obj_index: Optional[int] = None) -> int:
         """
@@ -2712,7 +2807,10 @@ class Problem(TensorMakerMixin, Serializable):
         # Collect the inner states of the remote Problem clones
         if self._actors is not None:
             self._remote_states = ray.get(
-                [actor.call.remote("_make_pickle_data_for_main", [], {}) for actor in self._actors]
+                [
+                    actor.call.remote("_make_pickle_data_for_main", [], {})
+                    for actor in self._actors
+                ]
             )
 
         # Prepare the main state dictionary
@@ -2935,7 +3033,8 @@ class Problem(TensorMakerMixin, Serializable):
                 # If the argument `num_interactions` is given, then we compute each task's target number of
                 # interactions from its sample size.
                 num_inter_per_task = [
-                    math.ceil((popsize_per_task[i] / popsize) * num_interactions) for i in range(num_tasks)
+                    math.ceil((popsize_per_task[i] / popsize) * num_interactions)
+                    for i in range(num_tasks)
                 ]
 
             if popsize_max is None:
@@ -2946,7 +3045,8 @@ class Problem(TensorMakerMixin, Serializable):
                 # If the argument `popsize_max` is given, then we compute each task's target maximum population size
                 # from its sample size.
                 popsize_max_per_task = [
-                    math.ceil((popsize_per_task[i] / popsize) * popsize_max) for i in range(num_tasks)
+                    math.ceil((popsize_per_task[i] / popsize) * popsize_max)
+                    for i in range(num_tasks)
                 ]
 
             # We trigger the synchronization between the main process and the remote actors.
@@ -2972,7 +3072,9 @@ class Problem(TensorMakerMixin, Serializable):
                             },
                         )
                     ),
-                    list(zip(popsize_per_task, num_inter_per_task, popsize_max_per_task)),
+                    list(
+                        zip(popsize_per_task, num_inter_per_task, popsize_max_per_task)
+                    ),
                 )
             )
 
@@ -3093,7 +3195,9 @@ class Problem(TensorMakerMixin, Serializable):
 
         if (distribution.dtype != self.dtype) or (distribution.device != self.device):
             # Make sure that the distribution is in the correct dtype and device
-            distribution = distribution.modified_copy(dtype=self.dtype, device=self.device)
+            distribution = distribution.modified_copy(
+                dtype=self.dtype, device=self.device
+            )
 
         # Call the protected method responsible for sampling solutions and computing the gradients
         result = self._sample_and_compute_gradients(
@@ -3287,7 +3391,10 @@ class Problem(TensorMakerMixin, Serializable):
 
         # With the help of `samples` and `fitnesses`, we now compute our gradients.
         grads = distribution.compute_gradients(
-            samples, fitnesses, objective_sense=self.senses[obj_index], ranking_method=ranking_method
+            samples,
+            fitnesses,
+            objective_sense=self.senses[obj_index],
+            ranking_method=ranking_method,
         )
 
         if grad_device != self.device:
@@ -3306,7 +3413,9 @@ class Problem(TensorMakerMixin, Serializable):
         """
         return str(self.device) == "cpu"
 
-    def make_callable_evaluator(self, *, obj_index: Optional[int] = None) -> "ProblemBoundEvaluator":
+    def make_callable_evaluator(
+        self, *, obj_index: Optional[int] = None
+    ) -> "ProblemBoundEvaluator":
         """
         Get a callable evaluator for evaluating the given solutions.
 
@@ -3410,7 +3519,9 @@ class Problem(TensorMakerMixin, Serializable):
             return ProblemBoundEvaluator(self, obj_index=obj_index)
 
 
-SolutionBatchSliceInfo = NamedTuple("SolutionBatchSliceInfo", source="SolutionBatch", slice=IndicesOrSlice)
+SolutionBatchSliceInfo = NamedTuple(
+    "SolutionBatchSliceInfo", source="SolutionBatch", slice=IndicesOrSlice
+)
 
 
 def _opt_bool(x: Optional[bool], default: bool) -> bool:
@@ -3440,7 +3551,9 @@ def _crowding_distance_assignment(pareto_set_utilities: torch.Tensor) -> torch.T
         crowding_distances (torch.Tensor): The computed crowding distances of the pareto_set_utilities.
     """
     Inf = float("inf")
-    near_zero_tolerance = _near_zero_float_tolerance.get(pareto_set_utilities.dtype, 1e-8)
+    near_zero_tolerance = _near_zero_float_tolerance.get(
+        pareto_set_utilities.dtype, 1e-8
+    )
 
     # Arg sort each objective
     argsorted_utilities = torch.argsort(pareto_set_utilities, dim=0)
@@ -3477,7 +3590,9 @@ def _crowding_distance_assignment(pareto_set_utilities: torch.Tensor) -> torch.T
     return crowding_distances
 
 
-def _compute_pareto_ranks(utils: torch.Tensor, crowdsort: bool) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
+def _compute_pareto_ranks(
+    utils: torch.Tensor, crowdsort: bool
+) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
     """GPU-friendly + Vectorized pareto ranking based on:
         Deb, Kalyanmoy, et al.
         "A fast and elitist multiobjective genetic algorithm: NSGA-II."
@@ -3507,7 +3622,9 @@ def _compute_pareto_ranks(utils: torch.Tensor, crowdsort: bool) -> Tuple[torch.T
     utils_b = utils.unsqueeze(1)
     never_worse_matrix = utils_a >= utils_b
     strictly_better_matrix = utils_a > utils_b
-    dominated_matrix = torch.all(never_worse_matrix, dim=-1) & torch.any(strictly_better_matrix, dim=-1)
+    dominated_matrix = torch.all(never_worse_matrix, dim=-1) & torch.any(
+        strictly_better_matrix, dim=-1
+    )
 
     # Calculate how many samples are dominated
     n_dominations = torch.sum(dominated_matrix, dim=-1)
@@ -3539,9 +3656,13 @@ def _compute_pareto_ranks(utils: torch.Tensor, crowdsort: bool) -> Tuple[torch.T
 
         # If crowd sorting, get the crowdsort distances, convert them to ranks and fill in the crowdsort_ranks elements
         if crowdsort:
-            crowdsort_distances = _crowding_distance_assignment(utils[new_non_dominated])
+            crowdsort_distances = _crowding_distance_assignment(
+                utils[new_non_dominated]
+            )
             # Note the descending sort -- we want to maximize distances
-            crowdsort_ranks[new_non_dominated] = torch.argsort(crowdsort_distances, descending=True)
+            crowdsort_ranks[new_non_dominated] = torch.argsort(
+                crowdsort_distances, descending=True
+            )
 
         # Update the number of dominations for remaining solutions by removing any domination counts introduce by the solutions we just sorted
         n_dominations += -dominated_matrix[:, new_non_dominated].sum(dim=-1)
@@ -3551,7 +3672,9 @@ def _compute_pareto_ranks(utils: torch.Tensor, crowdsort: bool) -> Tuple[torch.T
     return ranks, crowdsort_ranks
 
 
-def _pareto_sort(utils: torch.Tensor, crowdsort: bool) -> Tuple[List[torch.Tensor], torch.Tensor]:
+def _pareto_sort(
+    utils: torch.Tensor, crowdsort: bool
+) -> Tuple[List[torch.Tensor], torch.Tensor]:
     """Pareto sort a given set of utilities, in a GPU-friendly + Vectorized manner
     Args:
         utils (torch.Tensor): The utilities (or fitnesses) to rank of shape [num_samples, num_objectives]
@@ -3702,7 +3825,9 @@ class SolutionBatch(Serializable):
                 slice_of=slice_of,
             )
             self._data = empty_tensor_like(like._data, length=popsize, device=device)
-            self._evdata = empty_tensor_like(like._evdata, length=popsize, device=device)
+            self._evdata = empty_tensor_like(
+                like._evdata, length=popsize, device=device
+            )
             self._evdata[:] = float("nan")
 
             self._descending = like._descending
@@ -3770,16 +3895,25 @@ class SolutionBatch(Serializable):
 
             if problem.dtype is object:
                 if str(device) != "cpu":
-                    raise ValueError("Cannot create a batch containing arbitrary objects on a device other than cpu")
+                    raise ValueError(
+                        "Cannot create a batch containing arbitrary objects on a device other than cpu"
+                    )
                 self._data = ObjectArray(popsize)
             else:
-                self._data = torch.empty((popsize, problem.solution_length), device=device, dtype=problem.dtype)
+                self._data = torch.empty(
+                    (popsize, problem.solution_length),
+                    device=device,
+                    dtype=problem.dtype,
+                )
 
             if not _opt_bool(empty, default=False):
                 self._data[:] = problem.generate_values(len(self._data))
 
             self._evdata = problem.make_nan(
-                popsize, self._num_objs + problem.eval_data_length, device=device, use_eval_dtype=True
+                popsize,
+                self._num_objs + problem.eval_data_length,
+                device=device,
+                use_eval_dtype=True,
             )
             self._descending = problem.get_obj_order_descending()
         else:
@@ -3843,7 +3977,9 @@ class SolutionBatch(Serializable):
         return torch.argsort(ev_col, descending=descending)
 
     @torch.no_grad()
-    def compute_pareto_ranks(self, crowdsort: bool = True) -> Tuple[torch.Tensor, torch.Tensor]:
+    def compute_pareto_ranks(
+        self, crowdsort: bool = True
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         Compute the pareto-ranks of the solutions in the batch.
         Args:
@@ -4163,7 +4299,9 @@ class SolutionBatch(Serializable):
             return self._evdata[:, self._normalize_obj_index(obj_index)]
 
     @torch.no_grad()
-    def access_values(self, *, keep_evals: bool = False) -> Union[torch.Tensor, ObjectArray]:
+    def access_values(
+        self, *, keep_evals: bool = False
+    ) -> Union[torch.Tensor, ObjectArray]:
         """
         Get the internal mutable tensor storing the decision values.
 
@@ -4276,16 +4414,25 @@ class SolutionBatch(Serializable):
             if ranking_method is None:
                 result = evdata * self._get_objective_sign(obj_index)
             else:
-                result = rank(evdata, ranking_method=ranking_method, higher_is_better=self._descending[obj_index])
+                result = rank(
+                    evdata,
+                    ranking_method=ranking_method,
+                    higher_is_better=self._descending[obj_index],
+                )
 
             if using_values_dtype:
-                result = torch.as_tensor(result, dtype=self._data.dtype, device=self._data.device)
+                result = torch.as_tensor(
+                    result, dtype=self._data.dtype, device=self._data.device
+                )
 
             return result
         else:
             if self._num_objs == 1:
                 return self.utility(
-                    0, ranking_method=ranking_method, check_nans=check_nans, using_values_dtype=using_values_dtype
+                    0,
+                    ranking_method=ranking_method,
+                    check_nans=check_nans,
+                    using_values_dtype=using_values_dtype,
                 )
             else:
                 return torch.stack(
@@ -4339,13 +4486,17 @@ class SolutionBatch(Serializable):
 
         """
         result = self.utility(
-            ranking_method=ranking_method, check_nans=check_nans, using_values_dtype=using_values_dtype
+            ranking_method=ranking_method,
+            check_nans=check_nans,
+            using_values_dtype=using_values_dtype,
         )
         if result.ndim == 1:
             result = result.view(len(result), 1)
         return result
 
-    def split(self, num_pieces: Optional[int] = None, *, max_size: Optional[int] = None) -> "SolutionBatchPieces":
+    def split(
+        self, num_pieces: Optional[int] = None, *, max_size: Optional[int] = None
+    ) -> "SolutionBatchPieces":
         """Split this SolutionBatch into a specified number of pieces,
         or into an unspecified number of pieces where the maximum
         size of each piece is specified.
@@ -4400,7 +4551,9 @@ class SolutionBatch(Serializable):
         if is_sequence(indices):
             return type(self)(slice_of=(self, indices))
         else:
-            raise TypeError("Expected a sequence of solution indices, but got a `{type(indices)}`")
+            raise TypeError(
+                "Expected a sequence of solution indices, but got a `{type(indices)}`"
+            )
 
     def take_best(self, n: int, *, obj_index: Optional[int] = None) -> "SolutionBatch":
         """Make a new SolutionBatch containing the best `n` solutions.
@@ -4422,7 +4575,9 @@ class SolutionBatch(Serializable):
         if obj_index is None and self._num_objs >= 2:
             ranks, crowdsort_ranks = self.compute_pareto_ranks(crowdsort=True)
             # Combine the ranks, such that solutions with a better crowdsort rank are weighted above solutions with the same pareto rank **only**
-            combined_ranks = ranks.to(torch.float) + 0.1 * crowdsort_ranks.to(torch.float) / len(self)
+            combined_ranks = ranks.to(torch.float) + 0.1 * crowdsort_ranks.to(
+                torch.float
+            ) / len(self)
             indices = torch.argsort(combined_ranks)[:n]
         else:
             indices = self.argsort(obj_index)[:n]
@@ -4469,7 +4624,9 @@ class SolutionBatch(Serializable):
             The SolutionBatch on the specified device.
         """
         if isinstance(self._data, ObjectArray):
-            raise ValueError("The `to(...)` method is not supported when the dtype is `object`.")
+            raise ValueError(
+                "The `to(...)` method is not supported when the dtype is `object`."
+            )
 
         device = torch.device(device)
         if device == self.device:
@@ -4609,7 +4766,13 @@ class SolutionBatchPieces(Sequence):
     """
 
     @torch.no_grad()
-    def __init__(self, batch: SolutionBatch, *, num_pieces: Optional[int] = None, max_size: Optional[int] = None):
+    def __init__(
+        self,
+        batch: SolutionBatch,
+        *,
+        num_pieces: Optional[int] = None,
+        max_size: Optional[int] = None,
+    ):
         """
         `__init__(...)`: Initialize the SolutionBatchPieces.
 
@@ -4883,7 +5046,9 @@ class Solution(Serializable):
             )
 
         if eval_data is not None:
-            eval_data = torch.as_tensor(eval_data, dtype=self.eval_dtype, device=self.device)
+            eval_data = torch.as_tensor(
+                eval_data, dtype=self.eval_dtype, device=self.device
+            )
             if eval_data.ndim != 1:
                 raise ValueError(
                     f"The argument `eval_data` was expected as a 1-dimensional sequence."
@@ -4893,7 +5058,9 @@ class Solution(Serializable):
 
         self._batch.set_evals(evals, eval_data)
 
-    def set_evaluation(self, evaluation: RealOrVector, eval_data: Optional[Iterable] = None):
+    def set_evaluation(
+        self, evaluation: RealOrVector, eval_data: Optional[Iterable] = None
+    ):
         """
         Set the evaluation results of the Solution.
 
@@ -5154,7 +5321,9 @@ class ProblemBoundEvaluator:
     def _make_empty_solution_batch(self, popsize: int) -> SolutionBatch:
         return SolutionBatch(self._problem, popsize=popsize, empty=True, device="meta")
 
-    def _prepare_evaluated_solution_batch(self, values_2d: torch.Tensor) -> SolutionBatch:
+    def _prepare_evaluated_solution_batch(
+        self, values_2d: torch.Tensor
+    ) -> SolutionBatch:
         num_solutions, solution_length = values_2d.shape
         batch = self._make_empty_solution_batch(num_solutions)
         batch._data = values_2d
@@ -5251,7 +5420,9 @@ class ObjectTypedProblemBoundEvaluator(ProblemBoundEvaluator):
                 "The positional argument `values` was expected as an `ObjectArray`."
                 f" However, an object of this type was encountered: {type(values)}."
             )
-        result = self._prepare_evaluated_solution_batch(values).evals.as_subclass(torch.Tensor)
+        result = self._prepare_evaluated_solution_batch(values).evals.as_subclass(
+            torch.Tensor
+        )
         if len(self._problem.senses) == 1:
             result = result.reshape(-1)
         return result

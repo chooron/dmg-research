@@ -1,4 +1,8 @@
-from ablation.ic_core.model_adapter import LITE_MODEL_CLASSES, MODEL_CLASSES, model_variant_inventory
+from ablation.ic_core.model_adapter import (
+    LITE_MODEL_CLASSES,
+    MODEL_CLASSES,
+    model_variant_inventory,
+)
 
 
 def test_all_ic_models_have_explicit_lite_mapping() -> None:

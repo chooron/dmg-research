@@ -8,13 +8,11 @@ from __future__ import annotations
 
 import pytest
 import torch
-
 from models import SIMHYD, XAJ
 from models.parameter_specs import SIMHYD_PARAM_SPECS, XAJ_PARAM_SPECS
-from models.xaj import _xaj_step
 from models.simhyd import _simhyd_step
+from models.xaj import _xaj_step
 from training.dpl.run_dpl_model import kge_per_basin
-
 
 DEGENERATE_TIME = 96
 DEGENERATE_BATCH = 2
@@ -25,7 +23,8 @@ def _dry_forcing() -> tuple[dict[str, torch.Tensor], torch.Tensor]:
         DEGENERATE_BATCH, DEGENERATE_TIME, dtype=torch.float32, requires_grad=True
     )
     pet = torch.full(
-        (DEGENERATE_BATCH, DEGENERATE_TIME), 1e-8,
+        (DEGENERATE_BATCH, DEGENERATE_TIME),
+        1e-8,
         dtype=torch.float32,
         requires_grad=True,
     )
@@ -70,18 +69,25 @@ def _params(
             XAJ,
             _xaj_step,
             XAJ_PARAM_SPECS,
-            {"xaj_im": 0.0, "xaj_ki": 0.0, "xaj_kg": 0.0,
-             "xaj_ci": 1.0, "xaj_cg": 1.0},
+            {"xaj_im": 0.0, "xaj_ki": 0.0, "xaj_kg": 0.0, "xaj_ci": 1.0, "xaj_cg": 1.0},
             id="XAJ",
         ),
         pytest.param(
             SIMHYD,
             _simhyd_step,
             SIMHYD_PARAM_SPECS,
-            {"simhyd_insc": 0.0, "simhyd_coeff": 0.0, "simhyd_sq": 10.0,
-             "simhyd_smsc": 0.0, "simhyd_sub": 0.0, "simhyd_crak": 1.0,
-             "simhyd_k": 1.0, "simhyd_etmul": 3.0,
-             "simhyd_a": 10.0, "simhyd_theta": 0.5},
+            {
+                "simhyd_insc": 0.0,
+                "simhyd_coeff": 0.0,
+                "simhyd_sq": 10.0,
+                "simhyd_smsc": 0.0,
+                "simhyd_sub": 0.0,
+                "simhyd_crak": 1.0,
+                "simhyd_k": 1.0,
+                "simhyd_etmul": 3.0,
+                "simhyd_a": 10.0,
+                "simhyd_theta": 0.5,
+            },
             id="SIMHYD",
         ),
     ],

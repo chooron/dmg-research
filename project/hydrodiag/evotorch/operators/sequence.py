@@ -62,7 +62,9 @@ class CutAndSplice(CrossOver):
         children1.access_values(keep_evals=True)[row_index] = childvals1
         children2.access_values(keep_evals=True)[row_index] = childvals2
 
-    def _do_cross_over(self, parents1: ObjectArray, parents2: ObjectArray) -> SolutionBatch:
+    def _do_cross_over(
+        self, parents1: ObjectArray, parents2: ObjectArray
+    ) -> SolutionBatch:
         n = len(parents1)
 
         children1 = SolutionBatch(self.problem, popsize=n, empty=True)

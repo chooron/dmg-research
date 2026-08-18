@@ -1,7 +1,6 @@
 """Regression tests for the streamflow-only XAJ execution path."""
 
 import torch
-
 from models import XAJLite
 from models.parameter_specs import XAJ_LITE_PARAM_SPECS
 
@@ -19,7 +18,9 @@ def _params(batch=2, dtype=torch.float32, requires_grad=False):
     values = {}
     for name, spec in XAJ_LITE_PARAM_SPECS.items():
         values[name] = torch.full(
-            (batch,), float(spec["default"]), dtype=dtype,
+            (batch,),
+            float(spec["default"]),
+            dtype=dtype,
             requires_grad=requires_grad,
         )
     return values
@@ -31,7 +32,9 @@ def test_xaj_lite_compact_and_diagnostic_paths_match():
     with torch.no_grad():
         model = XAJLite()
         q_diagnostic, aux_diagnostic = model(
-            forcing, params, return_states=True,
+            forcing,
+            params,
+            return_states=True,
         )
         q_lite, aux_lite = model(forcing, params)
 
@@ -50,7 +53,9 @@ def test_xaj_lite_gradients_are_finite_and_stateful_diagnostics_remain_available
     loss = qsim.square().mean()
     reference_params = _params(requires_grad=True)
     q_reference, _ = diagnostic_model(
-        forcing, reference_params, return_states=True,
+        forcing,
+        reference_params,
+        return_states=True,
     )
     reference_loss = q_reference.square().mean()
     loss.backward()
@@ -62,8 +67,10 @@ def test_xaj_lite_gradients_are_finite_and_stateful_diagnostics_remain_available
     assert all(torch.isfinite(value.grad).all() for value in params.values())
     for name in params:
         assert torch.allclose(
-            params[name].grad, reference_params[name].grad,
-            atol=3e-5, rtol=3e-5,
+            params[name].grad,
+            reference_params[name].grad,
+            atol=3e-5,
+            rtol=3e-5,
         )
 
     with torch.no_grad():

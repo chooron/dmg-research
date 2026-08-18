@@ -8,7 +8,9 @@ from typing import Iterable
 import numpy as np
 
 
-def kge_prime(sim: np.ndarray, obs: np.ndarray, min_valid: int = 30) -> tuple[float, int]:
+def kge_prime(
+    sim: np.ndarray, obs: np.ndarray, min_valid: int = 30
+) -> tuple[float, int]:
     """Return CV-ratio KGE' and valid count using one shared finite mask."""
     sim = np.asarray(sim, dtype=float)
     obs = np.asarray(obs, dtype=float)
@@ -22,13 +24,17 @@ def kge_prime(sim: np.ndarray, obs: np.ndarray, min_valid: int = 30) -> tuple[fl
     if mean_obs == 0.0 or std_obs == 0.0:
         return math.nan, n
     r = float(np.corrcoef(sim_valid, obs_valid)[0, 1])
-    cv_sim = float(sim_valid.std() / sim_valid.mean()) if sim_valid.mean() != 0 else math.nan
+    cv_sim = (
+        float(sim_valid.std() / sim_valid.mean()) if sim_valid.mean() != 0 else math.nan
+    )
     cv_obs = float(std_obs / mean_obs)
     if not np.isfinite(r) or not np.isfinite(cv_sim) or not np.isfinite(cv_obs):
         return math.nan, n
     gamma = cv_sim / cv_obs
     beta = float(sim_valid.mean() / mean_obs)
-    return float(1.0 - np.sqrt((r - 1.0) ** 2 + (gamma - 1.0) ** 2 + (beta - 1.0) ** 2)), n
+    return float(
+        1.0 - np.sqrt((r - 1.0) ** 2 + (gamma - 1.0) ** 2 + (beta - 1.0) ** 2)
+    ), n
 
 
 def finite_values(values: Iterable[float]) -> np.ndarray:
@@ -36,7 +42,9 @@ def finite_values(values: Iterable[float]) -> np.ndarray:
     return np.sort(array[np.isfinite(array)])
 
 
-def bootstrap_mean_ci(values: Iterable[float], rng: np.random.Generator, n_resamples: int = 10_000) -> tuple[float, float]:
+def bootstrap_mean_ci(
+    values: Iterable[float], rng: np.random.Generator, n_resamples: int = 10_000
+) -> tuple[float, float]:
     values = finite_values(values)
     if values.size == 0:
         return math.nan, math.nan
@@ -45,7 +53,9 @@ def bootstrap_mean_ci(values: Iterable[float], rng: np.random.Generator, n_resam
     return tuple(float(x) for x in np.percentile(means, [2.5, 97.5]))
 
 
-def bootstrap_median_ci(values: Iterable[float], rng: np.random.Generator, n_resamples: int = 10_000) -> tuple[float, float]:
+def bootstrap_median_ci(
+    values: Iterable[float], rng: np.random.Generator, n_resamples: int = 10_000
+) -> tuple[float, float]:
     """Return a paired basin bootstrap interval for the sample median."""
     values = finite_values(values)
     if values.size == 0:
@@ -94,7 +104,9 @@ def block_bootstrap_median_ci(
     medians = np.empty(n_resamples, dtype=float)
     for index in range(n_resamples):
         sampled = rng.integers(0, len(block_values), size=len(block_values))
-        medians[index] = np.median(np.concatenate([block_values[item] for item in sampled]))
+        medians[index] = np.median(
+            np.concatenate([block_values[item] for item in sampled])
+        )
     return tuple(float(x) for x in np.percentile(medians, [2.5, 97.5]))
 
 
@@ -108,7 +120,9 @@ def support_status(ci_low: float, ci_high: float) -> str:
     return "inconclusive"
 
 
-def summary(values: Iterable[float], rng: np.random.Generator | None = None) -> dict[str, float]:
+def summary(
+    values: Iterable[float], rng: np.random.Generator | None = None
+) -> dict[str, float]:
     values = finite_values(values)
     result = {
         "valid_basin_count": int(values.size),
@@ -124,18 +138,22 @@ def summary(values: Iterable[float], rng: np.random.Generator | None = None) -> 
         "bootstrap_ci_high": math.nan,
     }
     if values.size:
-        result.update({
-            "median": float(np.median(values)),
-            "p25": float(np.percentile(values, 25)),
-            "p75": float(np.percentile(values, 75)),
-            "mean": float(values.mean()),
-            "sd": float(values.std(ddof=1)) if values.size > 1 else math.nan,
-            "minimum": float(values.min()),
-            "maximum": float(values.max()),
-            "fraction_positive": float((values > 0).mean()),
-        })
+        result.update(
+            {
+                "median": float(np.median(values)),
+                "p25": float(np.percentile(values, 25)),
+                "p75": float(np.percentile(values, 75)),
+                "mean": float(values.mean()),
+                "sd": float(values.std(ddof=1)) if values.size > 1 else math.nan,
+                "minimum": float(values.min()),
+                "maximum": float(values.max()),
+                "fraction_positive": float((values > 0).mean()),
+            }
+        )
         if rng is not None:
-            result["bootstrap_ci_low"], result["bootstrap_ci_high"] = bootstrap_mean_ci(values, rng)
+            result["bootstrap_ci_low"], result["bootstrap_ci_high"] = bootstrap_mean_ci(
+                values, rng
+            )
     return result
 
 

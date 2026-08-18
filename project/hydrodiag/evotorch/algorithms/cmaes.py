@@ -46,7 +46,12 @@ def _h_sig(p_sigma: torch.Tensor, c_sigma: float, iter: int) -> torch.Tensor:
     return stall.any().to(p_sigma.dtype)
 
 
-def _limit_stdev(sigma: torch.Tensor, C: torch.Tensor, stdev_min: Optional[float], stdev_max: Optional[float]):
+def _limit_stdev(
+    sigma: torch.Tensor,
+    C: torch.Tensor,
+    stdev_min: Optional[float],
+    stdev_max: Optional[float],
+):
     """Limit the standard deviation of a covariance matrix sigma^2 C
     Args:
         sigma (torch.Tensor): The square root of the scale of the covariance matrix
@@ -80,7 +85,9 @@ def _limit_stdev(sigma: torch.Tensor, C: torch.Tensor, stdev_min: Optional[float
     return C
 
 
-def _safe_divide(a: Union[Real, torch.Tensor], b: Union[Real, torch.Tensor]) -> Union[torch.Tensor]:
+def _safe_divide(
+    a: Union[Real, torch.Tensor], b: Union[Real, torch.Tensor]
+) -> Union[torch.Tensor]:
     tolerance = 1e-8
     if abs(b) < tolerance:
         b = (-tolerance) if b < 0 else tolerance
@@ -212,7 +219,9 @@ class CMAES(SearchAlgorithm, SinglePopulationAlgorithmMixin):
         """
 
         # Initialize the base class
-        SearchAlgorithm.__init__(self, problem, center=self._get_center, stepsize=self._get_sigma)
+        SearchAlgorithm.__init__(
+            self, problem, center=self._get_center, stepsize=self._get_sigma
+        )
 
         # Ensure that the problem is numeric
         problem.ensure_numeric()
@@ -252,7 +261,9 @@ class CMAES(SearchAlgorithm, SinglePopulationAlgorithmMixin):
 
         # Store the center
         self.m = self._problem.make_tensor(center_init).squeeze()
-        valid_shaped_m = (self.m.ndim == 1) and (len(self.m) == self._problem.solution_length)
+        valid_shaped_m = (self.m.ndim == 1) and (
+            len(self.m) == self._problem.solution_length
+        )
         if not valid_shaped_m:
             raise ValueError(
                 f"The initial center point was expected as a vector of length {self._problem.solution_length}."
@@ -276,14 +287,18 @@ class CMAES(SearchAlgorithm, SinglePopulationAlgorithmMixin):
         # Conditioned on popsize
 
         # w_i = log((lambda + 1) / 2) - log(i) for i = 1 ... lambda
-        raw_weights = self.problem.make_tensor(np.log((popsize + 1) / 2) - torch.log(torch.arange(popsize) + 1))
+        raw_weights = self.problem.make_tensor(
+            np.log((popsize + 1) / 2) - torch.log(torch.arange(popsize) + 1)
+        )
         # positive valued weights are the first mu
         positive_weights = raw_weights[: self.mu]
         negative_weights = raw_weights[self.mu :]
 
         # Variance effective selection mass of positive weights
         # Not affected by future updates to raw_weights
-        self.mu_eff = torch.sum(positive_weights).pow(2.0) / torch.sum(positive_weights.pow(2.0))
+        self.mu_eff = torch.sum(positive_weights).pow(2.0) / torch.sum(
+            positive_weights.pow(2.0)
+        )
 
         # === Initialize search parameters ===
         # Conditioned on weights
@@ -302,14 +317,20 @@ class CMAES(SearchAlgorithm, SinglePopulationAlgorithmMixin):
 
         # Damping factor for step-size adapation
         if damp_sigma is None:
-            damp_sigma = 1 + 2 * max(0, torch.sqrt((self.mu_eff - 1) / (d + 1)) - 1) + self.c_sigma
+            damp_sigma = (
+                1
+                + 2 * max(0, torch.sqrt((self.mu_eff - 1) / (d + 1)) - 1)
+                + self.c_sigma
+            )
         self.damp_sigma = damp_sigma_ratio * damp_sigma
 
         # Learning rate for evolution path for rank-1 update
         if c_c is None:
             # Branches on separability
             if separable:
-                c_c = (1 + (1 / d) + (self.mu_eff / d)) / (d**0.5 + (1 / d) + 2 * (self.mu_eff / d))
+                c_c = (1 + (1 / d) + (self.mu_eff / d)) / (
+                    d**0.5 + (1 / d) + 2 * (self.mu_eff / d)
+                )
             else:
                 c_c = (4 + self.mu_eff / d) / (d + (4 + 2 * self.mu_eff / d))
         self.c_c = c_c_ratio * c_c
@@ -327,15 +348,24 @@ class CMAES(SearchAlgorithm, SinglePopulationAlgorithmMixin):
         if c_mu is None:
             # Branches on separability
             if separable:
-                c_mu = (0.25 + self.mu_eff + (1.0 / self.mu_eff) - 2) / (d + 4 * np.sqrt(d) + (self.mu_eff / 2.0))
+                c_mu = (0.25 + self.mu_eff + (1.0 / self.mu_eff) - 2) / (
+                    d + 4 * np.sqrt(d) + (self.mu_eff / 2.0)
+                )
             else:
                 c_mu = min(
-                    1 - self.c_1, 2 * ((0.25 + self.mu_eff - 2 + (1 / self.mu_eff)) / ((d + 2) ** 2.0 + self.mu_eff))
+                    1 - self.c_1,
+                    2
+                    * (
+                        (0.25 + self.mu_eff - 2 + (1 / self.mu_eff))
+                        / ((d + 2) ** 2.0 + self.mu_eff)
+                    ),
                 )
         self.c_mu = c_mu_ratio * c_mu
 
         # The 'variance aware' coefficient used for the additive component of the evolution path for sigma
-        self.variance_discount_sigma = torch.sqrt(self.c_sigma * (2 - self.c_sigma) * self.mu_eff)
+        self.variance_discount_sigma = torch.sqrt(
+            self.c_sigma * (2 - self.c_sigma) * self.mu_eff
+        )
         # The 'variance aware' coefficient used for the additive component of the evolution path for rank-1 updates
         self.variance_discount_c = torch.sqrt(self.c_c * (2 - self.c_c) * self.mu_eff)
 
@@ -349,7 +379,9 @@ class CMAES(SearchAlgorithm, SinglePopulationAlgorithmMixin):
             # Active CMA-ES: negative weights sum to alpha
 
             # Get the variance effective selection mass of negative weights
-            mu_eff_neg = torch.sum(negative_weights).pow(2.0) / torch.sum(negative_weights.pow(2.0))
+            mu_eff_neg = torch.sum(negative_weights).pow(2.0) / torch.sum(
+                negative_weights.pow(2.0)
+            )
 
             # Alpha is the minimum of the following 3 terms
             alpha_mu = 1 + self.c_1 / self.c_mu
@@ -358,7 +390,9 @@ class CMAES(SearchAlgorithm, SinglePopulationAlgorithmMixin):
             alpha = min([alpha_mu, alpha_mu_eff, alpha_pos_def])
 
             # Rescale negative weights
-            negative_weights = alpha * negative_weights / torch.sum(torch.abs(negative_weights))
+            negative_weights = (
+                alpha * negative_weights / torch.sum(torch.abs(negative_weights))
+            )
         else:
             # Negative weights are simply zero
             negative_weights = torch.zeros_like(negative_weights)
@@ -380,7 +414,14 @@ class CMAES(SearchAlgorithm, SinglePopulationAlgorithmMixin):
 
         # How often to decompose C
         if limit_C_decomposition:
-            self.decompose_C_freq = max(1, int(np.floor(_safe_divide(1, 10 * d * (self.c_1.cpu() + self.c_mu.cpu())))))
+            self.decompose_C_freq = max(
+                1,
+                int(
+                    np.floor(
+                        _safe_divide(1, 10 * d * (self.c_1.cpu() + self.c_mu.cpu()))
+                    )
+                ),
+            )
         else:
             self.decompose_C_freq = 1
 
@@ -405,7 +446,9 @@ class CMAES(SearchAlgorithm, SinglePopulationAlgorithmMixin):
         """Index of the objective being focused on"""
         return self._obj_index
 
-    def sample_distribution(self, num_samples: Optional[int] = None) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    def sample_distribution(
+        self, num_samples: Optional[int] = None
+    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         """Sample the population. All 3 representations of solutions are returned for easy calculations of updates.
         Note that the computation time of this operation of O(d^2 num_samples) unless separable, in which case O(d num_samples)
         Args:
@@ -446,12 +489,16 @@ class CMAES(SearchAlgorithm, SinglePopulationAlgorithmMixin):
         # Invert the sorting of the population to obtain the ranks
         # Note that these ranks start at zero, but this is fine as we are just using them for indexing
         ranks = torch.zeros_like(indices)
-        ranks[indices] = torch.arange(self.popsize, dtype=indices.dtype, device=indices.device)
+        ranks[indices] = torch.arange(
+            self.popsize, dtype=indices.dtype, device=indices.device
+        )
         # Get weights corresponding to each rank
         assigned_weights = self.weights[ranks]
         return assigned_weights
 
-    def update_m(self, zs: torch.Tensor, ys: torch.Tensor, assigned_weights: torch.Tensor) -> torch.Tensor:
+    def update_m(
+        self, zs: torch.Tensor, ys: torch.Tensor, assigned_weights: torch.Tensor
+    ) -> torch.Tensor:
         """Update the center of the search distribution m
         With zs and ys retained from sampling, this operation is O(popsize d), as it involves summing across popsize d-dimensional vectors.
         Args:
@@ -470,9 +517,13 @@ class CMAES(SearchAlgorithm, SinglePopulationAlgorithmMixin):
         top_mu_indices = top_mu.indices
 
         # Compute the weighted recombination in local coordinate space
-        local_m_displacement = torch.sum(top_mu_weights.unsqueeze(-1) * zs[top_mu_indices], dim=0)
+        local_m_displacement = torch.sum(
+            top_mu_weights.unsqueeze(-1) * zs[top_mu_indices], dim=0
+        )
         # Compute the weighted recombination in shaped coordinate space
-        shaped_m_displacement = torch.sum(top_mu_weights.unsqueeze(-1) * ys[top_mu_indices], dim=0)
+        shaped_m_displacement = torch.sum(
+            top_mu_weights.unsqueeze(-1) * ys[top_mu_indices], dim=0
+        )
 
         # Update m
         self.m = self.m + self.c_m * self.sigma * shaped_m_displacement
@@ -487,7 +538,9 @@ class CMAES(SearchAlgorithm, SinglePopulationAlgorithmMixin):
             local_m_displacement (torch.Tensor): The weighted recombination of local samples zs, corresponding to
                 (1/sigma) (C^-1/2) (m' - m) where m' is the updated m
         """
-        self.p_sigma = (1 - self.c_sigma) * self.p_sigma + self.variance_discount_sigma * local_m_displacement
+        self.p_sigma = (
+            1 - self.c_sigma
+        ) * self.p_sigma + self.variance_discount_sigma * local_m_displacement
 
     def update_sigma(self) -> None:
         """Update the step size sigma according to its evolution path p_sigma
@@ -500,13 +553,17 @@ class CMAES(SearchAlgorithm, SinglePopulationAlgorithmMixin):
             exponential_update = (torch.norm(self.p_sigma).pow(2.0) / d - 1) / 2
         else:
             # Exponential update increasing likelihood p_sigma having expected norm
-            exponential_update = torch.norm(self.p_sigma) / self.unbiased_expectation - 1
+            exponential_update = (
+                torch.norm(self.p_sigma) / self.unbiased_expectation - 1
+            )
         # Rescale exponential update based on learning rate + damping factor
         exponential_update = (self.c_sigma / self.damp_sigma) * exponential_update
         # Multiplicative update to sigma
         self.sigma = self.sigma * torch.exp(exponential_update)
 
-    def update_p_c(self, shaped_m_displacement: torch.Tensor, h_sig: torch.Tensor) -> None:
+    def update_p_c(
+        self, shaped_m_displacement: torch.Tensor, h_sig: torch.Tensor
+    ) -> None:
         """Update the evolution path for rank-1 update, p_c
         This operation is bounded O(d), as is simply the sum of vectors
         Args:
@@ -514,9 +571,17 @@ class CMAES(SearchAlgorithm, SinglePopulationAlgorithmMixin):
                 (1/sigma) (m' - m) where m' is the updated m
             h_sig (torch.Tensor): Whether to stall the update based on the evolution path on sigma, p_sigma, expressed as a torch float
         """
-        self.p_c = (1 - self.c_c) * self.p_c + h_sig * self.variance_discount_c * shaped_m_displacement
+        self.p_c = (
+            1 - self.c_c
+        ) * self.p_c + h_sig * self.variance_discount_c * shaped_m_displacement
 
-    def update_C(self, zs: torch.Tensor, ys: torch.Tensor, assigned_weights: torch.Tensor, h_sig: torch.Tensor) -> None:
+    def update_C(
+        self,
+        zs: torch.Tensor,
+        ys: torch.Tensor,
+        assigned_weights: torch.Tensor,
+        h_sig: torch.Tensor,
+    ) -> None:
         """Update the covariance shape matrix C based on rank-1 and rank-mu updates
         This operation is bounded O(d^2 popsize), which is associated with computing the rank-mu update (summing across popsize d*d matrices)
         Args:
@@ -529,23 +594,34 @@ class CMAES(SearchAlgorithm, SinglePopulationAlgorithmMixin):
         # If using Active CMA-ES, reweight negative weights
         if self.active:
             assigned_weights = torch.where(
-                assigned_weights > 0, assigned_weights, d * assigned_weights / torch.norm(zs, dim=-1).pow(2.0)
+                assigned_weights > 0,
+                assigned_weights,
+                d * assigned_weights / torch.norm(zs, dim=-1).pow(2.0),
             )
-        c1a = self.c_1 * (1 - (1 - h_sig**2) * self.c_c * (2 - self.c_c))  # adjust for variance loss
+        c1a = self.c_1 * (
+            1 - (1 - h_sig**2) * self.c_c * (2 - self.c_c)
+        )  # adjust for variance loss
         weighted_pc = (self.c_1 / (c1a + 1e-23)) ** 0.5
         if self.separable:
             # Rank-1 update
             r1_update = c1a * (self.p_c.pow(2.0) - self.C)
             # Rank-mu update
             rmu_update = self.c_mu * torch.sum(
-                assigned_weights.unsqueeze(-1) * (ys.pow(2.0) - self.C.unsqueeze(0)), dim=0
+                assigned_weights.unsqueeze(-1) * (ys.pow(2.0) - self.C.unsqueeze(0)),
+                dim=0,
             )
         else:
             # Rank-1 update
-            r1_update = c1a * (torch.outer(weighted_pc * self.p_c, weighted_pc * self.p_c) - self.C)
+            r1_update = c1a * (
+                torch.outer(weighted_pc * self.p_c, weighted_pc * self.p_c) - self.C
+            )
             # Rank-mu update
             rmu_update = self.c_mu * (
-                torch.sum(assigned_weights.unsqueeze(-1).unsqueeze(-1) * (ys.unsqueeze(1) * ys.unsqueeze(2)), dim=0)
+                torch.sum(
+                    assigned_weights.unsqueeze(-1).unsqueeze(-1)
+                    * (ys.unsqueeze(1) * ys.unsqueeze(2)),
+                    dim=0,
+                )
                 - torch.sum(self.weights) * self.C
             )
 
@@ -576,7 +652,9 @@ class CMAES(SearchAlgorithm, SinglePopulationAlgorithmMixin):
 
         # === Center adaption ===
 
-        local_m_displacement, shaped_m_displacement = self.update_m(zs, ys, assigned_weights)
+        local_m_displacement, shaped_m_displacement = self.update_m(
+            zs, ys, assigned_weights
+        )
 
         # === Step size adaption ===
 

@@ -6,6 +6,7 @@ Temporal transfer of IC relative to dPL across structures and snow strata.
 
 import os
 import sys
+
 import pandas as pd
 
 
@@ -18,7 +19,9 @@ def format_stat(med, ci_low, ci_high, decs=3):
 
 
 def main():
-    project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    project_root = os.path.dirname(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    )
     r1_dir = os.path.join(project_root, "manuscript/results/R1")
 
     out_stats_dir = os.path.join(project_root, "manuscript/stats/tables")
@@ -30,7 +33,11 @@ def main():
     abd = df_paired_sum[
         (df_paired_sum["paradigm"] == "IC-dPL")
         & (df_paired_sum["metric"] == "kge")
-        & (df_paired_sum["effect"].isin(["A_IC_minus_dPL", "B_IC_minus_dPL", "D_IC_minus_dPL"]))
+        & (
+            df_paired_sum["effect"].isin(
+                ["A_IC_minus_dPL", "B_IC_minus_dPL", "D_IC_minus_dPL"]
+            )
+        )
     ]
 
     scopes = [
@@ -85,9 +92,21 @@ def main():
                     "Structure": struct_label,
                     "Scope": scope_label,
                     "n": int(sub_a["valid_basin_count"]),
-                    "A_str": format_stat(sub_a["median"], sub_a["bootstrap_ci_low"], sub_a["bootstrap_ci_high"]),
-                    "B_str": format_stat(sub_b["median"], sub_b["bootstrap_ci_low"], sub_b["bootstrap_ci_high"]),
-                    "D_str": format_stat(sub_d["median"], sub_d["bootstrap_ci_low"], sub_d["bootstrap_ci_high"]),
+                    "A_str": format_stat(
+                        sub_a["median"],
+                        sub_a["bootstrap_ci_low"],
+                        sub_a["bootstrap_ci_high"],
+                    ),
+                    "B_str": format_stat(
+                        sub_b["median"],
+                        sub_b["bootstrap_ci_low"],
+                        sub_b["bootstrap_ci_high"],
+                    ),
+                    "D_str": format_stat(
+                        sub_d["median"],
+                        sub_d["bootstrap_ci_low"],
+                        sub_d["bootstrap_ci_high"],
+                    ),
                 }
             )
 
@@ -123,7 +142,8 @@ def main():
     for r in rows:
         tex_rows_str += f"{r['Structure']} & {r['Scope']} & {r['n']} & {r['A_str']} & {r['B_str']} & {r['D_str']} \\\\\n"
 
-    full_tex = r"""\begin{table*}[t]
+    full_tex = (
+        r"""\begin{table*}[t]
 \centering
 \caption{Temporal transfer of IC relative to dPL across structures and snow strata.}
 \label{tab:s3_ic_dpl_temporal_transfer}
@@ -132,7 +152,9 @@ def main():
 \toprule
 Structure & Snow regime & n & A (Train: IC $-$ dPL) & B (Test: IC $-$ dPL) & D (Transfer Delta: B $-$ A) \\
 \midrule
-""" + tex_rows_str + r"""\bottomrule
+"""
+        + tex_rows_str
+        + r"""\bottomrule
 \end{tabular}
 \begin{tablenotes}
 \small
@@ -141,6 +163,7 @@ Structure & Snow regime & n & A (Train: IC $-$ dPL) & B (Test: IC $-$ dPL) & D (
 \end{threeparttable}
 \end{table*}
 """
+    )
 
     tex_stats_path = os.path.join(out_stats_dir, "TableS3_ic_dpl_temporal_transfer.tex")
     tex_table_path = os.path.join(out_table_dir, "TableS3_ic_dpl_temporal_transfer.tex")
@@ -150,7 +173,9 @@ Structure & Snow regime & n & A (Train: IC $-$ dPL) & B (Test: IC $-$ dPL) & D (
         f.write(full_tex)
 
     # Copy generator script to manuscript/scripts/
-    cp_script_target = os.path.join(project_root, "manuscript/scripts/generate_table_s3.py")
+    cp_script_target = os.path.join(
+        project_root, "manuscript/scripts/generate_table_s3.py"
+    )
     if os.path.abspath(__file__) != os.path.abspath(cp_script_target):
         with open(__file__, "r") as sf, open(cp_script_target, "w") as df:
             df.write(sf.read())

@@ -1,10 +1,38 @@
-def test_runner_uses_531_adapter(): pass
-def test_runner_never_uses_559(): pass
-def test_runner_output_root(): pass
-def test_candidate_budget_accounting(): pass
-def test_generation_trace_monotonic_best(): pass
-def test_checkpoint_resume(): pass
-def test_completed_task_not_rerun(): pass
-def test_config_hash_guard(): pass
-def test_single_basin_failure_isolated(): pass
-def test_test_metric_disabled(): pass
+def test_runner_uses_531_adapter():
+    pass
+
+
+def test_runner_never_uses_559():
+    pass
+
+
+def test_runner_output_root():
+    pass
+
+
+def test_candidate_budget_accounting():
+    pass
+
+
+def test_generation_trace_monotonic_best():
+    pass
+
+
+def test_checkpoint_resume():
+    pass
+
+
+def test_completed_task_not_rerun():
+    pass
+
+
+def test_config_hash_guard():
+    pass
+
+
+def test_single_basin_failure_isolated():
+    pass
+
+
+def test_test_metric_disabled():
+    pass

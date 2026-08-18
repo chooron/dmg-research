@@ -37,9 +37,9 @@ def compute_gr4j_uh_ordinates(
     """
     d_base = torch.clamp(x4, min=1e-3)  # [batch]
 
-    t = torch.arange(
-        1, max_len + 1, device=x4.device, dtype=x4.dtype
-    ).view(1, -1)  # [1, max_len]
+    t = torch.arange(1, max_len + 1, device=x4.device, dtype=x4.dtype).view(
+        1, -1
+    )  # [1, max_len]
 
     ratio = t / d_base.unsqueeze(-1)  # [batch, max_len]
 

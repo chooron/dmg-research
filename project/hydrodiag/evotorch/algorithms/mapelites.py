@@ -9,7 +9,13 @@ except ImportError:
     from functorch import vmap
 
 from ..core import Problem, SolutionBatch
-from ..operators import CosynePermutation, CrossOver, GaussianMutation, OnePointCrossOver, SimulatedBinaryCrossOver
+from ..operators import (
+    CosynePermutation,
+    CrossOver,
+    GaussianMutation,
+    OnePointCrossOver,
+    SimulatedBinaryCrossOver,
+)
 from ..tools import Device, DType, to_torch_dtype
 from .ga import ExtendedPopulationMixin
 from .searchalgorithm import SearchAlgorithm, SinglePopulationAlgorithmMixin
@@ -42,7 +48,9 @@ def _best_solution_considering_feature(
     fitnesses = evals[:, 0]
     features = evals[:, 1:]
     # suitable = torch.all(features >= feature_lb, dim=-1) & torch.all(features <= feature_ub, dim=-1)
-    suitable = _all_across_rightmost_dim(features >= feature_lb) & _all_across_rightmost_dim(features <= feature_ub)
+    suitable = _all_across_rightmost_dim(
+        features >= feature_lb
+    ) & _all_across_rightmost_dim(features <= feature_ub)
     processed_fitnesses = torch.where(suitable, fitnesses, penalty)
     index = argbest(processed_fitnesses)
 
@@ -67,7 +75,9 @@ def _best_solution_considering_all_features(
     )
 
 
-class MAPElites(SearchAlgorithm, SinglePopulationAlgorithmMixin, ExtendedPopulationMixin):
+class MAPElites(
+    SearchAlgorithm, SinglePopulationAlgorithmMixin, ExtendedPopulationMixin
+):
     """
     Implementation of the MAPElites algorithm.
 
@@ -334,7 +344,9 @@ class MAPElites(SearchAlgorithm, SinglePopulationAlgorithmMixin, ExtendedPopulat
         self._popsize = self._feature_grid.shape[0]
 
         self._population = problem.generate_batch(self._popsize)
-        self._filled = torch.zeros(self._popsize, dtype=torch.bool, device=self._population.device)
+        self._filled = torch.zeros(
+            self._popsize, dtype=torch.bool, device=self._population.device
+        )
 
         ExtendedPopulationMixin.__init__(
             self,
@@ -456,7 +468,9 @@ class MAPElites(SearchAlgorithm, SinglePopulationAlgorithmMixin, ExtendedPopulat
             lower_bounds = torch.as_tensor(lower_bounds, **cast_args)
             upper_bounds = torch.as_tensor(upper_bounds, **cast_args)
 
-        if (not isinstance(lower_bounds, torch.Tensor)) or (not isinstance(upper_bounds, torch.Tensor)):
+        if (not isinstance(lower_bounds, torch.Tensor)) or (
+            not isinstance(upper_bounds, torch.Tensor)
+        ):
             raise TypeError(
                 f"While preparing the map elites hypergrid with device={device} and dtype={dtype},"
                 f"`lower_bounds` and `upper_bounds` were expected as tensors, but their types are different."
@@ -481,10 +495,14 @@ class MAPElites(SearchAlgorithm, SinglePopulationAlgorithmMixin, ExtendedPopulat
             )
 
         if lower_bounds.size() != upper_bounds.size():
-            raise ValueError("`lower_bounds` and `upper_bounds` have incompatible shapes")
+            raise ValueError(
+                "`lower_bounds` and `upper_bounds` have incompatible shapes"
+            )
 
         if lower_bounds.dim() != 1:
-            raise ValueError("Only 1D tensors are supported for `lower_bounds` and for `upper_bounds`")
+            raise ValueError(
+                "Only 1D tensors are supported for `lower_bounds` and for `upper_bounds`"
+            )
 
         dtype = lower_bounds.dtype
         device = lower_bounds.device
@@ -501,5 +519,8 @@ class MAPElites(SearchAlgorithm, SinglePopulationAlgorithmMixin, ExtendedPopulat
             sp = torch.cat((n_inf, sp, p_inf))
             return sp.unfold(dimension=0, size=2, step=1).unsqueeze(1)
 
-        f_grids = [_make_feature_grid(*bounds) for bounds in zip(lower_bounds, upper_bounds, num_bins)]
+        f_grids = [
+            _make_feature_grid(*bounds)
+            for bounds in zip(lower_bounds, upper_bounds, num_bins)
+        ]
         return torch.stack([torch.cat(c) for c in itertools.product(*f_grids)])

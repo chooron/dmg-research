@@ -47,7 +47,9 @@ def fill_parameters(net: nn.Module, vector: torch.Tensor):
 
 
 @torch.no_grad()
-def parameter_vector(net: nn.Module, *, device: Optional[Device] = None) -> torch.Tensor:
+def parameter_vector(
+    net: nn.Module, *, device: Optional[Device] = None
+) -> torch.Tensor:
     """Get all the parameters of a torch module (net) into a vector
 
     No gradient information is kept.
@@ -88,7 +90,9 @@ def count_parameters(net: nn.Module) -> int:
     return count
 
 
-def device_of_module(m: nn.Module, default: Optional[Union[str, torch.device]] = None) -> torch.device:
+def device_of_module(
+    m: nn.Module, default: Optional[Union[str, torch.device]] = None
+) -> torch.device:
     """
     Get the device in which the module exists.
 

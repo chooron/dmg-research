@@ -232,8 +232,12 @@ class NEProblem(BaseNEProblem):
             objective_sense=objective_sense,
             initial_bounds=initial_bounds,
             bounds=None,  # Neuroevolution is an unbounded problem
-            solution_length=count_parameters(temp_network),  # The solution length is inherited from the network passed
-            dtype=next(temp_network.parameters()).dtype,  # The datatype is inherited from the network passed
+            solution_length=count_parameters(
+                temp_network
+            ),  # The solution length is inherited from the network passed
+            dtype=next(
+                temp_network.parameters()
+            ).dtype,  # The datatype is inherited from the network passed
             eval_dtype=eval_dtype,
             device=device,
             eval_data_length=eval_data_length,
@@ -289,7 +293,9 @@ class NEProblem(BaseNEProblem):
     def _nonserialized_attribs(self) -> List[str]:
         return ["instantiated_network"]
 
-    def _instantiate_net(self, network: Union[str, nn.Module, dict], device: Optional[Device] = None) -> nn.Module:
+    def _instantiate_net(
+        self, network: Union[str, nn.Module, dict], device: Optional[Device] = None
+    ) -> nn.Module:
         """Instantiate the network on the target device, to be overridden by the user for custom behaviour
         Returns:
             instantiated_network (nn.Module): The network instantiated on the target device
@@ -306,7 +312,9 @@ class NEProblem(BaseNEProblem):
             instantiated_network = network
         else:
             # Passed argument was callable yielding network
-            instantiated_network = pass_info_if_needed(network, self._network_constants)(**self._network_args)
+            instantiated_network = pass_info_if_needed(
+                network, self._network_constants
+            )(**self._network_args)
 
         # Map to device
         device = self.network_device if device is None else device
@@ -382,7 +390,9 @@ class NEProblem(BaseNEProblem):
         """
         return self.network_device
 
-    def _evaluate_network(self, network: nn.Module) -> Union[float, torch.Tensor, tuple]:
+    def _evaluate_network(
+        self, network: nn.Module
+    ) -> Union[float, torch.Tensor, tuple]:
         """
         Evaluate a network and return the evaluation result(s).
 

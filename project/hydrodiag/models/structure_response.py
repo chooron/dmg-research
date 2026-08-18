@@ -12,13 +12,16 @@ import torch
 import torch.nn as nn
 
 from .parameter_specs import (
-    SUBSURFACE_BETA_PARAM_SPECS, SUBSURFACE_TAU0_PARAM_SPECS,
-    XAJ_KSS_PARAM_SPEC, NATIVE_XAJ_LATENT_Z0,
-    CONTROLLED_XAJ_CI_LOWER, CONTROLLED_XAJ_CI_UPPER,
-    CONTROLLED_XAJ_CG_LOWER, CONTROLLED_XAJ_CG_UPPER,
+    CONTROLLED_XAJ_CG_LOWER,
+    CONTROLLED_XAJ_CG_UPPER,
+    CONTROLLED_XAJ_CI_LOWER,
+    CONTROLLED_XAJ_CI_UPPER,
+    NATIVE_XAJ_LATENT_Z0,
+    SUBSURFACE_BETA_PARAM_SPECS,
+    SUBSURFACE_TAU0_PARAM_SPECS,
+    XAJ_KSS_PARAM_SPEC,
 )
 from .structure_utils import log_map_normalized, stable_positive_power
-
 
 RESPONSE_POWER_FLOOR = 1e-6
 # Derived from pre-Phase-0 native-XAJ latent-storage scaling; fixed, not fitted.
@@ -29,11 +32,15 @@ LOG_Y_FLOOR = 1e-30
 
 
 def normalized_to_controlled_ci(normalized: torch.Tensor) -> torch.Tensor:
-    return normalized * normalized.new_tensor(CONTROLLED_XAJ_CI_UPPER - CONTROLLED_XAJ_CI_LOWER) + normalized.new_tensor(CONTROLLED_XAJ_CI_LOWER)
+    return normalized * normalized.new_tensor(
+        CONTROLLED_XAJ_CI_UPPER - CONTROLLED_XAJ_CI_LOWER
+    ) + normalized.new_tensor(CONTROLLED_XAJ_CI_LOWER)
 
 
 def normalized_to_controlled_cg(normalized: torch.Tensor) -> torch.Tensor:
-    return normalized * normalized.new_tensor(CONTROLLED_XAJ_CG_UPPER - CONTROLLED_XAJ_CG_LOWER) + normalized.new_tensor(CONTROLLED_XAJ_CG_LOWER)
+    return normalized * normalized.new_tensor(
+        CONTROLLED_XAJ_CG_UPPER - CONTROLLED_XAJ_CG_LOWER
+    ) + normalized.new_tensor(CONTROLLED_XAJ_CG_LOWER)
 
 
 def normalized_to_tau0(normalized: torch.Tensor) -> torch.Tensor:
@@ -45,7 +52,9 @@ def normalized_to_tau0(normalized: torch.Tensor) -> torch.Tensor:
 def normalized_to_kss(normalized: torch.Tensor) -> torch.Tensor:
     """Map normalized coordinates to native-effective total KSS linearly."""
     spec = XAJ_KSS_PARAM_SPEC["xaj_kss"]
-    return normalized * normalized.new_tensor(spec["upper"] - spec["lower"]) + normalized.new_tensor(spec["lower"])
+    return normalized * normalized.new_tensor(
+        spec["upper"] - spec["lower"]
+    ) + normalized.new_tensor(spec["lower"])
 
 
 def normalized_to_beta(normalized: torch.Tensor) -> torch.Tensor:
@@ -114,10 +123,14 @@ def summarize_response_conditioning(
     if values.numel() == 0:
         zero = z_available.new_zeros(())
         return {
-            "extinction_count": zero, "positive_available_count": zero,
-            "f_extinct": zero, "log_z_ratio_mean": zero,
-            "log_z_ratio_std": zero, "log_z_ratio_median": zero,
-            "log_z_ratio_iqr": zero, "log_z_ratio_p05": zero,
+            "extinction_count": zero,
+            "positive_available_count": zero,
+            "f_extinct": zero,
+            "log_z_ratio_mean": zero,
+            "log_z_ratio_std": zero,
+            "log_z_ratio_median": zero,
+            "log_z_ratio_iqr": zero,
+            "log_z_ratio_p05": zero,
             "log_z_ratio_p95": zero,
         }
     extinction_count = extinct.sum()
@@ -125,7 +138,8 @@ def summarize_response_conditioning(
     return {
         "extinction_count": extinction_count,
         "positive_available_count": positive_count,
-        "f_extinct": extinction_count.to(z_available.dtype) / positive_count.to(z_available.dtype),
+        "f_extinct": extinction_count.to(z_available.dtype)
+        / positive_count.to(z_available.dtype),
         "log_z_ratio_mean": values.mean(),
         "log_z_ratio_std": values.std(unbiased=False),
         "log_z_ratio_median": values.median(),
@@ -201,14 +215,13 @@ def _analytic_subsurface_response_step(
     series_log_y_new = (
         a
         + 0.5 * delta * (log_y.square() - a.square())
-        + delta.square() * (
-            log_y.pow(3) / 6.0
-            - a * log_y.square() / 2.0
-            + a.pow(3) / 3.0
-        )
+        + delta.square()
+        * (log_y.pow(3) / 6.0 - a * log_y.square() / 2.0 + a.pow(3) / 3.0)
     )
     log_y_new = torch.where(
-        delta_near_zero, series_log_y_new, general_log_y_new,
+        delta_near_zero,
+        series_log_y_new,
+        general_log_y_new,
     )
     y_new_positive = torch.exp(log_y_new)
     y_new = torch.where(
@@ -232,7 +245,12 @@ def _subsurface_response_step(
 ) -> tuple[torch.Tensor, ...]:
     """Shared full/lite-facing kernel for the analytic response update."""
     return _analytic_subsurface_response_step(
-        r_ss, z, tau_0, beta, z0, nearzero,
+        r_ss,
+        z,
+        tau_0,
+        beta,
+        z0,
+        nearzero,
     )
 
 
@@ -244,7 +262,12 @@ def _dr_response_step(
 ) -> tuple[torch.Tensor, ...]:
     """Full D_R kernel."""
     return _subsurface_response_step(
-        r_ss, z, tau_0, torch.ones_like(z), z.new_tensor(DEFAULT_Z0), nearzero,
+        r_ss,
+        z,
+        tau_0,
+        torch.ones_like(z),
+        z.new_tensor(DEFAULT_Z0),
+        nearzero,
     )
 
 
@@ -318,7 +341,12 @@ class _ResponseModule(nn.Module):
     ) -> tuple[torch.Tensor, ...]:
         z0 = self.z0.to(device=z.device, dtype=z.dtype)
         out = self._step(
-            r_ss, z, tau_0, self._beta(z, beta), z0, self.nearzero,
+            r_ss,
+            z,
+            tau_0,
+            self._beta(z, beta),
+            z0,
+            self.nearzero,
         )
         if self.lite:
             return out[0], out[1]
@@ -332,7 +360,13 @@ class SubsurfaceResponseDR(_ResponseModule):
 class SubsurfaceResponseDRLite(SubsurfaceResponseDR):
     """Lite D_R process module with the same conservative kernel."""
 
-    def __init__(self, nearzero: float = 1e-8, *, z0: float | torch.Tensor = DEFAULT_Z0, compile_step: bool = True):
+    def __init__(
+        self,
+        nearzero: float = 1e-8,
+        *,
+        z0: float | torch.Tensor = DEFAULT_Z0,
+        compile_step: bool = True,
+    ):
         super().__init__(nearzero, z0=z0, lite=True, compile_step=compile_step)
 
 
@@ -345,7 +379,13 @@ class SubsurfaceResponseGR(_ResponseModule):
 class SubsurfaceResponseGRLite(SubsurfaceResponseGR):
     """Lite G_R process module with the same conservative kernel."""
 
-    def __init__(self, nearzero: float = 1e-8, *, z0: float | torch.Tensor = DEFAULT_Z0, compile_step: bool = True):
+    def __init__(
+        self,
+        nearzero: float = 1e-8,
+        *,
+        z0: float | torch.Tensor = DEFAULT_Z0,
+        compile_step: bool = True,
+    ):
         super().__init__(nearzero, z0=z0, lite=True, compile_step=compile_step)
 
 
@@ -355,16 +395,33 @@ GR = SubsurfaceResponseGR
 GRLite = SubsurfaceResponseGRLite
 
 __all__ = [
-    "DR", "DRLite", "GR", "GRLite",
-    "SubsurfaceResponseDR", "SubsurfaceResponseDRLite",
-    "SubsurfaceResponseGR", "SubsurfaceResponseGRLite",
-    "DEFAULT_Z0", "RESPONSE_POWER_FLOOR", "RESPONSE_DT", "BETA_ONE_TOL",
+    "DR",
+    "DRLite",
+    "GR",
+    "GRLite",
+    "SubsurfaceResponseDR",
+    "SubsurfaceResponseDRLite",
+    "SubsurfaceResponseGR",
+    "SubsurfaceResponseGRLite",
+    "DEFAULT_Z0",
+    "RESPONSE_POWER_FLOOR",
+    "RESPONSE_DT",
+    "BETA_ONE_TOL",
     "_analytic_subsurface_response_step",
-    "normalized_to_controlled_ci", "normalized_to_controlled_cg",
-    "normalized_to_tau0", "normalized_to_kss", "normalized_to_beta",
-    "native_linear_tau", "native_linear_storage", "native_linear_step_from_storage",
-    "native_effective_kss", "xaj_subsurface_input",
-    "response_conditioning_tensors", "summarize_response_conditioning",
-    "_dr_response_step", "_dr_response_step_lite",
-    "_gr_response_step", "_gr_response_step_lite",
+    "normalized_to_controlled_ci",
+    "normalized_to_controlled_cg",
+    "normalized_to_tau0",
+    "normalized_to_kss",
+    "normalized_to_beta",
+    "native_linear_tau",
+    "native_linear_storage",
+    "native_linear_step_from_storage",
+    "native_effective_kss",
+    "xaj_subsurface_input",
+    "response_conditioning_tensors",
+    "summarize_response_conditioning",
+    "_dr_response_step",
+    "_dr_response_step_lite",
+    "_gr_response_step",
+    "_gr_response_step_lite",
 ]

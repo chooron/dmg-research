@@ -6,6 +6,7 @@ Basin-wise paired KGE differences among the controlled XAJ structures.
 
 import os
 import sys
+
 import pandas as pd
 
 
@@ -14,7 +15,9 @@ def format_val(val, decs=3):
 
 
 def main():
-    project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    project_root = os.path.dirname(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    )
     r1_dir = os.path.join(project_root, "manuscript/results/R1")
 
     out_stats_dir = os.path.join(project_root, "manuscript/stats/tables")
@@ -62,7 +65,9 @@ def main():
                         ]
 
                     if len(sub) == 0:
-                        raise ValueError(f"Missing row for {p} {per} {scope_label} {c_code}")
+                        raise ValueError(
+                            f"Missing row for {p} {per} {scope_label} {c_code}"
+                        )
 
                     r = sub.iloc[0]
                     rows.append(
@@ -99,8 +104,12 @@ def main():
     )
     full_md = md_header + md_rows_str + md_note
 
-    md_stats_path = os.path.join(out_stats_dir, "TableS2_paired_structural_kge_differences.md")
-    md_table_path = os.path.join(out_table_dir, "TableS2_paired_structural_kge_differences.md")
+    md_stats_path = os.path.join(
+        out_stats_dir, "TableS2_paired_structural_kge_differences.md"
+    )
+    md_table_path = os.path.join(
+        out_table_dir, "TableS2_paired_structural_kge_differences.md"
+    )
     with open(md_stats_path, "w") as f:
         f.write(full_md)
     with open(md_table_path, "w") as f:
@@ -115,7 +124,8 @@ def main():
             f"{r['n']} & {format_val(r['Median'])} & {ci_str} & {format_val(r['Pos_frac'])} \\\\\n"
         )
 
-    full_tex = r"""\begin{table*}[t]
+    full_tex = (
+        r"""\begin{table*}[t]
 \centering
 \caption{Basin-wise paired KGE differences among the controlled XAJ structures.}
 \label{tab:s2_paired_structural_kge_differences}
@@ -124,7 +134,9 @@ def main():
 \toprule
 Paradigm & Period & Snow regime & Contrast & n & Median $\Delta\text{KGE}$ & Bootstrap 95\% CI & Positive Fraction \\
 \midrule
-""" + tex_rows_str + r"""\bottomrule
+"""
+        + tex_rows_str
+        + r"""\bottomrule
 \end{tabular}
 \begin{tablenotes}
 \small
@@ -133,16 +145,23 @@ Paradigm & Period & Snow regime & Contrast & n & Median $\Delta\text{KGE}$ & Boo
 \end{threeparttable}
 \end{table*}
 """
+    )
 
-    tex_stats_path = os.path.join(out_stats_dir, "TableS2_paired_structural_kge_differences.tex")
-    tex_table_path = os.path.join(out_table_dir, "TableS2_paired_structural_kge_differences.tex")
+    tex_stats_path = os.path.join(
+        out_stats_dir, "TableS2_paired_structural_kge_differences.tex"
+    )
+    tex_table_path = os.path.join(
+        out_table_dir, "TableS2_paired_structural_kge_differences.tex"
+    )
     with open(tex_stats_path, "w") as f:
         f.write(full_tex)
     with open(tex_table_path, "w") as f:
         f.write(full_tex)
 
     # Copy generator script to manuscript/scripts/
-    cp_script_target = os.path.join(project_root, "manuscript/scripts/generate_table_s2.py")
+    cp_script_target = os.path.join(
+        project_root, "manuscript/scripts/generate_table_s2.py"
+    )
     if os.path.abspath(__file__) != os.path.abspath(cp_script_target):
         with open(__file__, "r") as sf, open(cp_script_target, "w") as df:
             df.write(sf.read())

@@ -224,7 +224,9 @@ class GymNE(NEProblem):
                 f" Please specify the environment to solve via only one of these arguments, not both."
             )
         else:
-            raise ValueError("Environment name is missing. Please specify it via the argument `env`.")
+            raise ValueError(
+                "Environment name is missing. Please specify it via the argument `env`."
+            )
 
         # Make sure that the network argument is not missing.
         if network is None:
@@ -235,9 +237,13 @@ class GymNE(NEProblem):
 
         # Store various environment information
         self._env_config = {} if env_config is None else deepcopy(dict(env_config))
-        self._decrease_rewards_by = 0.0 if decrease_rewards_by is None else float(decrease_rewards_by)
+        self._decrease_rewards_by = (
+            0.0 if decrease_rewards_by is None else float(decrease_rewards_by)
+        )
         self._alive_bonus_schedule = alive_bonus_schedule
-        self._action_noise_stdev = None if action_noise_stdev is None else float(action_noise_stdev)
+        self._action_noise_stdev = (
+            None if action_noise_stdev is None else float(action_noise_stdev)
+        )
         self._observation_normalization = bool(observation_normalization)
         self._num_episodes = int(num_episodes)
         self._episode_length = None if episode_length is None else int(episode_length)
@@ -257,7 +263,9 @@ class GymNE(NEProblem):
 
         if isinstance(tmp_env.action_space, gym.spaces.Discrete):
             self._act_length = tmp_env.action_space.n
-            self._box_act_space = gym.spaces.Box(low=float("-inf"), high=float("inf"), shape=(self._act_length,))
+            self._box_act_space = gym.spaces.Box(
+                low=float("-inf"), high=float("inf"), shape=(self._act_length,)
+            )
         else:
             self._act_length = len(tmp_env.action_space.low)
             self._box_act_space = tmp_env.action_space
@@ -321,7 +329,9 @@ class GymNE(NEProblem):
             self._env = self._instantiate_new_env()
         return self._env
 
-    def _normalize_observation(self, observation: Iterable, *, update_stats: bool = True) -> Iterable:
+    def _normalize_observation(
+        self, observation: Iterable, *, update_stats: bool = True
+    ) -> Iterable:
         observation = np.asarray(observation, dtype="float32")
         if self.observation_normalization:
             if update_stats:
@@ -333,11 +343,18 @@ class GymNE(NEProblem):
 
     def _use_policy(self, observation: Iterable, policy: nn.Module) -> Iterable:
         with torch.no_grad():
-            result = policy(torch.as_tensor(observation, dtype=torch.float32, device="cpu")).numpy()
+            result = policy(
+                torch.as_tensor(observation, dtype=torch.float32, device="cpu")
+            ).numpy()
         if self._action_noise_stdev is not None:
             result = (
                 result
-                + self.make_gaussian(len(result), center=0.0, stdev=self._action_noise_stdev, device="cpu").numpy()
+                + self.make_gaussian(
+                    len(result),
+                    center=0.0,
+                    stdev=self._action_noise_stdev,
+                    device="cpu",
+                ).numpy()
             )
         env = self._get_env()
         if isinstance(env.action_space, gym.spaces.Discrete):
@@ -380,7 +397,9 @@ class GymNE(NEProblem):
         else:
             env = self._get_env()
 
-        observation = self._normalize_observation(reset_env(env), update_stats=update_stats)
+        observation = self._normalize_observation(
+            reset_env(env), update_stats=update_stats
+        )
         if visualize:
             env.render()
         t = 0
@@ -388,7 +407,9 @@ class GymNE(NEProblem):
         cumulative_reward = 0.0
 
         while True:
-            observation, raw_reward, done, info = take_step_in_env(env, self._use_policy(observation, policy))
+            observation, raw_reward, done, info = take_step_in_env(
+                env, self._use_policy(observation, policy)
+            )
             reward = raw_reward - decrease_rewards_by
             t += 1
             if update_stats:
@@ -397,15 +418,21 @@ class GymNE(NEProblem):
             if visualize:
                 env.render()
 
-            observation = self._normalize_observation(observation, update_stats=update_stats)
+            observation = self._normalize_observation(
+                observation, update_stats=update_stats
+            )
 
             cumulative_reward += reward
 
-            if done or ((self._episode_length is not None) and (t >= self._episode_length)):
+            if done or (
+                (self._episode_length is not None) and (t >= self._episode_length)
+            ):
                 if update_stats:
                     self._episode_count += 1
 
-                final_info = dict(cumulative_reward=cumulative_reward, interaction_count=t)
+                final_info = dict(
+                    cumulative_reward=cumulative_reward, interaction_count=t
+                )
 
                 for k in self._info_keys:
                     if k not in final_info:
@@ -514,7 +541,9 @@ class GymNE(NEProblem):
 
     def _ensure_obsnorm(self):
         if not self.observation_normalization:
-            raise ValueError("This feature can only be used when observation_normalization=True.")
+            raise ValueError(
+                "This feature can only be used when observation_normalization=True."
+            )
 
     def get_observation_stats(self) -> RunningStat:
         """Get the observation stats"""
@@ -546,7 +575,9 @@ class GymNE(NEProblem):
         return result
 
     def _make_sync_data_for_main(self) -> Any:
-        result = dict(episode_count=self.episode_count, interaction_count=self.interaction_count)
+        result = dict(
+            episode_count=self.episode_count, interaction_count=self.interaction_count
+        )
 
         if self.observation_normalization:
             result["obs_stats_delta"] = self.pop_observation_stats()
@@ -576,7 +607,9 @@ class GymNE(NEProblem):
         # For when the main Problem object (the non-remote one) gets pickled,
         # this function returns the counters of this remote Problem instance,
         # to be sent to the main one.
-        return dict(interaction_count=self.interaction_count, episode_count=self.episode_count)
+        return dict(
+            interaction_count=self.interaction_count, episode_count=self.episode_count
+        )
 
     def _use_pickle_data_from_main(self, state: dict):
         # For when a newly unpickled Problem object gets (re)parallelized,
@@ -589,10 +622,15 @@ class GymNE(NEProblem):
             elif k == "interaction_count":
                 self.set_interaction_count(v)
             else:
-                raise ValueError(f"When restoring the inner state of a remote worker, unrecognized state key: {k}")
+                raise ValueError(
+                    f"When restoring the inner state of a remote worker, unrecognized state key: {k}"
+                )
 
     def _extra_status(self, batch: SolutionBatch):
-        return dict(total_interaction_count=self.interaction_count, total_episode_count=self.episode_count)
+        return dict(
+            total_interaction_count=self.interaction_count,
+            total_episode_count=self.episode_count,
+        )
 
     @property
     def observation_normalization(self) -> bool:
@@ -708,7 +746,9 @@ class GymNE(NEProblem):
             result["obs_mean"] = torch.as_tensor(self._obs_stats.mean)
             result["obs_stdev"] = torch.as_tensor(self._obs_stats.stdev)
             result["obs_sum"] = torch.as_tensor(self._obs_stats.sum)
-            result["obs_sum_of_squares"] = torch.as_tensor(self._obs_stats.sum_of_squares)
+            result["obs_sum_of_squares"] = torch.as_tensor(
+                self._obs_stats.sum_of_squares
+            )
 
         # Some additional data.
         result["interaction_count"] = self.interaction_count

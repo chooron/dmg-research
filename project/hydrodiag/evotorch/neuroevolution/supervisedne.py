@@ -248,9 +248,13 @@ class SupervisedNE(NEProblem):
         if self._minibatch_size is None:
             return self._make_dataloader()
         else:
-            return DataLoader(self.dataset, shuffle=True, batch_size=self._minibatch_size)
+            return DataLoader(
+                self.dataset, shuffle=True, batch_size=self._minibatch_size
+            )
 
-    def _evaluate_using_minibatch(self, network: nn.Module, batch: Any) -> Union[float, torch.Tensor]:
+    def _evaluate_using_minibatch(
+        self, network: nn.Module, batch: Any
+    ) -> Union[float, torch.Tensor]:
         """
         Pass a minibatch through a network, and compute the loss.
 
@@ -338,11 +342,16 @@ class SupervisedNE(NEProblem):
                 self._current_minibatch = self.get_minibatch()
             else:
                 self._current_minibatch = self._current_minibatches[batch_idx]
-            loss += self._evaluate_using_minibatch(network, self._current_minibatch) / self._num_minibatches
+            loss += (
+                self._evaluate_using_minibatch(network, self._current_minibatch)
+                / self._num_minibatches
+            )
         return loss
 
     def _evaluate_batch(self, batch: SolutionBatch):
         if self._common_minibatch:
             # If using a common data batch, generate them now and use them for the entire batch of solutions
-            self._current_minibatches = [self.get_minibatch() for _ in range(self._num_minibatches)]
+            self._current_minibatches = [
+                self.get_minibatch() for _ in range(self._num_minibatches)
+            ]
         return super()._evaluate_batch(batch)

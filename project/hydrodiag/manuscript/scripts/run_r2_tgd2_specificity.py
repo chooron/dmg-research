@@ -14,12 +14,13 @@ Base–CN outputs. Canonical dPL medians are NOT used here (seed-level values on
 New estimand: delta_beta = beta(excess ~ frac_snow; Base–CN) - beta(excess ~ frac_snow;
 Base–TGD2), estimated with a PAIRED basin bootstrap (same resample fits both slopes).
 """
+
 from __future__ import annotations
 
 import json
 import sys
-from pathlib import Path
 from itertools import combinations
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -32,15 +33,25 @@ RESULTS_R2 = MANUSCRIPT / "results" / "R2"
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 # Reuse frozen R2 helpers to guarantee identical statistical definitions.
 from run_r2_within_structure_baseline import (  # noqa: E402
-    COMMON_XAJ, BASIN_FILE, BOUNDS_FILE, SNOW_FILE,
-    assign_regime, rms_dist, bootstrap_stat, bootstrap_regression,
+    BASIN_FILE,
+    BOUNDS_FILE,
+    COMMON_XAJ,
+    SNOW_FILE,
+    assign_regime,
+    bootstrap_regression,
+    bootstrap_stat,
+    rms_dist,
 )
 
 N_BOOT = 10000
 SEED = 20260730
 
 IC_RAW_DIRS = {
-    "Base": PROJECT / "results" / "xaj_base_cmaes_531_batched_paired_v2" / "raw" / "xaj",
+    "Base": PROJECT
+    / "results"
+    / "xaj_base_cmaes_531_batched_paired_v2"
+    / "raw"
+    / "xaj",
     "CN": PROJECT / "results" / "xaj_cn_cmaes_531_batched_paired_v2" / "raw" / "xaj_cn",
     "TGD2": PROJECT / "results" / "xaj_tgd2_cmaes_531_batched_v1" / "raw" / "xaj_tgd2",
 }
@@ -59,14 +70,26 @@ STRATA = [
     ("ExcludeS5", lambda d: d[d["snow_regime"] != "S5"]),
 ]
 
-SUMMARY_METRICS = ["within_a", "within_b", "within_pooled", "between_all",
-                   "excess", "ratio", "prop_excess_gt_0", "prop_between_gt_within"]
+SUMMARY_METRICS = [
+    "within_a",
+    "within_b",
+    "within_pooled",
+    "between_all",
+    "excess",
+    "ratio",
+    "prop_excess_gt_0",
+    "prop_between_gt_within",
+]
 
 
 def load_ic_z(basins):
     """Return {basin: {structure: {start: (z_vec15, train_kge)}}} from raw CMA-ES JSON."""
     b_df = pd.read_csv(BOUNDS_FILE)
-    bounds = b_df[b_df["active_model_key"] == "XAJ"].drop_duplicates("code_name").set_index("code_name")
+    bounds = (
+        b_df[b_df["active_model_key"] == "XAJ"]
+        .drop_duplicates("code_name")
+        .set_index("code_name")
+    )
     lowers = np.array([bounds.loc[n, "lower_bound"] for n in COMMON_XAJ], dtype=float)
     uppers = np.array([bounds.loc[n, "upper_bound"] for n in COMMON_XAJ], dtype=float)
 
@@ -97,7 +120,11 @@ def load_dpl_z(basins):
         sub = dpl[dpl["structure"] == label]
         for b, bsub in sub.groupby("basin_id"):
             for seed, ssub in bsub.groupby("seed"):
-                vec = ssub.set_index("parameter").loc[COMMON_XAJ]["z"].to_numpy(dtype=float)
+                vec = (
+                    ssub.set_index("parameter")
+                    .loc[COMMON_XAJ]["z"]
+                    .to_numpy(dtype=float)
+                )
                 out[b].setdefault(struct, {})[str(seed)] = vec
     return out
 
@@ -125,30 +152,61 @@ def canonical_d(a_dict, b_dict, a_keys, b_keys, paradigm):
 def contrast_rows(z_map, basins, paradigm):
     rows = []
     for b in basins:
-        for (a_name, b_name) in CONTRASTS:
+        for a_name, b_name in CONTRASTS:
             a_dict = z_map[b][a_name]
             b_dict = z_map[b][b_name]
             a_keys = sorted(a_dict.keys())
             b_keys = sorted(b_dict.keys())
-            w_a = float(np.median([rms_dist(_vec(a_dict[s1]), _vec(a_dict[s2]))
-                                   for s1, s2 in combinations(a_keys, 2)]))
-            w_b = float(np.median([rms_dist(_vec(b_dict[s1]), _vec(b_dict[s2]))
-                                   for s1, s2 in combinations(b_keys, 2)]))
+            w_a = float(
+                np.median(
+                    [
+                        rms_dist(_vec(a_dict[s1]), _vec(a_dict[s2]))
+                        for s1, s2 in combinations(a_keys, 2)
+                    ]
+                )
+            )
+            w_b = float(
+                np.median(
+                    [
+                        rms_dist(_vec(b_dict[s1]), _vec(b_dict[s2]))
+                        for s1, s2 in combinations(b_keys, 2)
+                    ]
+                )
+            )
             w_pooled = (w_a + w_b) / 2.0
-            b_all = float(np.median([rms_dist(_vec(a_dict[s1]), _vec(b_dict[s2]))
-                                     for s1 in a_keys for s2 in b_keys]))
+            b_all = float(
+                np.median(
+                    [
+                        rms_dist(_vec(a_dict[s1]), _vec(b_dict[s2]))
+                        for s1 in a_keys
+                        for s2 in b_keys
+                    ]
+                )
+            )
             excess = b_all - w_pooled
             ratio = b_all / w_pooled if w_pooled > 1e-12 else np.nan
-            matched = [rms_dist(_vec(a_dict[s]), _vec(b_dict[s])) for s in a_keys if s in b_dict]
+            matched = [
+                rms_dist(_vec(a_dict[s]), _vec(b_dict[s]))
+                for s in a_keys
+                if s in b_dict
+            ]
             matched_median = float(np.median(matched)) if matched else np.nan
             canonical_d_val = canonical_d(a_dict, b_dict, a_keys, b_keys, paradigm)
-            rows.append({
-                "basin_id": b, "paradigm": paradigm,
-                "contrast": f"{a_name}-{b_name}",
-                "within_a": w_a, "within_b": w_b, "within_pooled": w_pooled,
-                "between_all": b_all, "excess": excess, "ratio": ratio,
-                "matched_d_rms": matched_median, "canonical_best_d_rms": canonical_d_val,
-            })
+            rows.append(
+                {
+                    "basin_id": b,
+                    "paradigm": paradigm,
+                    "contrast": f"{a_name}-{b_name}",
+                    "within_a": w_a,
+                    "within_b": w_b,
+                    "within_pooled": w_pooled,
+                    "between_all": b_all,
+                    "excess": excess,
+                    "ratio": ratio,
+                    "matched_d_rms": matched_median,
+                    "canonical_best_d_rms": canonical_d_val,
+                }
+            )
     return rows
 
 
@@ -165,7 +223,9 @@ def paired_slope_difference_bootstrap(x, y_cn, y_tg, n_boot=N_BOOT, seed=SEED):
     deltas = np.zeros(n_boot)
     for i in range(n_boot):
         ix = boot_idx[i]
-        deltas[i] = np.polyfit(x[ix], y_cn[ix], 1)[0] - np.polyfit(x[ix], y_tg[ix], 1)[0]
+        deltas[i] = (
+            np.polyfit(x[ix], y_cn[ix], 1)[0] - np.polyfit(x[ix], y_tg[ix], 1)[0]
+        )
     lo, hi = float(np.percentile(deltas, 2.5)), float(np.percentile(deltas, 97.5))
     return delta_point, lo, hi
 
@@ -202,98 +262,212 @@ def main() -> None:
     frozen = pd.read_csv(RESULTS_R2 / "r2_within_structure_basin_level.csv")
     frozen["basin_id"] = frozen["basin_id"].astype(str).str.zfill(8)
     mine = df_all[df_all["contrast"] == "Base-CN"][
-        ["basin_id", "paradigm", "within_a", "within_b", "within_pooled",
-         "between_all", "excess", "ratio"]].rename(columns={
-             "within_a": "within_base", "within_b": "within_cn"})
+        [
+            "basin_id",
+            "paradigm",
+            "within_a",
+            "within_b",
+            "within_pooled",
+            "between_all",
+            "excess",
+            "ratio",
+        ]
+    ].rename(columns={"within_a": "within_base", "within_b": "within_cn"})
     key = ["basin_id", "paradigm"]
-    m = mine.merge(frozen[key + ["within_base", "within_cn", "within_pooled",
-                                 "between_all", "excess", "ratio"]], on=key, suffixes=("", "_f"))
+    m = mine.merge(
+        frozen[
+            key
+            + [
+                "within_base",
+                "within_cn",
+                "within_pooled",
+                "between_all",
+                "excess",
+                "ratio",
+            ]
+        ],
+        on=key,
+        suffixes=("", "_f"),
+    )
     for col in ["within_base", "within_cn", "within_pooled", "between_all", "excess"]:
-        assert np.allclose(m[col], m[col + "_f"], rtol=0, atol=1e-12), \
+        assert np.allclose(m[col], m[col + "_f"], rtol=0, atol=1e-12), (
             f"Base-CN basin-level mismatch on {col}"
-    print(f"VALIDATION 1 OK: recomputed Base-CN basin-level matches frozen CSV "
-          f"({len(m)} rows, 5 numeric cols atol=1e-12).")
+        )
+    print(
+        f"VALIDATION 1 OK: recomputed Base-CN basin-level matches frozen CSV "
+        f"({len(m)} rows, 5 numeric cols atol=1e-12)."
+    )
 
-    df_all.to_csv(RESULTS_R2 / "r2_tgd2_specificity_basin_level.csv",
-                  index=False, float_format="%.17g")
+    df_all.to_csv(
+        RESULTS_R2 / "r2_tgd2_specificity_basin_level.csv",
+        index=False,
+        float_format="%.17g",
+    )
     print("wrote r2_tgd2_specificity_basin_level.csv")
 
     # ------------------------------------------------------------------ summaries
     summary_rows = []
     for paradigm in ["IC", "dPL"]:
         for contrast in [f"{a}-{b}" for a, b in CONTRASTS]:
-            cdf = df_all[(df_all["paradigm"] == paradigm) & (df_all["contrast"] == contrast)]
+            cdf = df_all[
+                (df_all["paradigm"] == paradigm) & (df_all["contrast"] == contrast)
+            ]
             for st_name, filt in STRATA:
                 sub = filt(cdf)
                 n_b = len(sub)
-                for m in ["within_a", "within_b", "within_pooled", "between_all", "excess", "ratio"]:
+                for m in [
+                    "within_a",
+                    "within_b",
+                    "within_pooled",
+                    "between_all",
+                    "excess",
+                    "ratio",
+                ]:
                     vals = sub[m].dropna().to_numpy()
-                    pt, lo, hi = bootstrap_stat(vals, np.median, n_boot=N_BOOT, seed=SEED)
-                    summary_rows.append({
-                        "paradigm": paradigm, "contrast": contrast, "stratum": st_name,
-                        "n_basins": n_b, "metric": m, "median": pt,
-                        "ci_lower": lo, "ci_upper": hi,
-                    })
-                pt, lo, hi = bootstrap_stat((sub["excess"] > 0).astype(float).to_numpy(),
-                                            np.mean, n_boot=N_BOOT, seed=SEED)
-                summary_rows.append({
-                    "paradigm": paradigm, "contrast": contrast, "stratum": st_name,
-                    "n_basins": n_b, "metric": "prop_excess_gt_0", "median": pt,
-                    "ci_lower": lo, "ci_upper": hi,
-                })
+                    pt, lo, hi = bootstrap_stat(
+                        vals, np.median, n_boot=N_BOOT, seed=SEED
+                    )
+                    summary_rows.append(
+                        {
+                            "paradigm": paradigm,
+                            "contrast": contrast,
+                            "stratum": st_name,
+                            "n_basins": n_b,
+                            "metric": m,
+                            "median": pt,
+                            "ci_lower": lo,
+                            "ci_upper": hi,
+                        }
+                    )
                 pt, lo, hi = bootstrap_stat(
-                    (sub["between_all"] > sub["within_pooled"]).astype(float).to_numpy(),
-                    np.mean, n_boot=N_BOOT, seed=SEED)
-                summary_rows.append({
-                    "paradigm": paradigm, "contrast": contrast, "stratum": st_name,
-                    "n_basins": n_b, "metric": "prop_between_gt_within", "median": pt,
-                    "ci_lower": lo, "ci_upper": hi,
-                })
+                    (sub["excess"] > 0).astype(float).to_numpy(),
+                    np.mean,
+                    n_boot=N_BOOT,
+                    seed=SEED,
+                )
+                summary_rows.append(
+                    {
+                        "paradigm": paradigm,
+                        "contrast": contrast,
+                        "stratum": st_name,
+                        "n_basins": n_b,
+                        "metric": "prop_excess_gt_0",
+                        "median": pt,
+                        "ci_lower": lo,
+                        "ci_upper": hi,
+                    }
+                )
+                pt, lo, hi = bootstrap_stat(
+                    (sub["between_all"] > sub["within_pooled"])
+                    .astype(float)
+                    .to_numpy(),
+                    np.mean,
+                    n_boot=N_BOOT,
+                    seed=SEED,
+                )
+                summary_rows.append(
+                    {
+                        "paradigm": paradigm,
+                        "contrast": contrast,
+                        "stratum": st_name,
+                        "n_basins": n_b,
+                        "metric": "prop_between_gt_within",
+                        "median": pt,
+                        "ci_lower": lo,
+                        "ci_upper": hi,
+                    }
+                )
 
     df_sum = pd.DataFrame(summary_rows)
-    df_sum.to_csv(RESULTS_R2 / "r2_tgd2_specificity_summary.csv", index=False, float_format="%.17g")
+    df_sum.to_csv(
+        RESULTS_R2 / "r2_tgd2_specificity_summary.csv",
+        index=False,
+        float_format="%.17g",
+    )
 
     # ------------------------------------------------------------- regressions (full)
     reg_rows = []
     for paradigm in ["IC", "dPL"]:
         for contrast in [f"{a}-{b}" for a, b in CONTRASTS]:
-            cdf = df_all[(df_all["paradigm"] == paradigm) & (df_all["contrast"] == contrast)]
-            for st_name, filt in [("Full531", lambda d: d),
-                                  ("ExcludeS5", lambda d: d[d["snow_regime"] != "S5"])]:
+            cdf = df_all[
+                (df_all["paradigm"] == paradigm) & (df_all["contrast"] == contrast)
+            ]
+            for st_name, filt in [
+                ("Full531", lambda d: d),
+                ("ExcludeS5", lambda d: d[d["snow_regime"] != "S5"]),
+            ]:
                 sub = filt(cdf)
                 x = sub["frac_snow"].to_numpy()
                 for dep in ["within_pooled", "between_all", "excess"]:
                     y = sub[dep].to_numpy()
                     res = bootstrap_regression(x, y, n_boot=N_BOOT, seed=SEED)
-                    reg_rows.append({
-                        "paradigm": paradigm, "contrast": contrast, "stratum": st_name,
-                        "dependent_var": dep, **res,
-                    })
+                    reg_rows.append(
+                        {
+                            "paradigm": paradigm,
+                            "contrast": contrast,
+                            "stratum": st_name,
+                            "dependent_var": dep,
+                            **res,
+                        }
+                    )
 
     df_reg = pd.DataFrame(reg_rows)
-    df_reg.to_csv(RESULTS_R2 / "r2_tgd2_specificity_regressions.csv", index=False, float_format="%.17g")
+    df_reg.to_csv(
+        RESULTS_R2 / "r2_tgd2_specificity_regressions.csv",
+        index=False,
+        float_format="%.17g",
+    )
 
     # -------------------------------------------------- validation 2: frozen regressions
     frozen_reg = pd.read_csv(RESULTS_R2 / "r2_within_structure_regressions.csv")
     mine_reg = df_reg[df_reg["contrast"] == "Base-CN"][
-        ["paradigm", "stratum", "dependent_var", "slope", "slope_ci_lower",
-         "slope_ci_upper", "spearman_rho"]]
-    mr = mine_reg.merge(frozen_reg[["paradigm", "stratum", "dependent_var", "slope",
-                                    "slope_ci_lower", "slope_ci_upper", "spearman_rho"]],
-                        on=["paradigm", "stratum", "dependent_var"], suffixes=("", "_f"))
+        [
+            "paradigm",
+            "stratum",
+            "dependent_var",
+            "slope",
+            "slope_ci_lower",
+            "slope_ci_upper",
+            "spearman_rho",
+        ]
+    ]
+    mr = mine_reg.merge(
+        frozen_reg[
+            [
+                "paradigm",
+                "stratum",
+                "dependent_var",
+                "slope",
+                "slope_ci_lower",
+                "slope_ci_upper",
+                "spearman_rho",
+            ]
+        ],
+        on=["paradigm", "stratum", "dependent_var"],
+        suffixes=("", "_f"),
+    )
     for col in ["slope", "slope_ci_lower", "slope_ci_upper", "spearman_rho"]:
-        assert np.allclose(mr[col], mr[col + "_f"], rtol=0, atol=1e-12), \
+        assert np.allclose(mr[col], mr[col + "_f"], rtol=0, atol=1e-12), (
             f"Base-CN regression mismatch on {col}"
-    print(f"VALIDATION 2 OK: recomputed Base-CN regressions match frozen CSV "
-          f"({len(mr)} rows, atol=1e-12).")
+        )
+    print(
+        f"VALIDATION 2 OK: recomputed Base-CN regressions match frozen CSV "
+        f"({len(mr)} rows, atol=1e-12)."
+    )
 
     # ------------------------------------------- paired slope-difference (delta_beta)
     diff_rows = []
     for paradigm in ["IC", "dPL"]:
-        for st_name, filt in [("Full531", lambda d: d),
-                              ("ExcludeS5", lambda d: d[d["snow_regime"] != "S5"])]:
-            cn = df_all[(df_all["paradigm"] == paradigm) & (df_all["contrast"] == "Base-CN")]
-            tg = df_all[(df_all["paradigm"] == paradigm) & (df_all["contrast"] == "Base-TGD2")]
+        for st_name, filt in [
+            ("Full531", lambda d: d),
+            ("ExcludeS5", lambda d: d[d["snow_regime"] != "S5"]),
+        ]:
+            cn = df_all[
+                (df_all["paradigm"] == paradigm) & (df_all["contrast"] == "Base-CN")
+            ]
+            tg = df_all[
+                (df_all["paradigm"] == paradigm) & (df_all["contrast"] == "Base-TGD2")
+            ]
             cn = filt(cn).set_index("basin_id")
             tg = filt(tg).set_index("basin_id")
             common = cn.index.intersection(tg.index)
@@ -303,25 +477,48 @@ def main() -> None:
             y_tg = tg.loc[common, "excess"].to_numpy()
             delta, lo, hi = paired_slope_difference_bootstrap(x, y_cn, y_tg)
             # also report the two individual slopes from the same paired pipeline
-            diff_rows.append({
-                "paradigm": paradigm, "stratum": st_name, "n_basins": len(common),
-                "beta_base_cn": float(np.polyfit(x, y_cn, 1)[0]),
-                "beta_base_tgd2": float(np.polyfit(x, y_tg, 1)[0]),
-                "delta_beta": delta, "delta_beta_ci_lower": lo, "delta_beta_ci_upper": hi,
-            })
+            diff_rows.append(
+                {
+                    "paradigm": paradigm,
+                    "stratum": st_name,
+                    "n_basins": len(common),
+                    "beta_base_cn": float(np.polyfit(x, y_cn, 1)[0]),
+                    "beta_base_tgd2": float(np.polyfit(x, y_tg, 1)[0]),
+                    "delta_beta": delta,
+                    "delta_beta_ci_lower": lo,
+                    "delta_beta_ci_upper": hi,
+                }
+            )
 
     df_diff = pd.DataFrame(diff_rows)
-    df_diff.to_csv(RESULTS_R2 / "r2_tgd2_slope_difference_summary.csv", index=False, float_format="%.17g")
+    df_diff.to_csv(
+        RESULTS_R2 / "r2_tgd2_slope_difference_summary.csv",
+        index=False,
+        float_format="%.17g",
+    )
 
     # ------------------------------------------------------------------- final checks
-    assert df_all[["within_a", "within_b", "within_pooled", "between_all", "excess"]].isna().sum().sum() == 0
+    assert (
+        df_all[["within_a", "within_b", "within_pooled", "between_all", "excess"]]
+        .isna()
+        .sum()
+        .sum()
+        == 0
+    )
     for p in ["IC", "dPL"]:
         for reg, n in [("S1", 165), ("S2", 156), ("S3", 121), ("S4", 34), ("S5", 55)]:
-            c = int(((df_all["paradigm"] == p) & (df_all["contrast"] == "Base-CN")
-                     & (df_all["snow_regime"] == reg)).sum())
+            c = int(
+                (
+                    (df_all["paradigm"] == p)
+                    & (df_all["contrast"] == "Base-CN")
+                    & (df_all["snow_regime"] == reg)
+                ).sum()
+            )
             assert c == n, f"{p} {reg} count {c} != {n}"
-    print("VALIDATION 3 OK: no NaN in distance columns; S1-S5 counts 165/156/121/34/55 "
-          "per paradigm; Exclude-S5 = 476.")
+    print(
+        "VALIDATION 3 OK: no NaN in distance columns; S1-S5 counts 165/156/121/34/55 "
+        "per paradigm; Exclude-S5 = 476."
+    )
     print("All TGD2 specificity outputs written.")
 
 

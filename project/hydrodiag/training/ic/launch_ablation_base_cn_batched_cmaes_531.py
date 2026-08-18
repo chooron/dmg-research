@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Run the missing Base/CN IC calibrations serially under the 531-basin protocol."""
+
 from __future__ import annotations
 
 import argparse
@@ -17,7 +18,6 @@ from training.ic.run_tgd2_batched_cmaes_531 import (
     DEFAULT_STARTS,
     population_for_dimension,
 )
-
 
 RUNNER = PROJECT / "training/ic/run_tgd2_batched_cmaes_531.py"
 MODELS = ("GR4J", "GR4J_CN", "SIMHYD", "SIMHYD_CN")
@@ -43,11 +43,24 @@ def main() -> None:
         population = population_for_dimension(ADDITIONAL_MODEL_DIMENSIONS[model])
         output = args.output_root / f"{model.lower()}_cmaes_531_batched_v1"
         command = [
-            sys.executable, str(RUNNER), "--model", model, "--output", str(output),
-            "--starts", str(args.starts), "--population", str(population),
-            "--generations", str(args.generations),
-            "--chunk-basins", str(CHUNK_BASINS[model]),
-            "--checkpoint-interval", str(args.checkpoint_interval), "--device", args.device,
+            sys.executable,
+            str(RUNNER),
+            "--model",
+            model,
+            "--output",
+            str(output),
+            "--starts",
+            str(args.starts),
+            "--population",
+            str(population),
+            "--generations",
+            str(args.generations),
+            "--chunk-basins",
+            str(CHUNK_BASINS[model]),
+            "--checkpoint-interval",
+            str(args.checkpoint_interval),
+            "--device",
+            args.device,
         ]
         print("COMMAND:", " ".join(command), flush=True)
         if not args.dry_run:

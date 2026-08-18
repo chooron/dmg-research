@@ -3,10 +3,8 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-
 from ablation.ic_core.config import load_resolved_config
 from ablation.ic_core.data_adapter import load_531_bundle, read_basin_ids
-
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 CONFIG = PROJECT_ROOT / "ablation/configs/ic_foundation_531_v1.json"
@@ -15,7 +13,10 @@ CONFIG = PROJECT_ROOT / "ablation/configs/ic_foundation_531_v1.json"
 @pytest.fixture(scope="session")
 def bundle():
     config = load_resolved_config(CONFIG, device_override="cpu")
-    config["periods"] = {"warmup": {"start": "1988-01-01", "end": "1988-12-31"}, "train": {"start": "1989-01-01", "end": "1998-12-31"}}
+    config["periods"] = {
+        "warmup": {"start": "1988-01-01", "end": "1988-12-31"},
+        "train": {"start": "1989-01-01", "end": "1998-12-31"},
+    }
     return load_531_bundle(config)
 
 

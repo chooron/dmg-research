@@ -10,22 +10,48 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+from training.data_contract import FORCING_NAMES, load_dates, load_gage_ids
 
 from .periods import resolve_periods
 from .schemas import ICDataBundle
-from .units import convert_ft3s_to_mm_day, conversion_metadata
-from training.data_contract import FORCING_NAMES, load_dates, load_gage_ids
-
+from .units import conversion_metadata, convert_ft3s_to_mm_day
 
 ATTRIBUTE_NAMES = (
-    "p_mean", "pet_mean", "p_seasonality", "frac_snow", "aridity",
-    "high_prec_freq", "high_prec_dur", "low_prec_freq", "low_prec_dur",
-    "elev_mean", "slope_mean", "area_gages2", "frac_forest", "lai_max",
-    "lai_diff", "gvf_max", "gvf_diff", "dom_land_cover_frac", "dom_land_cover",
-    "root_depth_50", "soil_depth_pelletier", "soil_depth_statsgo", "soil_porosity",
-    "soil_conductivity", "max_water_content", "sand_frac", "silt_frac", "clay_frac",
-    "geol_1st_class", "glim_1st_class_frac", "geol_2nd_class", "glim_2nd_class_frac",
-    "carbonate_rocks_frac", "geol_porosity", "geol_permeability",
+    "p_mean",
+    "pet_mean",
+    "p_seasonality",
+    "frac_snow",
+    "aridity",
+    "high_prec_freq",
+    "high_prec_dur",
+    "low_prec_freq",
+    "low_prec_dur",
+    "elev_mean",
+    "slope_mean",
+    "area_gages2",
+    "frac_forest",
+    "lai_max",
+    "lai_diff",
+    "gvf_max",
+    "gvf_diff",
+    "dom_land_cover_frac",
+    "dom_land_cover",
+    "root_depth_50",
+    "soil_depth_pelletier",
+    "soil_depth_statsgo",
+    "soil_porosity",
+    "soil_conductivity",
+    "max_water_content",
+    "sand_frac",
+    "silt_frac",
+    "clay_frac",
+    "geol_1st_class",
+    "glim_1st_class_frac",
+    "geol_2nd_class",
+    "glim_2nd_class_frac",
+    "carbonate_rocks_frac",
+    "geol_porosity",
+    "geol_permeability",
 )
 AREA_FIELD = "area_gages2"
 AREA_ATTRIBUTE_INDEX = 11
@@ -61,7 +87,9 @@ def read_basin_ids(path: str | Path) -> list[str]:
 
 def _git_commit(project_root: Path) -> str:
     try:
-        return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=project_root, text=True).strip()
+        return subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=project_root, text=True
+        ).strip()
     except Exception:
         return "UNVERIFIED"
 
@@ -71,7 +99,9 @@ def load_531_bundle(config: dict[str, Any]) -> ICDataBundle:
     with Path(config["dataset_path"]).open("rb") as handle:
         dataset = pickle.load(handle)
     if not isinstance(dataset, tuple) or len(dataset) != 3:
-        raise ValueError("camels_dataset must be a pickle tuple (forcing,target,attributes)")
+        raise ValueError(
+            "camels_dataset must be a pickle tuple (forcing,target,attributes)"
+        )
     dataset_forcing, dataset_target, attributes = dataset
     dataset_forcing = np.asarray(dataset_forcing)
     dataset_target = np.asarray(dataset_target)
@@ -83,15 +113,28 @@ def load_531_bundle(config: dict[str, Any]) -> ICDataBundle:
     missing = [basin_id for basin_id in basin_ids if basin_id not in id_to_index]
     if missing:
         raise KeyError(f"531 basin IDs missing from gage_id.npy: {missing}")
-    metadata_indices = np.asarray([id_to_index[basin_id] for basin_id in basin_ids], dtype=np.int64)
+    metadata_indices = np.asarray(
+        [id_to_index[basin_id] for basin_id in basin_ids], dtype=np.int64
+    )
     if dataset_forcing.ndim != 3 or dataset_forcing.shape[2] != 3:
-        raise ValueError(f"dataset forcing must be [basin,time,3], got {dataset_forcing.shape}")
+        raise ValueError(
+            f"dataset forcing must be [basin,time,3], got {dataset_forcing.shape}"
+        )
     if dataset_target.ndim != 3 or dataset_target.shape[2] != 1:
-        raise ValueError(f"dataset target must be [basin,time,1], got {dataset_target.shape}")
+        raise ValueError(
+            f"dataset target must be [basin,time,1], got {dataset_target.shape}"
+        )
     if attributes.ndim != 2 or attributes.shape[1] != 35:
-        raise ValueError(f"dataset attributes must be [basin,35], got {attributes.shape}")
-    if dataset_forcing.shape[:2] != dataset_target.shape[:2] or dataset_forcing.shape[0] != attributes.shape[0]:
-        raise ValueError("forcing, target, and attributes do not share source basin/time axes")
+        raise ValueError(
+            f"dataset attributes must be [basin,35], got {attributes.shape}"
+        )
+    if (
+        dataset_forcing.shape[:2] != dataset_target.shape[:2]
+        or dataset_forcing.shape[0] != attributes.shape[0]
+    ):
+        raise ValueError(
+            "forcing, target, and attributes do not share source basin/time axes"
+        )
     forcing_names = FORCING_NAMES
     # gage_id.npy defines the dataset basin axis.  The tuple has no IDs, so
     # this replaces the old P/T signature join against forcing metadata while
@@ -110,9 +153,15 @@ def load_531_bundle(config: dict[str, Any]) -> ICDataBundle:
     target_mm_day, valid_target_mask = convert_ft3s_to_mm_day(
         target_cfs, area_km2, return_valid_mask=True
     )
-    if "periods" not in config or "warmup" not in config["periods"] or "train" not in config["periods"]:
-        raise ValueError("Formal runner config must include explicit 'periods' (warmup and train).")
-        
+    if (
+        "periods" not in config
+        or "warmup" not in config["periods"]
+        or "train" not in config["periods"]
+    ):
+        raise ValueError(
+            "Formal runner config must include explicit 'periods' (warmup and train)."
+        )
+
     w_start = np.datetime64(config["periods"]["warmup"]["start"], "D")
     w_end = np.datetime64(config["periods"]["warmup"]["end"], "D")
     calc_warmup_days = int((w_end - w_start).astype("timedelta64[D]").astype(int) + 1)
@@ -122,16 +171,18 @@ def load_531_bundle(config: dict[str, Any]) -> ICDataBundle:
         config["periods"],
         warmup_days=calc_warmup_days,
     )
-    
+
     input_length = periods.train_forcing_end_index - periods.train_forcing_start_index
     warmup_length = periods.warmup.days
     train_length = periods.train.days
-    
+
     if input_length <= 0 or warmup_length <= 0 or train_length <= 0:
-        raise ValueError(f"Hard fail: Invalid period lengths input_length={input_length}, warmup_length={warmup_length}, train_length={train_length}")
+        raise ValueError(
+            f"Hard fail: Invalid period lengths input_length={input_length}, warmup_length={warmup_length}, train_length={train_length}"
+        )
 
     train_temp = selected_forcing[
-        :, periods.train.start_index:periods.train.end_index + 1, 1
+        :, periods.train.start_index : periods.train.end_index + 1, 1
     ].astype(np.float64)
     temp_mean_train = np.nanmean(train_temp, axis=1).astype(np.float32)
     temp_std_train = np.nanstd(train_temp, axis=1).astype(np.float32)
@@ -203,8 +254,14 @@ def manifest_for_bundle(bundle: ICDataBundle, config: dict[str, Any]) -> dict[st
             "valid_target_mask": list(bundle.valid_target_mask.shape),
             "attributes": list(bundle.raw_attributes.shape),
         },
-        "source_indices_first_last": [bundle.source_indices[:5].tolist(), bundle.source_indices[-5:].tolist()],
-        "metadata_indices_first_last": [bundle.metadata_indices[:5].tolist(), bundle.metadata_indices[-5:].tolist()],
+        "source_indices_first_last": [
+            bundle.source_indices[:5].tolist(),
+            bundle.source_indices[-5:].tolist(),
+        ],
+        "metadata_indices_first_last": [
+            bundle.metadata_indices[:5].tolist(),
+            bundle.metadata_indices[-5:].tolist(),
+        ],
         "area_field": bundle.area_field,
         "area_attribute_index": AREA_ATTRIBUTE_INDEX,
         "area_unit": bundle.area_unit,
@@ -225,11 +282,15 @@ def write_basin_index_csv(bundle: ICDataBundle, path: str | Path) -> None:
         writer.writerow(["selected_position", "basin_id", "source_index"])
         writer.writerows(
             (position, basin_id, int(source_index))
-            for position, (basin_id, source_index) in enumerate(zip(bundle.basin_ids, bundle.source_indices))
+            for position, (basin_id, source_index) in enumerate(
+                zip(bundle.basin_ids, bundle.source_indices)
+            )
         )
 
 
-def write_manifest(bundle: ICDataBundle, config: dict[str, Any], path: str | Path) -> dict[str, Any]:
+def write_manifest(
+    bundle: ICDataBundle, config: dict[str, Any], path: str | Path
+) -> dict[str, Any]:
     manifest = manifest_for_bundle(bundle, config)
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)

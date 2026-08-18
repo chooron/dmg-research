@@ -1,8 +1,14 @@
 import json
 import os
-from ablation.controlled_optimizer_ablation.experiment_matrix import generate_phase1_matrix
+
+from ablation.controlled_optimizer_ablation.aggregation import (
+    compute_metrics,
+    generate_report,
+)
+from ablation.controlled_optimizer_ablation.experiment_matrix import (
+    generate_phase1_matrix,
+)
 from ablation.controlled_optimizer_ablation.runner import run_tasks
-from ablation.controlled_optimizer_ablation.aggregation import compute_metrics, generate_report
 
 with open("ablation/configs/controlled_optimizer_ablation/phase1_optimizer.json") as f:
     config = json.load(f)

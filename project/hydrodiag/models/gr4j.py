@@ -38,10 +38,14 @@ def _gr4j_step(
     ratio = torch.clamp(s_prod / (x1 + nearzero), min=0.0, max=1.0)
     # When precip >= pet: p_s from eq. 3
     tanh_pn_x1 = torch.tanh(p_n / (x1 + nearzero))
-    p_s_calc = (x1 * (1.0 - ratio * ratio) * tanh_pn_x1) / (1.0 + ratio * tanh_pn_x1 + nearzero)
+    p_s_calc = (x1 * (1.0 - ratio * ratio) * tanh_pn_x1) / (
+        1.0 + ratio * tanh_pn_x1 + nearzero
+    )
     # When precip < pet: e_s from eq. 4
     tanh_pen_x1 = torch.tanh(pe_n / (x1 + nearzero))
-    e_s_calc = (s_prod * (2.0 - ratio) * tanh_pen_x1) / (1.0 + (1.0 - ratio) * tanh_pen_x1 + nearzero)
+    e_s_calc = (s_prod * (2.0 - ratio) * tanh_pen_x1) / (
+        1.0 + (1.0 - ratio) * tanh_pen_x1 + nearzero
+    )
     p_s = torch.where(mask_pn, p_s_calc, torch.zeros_like(precip_t))
     e_s = torch.where(mask_pn, torch.zeros_like(precip_t), e_s_calc)
 
@@ -49,7 +53,7 @@ def _gr4j_step(
 
     # Percolation (eq. 5)
     n4 = 4.0 / 9.0 * s_prod / (x1 + nearzero)
-    perc = s_prod * (1.0 - (1.0 + n4 ** 4.0) ** (-0.25))
+    perc = s_prod * (1.0 - (1.0 + n4**4.0) ** (-0.25))
     s_prod = s_prod - perc
 
     # Total water reaching routing
@@ -61,18 +65,30 @@ def _gr4j_step(
     p_r_uh2 = 0.1 * p_r
 
     # Update UH1 buffer (shift left, add new contributions)
-    uh1_shifted = torch.cat([uh1_buf[:, 1:], torch.zeros(B, 1, device=precip_t.device, dtype=precip_t.dtype)], dim=1)
+    uh1_shifted = torch.cat(
+        [
+            uh1_buf[:, 1:],
+            torch.zeros(B, 1, device=precip_t.device, dtype=precip_t.dtype),
+        ],
+        dim=1,
+    )
     uh1_buf = uh1_shifted + uh1_ord * p_r_uh1[:, None]
     q_uh1_out = uh1_buf[:, 0]
 
     # Update UH2 buffer
-    uh2_shifted = torch.cat([uh2_buf[:, 1:], torch.zeros(B, 1, device=precip_t.device, dtype=precip_t.dtype)], dim=1)
+    uh2_shifted = torch.cat(
+        [
+            uh2_buf[:, 1:],
+            torch.zeros(B, 1, device=precip_t.device, dtype=precip_t.dtype),
+        ],
+        dim=1,
+    )
     uh2_buf = uh2_shifted + uh2_ord * p_r_uh2[:, None]
     q_uh2_out = uh2_buf[:, 0]
 
     # Groundwater exchange (eq. 18)
     ratio_r = torch.clamp(s_route / (x3 + nearzero), min=0.0)
-    gw_exchange = x2 * ratio_r ** 3.5
+    gw_exchange = x2 * ratio_r**3.5
 
     # Update routing store
     s_route_in = s_route + q_uh1_out + gw_exchange
@@ -80,7 +96,7 @@ def _gr4j_step(
 
     # Outflow of routing store
     ratio_r2 = torch.clamp(s_route / (x3 + nearzero), min=0.0)
-    q_r = s_route * (1.0 - (1.0 + ratio_r2 ** 4.0) ** (-0.25))
+    q_r = s_route * (1.0 - (1.0 + ratio_r2**4.0) ** (-0.25))
     s_route = s_route - q_r
 
     # Direct flow component
@@ -138,12 +154,26 @@ class GR4J(BaseHydrologicalModel):
         uh1_ord, uh2_ord = compute_gr4j_uh_ordinates(x4, self.UH1_MAX)
         uh2_ord = compute_gr4j_uh_ordinates(x4, self.UH2_MAX)[1]
 
-        s_prod, s_route, uh1_buf, uh2_buf = self._init_states(batch, device, dtype, initial_states, x1, x3)
+        s_prod, s_route, uh1_buf, uh2_buf = self._init_states(
+            batch, device, dtype, initial_states, x1, x3
+        )
 
         qsim, (s_prod, s_route, uh1_buf, uh2_buf) = self._step_loop(
-            precip, pet, nsteps, batch, device, dtype,
-            s_prod, s_route, uh1_buf, uh2_buf,
-            uh1_ord, uh2_ord, x1, x2, x3,
+            precip,
+            pet,
+            nsteps,
+            batch,
+            device,
+            dtype,
+            s_prod,
+            s_route,
+            uh1_buf,
+            uh2_buf,
+            uh1_ord,
+            uh2_ord,
+            x1,
+            x2,
+            x3,
         )
 
         if self.compact_output and not return_states:
@@ -177,14 +207,34 @@ class GR4J(BaseHydrologicalModel):
     ) -> tuple[torch.Tensor, ...]:
         if initial_states is not None:
             return (
-                initial_states.get("s_prod", x1 * 0.5 if x1 is not None else torch.full((batch,), 100.0, device=device, dtype=dtype)),
-                initial_states.get("s_route", x3 * 0.5 if x3 is not None else torch.full((batch,), 100.0, device=device, dtype=dtype)),
-                initial_states.get("uh1_buf", torch.zeros(batch, self.UH1_MAX, device=device, dtype=dtype)),
-                initial_states.get("uh2_buf", torch.zeros(batch, self.UH2_MAX, device=device, dtype=dtype)),
+                initial_states.get(
+                    "s_prod",
+                    x1 * 0.5
+                    if x1 is not None
+                    else torch.full((batch,), 100.0, device=device, dtype=dtype),
+                ),
+                initial_states.get(
+                    "s_route",
+                    x3 * 0.5
+                    if x3 is not None
+                    else torch.full((batch,), 100.0, device=device, dtype=dtype),
+                ),
+                initial_states.get(
+                    "uh1_buf",
+                    torch.zeros(batch, self.UH1_MAX, device=device, dtype=dtype),
+                ),
+                initial_states.get(
+                    "uh2_buf",
+                    torch.zeros(batch, self.UH2_MAX, device=device, dtype=dtype),
+                ),
             )
         return (
-            x1 * 0.5 if x1 is not None else torch.full((batch,), 100.0, device=device, dtype=dtype),
-            x3 * 0.5 if x3 is not None else torch.full((batch,), 100.0, device=device, dtype=dtype),
+            x1 * 0.5
+            if x1 is not None
+            else torch.full((batch,), 100.0, device=device, dtype=dtype),
+            x3 * 0.5
+            if x3 is not None
+            else torch.full((batch,), 100.0, device=device, dtype=dtype),
             torch.zeros(batch, self.UH1_MAX, device=device, dtype=dtype),
             torch.zeros(batch, self.UH2_MAX, device=device, dtype=dtype),
         )

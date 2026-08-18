@@ -38,18 +38,26 @@ def compute_kge_fp64_batch_gpu(
 
     sim_mean = sim_valid.sum(dim=1) / safe_count
     obs_mean = obs_valid.sum(dim=1) / safe_count
-    d_sim = torch.where(mask, sim_fp64 - sim_mean.unsqueeze(1), torch.zeros_like(sim_fp64))
-    d_obs = torch.where(mask, obs_fp64.unsqueeze(0) - obs_mean.unsqueeze(1), torch.zeros_like(sim_fp64))
+    d_sim = torch.where(
+        mask, sim_fp64 - sim_mean.unsqueeze(1), torch.zeros_like(sim_fp64)
+    )
+    d_obs = torch.where(
+        mask, obs_fp64.unsqueeze(0) - obs_mean.unsqueeze(1), torch.zeros_like(sim_fp64)
+    )
 
     sim_var = d_sim.square().sum(dim=1) / safe_count
     obs_var = d_obs.square().sum(dim=1) / safe_count
     sim_std = torch.sqrt(sim_var)
     obs_std = torch.sqrt(obs_var)
-    denom = torch.sqrt(d_sim.square().sum(dim=1)) * torch.sqrt(d_obs.square().sum(dim=1))
+    denom = torch.sqrt(d_sim.square().sum(dim=1)) * torch.sqrt(
+        d_obs.square().sum(dim=1)
+    )
     r = (d_sim * d_obs).sum(dim=1) / denom
     alpha = sim_std / obs_std
     beta = sim_mean / obs_mean
-    kge = 1.0 - torch.sqrt((r - 1.0).square() + (alpha - 1.0).square() + (beta - 1.0).square())
+    kge = 1.0 - torch.sqrt(
+        (r - 1.0).square() + (alpha - 1.0).square() + (beta - 1.0).square()
+    )
 
     invalid = (count < float(min_samples)) | (obs_std < 1e-10)
     return torch.where(invalid, torch.full_like(kge, -999.0), kge)
@@ -73,7 +81,12 @@ def compute_kge_fp64_matrix_gpu(
     if sim_fp64.dtype != torch.float64 or obs_fp64.dtype != torch.float64:
         raise TypeError("GPU KGE requires torch.float64 inputs")
 
-    mask = torch.isfinite(sim_fp64) & torch.isfinite(obs_fp64) & (sim_fp64 >= 0.0) & (obs_fp64 >= 0.0)
+    mask = (
+        torch.isfinite(sim_fp64)
+        & torch.isfinite(obs_fp64)
+        & (sim_fp64 >= 0.0)
+        & (obs_fp64 >= 0.0)
+    )
     count = mask.sum(dim=1).to(torch.float64)
     safe_count = count.clamp_min(1.0)
     sim_valid = torch.where(mask, sim_fp64, torch.zeros_like(sim_fp64))
@@ -81,18 +94,26 @@ def compute_kge_fp64_matrix_gpu(
 
     sim_mean = sim_valid.sum(dim=1) / safe_count
     obs_mean = obs_valid.sum(dim=1) / safe_count
-    d_sim = torch.where(mask, sim_fp64 - sim_mean.unsqueeze(1), torch.zeros_like(sim_fp64))
-    d_obs = torch.where(mask, obs_fp64 - obs_mean.unsqueeze(1), torch.zeros_like(obs_fp64))
+    d_sim = torch.where(
+        mask, sim_fp64 - sim_mean.unsqueeze(1), torch.zeros_like(sim_fp64)
+    )
+    d_obs = torch.where(
+        mask, obs_fp64 - obs_mean.unsqueeze(1), torch.zeros_like(obs_fp64)
+    )
 
     sim_var = d_sim.square().sum(dim=1) / safe_count
     obs_var = d_obs.square().sum(dim=1) / safe_count
     sim_std = torch.sqrt(sim_var)
     obs_std = torch.sqrt(obs_var)
-    denom = torch.sqrt(d_sim.square().sum(dim=1)) * torch.sqrt(d_obs.square().sum(dim=1))
+    denom = torch.sqrt(d_sim.square().sum(dim=1)) * torch.sqrt(
+        d_obs.square().sum(dim=1)
+    )
     r = (d_sim * d_obs).sum(dim=1) / denom
     alpha = sim_std / obs_std
     beta = sim_mean / obs_mean
-    kge = 1.0 - torch.sqrt((r - 1.0).square() + (alpha - 1.0).square() + (beta - 1.0).square())
+    kge = 1.0 - torch.sqrt(
+        (r - 1.0).square() + (alpha - 1.0).square() + (beta - 1.0).square()
+    )
 
     invalid = (count < float(min_samples)) | (obs_std < 1e-10)
     return torch.where(invalid, torch.full_like(kge, -999.0), kge)

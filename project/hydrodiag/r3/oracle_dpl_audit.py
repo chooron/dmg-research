@@ -69,7 +69,9 @@ def main() -> None:
     parser.add_argument("--results-root", type=Path, default=DEFAULT_RESULTS_ROOT)
     parser.add_argument("--truth-run-id", default="r3_synthetic_truth_v1")
     parser.add_argument("--run-id", default="r3_gate_v1")
-    parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
+    parser.add_argument(
+        "--device", default="cuda" if torch.cuda.is_available() else "cpu"
+    )
     parser.add_argument("--batch-basins", type=int, default=128)
     args = parser.parse_args()
 
@@ -84,6 +86,7 @@ def main() -> None:
         kge_per_basin,
         load_data,
     )
+
     from r3.common import frac_snow_series, load_bundle
 
     bundle, _ = load_bundle(args.project_root, args.data_root)
@@ -128,9 +131,9 @@ def main() -> None:
                 "pet": torch.from_numpy(forcing_np[:, :, 2]).to(device, dtype=dtype),
             }
             if psol_key is not None:
-                fc["cn_psol_annual"] = torch.from_numpy(
-                    train_forcing[psol_key]
-                ).to(device, dtype=dtype)
+                fc["cn_psol_annual"] = torch.from_numpy(train_forcing[psol_key]).to(
+                    device, dtype=dtype
+                )
             params = {
                 name: torch.from_numpy(theta_star[:, i]).to(device, dtype=dtype)
                 for i, name in enumerate(names)
@@ -143,12 +146,16 @@ def main() -> None:
             obs_np = cal_obs[:, ti].astype(np.float64)
             for k, b in enumerate(basin_ids):
                 diff = np.abs(q_np[k] - obs_np[k])
-                rows.append({
-                    "basin_id": b, "window_offset": int(off),
-                    "kge": float(kge[k]), "abs_err_max": float(diff.max()),
-                    "abs_err_mean": float(diff.mean()),
-                    "frac_snow": float(snow[b]),
-                })
+                rows.append(
+                    {
+                        "basin_id": b,
+                        "window_offset": int(off),
+                        "kge": float(kge[k]),
+                        "abs_err_max": float(diff.max()),
+                        "abs_err_mean": float(diff.mean()),
+                        "frac_snow": float(snow[b]),
+                    }
+                )
         return rows
 
     def run_eval(psol_key: str | None) -> list[dict]:
@@ -157,9 +164,15 @@ def main() -> None:
             [eval_forcing[k] for k in ("precip", "temp", "pet")], axis=-1
         ).astype(np.float64)
         fc = {
-            "precip": torch.from_numpy(forcing_np[:, :, 0]).to(device, dtype=torch.float64),
-            "temp": torch.from_numpy(forcing_np[:, :, 1]).to(device, dtype=torch.float64),
-            "pet": torch.from_numpy(forcing_np[:, :, 2]).to(device, dtype=torch.float64),
+            "precip": torch.from_numpy(forcing_np[:, :, 0]).to(
+                device, dtype=torch.float64
+            ),
+            "temp": torch.from_numpy(forcing_np[:, :, 1]).to(
+                device, dtype=torch.float64
+            ),
+            "pet": torch.from_numpy(forcing_np[:, :, 2]).to(
+                device, dtype=torch.float64
+            ),
         }
         if psol_key is not None:
             fc["cn_psol_annual"] = torch.from_numpy(
@@ -175,12 +188,16 @@ def main() -> None:
         for k, b in enumerate(basin_ids):
             kge = compute_kge_fp64(q_np[k], eval_obs[k])
             diff = np.abs(q_np[k].astype(np.float64) - eval_obs[k].astype(np.float64))
-            rows.append({
-                "basin_id": b, "window_offset": -1,  # evaluation path
-                "kge": float(kge), "abs_err_max": float(diff.max()),
-                "abs_err_mean": float(diff.mean()),
-                "frac_snow": float(snow[b]),
-            })
+            rows.append(
+                {
+                    "basin_id": b,
+                    "window_offset": -1,  # evaluation path
+                    "kge": float(kge),
+                    "abs_err_max": float(diff.max()),
+                    "abs_err_mean": float(diff.mean()),
+                    "frac_snow": float(snow[b]),
+                }
+            )
         return rows
 
     print("running dPL-path oracle (canonical + historical contrast) ...", flush=True)
@@ -194,7 +211,8 @@ def main() -> None:
 
     merged = canon_df.merge(
         hist_df.drop(columns=["frac_snow"]),
-        on=["basin_id", "window_offset"], suffixes=("_canon", "_hist")
+        on=["basin_id", "window_offset"],
+        suffixes=("_canon", "_hist"),
     )
     # frac_snow exists only on the left frame after dropping it from the right
     merged["kge_bias"] = merged["kge_hist"] - merged["kge_canon"]
@@ -223,10 +241,16 @@ def main() -> None:
     eval_hist = hist_df[hist_df["window_offset"] < 0]
 
     # per-basin median over windows (canonical)
-    per_basin = window_canon.groupby("basin_id").agg(
-        kge_median=("kge", "median"), abs_err_mean_median=("abs_err_mean", "median"),
-        abs_err_max_median=("abs_err_max", "median"), frac_snow=("frac_snow", "first"),
-    ).reset_index()
+    per_basin = (
+        window_canon.groupby("basin_id")
+        .agg(
+            kge_median=("kge", "median"),
+            abs_err_mean_median=("abs_err_mean", "median"),
+            abs_err_max_median=("abs_err_max", "median"),
+            frac_snow=("frac_snow", "first"),
+        )
+        .reset_index()
+    )
     per_basin_eval = eval_canon[["basin_id", "kge", "abs_err_mean", "frac_snow"]].copy()
     per_basin_eval.columns = ["basin_id", "kge_eval", "abs_err_mean_eval", "frac_snow"]
 
@@ -238,11 +262,15 @@ def main() -> None:
 
     # merged bias per window row
     bias = merged[merged["window_offset"] >= 0].copy()
-    per_basin_bias = bias.groupby("basin_id").agg(
-        kge_bias_median=("kge_bias", "median"),
-        abs_err_mean_bias_median=("abs_err_mean_bias", "median"),
-        frac_snow=("frac_snow", "first"),
-    ).reset_index()
+    per_basin_bias = (
+        bias.groupby("basin_id")
+        .agg(
+            kge_bias_median=("kge_bias", "median"),
+            abs_err_mean_bias_median=("abs_err_mean_bias", "median"),
+            frac_snow=("frac_snow", "first"),
+        )
+        .reset_index()
+    )
 
     report = {
         "protocol": "r3_oracle_dpl_audit_v1",
@@ -277,15 +305,23 @@ def main() -> None:
                 per_basin_bias["frac_snow"], per_basin_bias["kge_bias_median"]
             ),
             "regime_window_kge_median": {
-                regime: float(window_canon.assign(
-                    regime=window_canon["frac_snow"].map(snow_regime)
-                ).groupby("regime")["kge"].median().get(regime, float("nan")))
+                regime: float(
+                    window_canon.assign(
+                        regime=window_canon["frac_snow"].map(snow_regime)
+                    )
+                    .groupby("regime")["kge"]
+                    .median()
+                    .get(regime, float("nan"))
+                )
                 for regime in ("S1", "S2", "S3", "S4", "S5")
             },
             "regime_eval_kge_median": {
-                regime: float(eval_canon.assign(
-                    regime=eval_canon["frac_snow"].map(snow_regime)
-                ).groupby("regime")["kge"].median().get(regime, float("nan")))
+                regime: float(
+                    eval_canon.assign(regime=eval_canon["frac_snow"].map(snow_regime))
+                    .groupby("regime")["kge"]
+                    .median()
+                    .get(regime, float("nan"))
+                )
                 for regime in ("S1", "S2", "S3", "S4", "S5")
             },
         },
@@ -308,7 +344,10 @@ def main() -> None:
         },
     }
     write_json(output_dir / "oracle_dpl_audit.json", report)
-    print(f"COMPLETE dPL oracle audit -> {output_dir / 'oracle_dpl_audit.json'}", flush=True)
+    print(
+        f"COMPLETE dPL oracle audit -> {output_dir / 'oracle_dpl_audit.json'}",
+        flush=True,
+    )
 
 
 if __name__ == "__main__":

@@ -72,10 +72,20 @@ def run_ic_gate(args) -> dict:
     output = args.results_root / args.ic_run_id
     q_star = args.results_root / args.truth_run_id / "q_star.npz"
     command = [
-        sys.executable, str(PROJECT / "training/ic/run_tgd2_batched_cmaes_531.py"),
-        "--model", "XAJ_CN", "--output", str(output),
-        "--starts", str(args.starts), "--generations", str(args.generations),
-        "--target-npz", str(q_star), "--device", args.device,
+        sys.executable,
+        str(PROJECT / "training/ic/run_tgd2_batched_cmaes_531.py"),
+        "--model",
+        "XAJ_CN",
+        "--output",
+        str(output),
+        "--starts",
+        str(args.starts),
+        "--generations",
+        str(args.generations),
+        "--target-npz",
+        str(q_star),
+        "--device",
+        args.device,
     ]
     print(f"[gate-chain] {_utcnow()} D1 IC: {' '.join(command)}", flush=True)
     subprocess.run(command, cwd=PROJECT, check=True)
@@ -88,7 +98,9 @@ def run_dpl_gate(args, seed: int) -> dict:
     )
     config["output_dir"] = str(args.results_root / f"{args.dpl_run_prefix}{seed}")
     config["data_basin_ids"] = str(args.data_root / "531sub_id.txt")
-    config["target_override_npz"] = str(args.results_root / args.truth_run_id / "q_star.npz")
+    config["target_override_npz"] = str(
+        args.results_root / args.truth_run_id / "q_star.npz"
+    )
     config["_protocol"] = "r3_gate_531_dpl_synthetic_target_v1"
     config["_note"] = (
         "531-basin correct-CN dPL gate: canonical attribute normalization, "
@@ -100,10 +112,19 @@ def run_dpl_gate(args, seed: int) -> dict:
     cfg_file = config_path / f"dpl_xaj_cn_seed_{seed}.json"
     cfg_file.write_text(json.dumps(config, indent=2) + "\n")
     command = [
-        sys.executable, str(PROJECT / "training/dpl/run_dpl_model.py"),
-        "--config", str(cfg_file), "--model", "XAJ_CN", "--lite", "--seed", str(seed),
+        sys.executable,
+        str(PROJECT / "training/dpl/run_dpl_model.py"),
+        "--config",
+        str(cfg_file),
+        "--model",
+        "XAJ_CN",
+        "--lite",
+        "--seed",
+        str(seed),
     ]
-    print(f"[gate-chain] {_utcnow()} D2 dPL seed {seed}: {' '.join(command)}", flush=True)
+    print(
+        f"[gate-chain] {_utcnow()} D2 dPL seed {seed}: {' '.join(command)}", flush=True
+    )
     subprocess.run(command, cwd=PROJECT, check=True)
     return {"command": " ".join(command), "output": config["output_dir"]}
 
@@ -121,8 +142,11 @@ def main() -> None:
     parser.add_argument("--generations", type=int, default=300)
     parser.add_argument("--seeds", type=int, nargs="+", default=list(SEEDS))
     parser.add_argument("--device", default="cuda")
-    parser.add_argument("--skip-dpl", action="store_true",
-                        help="Run only D1 (531 CN-IC); D2 is launched separately in parallel.")
+    parser.add_argument(
+        "--skip-dpl",
+        action="store_true",
+        help="Run only D1 (531 CN-IC); D2 is launched separately in parallel.",
+    )
     parser.add_argument("--wait-poll-s", type=int, default=300)
     parser.add_argument("--skip-wait", action="store_true")
     args = parser.parse_args()
@@ -148,7 +172,10 @@ def main() -> None:
         report["stages"][key] = run_dpl_gate(args, seed)
     report["completed_at"] = _utcnow()
     write_json(args.results_root / "r3_gate_chain_report.json", report)
-    print(f"[gate-chain] COMPLETE -> {args.results_root / 'r3_gate_chain_report.json'}", flush=True)
+    print(
+        f"[gate-chain] COMPLETE -> {args.results_root / 'r3_gate_chain_report.json'}",
+        flush=True,
+    )
 
 
 if __name__ == "__main__":

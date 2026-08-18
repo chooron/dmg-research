@@ -1,9 +1,8 @@
 """Regression test for XAJ linear-reservoir state carry."""
 
 import torch
-
 from models import GR4J, XAJ, XAJWithCemaNeige
-from models.parameter_specs import GR4J_PARAM_SPECS, XAJ_PARAM_SPECS, XAJ_CN_PARAM_SPECS
+from models.parameter_specs import GR4J_PARAM_SPECS, XAJ_CN_PARAM_SPECS, XAJ_PARAM_SPECS
 
 
 def test_xaj_updates_linear_reservoir_states_between_steps():
@@ -50,9 +49,13 @@ def test_xaj_deep_evaporation_cannot_exceed_deep_storage():
         "qg": torch.zeros(1, dtype=torch.float64),
     }
     with torch.no_grad():
-        _, aux = model(forcings=forcings, params=params, initial_states=initial, return_states=True)
+        _, aux = model(
+            forcings=forcings, params=params, initial_states=initial, return_states=True
+        )
     assert torch.allclose(aux["evap"], torch.full((1, 1), 0.5, dtype=torch.float64))
-    assert torch.allclose(aux["final_states"]["wd"], torch.zeros(1, dtype=torch.float64))
+    assert torch.allclose(
+        aux["final_states"]["wd"], torch.zeros(1, dtype=torch.float64)
+    )
 
 
 def test_xaj_chunked_run_matches_full_run_with_uh_buffer():
@@ -84,15 +87,25 @@ def test_xaj_chunked_run_matches_full_run_with_uh_buffer():
 
 def test_xaj_cemaneige_preserves_prefixed_states():
     model = XAJWithCemaNeige().to(dtype=torch.float32)
-    forcings = {"precip": torch.zeros(1, 4), "pet": torch.zeros(1, 4), "temp": torch.zeros(1, 4)}
+    forcings = {
+        "precip": torch.zeros(1, 4),
+        "pet": torch.zeros(1, 4),
+        "temp": torch.zeros(1, 4),
+    }
     params = {
         name: torch.tensor([spec["default"]], dtype=torch.float32)
         for name, spec in XAJ_CN_PARAM_SPECS.items()
     }
-    init = {"xaj_qi": torch.tensor([5.0]), "xaj_qg": torch.tensor([2.0]), "cn_G": torch.tensor([3.0])}
+    init = {
+        "xaj_qi": torch.tensor([5.0]),
+        "xaj_qg": torch.tensor([2.0]),
+        "cn_G": torch.tensor([3.0]),
+    }
     with torch.no_grad():
         q_default, _ = model(forcings=forcings, params=params)
-        q_initial, aux = model(forcings=forcings, params=params, initial_states=init, return_states=True)
+        q_initial, aux = model(
+            forcings=forcings, params=params, initial_states=init, return_states=True
+        )
     assert not torch.allclose(q_default, q_initial)
     assert {"cn_G", "xaj_qi", "xaj_qg", "xaj_rs_uh_buffer"} <= set(aux["final_states"])
 

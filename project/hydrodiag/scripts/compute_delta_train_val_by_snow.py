@@ -22,12 +22,14 @@ sys.path.insert(0, str(PROJECT_DIR))
 from models import GR4J, HBV, XAJ
 from models.composed import GR4JWithCemaNeige, XAJWithCemaNeige
 from models.parameter_specs import (
-    GR4J_PARAM_SPECS, HBV_PARAM_SPECS, XAJ_PARAM_SPECS,
-    GR4J_CN_PARAM_SPECS, XAJ_CN_PARAM_SPECS,
+    GR4J_CN_PARAM_SPECS,
+    GR4J_PARAM_SPECS,
+    HBV_PARAM_SPECS,
+    XAJ_CN_PARAM_SPECS,
+    XAJ_PARAM_SPECS,
 )
 from optimization.pycma_calibrator_v3 import compute_kge_fp64
 from training.data_contract import load_dates, load_gage_ids
-
 
 BASE_CONFIG = PROJECT_DIR / "configs/ic_xnes_production_v1.json"
 CONFIG = json.loads(BASE_CONFIG.read_text())
@@ -37,32 +39,42 @@ CASES = {
     "GR4J": {
         "model_cls": GR4J,
         "specs": GR4J_PARAM_SPECS,
-        "ic": PROJECT_DIR / "results/archive/outputs_ic/ic_pilot_5models_v4_remote/GR4J/KGE_Q/best_parameters_physical.npz",
-        "dpl": PROJECT_DIR / "outputs/dpl_unified_365d_v1/GR4J/best_parameters_physical.npz",
+        "ic": PROJECT_DIR
+        / "results/archive/outputs_ic/ic_pilot_5models_v4_remote/GR4J/KGE_Q/best_parameters_physical.npz",
+        "dpl": PROJECT_DIR
+        / "outputs/dpl_unified_365d_v1/GR4J/best_parameters_physical.npz",
     },
     "GR4J_CN": {
         "model_cls": GR4JWithCemaNeige,
         "specs": GR4J_CN_PARAM_SPECS,
-        "ic": PROJECT_DIR / "results/archive/outputs_ic/ic_pilot_5models_v4_remote/GR4J_CN/KGE_Q/best_parameters_physical.npz",
-        "dpl": PROJECT_DIR / "outputs/dpl_unified_365d_v1/GR4J_CN/best_parameters_physical.npz",
+        "ic": PROJECT_DIR
+        / "results/archive/outputs_ic/ic_pilot_5models_v4_remote/GR4J_CN/KGE_Q/best_parameters_physical.npz",
+        "dpl": PROJECT_DIR
+        / "outputs/dpl_unified_365d_v1/GR4J_CN/best_parameters_physical.npz",
     },
     "HBV": {
         "model_cls": HBV,
         "specs": HBV_PARAM_SPECS,
-        "ic": PROJECT_DIR / "results/archive/outputs_ic/ic_pilot_5models_v4_remote/HBV/KGE_Q/best_parameters_physical.npz",
-        "dpl": PROJECT_DIR / "outputs/dpl_hbv_kgeq_365d_v1/best_parameters_physical.npz",
+        "ic": PROJECT_DIR
+        / "results/archive/outputs_ic/ic_pilot_5models_v4_remote/HBV/KGE_Q/best_parameters_physical.npz",
+        "dpl": PROJECT_DIR
+        / "outputs/dpl_hbv_kgeq_365d_v1/best_parameters_physical.npz",
     },
     "XAJ": {
         "model_cls": XAJ,
         "specs": XAJ_PARAM_SPECS,
-        "ic": PROJECT_DIR / "results/archive/outputs_ic/ic_xaj_kgeq_3restart_pop60_uh90_v1/XAJ/KGE_Q/best_parameters_physical.npz",
-        "dpl": PROJECT_DIR / "outputs/dpl_xaj_float32_fix_uh90_full/best_parameters_physical.npz",
+        "ic": PROJECT_DIR
+        / "results/archive/outputs_ic/ic_xaj_kgeq_3restart_pop60_uh90_v1/XAJ/KGE_Q/best_parameters_physical.npz",
+        "dpl": PROJECT_DIR
+        / "outputs/dpl_xaj_float32_fix_uh90_full/best_parameters_physical.npz",
     },
     "XAJ_CN": {
         "model_cls": XAJWithCemaNeige,
         "specs": XAJ_CN_PARAM_SPECS,
-        "ic": PROJECT_DIR / "results/archive/outputs_ic/ic_xaj_cn_kgeq_3restart_uh90_v1/XAJ_CN/KGE_Q/best_parameters_physical.npz",
-        "dpl": PROJECT_DIR / "outputs/dpl_xaj_cn_float32_fix_uh90_full/best_parameters_physical.npz",
+        "ic": PROJECT_DIR
+        / "results/archive/outputs_ic/ic_xaj_cn_kgeq_3restart_uh90_v1/XAJ_CN/KGE_Q/best_parameters_physical.npz",
+        "dpl": PROJECT_DIR
+        / "outputs/dpl_xaj_cn_float32_fix_uh90_full/best_parameters_physical.npz",
     },
 }
 
@@ -98,11 +110,11 @@ def load_data():
 def make_period_arrays(forcing, target, si, ei, warmup=366):
     start = si - warmup
     fc = {
-        "precip": forcing[start:ei + 1, :, 0].T.copy(),
-        "pet": forcing[start:ei + 1, :, 2].T.copy(),
-        "temp": forcing[start:ei + 1, :, 1].T.copy(),
+        "precip": forcing[start : ei + 1, :, 0].T.copy(),
+        "pet": forcing[start : ei + 1, :, 2].T.copy(),
+        "temp": forcing[start : ei + 1, :, 1].T.copy(),
     }
-    obs = target[si:ei + 1].T.copy()
+    obs = target[si : ei + 1].T.copy()
     return fc, obs
 
 
@@ -117,11 +129,15 @@ def evaluate(model_cls, specs, params_np, period_arrays, device, batch_size=64):
         for start in range(0, params_np.shape[0], batch_size):
             stop = min(start + batch_size, params_np.shape[0])
             params = {
-                name: torch.from_numpy(params_np[start:stop, j]).to(device=device, dtype=torch.float64)
+                name: torch.from_numpy(params_np[start:stop, j]).to(
+                    device=device, dtype=torch.float64
+                )
                 for j, name in enumerate(names)
             }
             fc = {
-                key: torch.from_numpy(value[start:stop]).to(device=device, dtype=torch.float64)
+                key: torch.from_numpy(value[start:stop]).to(
+                    device=device, dtype=torch.float64
+                )
                 for key, value in fc_np.items()
             }
             qsim, _ = model(forcings=fc, params=params)
@@ -136,7 +152,11 @@ def evaluate(model_cls, specs, params_np, period_arrays, device, batch_size=64):
 
 def aggregate(values, mask):
     x = np.asarray(values)[mask]
-    return {"mean": float(np.nanmean(x)), "median": float(np.nanmedian(x)), "n": int(x.size)}
+    return {
+        "mean": float(np.nanmean(x)),
+        "median": float(np.nanmedian(x)),
+        "n": int(x.size),
+    }
 
 
 def main():
@@ -154,18 +174,32 @@ def main():
         ic_params = np.asarray(np.load(case["ic"])["params"], dtype=np.float64)
         dpl_params = np.asarray(np.load(case["dpl"])["params"], dtype=np.float64)
         expected_dim = len(case["specs"])
-        assert ic_params.shape == (len(basin_ids), expected_dim), (model_name, "IC", ic_params.shape)
-        assert dpl_params.shape == (len(basin_ids), expected_dim), (model_name, "dPL", dpl_params.shape)
+        assert ic_params.shape == (len(basin_ids), expected_dim), (
+            model_name,
+            "IC",
+            ic_params.shape,
+        )
+        assert dpl_params.shape == (len(basin_ids), expected_dim), (
+            model_name,
+            "dPL",
+            dpl_params.shape,
+        )
         scores = {}
         for method, params in (("IC", ic_params), ("dPL", dpl_params)):
             scores[method] = {}
             for period in ("train", "val"):
                 scores[method][period] = evaluate(
-                    case["model_cls"], case["specs"], params,
-                    period_arrays[period], device)
+                    case["model_cls"],
+                    case["specs"],
+                    params,
+                    period_arrays[period],
+                    device,
+                )
                 np.savez_compressed(
                     OUT / f"{model_name}_{method}_{period}.npz",
-                    kge=scores[method][period], basin_ids=np.asarray(basin_ids))
+                    kge=scores[method][period],
+                    basin_ids=np.asarray(basin_ids),
+                )
 
         for group, mask in (("snow", snow), ("non_snow", ~snow)):
             row = {"model": model_name, "group": group, "n": int(mask.sum())}
@@ -188,8 +222,18 @@ def main():
         writer.writeheader()
         writer.writerows(all_rows)
     with (OUT / "basin_scores.csv").open("w", newline="") as f:
-        fields_b = ["model", "basin_id", "group", "ic_train", "dpl_train",
-                    "ic_val", "dpl_val", "delta_train", "delta_val", "drop"]
+        fields_b = [
+            "model",
+            "basin_id",
+            "group",
+            "ic_train",
+            "dpl_train",
+            "ic_val",
+            "dpl_val",
+            "delta_train",
+            "delta_val",
+            "drop",
+        ]
         writer = csv.DictWriter(f, fieldnames=fields_b)
         writer.writeheader()
         for model_name in CASES:
@@ -197,17 +241,25 @@ def main():
             for method in ("IC", "dPL"):
                 for period in ("train", "val"):
                     arrays[f"{method}_{period}"] = np.load(
-                        OUT / f"{model_name}_{method}_{period}.npz")["kge"]
+                        OUT / f"{model_name}_{method}_{period}.npz"
+                    )["kge"]
             for i, bid in enumerate(basin_ids):
                 dt = arrays["IC_train"][i] - arrays["dPL_train"][i]
                 dv = arrays["IC_val"][i] - arrays["dPL_val"][i]
-                writer.writerow({
-                    "model": model_name, "basin_id": bid,
-                    "group": "snow" if snow[i] else "non_snow",
-                    "ic_train": arrays["IC_train"][i], "dpl_train": arrays["dPL_train"][i],
-                    "ic_val": arrays["IC_val"][i], "dpl_val": arrays["dPL_val"][i],
-                    "delta_train": dt, "delta_val": dv, "drop": dt - dv,
-                })
+                writer.writerow(
+                    {
+                        "model": model_name,
+                        "basin_id": bid,
+                        "group": "snow" if snow[i] else "non_snow",
+                        "ic_train": arrays["IC_train"][i],
+                        "dpl_train": arrays["dPL_train"][i],
+                        "ic_val": arrays["IC_val"][i],
+                        "dpl_val": arrays["dPL_val"][i],
+                        "delta_train": dt,
+                        "delta_val": dv,
+                        "drop": dt - dv,
+                    }
+                )
 
     lines = [
         "# Train/validation Delta by snow group",

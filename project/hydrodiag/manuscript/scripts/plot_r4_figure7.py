@@ -28,6 +28,7 @@ Data semantics (from results/r4_phase1_soil_official/):
   robustness_controlled_regressions.csv — beta1 with bootstrap 95% CI
   robustness_extreme_swe_trimming.csv — Spearman rho(SWE, Delta Anom.) for full/trimmed samples
 """
+
 from __future__ import annotations
 
 import argparse
@@ -58,8 +59,20 @@ FIGURES_DIR = HERE.parents[0] / "figures"
 # Canonical dPL seed + IC fused only; seed-123 stays in the supplement.
 CANONICAL_DPL = "dPL_seed42"
 REGIME_CFG = {
-    CANONICAL_DPL: {"label": "dPL (seed 42)", "color": "#882E72", "marker": "o", "ls": "-", "lw": 1.5},
-    "IC_fused":    {"label": "IC (fused)",     "color": "#333333", "marker": "D", "ls": "-.", "lw": 1.4},
+    CANONICAL_DPL: {
+        "label": "dPL (seed 42)",
+        "color": "#882E72",
+        "marker": "o",
+        "ls": "-",
+        "lw": 1.5,
+    },
+    "IC_fused": {
+        "label": "IC (fused)",
+        "color": "#333333",
+        "marker": "D",
+        "ls": "-.",
+        "lw": 1.4,
+    },
 }
 REGIMES = [CANONICAL_DPL, "IC_fused"]
 REG_SHORT = ["dPL-42", "IC fused"]
@@ -97,11 +110,27 @@ def _phase_fingerprint(ax, med, lo, hi, regime_key):
     ax.axhline(0, color="#999999", ls="--", lw=0.8, zorder=1)
     # Very light emphasis of the Active Melt column (shared grammar, no text)
     ax.axvspan(0.5, 1.5, color="#EAF1F8", alpha=0.45, zorder=0)
-    ax.errorbar(x, y, yerr=[y - ylo, yhi - y], fmt="none",
-                ecolor=cfg["color"], elinewidth=0.9, capsize=2.4, capthick=0.9,
-                alpha=0.85, zorder=3)
-    ax.plot(x, y, color=cfg["color"], marker=cfg["marker"],
-            markersize=5.0, ls="none", zorder=4)
+    ax.errorbar(
+        x,
+        y,
+        yerr=[y - ylo, yhi - y],
+        fmt="none",
+        ecolor=cfg["color"],
+        elinewidth=0.9,
+        capsize=2.4,
+        capthick=0.9,
+        alpha=0.85,
+        zorder=3,
+    )
+    ax.plot(
+        x,
+        y,
+        color=cfg["color"],
+        marker=cfg["marker"],
+        markersize=5.0,
+        ls="none",
+        zorder=4,
+    )
 
 
 def generate_figure7(results_root: Path, out_dir: Path) -> Path:
@@ -118,7 +147,9 @@ def generate_figure7(results_root: Path, out_dir: Path) -> Path:
     df_trim = pd.read_csv(r4_dir / "robustness_extreme_swe_trimming.csv")
 
     # Use the actual upper quartile of the current 531-basin SWE burden.
-    canonical_swe = df_paired[df_paired["regime"] == CANONICAL_DPL].drop_duplicates("basin_id")
+    canonical_swe = df_paired[df_paired["regime"] == CANONICAL_DPL].drop_duplicates(
+        "basin_id"
+    )
     q3_swe_mm = float(canonical_swe["snow_burden_swe_mm"].quantile(Q3_QUANTILE))
     q3_n = int((canonical_swe["snow_burden_swe_mm"] >= q3_swe_mm).sum())
 
@@ -127,7 +158,9 @@ def generate_figure7(results_root: Path, out_dir: Path) -> Path:
     for reg in REGIMES:
         df_r = df_phase[df_phase["regime"] == reg]
         for p in PHASE_ORDER:
-            vals = df_r.loc[df_r["phase_name"] == p, "delta_anomaly_corr"].to_numpy(dtype=np.float64)
+            vals = df_r.loc[df_r["phase_name"] == p, "delta_anomaly_corr"].to_numpy(
+                dtype=np.float64
+            )
             med, lo, hi = bootstrap_median_ci(vals)
             pmed[(reg, p)] = med
             plo[(reg, p)] = lo
@@ -136,10 +169,14 @@ def generate_figure7(results_root: Path, out_dir: Path) -> Path:
     # 3. Setup asymmetric 4-tier GridSpec
     fig = plt.figure(figsize=(7.2, 9.0))
     gs = fig.add_gridspec(
-        4, 1,
+        4,
+        1,
         height_ratios=[2.0, 1.4, 2.1, 1.15],
         hspace=0.42,
-        left=0.08, right=0.96, top=0.97, bottom=0.045,
+        left=0.08,
+        right=0.96,
+        top=0.97,
+        bottom=0.045,
     )
 
     # -----------------------------------------------------------------------
@@ -149,8 +186,16 @@ def generate_figure7(results_root: Path, out_dir: Path) -> Path:
     apply_clean_spines(ax_a)
     ax_a.axhline(0, color="#999999", ls="--", lw=0.8, zorder=1)
     ax_a.axvspan(7.5, 9.5, color="#EAF1F8", alpha=0.55, zorder=0)
-    ax_a.text(8.5, 0.222, "Upper SWE tail", ha="center", va="bottom",
-              fontsize=7.0, color="#4A6FA5", zorder=5)
+    ax_a.text(
+        8.5,
+        0.222,
+        "Upper SWE tail",
+        ha="center",
+        va="bottom",
+        fontsize=7.0,
+        color="#4A6FA5",
+        zorder=5,
+    )
 
     x_dec = np.arange(10)
     for reg in REGIMES:
@@ -159,27 +204,62 @@ def generate_figure7(results_root: Path, out_dir: Path) -> Path:
         ym = df_sub["delta_anomaly_corr_median"].to_numpy()
         ylo = df_sub["delta_anomaly_corr_ci_lower"].to_numpy()
         yhi = df_sub["delta_anomaly_corr_ci_upper"].to_numpy()
-        ci_handle = ax_a.errorbar(x_dec, ym, yerr=[ym - ylo, yhi - ym], fmt="none",
-                                  ecolor=cfg["color"], elinewidth=0.8, capsize=2.2, capthick=0.8,
-                                  alpha=0.85, zorder=3)
-        ax_a.plot(x_dec, ym, color=cfg["color"], marker=cfg["marker"],
-                  markersize=4.6, lw=cfg["lw"], ls=cfg["ls"],
-                  label=cfg["label"], zorder=4)
+        ci_handle = ax_a.errorbar(
+            x_dec,
+            ym,
+            yerr=[ym - ylo, yhi - ym],
+            fmt="none",
+            ecolor=cfg["color"],
+            elinewidth=0.8,
+            capsize=2.2,
+            capthick=0.8,
+            alpha=0.85,
+            zorder=3,
+        )
+        ax_a.plot(
+            x_dec,
+            ym,
+            color=cfg["color"],
+            marker=cfg["marker"],
+            markersize=4.6,
+            lw=cfg["lw"],
+            ls=cfg["ls"],
+            label=cfg["label"],
+            zorder=4,
+        )
 
     ax_a.set_xticks(x_dec)
-    ax_a.set_xticklabels([f"D{i+1:02d}" for i in range(10)], fontsize=7.8)
+    ax_a.set_xticklabels([f"D{i + 1:02d}" for i in range(10)], fontsize=7.8)
     ax_a.set_xlabel("Snow-17 SWE burden decile", fontsize=8.2)
     ax_a.set_ylabel(DELTA_LABEL, fontsize=8.5)
-    ax_a.set_title("(a) Snow-burden dependence", loc="left", fontweight="bold", fontsize=9.0)
+    ax_a.set_title(
+        "(a) Snow-burden dependence", loc="left", fontweight="bold", fontsize=9.0
+    )
     ax_a.set_ylim(-0.04, 0.25)
     ax_a.set_yticks([0.00, 0.05, 0.10, 0.15, 0.20, 0.25])
 
-    leg_a = [plt.Line2D([0], [0], color=REGIME_CFG[r]["color"], marker=REGIME_CFG[r]["marker"],
-                        ls=REGIME_CFG[r]["ls"], lw=1.4, markersize=4.6, label=REGIME_CFG[r]["label"])
-             for r in REGIMES]
+    leg_a = [
+        plt.Line2D(
+            [0],
+            [0],
+            color=REGIME_CFG[r]["color"],
+            marker=REGIME_CFG[r]["marker"],
+            ls=REGIME_CFG[r]["ls"],
+            lw=1.4,
+            markersize=4.6,
+            label=REGIME_CFG[r]["label"],
+        )
+        for r in REGIMES
+    ]
     ci_handle.set_label("95 % bootstrap CI of the median")
-    ax_a.legend(handles=leg_a + [ci_handle], loc="upper left", frameon=True,
-                facecolor="#FFFFFF", framealpha=0.92, fontsize=7.4)
+    ax_a.legend(
+        handles=leg_a + [ci_handle],
+        loc="upper left",
+        frameon=True,
+        facecolor="#FFFFFF",
+        framealpha=0.92,
+        fontsize=7.4,
+    )
 
     # -----------------------------------------------------------------------
     # (b, c) Phase fingerprints by regime (when?)
@@ -205,7 +285,9 @@ def generate_figure7(results_root: Path, out_dir: Path) -> Path:
             ax.set_ylabel(DELTA_LABEL, fontsize=7.5)
         else:
             ax.tick_params(axis="y", labelleft=False)
-        ax.set_title(f"({chr(98+i)}) {sub}", loc="left", fontweight="bold", fontsize=8.2)
+        ax.set_title(
+            f"({chr(98 + i)}) {sub}", loc="left", fontweight="bold", fontsize=8.2
+        )
 
     # -----------------------------------------------------------------------
     # (d, e) Real-basin paired evidence: Active melt vs Summer dry-down
@@ -254,18 +336,26 @@ def generate_figure7(results_root: Path, out_dir: Path) -> Path:
 
             # Ordinary catchments: light transparency
             ax.scatter(
-                xb[~hs], yc[~hs],
+                xb[~hs],
+                yc[~hs],
                 marker=cfg["marker"],
-                facecolors=cfg["color"], edgecolors="none",
-                s=14, alpha=0.30, zorder=3,
+                facecolors=cfg["color"],
+                edgecolors="none",
+                s=14,
+                alpha=0.30,
+                zorder=3,
             )
             # Upper snow-burden quartile (Q3): emphasize the high-snow evidence.
             if hs.sum() > 0:
                 ax.scatter(
-                    xb[hs], yc[hs],
+                    xb[hs],
+                    yc[hs],
                     marker=cfg["marker"],
-                    facecolors=cfg["color"], edgecolors=cfg["color"],
-                    s=30, alpha=0.75, zorder=4,
+                    facecolors=cfg["color"],
+                    edgecolors=cfg["color"],
+                    s=30,
+                    alpha=0.75,
+                    zorder=4,
                 )
 
         ax.set_xlim(*SCAT_LIM)
@@ -275,26 +365,49 @@ def generate_figure7(results_root: Path, out_dir: Path) -> Path:
         ax.set_aspect("equal", adjustable="box")
         ax.set_xlabel(ABS_BASE_LABEL, fontsize=7.8)
         ax.set_ylabel(ABS_CN_LABEL, fontsize=7.8)
-        ax.set_title(f"({letter}) {ph_title}", loc="left", fontweight="bold", fontsize=8.5)
+        ax.set_title(
+            f"({letter}) {ph_title}", loc="left", fontweight="bold", fontsize=8.5
+        )
 
         ax.text(
-            0.03, 0.96, note_text,
-            transform=ax.transAxes, fontsize=6.4, va="top", ha="left",
+            0.03,
+            0.96,
+            note_text,
+            transform=ax.transAxes,
+            fontsize=6.4,
+            va="top",
+            ha="left",
             color=note_col,
             zorder=5,
         )
 
     # Single regime legend for scatter panels (panel e, lower-right)
     legend_scat = [
-        Line2D([0], [0], marker=REGIME_CFG[r]["marker"], color="w",
-               markerfacecolor=REGIME_CFG[r]["color"], markersize=5.0,
-               label=REGIME_CFG[r]["label"])
+        Line2D(
+            [0],
+            [0],
+            marker=REGIME_CFG[r]["marker"],
+            color="w",
+            markerfacecolor=REGIME_CFG[r]["color"],
+            markersize=5.0,
+            label=REGIME_CFG[r]["label"],
+        )
         for r in REGIMES
     ]
-    q3_patch = Patch(fc="none", ec="#555555", lw=1.0,
-                     label=f"Upper SWE quartile (Q3; SWE ≥ {q3_swe_mm:.1f} mm)")
-    ax_e.legend(handles=legend_scat + [q3_patch], loc="lower right", frameon=True,
-                facecolor="#FFFFFF", framealpha=0.90, fontsize=6.6)
+    q3_patch = Patch(
+        fc="none",
+        ec="#555555",
+        lw=1.0,
+        label=f"Upper SWE quartile (Q3; SWE ≥ {q3_swe_mm:.1f} mm)",
+    )
+    ax_e.legend(
+        handles=legend_scat + [q3_patch],
+        loc="lower right",
+        frameon=True,
+        facecolor="#FFFFFF",
+        framealpha=0.90,
+        fontsize=6.6,
+    )
 
     # -----------------------------------------------------------------------
     # (f) Robustness checks — thin full-width synthesis rail
@@ -310,18 +423,33 @@ def generate_figure7(results_root: Path, out_dir: Path) -> Path:
     df_ra = df_reg[df_reg["target_metric"] == "delta_anomaly_corr"]
     for idx, reg in enumerate(REGIMES):
         row = df_ra[df_ra["regime"] == reg].iloc[0]
-        b1, lo, hi = row["beta1_swe_burden_std"], row["beta1_ci_lower"], row["beta1_ci_upper"]
+        b1, lo, hi = (
+            row["beta1_swe_burden_std"],
+            row["beta1_ci_lower"],
+            row["beta1_ci_upper"],
+        )
         col = REGIME_CFG[reg]["color"]
-        ax_f1.errorbar(b1, rail_y[idx], xerr=[[b1 - lo], [hi - b1]],
-                       fmt="o", color=col, ecolor=col, elinewidth=1.1,
-                       capsize=2.5, markersize=4.6, zorder=3)
+        ax_f1.errorbar(
+            b1,
+            rail_y[idx],
+            xerr=[[b1 - lo], [hi - b1]],
+            fmt="o",
+            color=col,
+            ecolor=col,
+            elinewidth=1.1,
+            capsize=2.5,
+            markersize=4.6,
+            zorder=3,
+        )
     ax_f1.set_yticks(rail_y)
     ax_f1.set_yticklabels(REG_SHORT, fontsize=6.8)
     ax_f1.invert_yaxis()
     ax_f1.set_xlabel("Controlled SWE $\\beta_1$ [std.]", fontsize=6.8)
     ax_f1.set_xlim(-0.03, 0.07)
     ax_f1.set_xticks([-0.02, 0.00, 0.02, 0.04, 0.06])
-    ax_f1.set_title("After controlling for Delta KGE", loc="left", fontsize=6.8, fontweight="bold")
+    ax_f1.set_title(
+        "After controlling for Delta KGE", loc="left", fontsize=6.8, fontweight="bold"
+    )
 
     # (f2) Authoritative leave-one-HUC02-out (18 regions)
     ax_f2 = fig.add_subplot(gs_rob_axes[1])
@@ -329,14 +457,33 @@ def generate_figure7(results_root: Path, out_dir: Path) -> Path:
     ax_f2.axvline(0, color="#999999", ls="--", lw=0.8, zorder=1)
     for idx, reg in enumerate(REGIMES):
         sub = df_loro[df_loro["regime"] == reg]
-        full = sub[sub["dropped_region"] == "NONE (Full Sample)"]["rho_delta_anomaly_swe"].iloc[0]
+        full = sub[sub["dropped_region"] == "NONE (Full Sample)"][
+            "rho_delta_anomaly_swe"
+        ].iloc[0]
         loro = sub[sub["dropped_region"] != "NONE (Full Sample)"]
-        rmin, rmax = loro["rho_delta_anomaly_swe"].min(), loro["rho_delta_anomaly_swe"].max()
+        rmin, rmax = (
+            loro["rho_delta_anomaly_swe"].min(),
+            loro["rho_delta_anomaly_swe"].max(),
+        )
         col = REGIME_CFG[reg]["color"]
-        ax_f2.plot([rmin, rmax], [rail_y[idx], rail_y[idx]], color=col,
-                   lw=1.6, alpha=0.55, solid_capstyle="butt", zorder=2)
-        ax_f2.plot([rmin, rmax], [rail_y[idx], rail_y[idx]], marker="|",
-                   color=col, ms=4.0, alpha=0.55, zorder=2)
+        ax_f2.plot(
+            [rmin, rmax],
+            [rail_y[idx], rail_y[idx]],
+            color=col,
+            lw=1.6,
+            alpha=0.55,
+            solid_capstyle="butt",
+            zorder=2,
+        )
+        ax_f2.plot(
+            [rmin, rmax],
+            [rail_y[idx], rail_y[idx]],
+            marker="|",
+            color=col,
+            ms=4.0,
+            alpha=0.55,
+            zorder=2,
+        )
         ax_f2.plot(full, rail_y[idx], marker="*", color=col, ms=6.5, zorder=4)
     ax_f2.set_yticks(rail_y)
     ax_f2.set_yticklabels([])
@@ -344,14 +491,31 @@ def generate_figure7(results_root: Path, out_dir: Path) -> Path:
     ax_f2.set_xlabel("Spearman $\\rho$(SWE, $\\Delta$Anom.)", fontsize=6.8)
     ax_f2.set_xlim(0.05, 0.45)
     ax_f2.set_xticks([0.10, 0.20, 0.30, 0.40])
-    ax_f2.set_title("After leaving out one HUC02 region", loc="left", fontsize=6.8, fontweight="bold")
+    ax_f2.set_title(
+        "After leaving out one HUC02 region",
+        loc="left",
+        fontsize=6.8,
+        fontweight="bold",
+    )
     legend_f2 = [
-        Line2D([0], [0], marker="*", color="w", markerfacecolor="#555555", ms=5.5, label="Full sample"),
+        Line2D(
+            [0],
+            [0],
+            marker="*",
+            color="w",
+            markerfacecolor="#555555",
+            ms=5.5,
+            label="Full sample",
+        ),
         Line2D([0], [0], color="#555555", lw=1.6, label="LORO range (18 regions)"),
     ]
-    ax_f2.legend(handles=legend_f2, loc="upper left", frameon=True,
-                 facecolor="#FFFFFF", fontsize=5.6)
-
+    ax_f2.legend(
+        handles=legend_f2,
+        loc="upper left",
+        frameon=True,
+        facecolor="#FFFFFF",
+        fontsize=5.6,
+    )
 
     # (f3) Extreme-SWE trimming
     ax_f3 = fig.add_subplot(gs_rob_axes[2])
@@ -365,29 +529,76 @@ def generate_figure7(results_root: Path, out_dir: Path) -> Path:
         sub_trim = df_trim[df_trim["regime"] == reg]
         base_y = rail_y[idx]
         for t_idx, scheme in enumerate(trim_schemes):
-            val = sub_trim[sub_trim["trimming_scheme"] == scheme]["rho_delta_anomaly_swe"].iloc[0]
+            val = sub_trim[sub_trim["trimming_scheme"] == scheme][
+                "rho_delta_anomaly_swe"
+            ].iloc[0]
             # stack three markers vertically per regime row (small y offsets)
             yoff = (t_idx - 1) * 0.16
-            ax_f3.plot(val, base_y + yoff, marker=trim_markers[t_idx], color=col, ms=4.2, zorder=3)
+            ax_f3.plot(
+                val,
+                base_y + yoff,
+                marker=trim_markers[t_idx],
+                color=col,
+                ms=4.2,
+                zorder=3,
+            )
     ax_f3.set_yticks(rail_y)
     ax_f3.set_yticklabels([])
     ax_f3.invert_yaxis()
     ax_f3.set_xlabel("Spearman $\\rho$(SWE, $\\Delta$Anom.)", fontsize=6.8)
     ax_f3.set_xlim(0.05, 0.40)
     ax_f3.set_xticks([0.10, 0.20, 0.30, 0.40])
-    ax_f3.set_title("After removing SWE extremes", loc="left", fontsize=6.8, fontweight="bold")
+    ax_f3.set_title(
+        "After removing SWE extremes", loc="left", fontsize=6.8, fontweight="bold"
+    )
     legend_f3 = [
-        Line2D([0], [0], marker="o", color="w", markerfacecolor="#555555", ms=4.0, label="Full"),
-        Line2D([0], [0], marker="^", color="w", markerfacecolor="#555555", ms=4.0, label="Trim 1 %"),
-        Line2D([0], [0], marker="s", color="w", markerfacecolor="#555555", ms=4.0, label="Trim 5 %"),
+        Line2D(
+            [0],
+            [0],
+            marker="o",
+            color="w",
+            markerfacecolor="#555555",
+            ms=4.0,
+            label="Full",
+        ),
+        Line2D(
+            [0],
+            [0],
+            marker="^",
+            color="w",
+            markerfacecolor="#555555",
+            ms=4.0,
+            label="Trim 1 %",
+        ),
+        Line2D(
+            [0],
+            [0],
+            marker="s",
+            color="w",
+            markerfacecolor="#555555",
+            ms=4.0,
+            label="Trim 5 %",
+        ),
     ]
-    ax_f3.legend(handles=legend_f3, loc="upper right", frameon=True,
-                 facecolor="#FFFFFF", fontsize=5.4)
+    ax_f3.legend(
+        handles=legend_f3,
+        loc="upper right",
+        frameon=True,
+        facecolor="#FFFFFF",
+        fontsize=5.4,
+    )
 
     # Unified title for panel (f) strip
     pos_top = gs_rob_row[0].get_position(fig)
-    fig.text(0.08, pos_top.y1, "(f) Robustness checks",
-             fontsize=8.5, fontweight="bold", ha="left", va="top")
+    fig.text(
+        0.08,
+        pos_top.y1,
+        "(f) Robustness checks",
+        fontsize=8.5,
+        fontweight="bold",
+        ha="left",
+        va="top",
+    )
 
     # 5. Save PNG only (300 dpi)
     png_path = out_dir / "figure7_r4_soil_consistency.png"

@@ -7,16 +7,27 @@ from typing import Any
 from .base import BaseHydrologicalModel
 from .cemaneige import CemaNeige
 from .parameter_specs import (
-    CEMANEIGE_PARAM_SPECS, XAJ_CONTROLLED_N_PARAM_SPECS,
-    XAJ_DE_PARAM_SPECS, XAJ_GE_PARAM_SPECS, XAJ_DR_PARAM_SPECS,
+    CEMANEIGE_PARAM_SPECS,
+    XAJ_CONTROLLED_N_PARAM_SPECS,
+    XAJ_DE_PARAM_SPECS,
+    XAJ_DR_PARAM_SPECS,
+    XAJ_GE_PARAM_SPECS,
     XAJ_GR_PARAM_SPECS,
 )
+from .utils import validate_forcings, validate_params
 from .xaj import XAJLite
 from .xaj_variants import (
-    XAJControlledN, XAJControlledNLite,
-    XAJDE, XAJDELite, XAJGE, XAJGELite, XAJDR, XAJDRLite, XAJGR, XAJGRLite,
+    XAJDE,
+    XAJDR,
+    XAJGE,
+    XAJGR,
+    XAJControlledN,
+    XAJControlledNLite,
+    XAJDELite,
+    XAJDRLite,
+    XAJGELite,
+    XAJGRLite,
 )
-from .utils import validate_forcings, validate_params
 
 
 class _ControlledXAJWithCemaNeige(BaseHydrologicalModel):
@@ -38,7 +49,9 @@ class _ControlledXAJWithCemaNeige(BaseHydrologicalModel):
         self.nearzero = nearzero
         self.compact_output = compact_output
         self._snow = CemaNeige(nearzero=nearzero)
-        structure_cls = self.structure_lite_cls if compact_output else self.structure_cls
+        structure_cls = (
+            self.structure_lite_cls if compact_output else self.structure_cls
+        )
         if compact_output:
             self._structure = structure_cls(nearzero=nearzero)
         else:
@@ -57,26 +70,39 @@ class _ControlledXAJWithCemaNeige(BaseHydrologicalModel):
         cn_initial = None
         structure_initial = None
         if initial_states is not None:
-            cn_initial = {k[3:]: v for k, v in initial_states.items() if k.startswith("cn_")}
-            structure_initial = {k[4:]: v for k, v in initial_states.items() if k.startswith("xaj_")}
+            cn_initial = {
+                k[3:]: v for k, v in initial_states.items() if k.startswith("cn_")
+            }
+            structure_initial = {
+                k[4:]: v for k, v in initial_states.items() if k.startswith("xaj_")
+            }
         effective, cn_aux = self._snow(
-            {"precip": precip, "pet": pet, "temp": temp}, cn_params,
-            initial_states=cn_initial, return_states=return_states,
+            {"precip": precip, "pet": pet, "temp": temp},
+            cn_params,
+            initial_states=cn_initial,
+            return_states=return_states,
         )
         qsim, structure_aux = self._structure(
-            {"precip": effective, "pet": pet, "temp": temp}, structure_params,
-            initial_states=structure_initial, return_states=return_states,
+            {"precip": effective, "pet": pet, "temp": temp},
+            structure_params,
+            initial_states=structure_initial,
+            return_states=return_states,
         )
         if self.compact_output and not return_states:
             return qsim, {}
         aux = {f"cn_{k}": v for k, v in cn_aux.items() if k != "final_states"}
-        aux.update({f"xaj_{k}": v for k, v in structure_aux.items() if k != "final_states"})
+        aux.update(
+            {f"xaj_{k}": v for k, v in structure_aux.items() if k != "final_states"}
+        )
         aux["effective_precip"] = effective
         aux["model_name"] = self.model_name
         if return_states:
             aux["final_states"] = {
                 **{f"cn_{k}": v for k, v in cn_aux.get("final_states", {}).items()},
-                **{f"xaj_{k}": v for k, v in structure_aux.get("final_states", {}).items()},
+                **{
+                    f"xaj_{k}": v
+                    for k, v in structure_aux.get("final_states", {}).items()
+                },
             }
         return qsim, aux
 

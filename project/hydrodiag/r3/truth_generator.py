@@ -58,21 +58,23 @@ CV_FOLDS = 5
 class GStarFit:
     z_mean: np.ndarray
     z_scale: np.ndarray
-    V_k: np.ndarray          # [17, K] right singular vectors (z-space)
-    ridge_coef: np.ndarray   # [35, K] attribute -> score coefficients
-    intercept: np.ndarray    # [K]
+    V_k: np.ndarray  # [17, K] right singular vectors (z-space)
+    ridge_coef: np.ndarray  # [35, K] attribute -> score coefficients
+    intercept: np.ndarray  # [K]
     alpha: float
     k: int
-    explained_variance: np.ndarray          # per-component
+    explained_variance: np.ndarray  # per-component
     cumulative_variance: np.ndarray
     cv_r2_per_component: np.ndarray
     cv_r2_total: float
-    attrs_stats: dict[str, np.ndarray]      # robust_normalize stats (full 531)
+    attrs_stats: dict[str, np.ndarray]  # robust_normalize stats (full 531)
 
 
 def load_cn_ic_field(results_root: Path = DEFAULT_RESULTS_ROOT) -> dict[str, Any]:
     """Best train-KGE restart per basin from the 531 XAJ-CN IC-CMA-ES field."""
-    raw_dir = results_root / IC_RESULT_ROOTS["XAJ_CN"] / "raw" / IC_RAW_SUBDIRS["XAJ_CN"]
+    raw_dir = (
+        results_root / IC_RESULT_ROOTS["XAJ_CN"] / "raw" / IC_RAW_SUBDIRS["XAJ_CN"]
+    )
     if not raw_dir.is_dir():
         raise FileNotFoundError(f"CN-IC raw result directory not found: {raw_dir}")
     records: dict[str, list[tuple[float, int, dict[str, Any]]]] = {}
@@ -97,8 +99,14 @@ def load_cn_ic_field(results_root: Path = DEFAULT_RESULTS_ROOT) -> dict[str, Any
         if tuple(data["parameter_names"]) != names:
             raise ValueError(f"CN-IC parameter-name mismatch at basin {basin}")
         params.append(np.asarray(data["parameters"], dtype=np.float64))
-        restart_info.append({"basin_id": basin, "start": start, "train_kge": _kge,
-                             "source_file": str(path)})
+        restart_info.append(
+            {
+                "basin_id": basin,
+                "start": start,
+                "train_kge": _kge,
+                "source_file": str(path),
+            }
+        )
     return {
         "basin_ids": basins,
         "parameter_names": list(names),
@@ -107,23 +115,32 @@ def load_cn_ic_field(results_root: Path = DEFAULT_RESULTS_ROOT) -> dict[str, Any
     }
 
 
-def physical_to_z(physical: np.ndarray, names: tuple[str, ...], specs: dict[str, dict[str, Any]]) -> np.ndarray:
+def physical_to_z(
+    physical: np.ndarray, names: tuple[str, ...], specs: dict[str, dict[str, Any]]
+) -> np.ndarray:
     lower = np.asarray([specs[n]["lower"] for n in names], dtype=np.float64)
     upper = np.asarray([specs[n]["upper"] for n in names], dtype=np.float64)
     return (np.asarray(physical, dtype=np.float64) - lower) / (upper - lower)
 
 
-def z_to_physical(z: np.ndarray, names: tuple[str, ...], specs: dict[str, dict[str, Any]]) -> np.ndarray:
+def z_to_physical(
+    z: np.ndarray, names: tuple[str, ...], specs: dict[str, dict[str, Any]]
+) -> np.ndarray:
     lower = np.asarray([specs[n]["lower"] for n in names], dtype=np.float64)
     upper = np.asarray([specs[n]["upper"] for n in names], dtype=np.float64)
     return lower + np.asarray(z, dtype=np.float64) * (upper - lower)
 
 
-def fit_g_star(attributes_raw: np.ndarray, z_cn: np.ndarray, *,
-               n_components: int | None = None,
-               variance_fraction: float = EXPLAINED_VARIANCE_FRACTION,
-               alpha_grid: np.ndarray = RIDGE_ALPHA_GRID,
-               cv_seed: int = CV_SEED, cv_folds: int = CV_FOLDS) -> GStarFit:
+def fit_g_star(
+    attributes_raw: np.ndarray,
+    z_cn: np.ndarray,
+    *,
+    n_components: int | None = None,
+    variance_fraction: float = EXPLAINED_VARIANCE_FRACTION,
+    alpha_grid: np.ndarray = RIDGE_ALPHA_GRID,
+    cv_seed: int = CV_SEED,
+    cv_folds: int = CV_FOLDS,
+) -> GStarFit:
     """Fit the deterministic attribute->CN-parameter mapping on the 531 field."""
     from training.dpl.run_dpl_model import robust_normalize
 
@@ -133,9 +150,13 @@ def fit_g_star(attributes_raw: np.ndarray, z_cn: np.ndarray, *,
     if z_cn.shape[0] != n:
         raise ValueError("attribute and parameter matrices must share the basin axis")
     if n_attr != 35:
-        raise ValueError(f"expected the full 35-dimension attribute vector, got {n_attr}")
+        raise ValueError(
+            f"expected the full 35-dimension attribute vector, got {n_attr}"
+        )
 
-    attrs_norm, attrs_stats = robust_normalize(np.asarray(attributes_raw, dtype=np.float32))
+    attrs_norm, attrs_stats = robust_normalize(
+        np.asarray(attributes_raw, dtype=np.float32)
+    )
     X = attrs_norm.astype(np.float64)
     X = np.column_stack([np.ones(n), X])  # affine
 
@@ -146,7 +167,7 @@ def fit_g_star(attributes_raw: np.ndarray, z_cn: np.ndarray, *,
 
     # SVD of the standardized parameter field (full 17-dim space).
     U, S, Vt = np.linalg.svd(Zc, full_matrices=False)
-    explained = S ** 2 / np.maximum((S ** 2).sum(), 1e-300)
+    explained = S**2 / np.maximum((S**2).sum(), 1e-300)
     cumulative = np.cumsum(explained)
     if n_components is None:
         k = int(np.searchsorted(cumulative, variance_fraction) + 1)
@@ -178,7 +199,7 @@ def fit_g_star(attributes_raw: np.ndarray, z_cn: np.ndarray, *,
             gram[0, 0] -= alpha  # do not penalize the intercept
             coef = np.linalg.solve(gram, Xtr.T @ Str)
             errors[te] = Xte @ coef - scores[te]
-        mse = float(np.mean(errors ** 2))
+        mse = float(np.mean(errors**2))
         cv_mse[float(alpha)] = mse
         if mse < best_mse:
             best_mse, best_alpha = mse, float(alpha)
@@ -193,17 +214,27 @@ def fit_g_star(attributes_raw: np.ndarray, z_cn: np.ndarray, *,
     scores_hat = X @ coef
     residual = scores - scores_hat
     ss_total = ((scores - scores.mean(axis=0)) ** 2).sum(axis=0)
-    cv_r2_per_component = 1.0 - np.array([cv_mse[alpha] * n / ss_total[i]
-                                          if ss_total[i] > 0 else np.nan
-                                          for i in range(k)])
-    total_var = float((Zc ** 2).sum())
+    cv_r2_per_component = 1.0 - np.array(
+        [
+            cv_mse[alpha] * n / ss_total[i] if ss_total[i] > 0 else np.nan
+            for i in range(k)
+        ]
+    )
+    total_var = float((Zc**2).sum())
     cv_r2_total = float(1.0 - (cv_mse[alpha] * n) / max(total_var, 1e-300))
 
     return GStarFit(
-        z_mean=z_mean, z_scale=z_scale, V_k=V_k,
-        ridge_coef=ridge_coef, intercept=intercept, alpha=alpha, k=int(k),
-        explained_variance=explained, cumulative_variance=cumulative,
-        cv_r2_per_component=cv_r2_per_component, cv_r2_total=cv_r2_total,
+        z_mean=z_mean,
+        z_scale=z_scale,
+        V_k=V_k,
+        ridge_coef=ridge_coef,
+        intercept=intercept,
+        alpha=alpha,
+        k=int(k),
+        explained_variance=explained,
+        cumulative_variance=cumulative,
+        cv_r2_per_component=cv_r2_per_component,
+        cv_r2_total=cv_r2_total,
         attrs_stats={key: np.asarray(value) for key, value in attrs_stats.items()},
     )
 
@@ -219,8 +250,9 @@ def g_star_apply(fit: GStarFit, attributes_raw: np.ndarray) -> np.ndarray:
     return z_star
 
 
-def clip_to_bounds(physical: np.ndarray, names: tuple[str, ...],
-                   specs: dict[str, dict[str, Any]]) -> tuple[np.ndarray, np.ndarray]:
+def clip_to_bounds(
+    physical: np.ndarray, names: tuple[str, ...], specs: dict[str, dict[str, Any]]
+) -> tuple[np.ndarray, np.ndarray]:
     lower = np.asarray([specs[n]["lower"] for n in names], dtype=np.float64)
     upper = np.asarray([specs[n]["upper"] for n in names], dtype=np.float64)
     clipped = np.clip(physical, lower, upper)
@@ -228,18 +260,22 @@ def clip_to_bounds(physical: np.ndarray, names: tuple[str, ...],
     return clipped, mask
 
 
-def parameter_diagnostics(physical: np.ndarray, names: tuple[str, ...],
-                          specs: dict[str, dict[str, Any]]) -> dict[str, Any]:
+def parameter_diagnostics(
+    physical: np.ndarray, names: tuple[str, ...], specs: dict[str, dict[str, Any]]
+) -> dict[str, Any]:
     lower = np.asarray([specs[n]["lower"] for n in names], dtype=np.float64)
     upper = np.asarray([specs[n]["upper"] for n in names], dtype=np.float64)
     z = (physical - lower) / (upper - lower)
     rows = {}
     for i, name in enumerate(names):
         rows[name] = {
-            "min": float(physical[:, i].min()), "max": float(physical[:, i].max()),
-            "mean": float(physical[:, i].mean()), "std": float(physical[:, i].std()),
+            "min": float(physical[:, i].min()),
+            "max": float(physical[:, i].max()),
+            "mean": float(physical[:, i].mean()),
+            "std": float(physical[:, i].std()),
             "median": float(np.median(physical[:, i])),
-            "min_z": float(z[:, i].min()), "max_z": float(z[:, i].max()),
+            "min_z": float(z[:, i].min()),
+            "max_z": float(z[:, i].max()),
             "mean_z": float(z[:, i].mean()),
             "frac_at_lower": float((physical[:, i] <= lower[i] + 1e-9).mean()),
             "frac_at_upper": float((physical[:, i] >= upper[i] - 1e-9).mean()),
@@ -251,8 +287,12 @@ def parameter_diagnostics(physical: np.ndarray, names: tuple[str, ...],
 
 
 def build_and_save_truth(
-    bundle, cn_field: dict[str, Any], output_dir: Path,
-    project_root: Path, results_root: Path, data_root: Path,
+    bundle,
+    cn_field: dict[str, Any],
+    output_dir: Path,
+    project_root: Path,
+    results_root: Path,
+    data_root: Path,
     n_components: int | None = None,
 ) -> tuple[GStarFit, np.ndarray, np.ndarray]:
     """Fit g*, compute theta*, save parameters + diagnostics + manifest.
@@ -281,7 +321,9 @@ def build_and_save_truth(
         basin_ids=np.asarray(bundle.basin_ids),
     )
     diag = {
-        "parameter_diagnostics_g_star": parameter_diagnostics(physical_clipped, names, specs),
+        "parameter_diagnostics_g_star": parameter_diagnostics(
+            physical_clipped, names, specs
+        ),
         "parameter_diagnostics_cn_ic_reference": parameter_diagnostics(
             cn_field["parameters"], names, specs
         ),

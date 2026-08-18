@@ -1,6 +1,5 @@
 import numpy as np
 import torch
-
 from ablation.ic_core.objective_adapter import KGEObjective
 
 

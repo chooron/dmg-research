@@ -75,8 +75,6 @@ def boot_ci(values: np.ndarray, stat_fn, n_boot: int, seed: int, alpha: float = 
     return float(lo), float(hi)
 
 
-
-
 def norm_seed(series: pd.Series) -> pd.Series:
     """Normalize seed columns: IC -> "", dPL -> "42"/"123"/"2026"."""
     return series.apply(lambda v: "" if pd.isna(v) else str(int(v)))
@@ -107,9 +105,14 @@ def main() -> None:
     p_decay = src / "posthoc_validation_decay.csv"
     p_sum = src / "posthoc_summary.json"
     p_val = src / "posthoc_validation_summary.json"
-    for p, label in [(p_basin, "basin table"), (p_theta, "theta cost"),
-                     (p_state, "state cost"), (p_decay, "decay"),
-                     (p_sum, "posthoc summary"), (p_val, "validation summary")]:
+    for p, label in [
+        (p_basin, "basin table"),
+        (p_theta, "theta cost"),
+        (p_state, "state cost"),
+        (p_decay, "decay"),
+        (p_sum, "posthoc summary"),
+        (p_val, "validation summary"),
+    ]:
         require(p, label)
 
     bt = pd.read_csv(p_basin)
@@ -132,20 +135,24 @@ def main() -> None:
     # ---------------- 1. tidy long table (per seed) ----------------
     # C_theta / C_state for structure Base (Figure 5 focuses on Base
     # structural omission; TGD2 rows remain available in the canonical CSVs).
-    c_theta = (tc[tc["structure"] == "Base"]
-                 .rename(columns={"C_theta_primary": "C_theta_base"})
-                 [["basin_id", "paradigm", "seed", "C_theta_base"]])
-    c_state = (sc[sc["structure"] == "Base"]
-                 .rename(columns={"C_state_primary": "C_state_base"})
-                 [["basin_id", "paradigm", "seed", "C_state_base"]])
-    decay = (dc[dc["metric"] == "decay_G_base"]
-               .rename(columns={"decay": "decay_G_base"})
-               [["basin_id", "paradigm", "seed", "decay_G_base"]])
+    c_theta = tc[tc["structure"] == "Base"].rename(
+        columns={"C_theta_primary": "C_theta_base"}
+    )[["basin_id", "paradigm", "seed", "C_theta_base"]]
+    c_state = sc[sc["structure"] == "Base"].rename(
+        columns={"C_state_primary": "C_state_base"}
+    )[["basin_id", "paradigm", "seed", "C_state_base"]]
+    decay = dc[dc["metric"] == "decay_G_base"].rename(
+        columns={"decay": "decay_G_base"}
+    )[["basin_id", "paradigm", "seed", "decay_G_base"]]
 
-    tidy = bt.merge(c_theta, on=["basin_id", "paradigm", "seed"], how="left") \
-             .merge(c_state, on=["basin_id", "paradigm", "seed"], how="left") \
-             .merge(decay, on=["basin_id", "paradigm", "seed"], how="left")
-    tidy = tidy.sort_values(["paradigm", "seed", "period", "basin_id"]).reset_index(drop=True)
+    tidy = (
+        bt.merge(c_theta, on=["basin_id", "paradigm", "seed"], how="left")
+        .merge(c_state, on=["basin_id", "paradigm", "seed"], how="left")
+        .merge(decay, on=["basin_id", "paradigm", "seed"], how="left")
+    )
+    tidy = tidy.sort_values(["paradigm", "seed", "period", "basin_id"]).reset_index(
+        drop=True
+    )
     tidy.to_csv(out_dir / "figure5_basin_table.csv", index=False)
 
     # ---------------- 2. dPL seed-median aggregation ----------------
@@ -184,36 +191,48 @@ def main() -> None:
     n_checks = 0
     for reg in REGIMES:
         for period in PERIODS:
-            for seed in ([None] if reg == "IC" else SEEDS):
+            for seed in [None] if reg == "IC" else SEEDS:
                 key = f"{reg}{'_' + str(seed) if seed is not None else ''}_{period}"
-                sub = tidy[(tidy["paradigm"] == reg) & (tidy["period"] == period)
-                           & (tidy["seed"] == ("" if seed is None else str(seed)))]
+                sub = tidy[
+                    (tidy["paradigm"] == reg)
+                    & (tidy["period"] == period)
+                    & (tidy["seed"] == ("" if seed is None else str(seed)))
+                ]
                 got = float(sub["F_close"].median())
                 frozen, *_ = frozen_fclose(key)
                 n_checks += 1
                 if frozen is None or abs(got - frozen) > 1e-9:
                     check_errors.append(f"F_close median {key}: {got} != {frozen}")
     for reg in REGIMES:
-        for seed in ([None] if reg == "IC" else SEEDS):
+        for seed in [None] if reg == "IC" else SEEDS:
             key = f"{reg}{'_' + str(seed) if seed is not None else ''}_decay_G_base"
-            sub = tidy[(tidy["paradigm"] == reg)
-                       & (tidy["seed"] == ("" if seed is None else str(seed)))]
+            sub = tidy[
+                (tidy["paradigm"] == reg)
+                & (tidy["seed"] == ("" if seed is None else str(seed)))
+            ]
             got = float(sub["decay_G_base"].median())
             frozen = frozen_val.get(key, {}).get("median")
             n_checks += 1
             if frozen is None or abs(got - frozen) > 1e-9:
                 check_errors.append(f"decay median {key}: {got} != {frozen}")
     if check_errors:
-        raise SystemExit("Figure 5 sanity check FAILED:\n  " + "\n  ".join(check_errors))
-    print(f"[check] recomputed F_close / decay_G_base medians match frozen values "
-          f"({n_checks} group(s) verified)", flush=True)
+        raise SystemExit(
+            "Figure 5 sanity check FAILED:\n  " + "\n  ".join(check_errors)
+        )
+    print(
+        f"[check] recomputed F_close / decay_G_base medians match frozen values "
+        f"({n_checks} group(s) verified)",
+        flush=True,
+    )
 
     # ---------------- 4. figure-facing summary ----------------
     summary: dict = {
         "protocol": "figure5_prepare_v1",
         "source_run": args.run_id,
-        "inputs": [str(p.relative_to(args.results_root)) for p in
-                   [p_basin, p_theta, p_state, p_decay, p_sum, p_val]],
+        "inputs": [
+            str(p.relative_to(args.results_root))
+            for p in [p_basin, p_theta, p_state, p_decay, p_sum, p_val]
+        ],
         "code": git_commit(PROJECT),
         "n_basins": n_basins,
         "n_boot": args.n_boot,
@@ -259,19 +278,24 @@ def main() -> None:
             "frac_gt_0": float((valid > 0).mean()),
             # display window for the jittered basin cloud (unclipped F_close has a
             # heavy two-sided tail; median/IQR/CI are unaffected by the window)
-            "frac_outside_display_window": float((((valid < -0.5) | (valid > 1.75))).mean()),
+            "frac_outside_display_window": float(
+                ((valid < -0.5) | (valid > 1.75)).mean()
+            ),
         }
         if reg == "dPL":
             # per-seed frozen medians are kept verbatim; the aggregated display
             # median (median of per-basin seed medians) is a different quantity
             # and must lie within the per-seed median range.
-            entry["seed_medians"] = [float(frozen_fclose(f"dPL_{s}_{period}")[0])
-                                     for s in SEEDS]
+            entry["seed_medians"] = [
+                float(frozen_fclose(f"dPL_{s}_{period}")[0]) for s in SEEDS
+            ]
             lo_s, hi_s = min(entry["seed_medians"]), max(entry["seed_medians"])
             if not (lo_s - 1e-9 <= entry["median"] <= hi_s + 1e-9):
-                raise SystemExit(f"Figure 5 sanity FAILED: {key} aggregated median "
-                                 f"{entry['median']:.6f} outside seed median range "
-                                 f"[{lo_s:.6f}, {hi_s:.6f}]")
+                raise SystemExit(
+                    f"Figure 5 sanity FAILED: {key} aggregated median "
+                    f"{entry['median']:.6f} outside seed median range "
+                    f"[{lo_s:.6f}, {hi_s:.6f}]"
+                )
         else:
             # IC: the aggregated median IS the frozen median (identical quantity).
             frozen_med, *_ = frozen_fclose(key)
@@ -282,7 +306,7 @@ def main() -> None:
     # -- panel (d): compensation decay (frozen stats) --
     pd_ = {}
     for reg in REGIMES:
-        for seed in ([None] if reg == "IC" else SEEDS):
+        for seed in [None] if reg == "IC" else SEEDS:
             key = f"{reg}{'_' + str(seed) if seed is not None else ''}"
             e = frozen_val.get(f"{key}_decay_G_base", {})
             pd_[key if seed is not None else reg] = {
@@ -304,12 +328,13 @@ def main() -> None:
             "boot_ci_median_display": list(ci),
             "frac_gt_0": float((d > 0).mean()),
             "n": int(len(d)),
-            "frac_outside_display_window": float((((d < -0.1) | (d > 0.15))).mean()),
+            "frac_outside_display_window": float(((d < -0.1) | (d > 0.15)).mean()),
         }
         if reg == "IC":
             frozen_med = frozen_val["IC_decay_G_base"]["median"]
-            assert abs(pd_["IC_agg"]["median"] - frozen_med) < 1e-9, \
+            assert abs(pd_["IC_agg"]["median"] - frozen_med) < 1e-9, (
                 "panel (d) IC aggregated decay median != frozen"
+            )
         else:
             # The aggregated median (median of per-basin seed medians) is a
             # display-only quantity distinct from each per-seed median; only a
@@ -318,9 +343,11 @@ def main() -> None:
             lo_s, hi_s = min(seed_meds), max(seed_meds)
             tol = 1e-3
             if not (lo_s - tol <= pd_["dPL_agg"]["median"] <= hi_s + tol):
-                raise SystemExit("Figure 5 sanity FAILED: dPL aggregated decay median "
-                                 f"{pd_['dPL_agg']['median']:.6f} far outside frozen seed "
-                                 f"median range [{lo_s:.6f}, {hi_s:.6f}]")
+                raise SystemExit(
+                    "Figure 5 sanity FAILED: dPL aggregated decay median "
+                    f"{pd_['dPL_agg']['median']:.6f} far outside frozen seed "
+                    f"median range [{lo_s:.6f}, {hi_s:.6f}]"
+                )
     summary["panel_d_decay"] = pd_
 
     # -- panels (e)/(f): excess errors vs frac_snow (Base) --
@@ -336,28 +363,38 @@ def main() -> None:
             x, y = x[ok], y[ok]
             # frozen spearman (from posthoc_summary tradeoffs; dPL per seed)
             trade = frozen_sum["tradeoffs"]
-            sp = [trade[f"{reg}{'_' + str(s) if reg == 'dPL' else ''}"][
-                f"spearman_{'C_theta' if metric == 'C_theta' else 'C_state'}_vs_frac_snow"]
-                for s in (SEEDS if reg == "dPL" else [None])]
+            sp = [
+                trade[f"{reg}{'_' + str(s) if reg == 'dPL' else ''}"][
+                    f"spearman_{'C_theta' if metric == 'C_theta' else 'C_state'}_vs_frac_snow"
+                ]
+                for s in (SEEDS if reg == "dPL" else [None])
+            ]
             # frac_snow-quartile bins (median + bootstrap CI) — descriptive
             # environmental gradient, no parametric trend model
-            bins = [(-np.inf, q_bins[0]), (q_bins[0], q_bins[1]),
-                    (q_bins[1], q_bins[2]), (q_bins[2], np.inf)]
+            bins = [
+                (-np.inf, q_bins[0]),
+                (q_bins[0], q_bins[1]),
+                (q_bins[1], q_bins[2]),
+                (q_bins[2], np.inf),
+            ]
             bin_entries = []
             for k, (lo, hi) in enumerate(bins):
                 m = (x > lo) & (x <= hi)
                 if m.sum() < 20:
                     continue
                 bm = y[m]
-                bin_entries.append({
-                    "bin": k + 1,
-                    "frac_snow_range": [float(lo), float(hi)],
-                    "n": int(m.sum()),
-                    "frac_snow_median": float(np.median(x[m])),
-                    "median": float(np.median(bm)),
-                    "boot_ci_median_display": list(boot_ci(bm, np.median, args.n_boot,
-                                                           args.seed + 20 + k)),
-                })
+                bin_entries.append(
+                    {
+                        "bin": k + 1,
+                        "frac_snow_range": [float(lo), float(hi)],
+                        "n": int(m.sum()),
+                        "frac_snow_median": float(np.median(x[m])),
+                        "median": float(np.median(bm)),
+                        "boot_ci_median_display": list(
+                            boot_ci(bm, np.median, args.n_boot, args.seed + 20 + k)
+                        ),
+                    }
+                )
             key = f"{metric}_{reg}"
             # display y-limits chosen in plot_figure5.py; fractions reported here
             y_hi = 2.6 if metric == "C_state" else 0.55
@@ -375,8 +412,13 @@ def main() -> None:
     write_json(out_dir / "figure5_summary.json", summary)
 
     print(f"COMPLETE Figure 5 data -> {out_dir}", flush=True)
-    print(f"  figure5_basin_table.csv      (tidy, per seed: {len(tidy)} rows)", flush=True)
-    print(f"  figure5_basin_seedmedian.csv (dPL seed-aggregated: {len(seedmed)} rows)", flush=True)
+    print(
+        f"  figure5_basin_table.csv      (tidy, per seed: {len(tidy)} rows)", flush=True
+    )
+    print(
+        f"  figure5_basin_seedmedian.csv (dPL seed-aggregated: {len(seedmed)} rows)",
+        flush=True,
+    )
     print(f"  figure5_summary.json         (panel-level numbers)", flush=True)
 
 

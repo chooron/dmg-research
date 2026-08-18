@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import torch
 
-
 POWER_FLOOR = 1e-6
 
 
@@ -31,12 +30,15 @@ def stable_positive_power(
     # first-order correction is inactive above the floor and gives the
     # requested x**gamma*log(x) derivative at gamma=1 for small positive x.
     linearized = (
-        powered + (value - safe_value)
+        powered
+        + (value - safe_value)
         + (exponent - 1.0) * (value * log_safe - safe_value * log_safe)
     )
     powered = torch.where(value < floor, linearized, powered)
     return torch.where(
-        value > 0.0, powered, torch.zeros_like(powered),
+        value > 0.0,
+        powered,
+        torch.zeros_like(powered),
     )
 
 

@@ -6,6 +6,7 @@ history.  It reports calibration and held-out evaluation KGE for every basin
 and seed, using exactly the forcing windows and 365-day warm-up path of the
 dPL trainer.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -34,8 +35,12 @@ from training.dpl.run_dpl_model import (  # noqa: E402
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--root", type=Path, required=True,
-                        help="Model root containing seed_<seed> directories.")
+    parser.add_argument(
+        "--root",
+        type=Path,
+        required=True,
+        help="Model root containing seed_<seed> directories.",
+    )
     parser.add_argument("--seeds", type=int, nargs="+", default=[42, 123, 2026])
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
@@ -58,12 +63,18 @@ def main() -> None:
         attrs, _ = robust_normalize(raw_attrs)
         attributes = torch.from_numpy(attrs)
         net_cfg = config["network"]
-        hidden_sizes = [int(v) for v in net_cfg.get(
-            "hidden_sizes", [net_cfg["hidden_size"]] * net_cfg.get("depth", 2)
-        )]
+        hidden_sizes = [
+            int(v)
+            for v in net_cfg.get(
+                "hidden_sizes", [net_cfg["hidden_size"]] * net_cfg.get("depth", 2)
+            )
+        ]
         net = StaticParameterNet(
-            attributes.shape[1], specs, hidden_sizes,
-            net_cfg["dropout"], net_cfg["output_epsilon"],
+            attributes.shape[1],
+            specs,
+            hidden_sizes,
+            net_cfg["dropout"],
+            net_cfg["output_epsilon"],
         ).to(device)
         checkpoint_path = seed_dir / "best_checkpoint.pt"
         if not checkpoint_path.exists():
@@ -75,42 +86,76 @@ def main() -> None:
         warmup = int(config["window"]["warmup_days"])
         batch_size = int(config["training"]["batch_size"])
         train_kge, _, _ = evaluate(
-            net, model_cls, specs, attributes, train_fc, train_obs, batch_size, device, warmup
+            net,
+            model_cls,
+            specs,
+            attributes,
+            train_fc,
+            train_obs,
+            batch_size,
+            device,
+            warmup,
         )
         eval_kge, _, _ = evaluate(
-            net, model_cls, specs, attributes, eval_fc, eval_obs, batch_size, device, warmup
+            net,
+            model_cls,
+            specs,
+            attributes,
+            eval_fc,
+            eval_obs,
+            batch_size,
+            device,
+            warmup,
         )
-        all_rows.append(pd.DataFrame({
-            "basin_id": basin_ids,
-            "seed": seed,
-            "checkpoint": checkpoint_path.name,
-            "checkpoint_epoch": int(checkpoint.get("epoch", -1)),
-            "train_kge": train_kge,
-            "validation_kge": eval_kge,
-        }))
-        checkpoint_rows.append({
-            "seed": seed,
-            "checkpoint": checkpoint_path.name,
-            "checkpoint_epoch": int(checkpoint.get("epoch", -1)),
-            "checkpoint_val_kge_median": float(checkpoint.get("val_kge_median", np.nan)),
-            "train_kge_median": float(np.nanmedian(train_kge)),
-            "validation_kge_median": float(np.nanmedian(eval_kge)),
-            "validation_kge_mean": float(np.nanmean(eval_kge)),
-        })
+        all_rows.append(
+            pd.DataFrame(
+                {
+                    "basin_id": basin_ids,
+                    "seed": seed,
+                    "checkpoint": checkpoint_path.name,
+                    "checkpoint_epoch": int(checkpoint.get("epoch", -1)),
+                    "train_kge": train_kge,
+                    "validation_kge": eval_kge,
+                }
+            )
+        )
+        checkpoint_rows.append(
+            {
+                "seed": seed,
+                "checkpoint": checkpoint_path.name,
+                "checkpoint_epoch": int(checkpoint.get("epoch", -1)),
+                "checkpoint_val_kge_median": float(
+                    checkpoint.get("val_kge_median", np.nan)
+                ),
+                "train_kge_median": float(np.nanmedian(train_kge)),
+                "validation_kge_median": float(np.nanmedian(eval_kge)),
+                "validation_kge_mean": float(np.nanmean(eval_kge)),
+            }
+        )
         print(json.dumps(checkpoint_rows[-1]), flush=True)
 
     args.output.mkdir(parents=True, exist_ok=True)
     table = pd.concat(all_rows, ignore_index=True)
     table.to_csv(args.output / "per_seed_kge.csv", index=False)
-    pd.DataFrame(checkpoint_rows).to_csv(args.output / "per_seed_summary.csv", index=False)
-    median = table.groupby("basin_id", as_index=False)[["train_kge", "validation_kge"]].median()
+    pd.DataFrame(checkpoint_rows).to_csv(
+        args.output / "per_seed_summary.csv", index=False
+    )
+    median = table.groupby("basin_id", as_index=False)[
+        ["train_kge", "validation_kge"]
+    ].median()
     median.to_csv(args.output / "median_of_3_per_basin.csv", index=False)
-    (args.output / "manifest.json").write_text(json.dumps({
-        "purpose": "evaluation_only_paused_xaj_tgd2_dpl_checkpoints",
-        "seeds": args.seeds,
-        "model": "XAJ_TGD2",
-        "selection": "best validation checkpoint available at pause; no optimization performed",
-    }, indent=2) + "\n")
+    (args.output / "manifest.json").write_text(
+        json.dumps(
+            {
+                "purpose": "evaluation_only_paused_xaj_tgd2_dpl_checkpoints",
+                "seeds": args.seeds,
+                "model": "XAJ_TGD2",
+                "selection": "best validation checkpoint available at pause; no optimization performed",
+            },
+            indent=2,
+        )
+        + "\n"
+    )
 
 
 if __name__ == "__main__":

@@ -10,42 +10,42 @@ from dataclasses import dataclass
 from typing import Type
 
 from models import (
+    GR4J,
+    HBV,
+    SIMHYD,
+    XAJ,
     BaseHydrologicalModel,
     CemaNeige,
     CemaNeigeHyst,
-    PrecipitationDelay,
-    TemperatureDependentGenericDelay2,
-    GR4J,
     GR4JWithCemaNeige,
     GR4JWithPrecipitationDelay,
     GR4JWithTGD2,
-    HBV,
-    SIMHYD,
+    PrecipitationDelay,
     SIMHYDWithCemaNeige,
     SIMHYDWithPrecipitationDelay,
     SIMHYDWithTGD2,
-    XAJ,
+    TemperatureDependentGenericDelay2,
     XAJWithCemaNeige,
     XAJWithPrecipitationDelay,
     XAJWithTGD2,
 )
 from models.parameter_specs import (
-    CEMANEIGE_PARAM_SPECS,
     CEMANEIGE_HYST_PARAM_SPECS,
-    PRECIP_DELAY_PARAM_SPECS,
-    TGD2_PARAM_SPECS,
+    CEMANEIGE_PARAM_SPECS,
     GR4J_CN_PARAM_SPECS,
-    GR4J_PD_PARAM_SPECS,
     GR4J_PARAM_SPECS,
+    GR4J_PD_PARAM_SPECS,
     GR4J_TGD2_PARAM_SPECS,
     HBV_PARAM_SPECS,
+    PRECIP_DELAY_PARAM_SPECS,
     SIMHYD_CN_PARAM_SPECS,
-    SIMHYD_PD_PARAM_SPECS,
     SIMHYD_PARAM_SPECS,
+    SIMHYD_PD_PARAM_SPECS,
     SIMHYD_TGD2_PARAM_SPECS,
+    TGD2_PARAM_SPECS,
     XAJ_CN_PARAM_SPECS,
-    XAJ_PD_PARAM_SPECS,
     XAJ_PARAM_SPECS,
+    XAJ_PD_PARAM_SPECS,
     XAJ_TGD2_PARAM_SPECS,
 )
 
@@ -66,9 +66,25 @@ MODEL_REGISTRY: tuple[ModelCase, ...] = (
     ModelCase("XAJ", XAJ, XAJ_PARAM_SPECS, "rainfall-runoff", False, True),
     ModelCase("SIMHYD", SIMHYD, SIMHYD_PARAM_SPECS, "rainfall-runoff", False, True),
     ModelCase("CemaNeige", CemaNeige, CEMANEIGE_PARAM_SPECS, "snow", True, False),
-    ModelCase("CemaNeigeHyst", CemaNeigeHyst, CEMANEIGE_HYST_PARAM_SPECS, "snow", True, False),
-    ModelCase("PrecipitationDelay", PrecipitationDelay, PRECIP_DELAY_PARAM_SPECS, "control", False, False),
-    ModelCase("TemperatureDependentGenericDelay2", TemperatureDependentGenericDelay2, TGD2_PARAM_SPECS, "control", False, False),
+    ModelCase(
+        "CemaNeigeHyst", CemaNeigeHyst, CEMANEIGE_HYST_PARAM_SPECS, "snow", True, False
+    ),
+    ModelCase(
+        "PrecipitationDelay",
+        PrecipitationDelay,
+        PRECIP_DELAY_PARAM_SPECS,
+        "control",
+        False,
+        False,
+    ),
+    ModelCase(
+        "TemperatureDependentGenericDelay2",
+        TemperatureDependentGenericDelay2,
+        TGD2_PARAM_SPECS,
+        "control",
+        False,
+        False,
+    ),
     ModelCase(
         "GR4JWithCemaNeige",
         GR4JWithCemaNeige,
@@ -117,9 +133,20 @@ MODEL_REGISTRY: tuple[ModelCase, ...] = (
         False,
         True,
     ),
-    ModelCase("GR4JWithTGD2", GR4JWithTGD2, GR4J_TGD2_PARAM_SPECS, "composition", False, False),
-    ModelCase("SIMHYDWithTGD2", SIMHYDWithTGD2, SIMHYD_TGD2_PARAM_SPECS, "composition", False, True),
-    ModelCase("XAJWithTGD2", XAJWithTGD2, XAJ_TGD2_PARAM_SPECS, "composition", False, True),
+    ModelCase(
+        "GR4JWithTGD2", GR4JWithTGD2, GR4J_TGD2_PARAM_SPECS, "composition", False, False
+    ),
+    ModelCase(
+        "SIMHYDWithTGD2",
+        SIMHYDWithTGD2,
+        SIMHYD_TGD2_PARAM_SPECS,
+        "composition",
+        False,
+        True,
+    ),
+    ModelCase(
+        "XAJWithTGD2", XAJWithTGD2, XAJ_TGD2_PARAM_SPECS, "composition", False, True
+    ),
 )
 
 MODEL_BY_NAME = {case.name: case for case in MODEL_REGISTRY}

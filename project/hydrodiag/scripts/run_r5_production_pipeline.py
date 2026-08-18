@@ -75,19 +75,30 @@ def run_ic_phase(args: argparse.Namespace) -> None:
         log(f"Output directory: {out_dir}")
 
         if (out_dir / "DONE.json").exists() and not getattr(args, "force", False):
-            log(f"IC Task {model} ALREADY COMPLETE (DONE.json exists), skipping to next task.")
+            log(
+                f"IC Task {model} ALREADY COMPLETE (DONE.json exists), skipping to next task."
+            )
             continue
 
         cmd = [
-            sys.executable, str(IC_RUNNER),
-            "--model", model,
-            "--output", str(out_dir),
-            "--starts", str(args.ic_starts),
-            "--population", str(pop),
-            "--generations", str(args.ic_generations),
-            "--chunk-basins", str(chunk),
-            "--checkpoint-interval", str(args.ic_checkpoint_interval),
-            "--device", args.device,
+            sys.executable,
+            str(IC_RUNNER),
+            "--model",
+            model,
+            "--output",
+            str(out_dir),
+            "--starts",
+            str(args.ic_starts),
+            "--population",
+            str(pop),
+            "--generations",
+            str(args.ic_generations),
+            "--chunk-basins",
+            str(chunk),
+            "--checkpoint-interval",
+            str(args.ic_checkpoint_interval),
+            "--device",
+            args.device,
         ]
 
         status_data = {
@@ -104,7 +115,9 @@ def run_ic_phase(args: argparse.Namespace) -> None:
         log(f"Executing: {' '.join(cmd)}")
         ic_log_file = LOG_DIR / f"ic_{model.lower()}.log"
         with ic_log_file.open("a") as log_f:
-            log_f.write(f"=== STARTING {model} AT {datetime.datetime.now().isoformat()} ===\n")
+            log_f.write(
+                f"=== STARTING {model} AT {datetime.datetime.now().isoformat()} ===\n"
+            )
             log_f.flush()
             proc = subprocess.run(
                 cmd,
@@ -145,40 +158,62 @@ def run_dpl_phase(args: argparse.Namespace) -> None:
     dpl_cfg_dir.mkdir(parents=True, exist_ok=True)
 
     env = os.environ.copy()
-    env.update({
-        "OMP_NUM_THREADS": "1",
-        "MKL_NUM_THREADS": "1",
-        "OPENBLAS_NUM_THREADS": "1",
-        "NUMEXPR_NUM_THREADS": "1",
-        "TORCHINDUCTOR_COMPILE_THREADS": "1",
-        "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True",
-    })
+    env.update(
+        {
+            "OMP_NUM_THREADS": "1",
+            "MKL_NUM_THREADS": "1",
+            "OPENBLAS_NUM_THREADS": "1",
+            "NUMEXPR_NUM_THREADS": "1",
+            "TORCHINDUCTOR_COMPILE_THREADS": "1",
+            "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True",
+        }
+    )
 
     for model in DPL_MODELS:
         cfg = json.loads(json.dumps(base_cfg))
-        out_dir = PROJECT_DIR / "results" / f"dpl_camels_531_lite_v3" / model / f"seed_{args.dpl_seed}"
+        out_dir = (
+            PROJECT_DIR
+            / "results"
+            / f"dpl_camels_531_lite_v3"
+            / model
+            / f"seed_{args.dpl_seed}"
+        )
         cfg["model_name"] = model
-        cfg["output_dir"] = str(out_dir.relative_to(PROJECT_DIR) if out_dir.is_relative_to(PROJECT_DIR) else out_dir)
+        cfg["output_dir"] = str(
+            out_dir.relative_to(PROJECT_DIR)
+            if out_dir.is_relative_to(PROJECT_DIR)
+            else out_dir
+        )
         cfg["lite_mode"] = True
         if model.endswith("_TGD2"):
-            cfg["network"]["parameter_mapping"] = "sigmoid_to_physical_range_with_log_tgd2_residence_times"
-            cfg["network"]["tgd_structure_version"] = "temperature_dependent_generic_delay2_v1"
+            cfg["network"]["parameter_mapping"] = (
+                "sigmoid_to_physical_range_with_log_tgd2_residence_times"
+            )
+            cfg["network"]["tgd_structure_version"] = (
+                "temperature_dependent_generic_delay2_v1"
+            )
 
         cfg_path = dpl_cfg_dir / f"r5_{model.lower()}_seed_{args.dpl_seed}.json"
         cfg_path.write_text(json.dumps(cfg, indent=2) + "\n")
 
         cmd = [
-            sys.executable, str(DPL_RUNNER),
-            "--model", model,
-            "--config", str(cfg_path),
-            "--output", str(out_dir),
+            sys.executable,
+            str(DPL_RUNNER),
+            "--model",
+            model,
+            "--config",
+            str(cfg_path),
+            "--output",
+            str(out_dir),
             "--lite",
             "--resume",
         ]
 
         log_path = LOG_DIR / f"dpl_{model.lower()}_seed_{args.dpl_seed}.log"
         log_handle = log_path.open("a")
-        log_handle.write(f"=== LAUNCHING dPL {model} AT {datetime.datetime.now().isoformat()} ===\n")
+        log_handle.write(
+            f"=== LAUNCHING dPL {model} AT {datetime.datetime.now().isoformat()} ===\n"
+        )
         log_handle.write(f"COMMAND: {' '.join(cmd)}\n")
         log_handle.flush()
 
@@ -191,26 +226,35 @@ def run_dpl_phase(args: argparse.Namespace) -> None:
             text=True,
         )
 
-        active_procs.append({
-            "model": model,
-            "pid": proc.pid,
-            "proc": proc,
-            "log_file": str(log_path),
-            "log_handle": log_handle,
-            "output_dir": str(out_dir),
-            "start_time": datetime.datetime.now().isoformat(),
-        })
+        active_procs.append(
+            {
+                "model": model,
+                "pid": proc.pid,
+                "proc": proc,
+                "log_file": str(log_path),
+                "log_handle": log_handle,
+                "output_dir": str(out_dir),
+                "start_time": datetime.datetime.now().isoformat(),
+            }
+        )
         log(f"Launched dPL Process: model={model:<15} PID={proc.pid} log={log_path}")
 
-    update_status({
-        "current_phase": "dPL",
-        "dpl_processes": [
-            {"model": p["model"], "pid": p["pid"], "log_file": p["log_file"], "output_dir": p["output_dir"]}
-            for p in active_procs
-        ],
-        "start_time": datetime.datetime.now().isoformat(),
-        "status": "running",
-    })
+    update_status(
+        {
+            "current_phase": "dPL",
+            "dpl_processes": [
+                {
+                    "model": p["model"],
+                    "pid": p["pid"],
+                    "log_file": p["log_file"],
+                    "output_dir": p["output_dir"],
+                }
+                for p in active_procs
+            ],
+            "start_time": datetime.datetime.now().isoformat(),
+            "status": "running",
+        }
+    )
 
     log("=" * 60)
     log(f"ALL {len(active_procs)} dPL PROCESSES RUNNING CONCURRENTLY.")
@@ -226,17 +270,23 @@ def run_dpl_phase(args: argparse.Namespace) -> None:
                 still_running.append(item)
             else:
                 item["log_handle"].close()
-                log(f"dPL Process Finished: model={item['model']} PID={item['pid']} returncode={ret}")
+                log(
+                    f"dPL Process Finished: model={item['model']} PID={item['pid']} returncode={ret}"
+                )
                 if ret != 0:
-                    log(f"WARNING: dPL model={item['model']} failed with code {ret}! Check {item['log_file']}")
+                    log(
+                        f"WARNING: dPL model={item['model']} failed with code {ret}! Check {item['log_file']}"
+                    )
         active_procs = still_running
 
     log("PHASE 2 COMPLETE: ALL dPL PROCESSES FINISHED.")
-    update_status({
-        "current_phase": "COMPLETED",
-        "status": "success",
-        "end_time": datetime.datetime.now().isoformat(),
-    })
+    update_status(
+        {
+            "current_phase": "COMPLETED",
+            "status": "success",
+            "end_time": datetime.datetime.now().isoformat(),
+        }
+    )
 
 
 def main() -> None:
@@ -248,8 +298,12 @@ def main() -> None:
     parser.add_argument("--dpl-batch-size", type=int, default=128)
     parser.add_argument("--dpl-seed", type=int, default=42)
     parser.add_argument("--device", default="cuda")
-    parser.add_argument("--skip-ic", action="store_true", help="Skip IC phase if already completed")
-    parser.add_argument("--force", action="store_true", help="Force rerun even if DONE.json exists")
+    parser.add_argument(
+        "--skip-ic", action="store_true", help="Skip IC phase if already completed"
+    )
+    parser.add_argument(
+        "--force", action="store_true", help="Force rerun even if DONE.json exists"
+    )
     args = parser.parse_args()
 
     LOG_DIR.mkdir(parents=True, exist_ok=True)

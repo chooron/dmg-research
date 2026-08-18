@@ -12,7 +12,9 @@ torch._dynamo.config.recompile_limit = 64
 
 from models import SIMHYD, SIMHYDWithCemaNeige, SIMHYDWithPrecipitationDelay
 from models.parameter_specs import (
-    SIMHYD_CN_PARAM_SPECS, SIMHYD_PD_PARAM_SPECS, SIMHYD_PARAM_SPECS,
+    SIMHYD_CN_PARAM_SPECS,
+    SIMHYD_PARAM_SPECS,
+    SIMHYD_PD_PARAM_SPECS,
 )
 from models.simhyd import SIMHYD_UH_MAX_LEN, _simhyd_step
 
@@ -23,16 +25,16 @@ def _devices() -> list[str]:
 
 def _params(specs: dict, batch: int, device: str, dtype: torch.dtype) -> dict:
     return {
-        name: torch.full(
-            (batch,), float(spec["default"]), device=device, dtype=dtype
-        )
+        name: torch.full((batch,), float(spec["default"]), device=device, dtype=dtype)
         for name, spec in specs.items()
     }
 
 
 def _forcing(batch: int, time: int, device: str, dtype: torch.dtype) -> dict:
     generator = torch.Generator(device=device).manual_seed(20260720)
-    precip = torch.rand(batch, time, generator=generator, device=device, dtype=dtype) * 12.0
+    precip = (
+        torch.rand(batch, time, generator=generator, device=device, dtype=dtype) * 12.0
+    )
     pet = torch.rand(batch, time, generator=generator, device=device, dtype=dtype) * 5.0
     # Alternating cold/warm blocks exercise both CemaNeige accumulation and melt.
     phase = torch.arange(time, device=device, dtype=dtype)
@@ -62,9 +64,7 @@ def test_simhyd_forward_is_finite_and_nonnegative(device: str, dtype: torch.dtyp
         atol=1e-6 if dtype == torch.float32 else 1e-12,
         rtol=0.0,
     )
-    assert set(aux["final_states"]) == {
-        "soil", "groundwater", "runoff_uh_buffer"
-    }
+    assert set(aux["final_states"]) == {"soil", "groundwater", "runoff_uh_buffer"}
 
 
 def test_simhyd_exposes_gamma_parameters_only():
@@ -76,11 +76,14 @@ def test_simhyd_exposes_gamma_parameters_only():
     assert SIMHYDWithCemaNeige.routing_method == "gamma"
 
 
-@pytest.mark.parametrize("model_cls,specs", [
-    (SIMHYD, SIMHYD_PARAM_SPECS),
-    (SIMHYDWithCemaNeige, SIMHYD_CN_PARAM_SPECS),
-    (SIMHYDWithPrecipitationDelay, SIMHYD_PD_PARAM_SPECS),
-])
+@pytest.mark.parametrize(
+    "model_cls,specs",
+    [
+        (SIMHYD, SIMHYD_PARAM_SPECS),
+        (SIMHYDWithCemaNeige, SIMHYD_CN_PARAM_SPECS),
+        (SIMHYDWithPrecipitationDelay, SIMHYD_PD_PARAM_SPECS),
+    ],
+)
 @pytest.mark.parametrize("device", _devices())
 def test_simhyd_boundary_values_are_finite_and_gradient_safe(
     model_cls, specs, device: str
@@ -153,11 +156,14 @@ def test_simhyd_boundary_values_are_finite_and_gradient_safe(
         assert parameter.grad.abs().max() < 1e6, name
 
 
-@pytest.mark.parametrize("model_cls,specs", [
-    (SIMHYD, SIMHYD_PARAM_SPECS),
-    (SIMHYDWithCemaNeige, SIMHYD_CN_PARAM_SPECS),
-    (SIMHYDWithPrecipitationDelay, SIMHYD_PD_PARAM_SPECS),
-])
+@pytest.mark.parametrize(
+    "model_cls,specs",
+    [
+        (SIMHYD, SIMHYD_PARAM_SPECS),
+        (SIMHYDWithCemaNeige, SIMHYD_CN_PARAM_SPECS),
+        (SIMHYDWithPrecipitationDelay, SIMHYD_PD_PARAM_SPECS),
+    ],
+)
 @pytest.mark.parametrize("device", _devices())
 def test_simhyd_full_system_water_balance(model_cls, specs, device: str):
     """P - ET - Q equals the change in all physical and routing stores."""
@@ -181,14 +187,19 @@ def test_simhyd_full_system_water_balance(model_cls, specs, device: str):
         - qsim.sum(dim=1)
         - (final_storage - initial_storage)
     )
-    assert torch.allclose(residual, torch.zeros_like(residual), atol=2e-8, rtol=0.0), residual
+    assert torch.allclose(residual, torch.zeros_like(residual), atol=2e-8, rtol=0.0), (
+        residual
+    )
 
 
-@pytest.mark.parametrize("model_cls,specs", [
-    (SIMHYD, SIMHYD_PARAM_SPECS),
-    (SIMHYDWithCemaNeige, SIMHYD_CN_PARAM_SPECS),
-    (SIMHYDWithPrecipitationDelay, SIMHYD_PD_PARAM_SPECS),
-])
+@pytest.mark.parametrize(
+    "model_cls,specs",
+    [
+        (SIMHYD, SIMHYD_PARAM_SPECS),
+        (SIMHYDWithCemaNeige, SIMHYD_CN_PARAM_SPECS),
+        (SIMHYDWithPrecipitationDelay, SIMHYD_PD_PARAM_SPECS),
+    ],
+)
 @pytest.mark.parametrize("device", _devices())
 def test_simhyd_parameter_gradients_are_finite(model_cls, specs, device: str):
     dtype = torch.float32
@@ -199,9 +210,7 @@ def test_simhyd_parameter_gradients_are_finite(model_cls, specs, device: str):
     # active rather than identically masked by min(infiltration, rainfall).
     values["simhyd_coeff"][:] = 8.0
     values["simhyd_smsc"][:] = 100.0
-    params = {
-        name: torch.nn.Parameter(value.clone()) for name, value in values.items()
-    }
+    params = {name: torch.nn.Parameter(value.clone()) for name, value in values.items()}
     model = model_cls().to(device=device, dtype=dtype)
 
     qsim, aux = model(forcings=forcings, params=params)
@@ -245,9 +254,15 @@ def test_simhyd_step_compiles_fullgraph(device: str):
         torch.full((batch,), 3.0, device=device, dtype=dtype),
         torch.full((batch,), 80.0, device=device, dtype=dtype),
         torch.full((batch,), 20.0, device=device, dtype=dtype),
-        params["simhyd_insc"], params["simhyd_coeff"], params["simhyd_sq"],
-        params["simhyd_smsc"], params["simhyd_sub"], params["simhyd_crak"],
-        params["simhyd_k"], params["simhyd_etmul"], 1e-8,
+        params["simhyd_insc"],
+        params["simhyd_coeff"],
+        params["simhyd_sq"],
+        params["simhyd_smsc"],
+        params["simhyd_sub"],
+        params["simhyd_crak"],
+        params["simhyd_k"],
+        params["simhyd_etmul"],
+        1e-8,
     )
     compiled = torch.compile(_simhyd_step, fullgraph=True)
     with torch.no_grad():

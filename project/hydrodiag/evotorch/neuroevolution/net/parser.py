@@ -115,7 +115,12 @@ def _eval_with_constants(node: ast.expr, constants: dict) -> Any:
         ):
             erroneous_node = node
 
-        raise NetParsingError(msg, erroneous_node.lineno, erroneous_node.col_offset, original_error=original_error)
+        raise NetParsingError(
+            msg,
+            erroneous_node.lineno,
+            erroneous_node.col_offset,
+            original_error=original_error,
+        )
 
     def literal_eval(subnode: ast.expr):
         err = None
@@ -127,13 +132,19 @@ def _eval_with_constants(node: ast.expr, constants: dict) -> Any:
             err = ex
 
         if err is not None:
-            fail(f"When trying to parse expression, encountered: {repr(err)}", subnode, original_error=err)
+            fail(
+                f"When trying to parse expression, encountered: {repr(err)}",
+                subnode,
+                original_error=err,
+            )
 
         return result
 
     def get_constant(name):
         if name not in constants.keys():
-            fail(f"Unknown constant: {name}. Available constants: {repr(list(constants.keys()))}")
+            fail(
+                f"Unknown constant: {name}. Available constants: {repr(list(constants.keys()))}"
+            )
 
         return constants[name]
 
@@ -175,7 +186,10 @@ def _eval_with_constants(node: ast.expr, constants: dict) -> Any:
         # Note: ast.Num is a subclass of ast.Constant in Python 3.8 and later.
         #       To support Python 3.7 and earlier, we need to check for both.
         if not isinstance(index, (ast.Constant, ast.Num)):
-            fail(f"Expected a simple indexing operation, but got a {type(index).__name__}.", index)
+            fail(
+                f"Expected a simple indexing operation, but got a {type(index).__name__}.",
+                index,
+            )
 
         index = literal_eval(index)
 
@@ -200,7 +214,11 @@ def _process_call_expr(node: ast.Call, constants: dict) -> nn.Module:
 
 def _process_rshift_expr(node: ast.BinOp, constants: dict) -> nn.Module:
     if not isinstance(node.op, ast.RShift):
-        raise NetParsingError("Binary operators other than '>>' are not recognized.", node.lineno, node.col_offset)
+        raise NetParsingError(
+            "Binary operators other than '>>' are not recognized.",
+            node.lineno,
+            node.col_offset,
+        )
     left_module = _process_expr(node.left, constants=constants)
     right_module = _process_expr(node.right, constants=constants)
     return concat_modules(left_module, right_module)
@@ -212,7 +230,11 @@ def _process_expr(node: ast.expr, constants: dict) -> nn.Module:
     elif isinstance(node, ast.BinOp):
         return _process_rshift_expr(node, constants=constants)
     else:
-        raise NetParsingError(f"Unrecognized expression of type {type(node)}", node.lineno, node.col_offset)
+        raise NetParsingError(
+            f"Unrecognized expression of type {type(node)}",
+            node.lineno,
+            node.col_offset,
+        )
 
 
 def str_to_net(s: str, **constants) -> nn.Module:

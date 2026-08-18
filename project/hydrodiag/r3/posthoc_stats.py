@@ -47,6 +47,7 @@ Outputs (results/r3_misspec_analysis_v1/):
 
 Usage: python r3/posthoc_stats.py [--device cuda] [--n-boot 2000] [--seed 20260730]
 """
+
 from __future__ import annotations
 
 import argparse
@@ -153,10 +154,16 @@ def recorded_q_fit(models, structure, theta_hat, bundle, device, dtype) -> np.nd
     model = models[structure]
     for left in range(0, n, BATCH):
         right = min(n, left + BATCH)
-        fc = build_forcing_dict(bundle.forcing[left:right].astype(np.float32), device, dtype)
-        params = {name: torch.from_numpy(theta_hat[left:right, i]).to(device, dtype=dtype)
-                  for i, name in enumerate(names)}
-        qsim, _stores, _fs = recorded_forward_for_structure(structure, model, fc, params, device, dtype)
+        fc = build_forcing_dict(
+            bundle.forcing[left:right].astype(np.float32), device, dtype
+        )
+        params = {
+            name: torch.from_numpy(theta_hat[left:right, i]).to(device, dtype=dtype)
+            for i, name in enumerate(names)
+        }
+        qsim, _stores, _fs = recorded_forward_for_structure(
+            structure, model, fc, params, device, dtype
+        )
         q_full[left:right] = qsim.detach().cpu().numpy().astype(np.float64)
     return q_full
 
@@ -167,11 +174,16 @@ def main() -> None:
     parser.add_argument("--data-root", type=Path, default=DEFAULT_DATA_ROOT)
     parser.add_argument("--results-root", type=Path, default=DEFAULT_RESULTS_ROOT)
     parser.add_argument("--run-id", default="r3_misspec_analysis_v1")
-    parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
+    parser.add_argument(
+        "--device", default="cuda" if torch.cuda.is_available() else "cpu"
+    )
     parser.add_argument("--n-boot", type=int, default=2000)
     parser.add_argument("--seed", type=int, default=20260730)
-    parser.add_argument("--skip-forwards", action="store_true",
-                        help="Reuse cached posthoc_q_<fit>.npy if present (debug).")
+    parser.add_argument(
+        "--skip-forwards",
+        action="store_true",
+        help="Reuse cached posthoc_q_<fit>.npy if present (debug).",
+    )
     args = parser.parse_args()
 
     device = torch.device(args.device)
@@ -193,7 +205,9 @@ def main() -> None:
     theta_star = theta_npz["parameters"]
     cn_names = [str(x) for x in theta_npz["parameter_names"]]
     basin_ids = [str(b).zfill(8) for b in theta_npz["basin_ids"]]
-    q_star = np.asarray(np.load(truth_dir / "q_star.npz")["target_mm_day"], dtype=np.float64)
+    q_star = np.asarray(
+        np.load(truth_dir / "q_star.npz")["target_mm_day"], dtype=np.float64
+    )
     snow = np.load(truth_dir / "snow_star.npz")
 
     from r3.common import load_bundle
@@ -203,7 +217,9 @@ def main() -> None:
     train_slice = slice(pi["train"][0], pi["train"][1] + 1)
     test_slice = slice(pi["test"][0], pi["test"][1] + 1)
     fs_map = frac_snow_series(bundle)
-    frac_snow = np.array([fs_map.set_index("basin_id")["frac_snow"][b] for b in basin_ids])
+    frac_snow = np.array(
+        [fs_map.set_index("basin_id")["frac_snow"][b] for b in basin_ids]
+    )
 
     # ---------- official KGE sources ----------
     ic_runs = {
@@ -214,34 +230,57 @@ def main() -> None:
     dpl_runs = {}
     for struct, key in [("CN", "XAJ_CN"), ("Base", "XAJ"), ("TGD2", "XAJ_TGD2")]:
         for s in SEEDS:
-            tag = "cn" if struct == "CN" else ("xaj" if struct == "Base" else "xaj_tgd2")
-            d = (RES / f"r3_gate_dpl_xaj_{tag}_seed_{s}") if struct == "CN" \
+            tag = (
+                "cn" if struct == "CN" else ("xaj" if struct == "Base" else "xaj_tgd2")
+            )
+            d = (
+                (RES / f"r3_gate_dpl_xaj_{tag}_seed_{s}")
+                if struct == "CN"
                 else (RES / f"r3_misspec_dpl_{tag}_seed_{s}")
-            dpl_runs[f"{struct}_dPL_s{s}"] = (d, "XAJ_CN" if struct == "CN" else
-                                              ("XAJ" if struct == "Base" else "XAJ_TGD2"))
+            )
+            dpl_runs[f"{struct}_dPL_s{s}"] = (
+                d,
+                "XAJ_CN"
+                if struct == "CN"
+                else ("XAJ" if struct == "Base" else "XAJ_TGD2"),
+            )
 
     # official per-basin KGE: IC from raw JSON, dPL from basin_final_summary
-    official: dict[str, dict[str, np.ndarray]] = {}  # fit -> {"train": ..., "test": ...}
+    official: dict[
+        str, dict[str, np.ndarray]
+    ] = {}  # fit -> {"train": ..., "test": ...}
     for fit, (d, key) in ic_runs.items():
         est = load_ic_estimates(d, basin_ids)
         official[fit] = {
-            "train": np.array([est[b]["train_kge"] for b in basin_ids], dtype=np.float64),
+            "train": np.array(
+                [est[b]["train_kge"] for b in basin_ids], dtype=np.float64
+            ),
             "test": np.array([est[b]["test_kge"] for b in basin_ids], dtype=np.float64),
         }
     for fit, (d, key) in dpl_runs.items():
         summary = pd.read_csv(d / "basin_final_summary.csv")
-        kge_by_basin = dict(zip(summary["basin_id"].astype(str).str.zfill(8), summary["val_kge"]))
+        kge_by_basin = dict(
+            zip(summary["basin_id"].astype(str).str.zfill(8), summary["val_kge"])
+        )
         official[fit] = {
-            "train": np.full(len(basin_ids), np.nan),  # filled by recorded forward below
-            "test": np.array([kge_by_basin.get(b, np.nan) for b in basin_ids], dtype=np.float64),
+            "train": np.full(
+                len(basin_ids), np.nan
+            ),  # filled by recorded forward below
+            "test": np.array(
+                [kge_by_basin.get(b, np.nan) for b in basin_ids], dtype=np.float64
+            ),
         }
 
     # base-no-refit official
     ref = pd.read_csv(RES / "r3_base_no_refit_v1" / "base_no_refit_basin_metrics.csv")
     ref["basin_id"] = ref["basin_id"].astype(str).str.zfill(8)
     ref_map = ref.set_index("basin_id")
-    ref_train = np.array([ref_map.loc[b, "kge_train"] for b in basin_ids], dtype=np.float64)
-    ref_test = np.array([ref_map.loc[b, "kge_test"] for b in basin_ids], dtype=np.float64)
+    ref_train = np.array(
+        [ref_map.loc[b, "kge_train"] for b in basin_ids], dtype=np.float64
+    )
+    ref_test = np.array(
+        [ref_map.loc[b, "kge_test"] for b in basin_ids], dtype=np.float64
+    )
 
     # ---------- recorded forwards (q) ----------
     from models import XAJLite, XAJWithCemaNeigeLite, XAJWithTGD2Lite
@@ -274,14 +313,24 @@ def main() -> None:
             q = np.load(cache)
         else:
             print(f"[fwd] {fit} ({fit_structure[fit]}) ...", flush=True)
-            q = recorded_q_fit(models, fit_structure[fit], theta_hat, bundle, device, dtype)
+            q = recorded_q_fit(
+                models, fit_structure[fit], theta_hat, bundle, device, dtype
+            )
             np.save(cache, q)
         q_store[fit] = q
         kge_rec[fit] = {
-            "train": np.array([kge_components(q[i, train_slice], q_star[i, train_slice])["kge"]
-                               for i in range(len(basin_ids))]),
-            "test": np.array([kge_components(q[i, test_slice], q_star[i, test_slice])["kge"]
-                              for i in range(len(basin_ids))]),
+            "train": np.array(
+                [
+                    kge_components(q[i, train_slice], q_star[i, train_slice])["kge"]
+                    for i in range(len(basin_ids))
+                ]
+            ),
+            "test": np.array(
+                [
+                    kge_components(q[i, test_slice], q_star[i, test_slice])["kge"]
+                    for i in range(len(basin_ids))
+                ]
+            ),
         }
 
     # fill dPL train KGE from recorded forward
@@ -306,18 +355,34 @@ def main() -> None:
                 g_tgd2 = k_tgd2 - k_base
                 denom_close = k_cn - k_ref
                 denom_tgd2 = k_cn - k_base
-                f_close = np.where(denom_close > DENOM_TOL, g_base / np.where(denom_close > DENOM_TOL, denom_close, np.nan), np.nan)
-                f_tgd2 = np.where(denom_tgd2 > DENOM_TOL, g_tgd2 / np.where(denom_tgd2 > DENOM_TOL, denom_tgd2, np.nan), np.nan)
+                f_close = np.where(
+                    denom_close > DENOM_TOL,
+                    g_base / np.where(denom_close > DENOM_TOL, denom_close, np.nan),
+                    np.nan,
+                )
+                f_tgd2 = np.where(
+                    denom_tgd2 > DENOM_TOL,
+                    g_tgd2 / np.where(denom_tgd2 > DENOM_TOL, denom_tgd2, np.nan),
+                    np.nan,
+                )
                 for i, b in enumerate(basin_ids):
-                    rows.append({
-                        "basin_id": b, "paradigm": paradigm,
-                        "seed": seed if seed is not None else "", "period": period,
-                        "kge_base_no_refit": k_ref[i], "kge_base": k_base[i],
-                        "kge_tgd2": k_tgd2[i], "kge_cn": k_cn[i],
-                        "G_base": g_base[i], "F_close": f_close[i],
-                        "G_tgd2": g_tgd2[i], "F_tgd2": f_tgd2[i],
-                        "frac_snow": frac_snow[i],
-                    })
+                    rows.append(
+                        {
+                            "basin_id": b,
+                            "paradigm": paradigm,
+                            "seed": seed if seed is not None else "",
+                            "period": period,
+                            "kge_base_no_refit": k_ref[i],
+                            "kge_base": k_base[i],
+                            "kge_tgd2": k_tgd2[i],
+                            "kge_cn": k_cn[i],
+                            "G_base": g_base[i],
+                            "F_close": f_close[i],
+                            "G_tgd2": g_tgd2[i],
+                            "F_tgd2": f_tgd2[i],
+                            "frac_snow": frac_snow[i],
+                        }
+                    )
     basin_tab = pd.DataFrame(rows)
     basin_tab.to_csv(out_dir / "posthoc_basin_table.csv", index=False)
 
@@ -328,14 +393,24 @@ def main() -> None:
     for fit in comp_fits:
         q = q_store[fit]
         for period, sl in (("train", train_slice), ("test", test_slice)):
-            comps = np.array([list(kge_components(q[i, sl], q_star[i, sl]).values())
-                              for i in range(len(basin_ids))])
+            comps = np.array(
+                [
+                    list(kge_components(q[i, sl], q_star[i, sl]).values())
+                    for i in range(len(basin_ids))
+                ]
+            )
             for i, b in enumerate(basin_ids):
-                comp_rows.append({
-                    "basin_id": b, "fit": fit, "period": period,
-                    "r": comps[i, 0], "alpha": comps[i, 1], "beta": comps[i, 2],
-                    "kge": comps[i, 3],
-                })
+                comp_rows.append(
+                    {
+                        "basin_id": b,
+                        "fit": fit,
+                        "period": period,
+                        "r": comps[i, 0],
+                        "alpha": comps[i, 1],
+                        "beta": comps[i, 2],
+                        "kge": comps[i, 3],
+                    }
+                )
     comp_tab = pd.DataFrame(comp_rows)
     comp_tab.to_csv(out_dir / "posthoc_components.csv", index=False)
 
@@ -356,7 +431,7 @@ def main() -> None:
     pp["basin_id"] = pp["basin_id"].astype(str).str.zfill(8)
     theta_cost_rows = []
     for paradigm, pri, sec in [("IC", pri_ic, sec_ic), ("dPL", pri_dpl, sec_dpl)]:
-        for seed in ([None] if paradigm == "IC" else SEEDS):
+        for seed in [None] if paradigm == "IC" else SEEDS:
             if seed is None:
                 sub = pp[(pp["paradigm"] == paradigm) & (pp["seed"].isna())]
             else:
@@ -370,13 +445,23 @@ def main() -> None:
                     d_abs = bsub["delta_e"].abs()  # |e_M - e_CN|
                     pri_set = set(pri)
                     c_pri = d_abs[bsub["parameter"].isin(pri_set)].median()
-                    c_pri_sec = d_abs[bsub["parameter"].isin(pri_set | set(sec))].median()
-                    theta_cost_rows.append({
-                        "basin_id": b, "paradigm": paradigm, "structure": struct,
-                        "seed": seed if seed is not None else "",
-                        "C_theta_primary": float(c_pri) if np.isfinite(c_pri) else np.nan,
-                        "C_theta_primary_secondary": float(c_pri_sec) if np.isfinite(c_pri_sec) else np.nan,
-                    })
+                    c_pri_sec = d_abs[
+                        bsub["parameter"].isin(pri_set | set(sec))
+                    ].median()
+                    theta_cost_rows.append(
+                        {
+                            "basin_id": b,
+                            "paradigm": paradigm,
+                            "structure": struct,
+                            "seed": seed if seed is not None else "",
+                            "C_theta_primary": float(c_pri)
+                            if np.isfinite(c_pri)
+                            else np.nan,
+                            "C_theta_primary_secondary": float(c_pri_sec)
+                            if np.isfinite(c_pri_sec)
+                            else np.nan,
+                        }
+                    )
     theta_tab = pd.DataFrame(theta_cost_rows)
     theta_tab.to_csv(out_dir / "posthoc_theta_cost.csv", index=False)
 
@@ -385,55 +470,80 @@ def main() -> None:
     ex["basin_id"] = ex["basin_id"].astype(str).str.zfill(8)
     state_cost_rows = []
     for paradigm in ["IC", "dPL"]:
-        for seed in ([None] if paradigm == "IC" else SEEDS):
+        for seed in [None] if paradigm == "IC" else SEEDS:
             if seed is None:
-                sub = ex[(ex["paradigm"] == paradigm) & (ex["metric"] == "nrmse")
-                         & (ex["period"] == "test") & (ex["seed"].isna())]
+                sub = ex[
+                    (ex["paradigm"] == paradigm)
+                    & (ex["metric"] == "nrmse")
+                    & (ex["period"] == "test")
+                    & (ex["seed"].isna())
+                ]
             else:
-                sub = ex[(ex["paradigm"] == paradigm) & (ex["metric"] == "nrmse")
-                         & (ex["period"] == "test") & (ex["seed"] == seed)]
+                sub = ex[
+                    (ex["paradigm"] == paradigm)
+                    & (ex["metric"] == "nrmse")
+                    & (ex["period"] == "test")
+                    & (ex["seed"] == seed)
+                ]
             for struct in ["Base", "TGD2"]:
                 ssub = sub[sub["structure"] == struct]
                 for b in basin_ids:
-                    bsub = ssub[(ssub["basin_id"] == b) & (ssub["variable"].isin(pri_states))]
+                    bsub = ssub[
+                        (ssub["basin_id"] == b) & (ssub["variable"].isin(pri_states))
+                    ]
                     c = bsub["delta_E"].median()
-                    wd = ssub[(ssub["basin_id"] == b) & (ssub["variable"] == "wd")]["delta_E"]
-                    wt = ssub[(ssub["basin_id"] == b) & (ssub["variable"] == "wt")]["delta_E"]
-                    state_cost_rows.append({
-                        "basin_id": b, "paradigm": paradigm, "structure": struct,
-                        "seed": seed if seed is not None else "",
-                        "C_state_primary": float(c) if np.isfinite(c) else np.nan,
-                        "wd_delta_NRMSE": float(wd.iloc[0]) if len(wd) else np.nan,
-                        "wt_delta_NRMSE": float(wt.iloc[0]) if len(wt) else np.nan,
-                    })
+                    wd = ssub[(ssub["basin_id"] == b) & (ssub["variable"] == "wd")][
+                        "delta_E"
+                    ]
+                    wt = ssub[(ssub["basin_id"] == b) & (ssub["variable"] == "wt")][
+                        "delta_E"
+                    ]
+                    state_cost_rows.append(
+                        {
+                            "basin_id": b,
+                            "paradigm": paradigm,
+                            "structure": struct,
+                            "seed": seed if seed is not None else "",
+                            "C_state_primary": float(c) if np.isfinite(c) else np.nan,
+                            "wd_delta_NRMSE": float(wd.iloc[0]) if len(wd) else np.nan,
+                            "wt_delta_NRMSE": float(wt.iloc[0]) if len(wt) else np.nan,
+                        }
+                    )
     state_tab = pd.DataFrame(state_cost_rows)
     state_tab.to_csv(out_dir / "posthoc_state_cost.csv", index=False)
 
     # ---------- G: process-conditioned errors ----------
-    snow_active = snow["G"] > 1e-6          # truth snow pack present (mm)
-    melt_active = snow["melt"] > 1e-6       # truth melt flux (mm/d)
+    snow_active = snow["G"] > 1e-6  # truth snow pack present (mm)
+    melt_active = snow["melt"] > 1e-6  # truth melt flux (mm/d)
     proc_rows = []
     proc_fits = ["CN_IC", "Base_IC", "TGD2_IC", "Base_no_refit"] + [f for f in dpl_runs]
     for fit in proc_fits:
         q = q_store[fit]
         for period, sl in (("train", train_slice), ("test", test_slice)):
             idx = np.arange(bundle.forcing.shape[1])[sl]
-            for cond_name, cond in [("snow_active", snow_active[:, sl]),
-                                    ("melt_active", melt_active[:, sl]),
-                                    ("no_snow_active", ~snow_active[:, sl])]:
+            for cond_name, cond in [
+                ("snow_active", snow_active[:, sl]),
+                ("melt_active", melt_active[:, sl]),
+                ("no_snow_active", ~snow_active[:, sl]),
+            ]:
                 for i, b in enumerate(basin_ids):
                     sim = q[i, sl][cond[i]]
                     obs = q_star[i, sl][cond[i]]
                     if len(sim) < 30:
                         continue
                     err = sim - obs
-                    proc_rows.append({
-                        "basin_id": b, "fit": fit, "period": period, "condition": cond_name,
-                        "n_days": int(len(sim)),
-                        "mae": float(np.mean(np.abs(err))),
-                        "rmse": float(np.sqrt(np.mean(err ** 2))),
-                        "volume_bias_mm": float(err.sum()),
-                    })
+                    proc_rows.append(
+                        {
+                            "basin_id": b,
+                            "fit": fit,
+                            "period": period,
+                            "condition": cond_name,
+                            "n_days": int(len(sim)),
+                            "mae": float(np.mean(np.abs(err))),
+                            "rmse": float(np.sqrt(np.mean(err**2))),
+                            "volume_bias_mm": float(err.sum()),
+                        }
+                    )
     proc_tab = pd.DataFrame(proc_rows)
     proc_tab.to_csv(out_dir / "posthoc_process_errors.csv", index=False)
 
@@ -444,9 +554,11 @@ def main() -> None:
         for period in ("train", "test"):
             for seed in seeds:
                 tag = f"_{seed}" if seed is not None else ""
-                sub = basin_tab[(basin_tab["paradigm"] == paradigm) &
-                                (basin_tab["period"] == period) &
-                                (basin_tab["seed"] == (seed if seed is not None else ""))]
+                sub = basin_tab[
+                    (basin_tab["paradigm"] == paradigm)
+                    & (basin_tab["period"] == period)
+                    & (basin_tab["seed"] == (seed if seed is not None else ""))
+                ]
                 g = sub["G_base"].to_numpy()
                 f = sub["F_close"].to_numpy()
                 gt = sub["G_tgd2"].to_numpy()
@@ -454,38 +566,82 @@ def main() -> None:
                 fs = sub["frac_snow"].to_numpy()
                 valid_f = f[np.isfinite(f)]
                 valid_ft = ft[np.isfinite(ft)]
-                def med(x): return float(np.median(x)) if len(x) else float("nan")
-                def mn(x): return float(np.mean(x)) if len(x) else float("nan")
+
+                def med(x):
+                    return float(np.median(x)) if len(x) else float("nan")
+
+                def mn(x):
+                    return float(np.mean(x)) if len(x) else float("nan")
+
                 lo_m, hi_m = boot_ci(g, np.median, args.n_boot, rng_boot)
                 lo_M, hi_M = boot_ci(g, np.mean, args.n_boot, rng_boot + 1)
                 entry = {
                     "n": int(len(sub)),
-                    "G_base": {"median": med(g), "mean": mn(g),
-                               "q25": float(np.quantile(g, 0.25)), "q75": float(np.quantile(g, 0.75)),
-                               "q10": float(np.quantile(g, 0.10)), "q90": float(np.quantile(g, 0.90)),
-                               "boot_ci_median": [lo_m, hi_m], "boot_ci_mean": [lo_M, hi_M],
-                               "frac_gt_0": float((g > 0).mean()), "frac_le_0": float((g <= 0).mean())},
-                    "F_close": {"median": med(valid_f), "mean": mn(valid_f),
-                                "q25": float(np.quantile(valid_f, 0.25)) if len(valid_f) else np.nan,
-                                "q75": float(np.quantile(valid_f, 0.75)) if len(valid_f) else np.nan,
-                                "n_valid_denominator": int(len(valid_f)),
-                                "n_excluded": int(len(f) - len(valid_f)),
-                                "frac_gt_0": float((valid_f > 0).mean()) if len(valid_f) else np.nan,
-                                "frac_ge_0p5": float((valid_f >= 0.5).mean()) if len(valid_f) else np.nan,
-                                "frac_ge_1": float((valid_f >= 1.0).mean()) if len(valid_f) else np.nan},
-                    "G_tgd2": {"median": med(gt), "mean": mn(gt),
-                               "q25": float(np.quantile(gt, 0.25)), "q75": float(np.quantile(gt, 0.75)),
-                               "boot_ci_median": boot_ci(gt, np.median, args.n_boot, rng_boot + 2),
-                               "frac_gt_0": float((gt > 0).mean())},
-                    "F_tgd2": {"median": med(valid_ft), "mean": mn(valid_ft),
-                               "n_valid_denominator": int(len(valid_ft)),
-                               "n_excluded": int(len(ft) - len(valid_ft)),
-                               "frac_gt_0": float((valid_ft > 0).mean()) if len(valid_ft) else np.nan,
-                               "frac_ge_0p5": float((valid_ft >= 0.5).mean()) if len(valid_ft) else np.nan},
-                    "frac_snow": {"spearman_G_base": spearman(fs, g),
-                                  "spearman_F_close": spearman(fs[np.isfinite(f)], f[np.isfinite(f)]),
-                                  "spearman_G_tgd2": spearman(fs, gt),
-                                  "spearman_F_tgd2": spearman(fs[np.isfinite(ft)], ft[np.isfinite(ft)])},
+                    "G_base": {
+                        "median": med(g),
+                        "mean": mn(g),
+                        "q25": float(np.quantile(g, 0.25)),
+                        "q75": float(np.quantile(g, 0.75)),
+                        "q10": float(np.quantile(g, 0.10)),
+                        "q90": float(np.quantile(g, 0.90)),
+                        "boot_ci_median": [lo_m, hi_m],
+                        "boot_ci_mean": [lo_M, hi_M],
+                        "frac_gt_0": float((g > 0).mean()),
+                        "frac_le_0": float((g <= 0).mean()),
+                    },
+                    "F_close": {
+                        "median": med(valid_f),
+                        "mean": mn(valid_f),
+                        "q25": float(np.quantile(valid_f, 0.25))
+                        if len(valid_f)
+                        else np.nan,
+                        "q75": float(np.quantile(valid_f, 0.75))
+                        if len(valid_f)
+                        else np.nan,
+                        "n_valid_denominator": int(len(valid_f)),
+                        "n_excluded": int(len(f) - len(valid_f)),
+                        "frac_gt_0": float((valid_f > 0).mean())
+                        if len(valid_f)
+                        else np.nan,
+                        "frac_ge_0p5": float((valid_f >= 0.5).mean())
+                        if len(valid_f)
+                        else np.nan,
+                        "frac_ge_1": float((valid_f >= 1.0).mean())
+                        if len(valid_f)
+                        else np.nan,
+                    },
+                    "G_tgd2": {
+                        "median": med(gt),
+                        "mean": mn(gt),
+                        "q25": float(np.quantile(gt, 0.25)),
+                        "q75": float(np.quantile(gt, 0.75)),
+                        "boot_ci_median": boot_ci(
+                            gt, np.median, args.n_boot, rng_boot + 2
+                        ),
+                        "frac_gt_0": float((gt > 0).mean()),
+                    },
+                    "F_tgd2": {
+                        "median": med(valid_ft),
+                        "mean": mn(valid_ft),
+                        "n_valid_denominator": int(len(valid_ft)),
+                        "n_excluded": int(len(ft) - len(valid_ft)),
+                        "frac_gt_0": float((valid_ft > 0).mean())
+                        if len(valid_ft)
+                        else np.nan,
+                        "frac_ge_0p5": float((valid_ft >= 0.5).mean())
+                        if len(valid_ft)
+                        else np.nan,
+                    },
+                    "frac_snow": {
+                        "spearman_G_base": spearman(fs, g),
+                        "spearman_F_close": spearman(
+                            fs[np.isfinite(f)], f[np.isfinite(f)]
+                        ),
+                        "spearman_G_tgd2": spearman(fs, gt),
+                        "spearman_F_tgd2": spearman(
+                            fs[np.isfinite(ft)], ft[np.isfinite(ft)]
+                        ),
+                    },
                 }
                 summary[f"{paradigm}{tag}_{period}"] = entry
 
@@ -494,17 +650,43 @@ def main() -> None:
     for paradigm, seeds in regimes:
         for seed in seeds:
             tag = f"_{seed}" if seed is not None else ""
-            bt = basin_tab[(basin_tab["paradigm"] == paradigm) &
-                           (basin_tab["period"] == "test") &
-                           (basin_tab["seed"] == (seed if seed is not None else ""))].set_index("basin_id")
-            tc = theta_tab[(theta_tab["paradigm"] == paradigm) &
-                           (theta_tab["seed"] == (seed if seed is not None else ""))]
-            sc = state_tab[(state_tab["paradigm"] == paradigm) &
-                           (state_tab["seed"] == (seed if seed is not None else ""))]
-            ct_b = tc[tc["structure"] == "Base"].set_index("basin_id").loc[bt.index, "C_theta_primary"].to_numpy()
-            ct_t = tc[tc["structure"] == "TGD2"].set_index("basin_id").loc[bt.index, "C_theta_primary"].to_numpy()
-            cs_b = sc[sc["structure"] == "Base"].set_index("basin_id").loc[bt.index, "C_state_primary"].to_numpy()
-            cs_t = sc[sc["structure"] == "TGD2"].set_index("basin_id").loc[bt.index, "C_state_primary"].to_numpy()
+            bt = basin_tab[
+                (basin_tab["paradigm"] == paradigm)
+                & (basin_tab["period"] == "test")
+                & (basin_tab["seed"] == (seed if seed is not None else ""))
+            ].set_index("basin_id")
+            tc = theta_tab[
+                (theta_tab["paradigm"] == paradigm)
+                & (theta_tab["seed"] == (seed if seed is not None else ""))
+            ]
+            sc = state_tab[
+                (state_tab["paradigm"] == paradigm)
+                & (state_tab["seed"] == (seed if seed is not None else ""))
+            ]
+            ct_b = (
+                tc[tc["structure"] == "Base"]
+                .set_index("basin_id")
+                .loc[bt.index, "C_theta_primary"]
+                .to_numpy()
+            )
+            ct_t = (
+                tc[tc["structure"] == "TGD2"]
+                .set_index("basin_id")
+                .loc[bt.index, "C_theta_primary"]
+                .to_numpy()
+            )
+            cs_b = (
+                sc[sc["structure"] == "Base"]
+                .set_index("basin_id")
+                .loc[bt.index, "C_state_primary"]
+                .to_numpy()
+            )
+            cs_t = (
+                sc[sc["structure"] == "TGD2"]
+                .set_index("basin_id")
+                .loc[bt.index, "C_state_primary"]
+                .to_numpy()
+            )
             g = bt["G_base"].to_numpy()
             f = bt["F_close"].to_numpy()
             gt = bt["G_tgd2"].to_numpy()
@@ -532,22 +714,37 @@ def main() -> None:
         for period in ("train", "test"):
             for seed in seeds:
                 tag = f"_{seed}" if seed is not None else ""
-                sub = basin_tab[(basin_tab["paradigm"] == paradigm) &
-                                (basin_tab["period"] == period) &
-                                (basin_tab["seed"] == (seed if seed is not None else ""))]
+                sub = basin_tab[
+                    (basin_tab["paradigm"] == paradigm)
+                    & (basin_tab["period"] == period)
+                    & (basin_tab["seed"] == (seed if seed is not None else ""))
+                ]
                 fs = sub["frac_snow"].to_numpy()
                 qs = np.quantile(fs, [0.25, 0.5, 0.75])
-                bins = [(-np.inf, qs[0]), (qs[0], qs[1]), (qs[1], qs[2]), (qs[2], np.inf)]
+                bins = [
+                    (-np.inf, qs[0]),
+                    (qs[0], qs[1]),
+                    (qs[1], qs[2]),
+                    (qs[2], np.inf),
+                ]
                 qd = []
                 for lo, hi in bins:
                     m = (fs > lo) & (fs <= hi)
-                    qd.append({
-                        "frac_snow_range": [float(lo), float(hi)],
-                        "n": int(m.sum()),
-                        "G_base_median": float(np.median(sub["G_base"].to_numpy()[m])),
-                        "F_close_median": float(np.nanmedian(sub["F_close"].to_numpy()[m])),
-                        "G_tgd2_median": float(np.median(sub["G_tgd2"].to_numpy()[m])),
-                    })
+                    qd.append(
+                        {
+                            "frac_snow_range": [float(lo), float(hi)],
+                            "n": int(m.sum()),
+                            "G_base_median": float(
+                                np.median(sub["G_base"].to_numpy()[m])
+                            ),
+                            "F_close_median": float(
+                                np.nanmedian(sub["F_close"].to_numpy()[m])
+                            ),
+                            "G_tgd2_median": float(
+                                np.median(sub["G_tgd2"].to_numpy()[m])
+                            ),
+                        }
+                    )
                 quart[f"{paradigm}{tag}_{period}"] = qd
     summary["frac_snow_quartiles"] = quart
 
@@ -555,9 +752,11 @@ def main() -> None:
     for paradigm, seeds in regimes:
         for seed in seeds:
             tag = f"_{seed}" if seed is not None else ""
-            sub = basin_tab[(basin_tab["paradigm"] == paradigm) &
-                            (basin_tab["period"] == "test") &
-                            (basin_tab["seed"] == (seed if seed is not None else ""))]
+            sub = basin_tab[
+                (basin_tab["paradigm"] == paradigm)
+                & (basin_tab["period"] == "test")
+                & (basin_tab["seed"] == (seed if seed is not None else ""))
+            ]
             m = sub["frac_snow"] <= 1e-6
             nosnow[f"{paradigm}{tag}"] = {
                 "n": int(m.sum()),

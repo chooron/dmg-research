@@ -11,7 +11,6 @@ import sys
 import time
 from pathlib import Path
 
-
 HERE = Path(__file__).resolve().parent
 PROJECT_DIR = HERE.parents[1]
 REPO_ROOT = PROJECT_DIR.parents[1]
@@ -22,26 +21,43 @@ GENERATED = HERE / "generated_configs"
 LOG_DIR = HERE / "logs"
 
 MODELS = (
-    "HBV", "GR4J", "XAJ", "GR4J_CN", "XAJ_CN", "SIMHYD", "SIMHYD_CN",
-    "GR4J_PD", "XAJ_PD", "SIMHYD_PD",
+    "HBV",
+    "GR4J",
+    "XAJ",
+    "GR4J_CN",
+    "XAJ_CN",
+    "SIMHYD",
+    "SIMHYD_CN",
+    "GR4J_PD",
+    "XAJ_PD",
+    "SIMHYD_PD",
     "XAJ_TGD2",
-    "XAJ_2S", "XAJ_RWPE",
+    "XAJ_2S",
+    "XAJ_RWPE",
 )
 
 
 def replace_repo_root(value: object, source_root: Path, target_root: Path) -> object:
     if isinstance(value, str):
         source = str(source_root)
-        return value.replace(source, str(target_root)) if value.startswith(source) else value
+        return (
+            value.replace(source, str(target_root))
+            if value.startswith(source)
+            else value
+        )
     if isinstance(value, dict):
-        return {key: replace_repo_root(item, source_root, target_root) for key, item in value.items()}
+        return {
+            key: replace_repo_root(item, source_root, target_root)
+            for key, item in value.items()
+        }
     if isinstance(value, list):
         return [replace_repo_root(item, source_root, target_root) for item in value]
     return value
 
 
-def prepare_config(base: dict, model: str, repo_root: Path,
-                   output_prefix: str) -> tuple[Path, Path]:
+def prepare_config(
+    base: dict, model: str, repo_root: Path, output_prefix: str
+) -> tuple[Path, Path]:
     config = json.loads(json.dumps(base))
     for source_root in KNOWN_REPO_ROOTS:
         config = replace_repo_root(config, source_root, repo_root)
@@ -74,11 +90,20 @@ def main() -> None:
     LOG_DIR.mkdir(parents=True, exist_ok=True)
     commands = []
     for index, model in enumerate(MODELS):
-        config_path, output_dir = prepare_config(base, model, args.repo_root, args.output_prefix)
+        config_path, output_dir = prepare_config(
+            base, model, args.repo_root, args.output_prefix
+        )
         if (output_dir / "COMPLETE").exists() and not args.force:
             print(f"SKIP {model} COMPLETE exists")
             continue
-        command = [sys.executable, str(RUNNER), "--config", str(config_path), "--model", model]
+        command = [
+            sys.executable,
+            str(RUNNER),
+            "--config",
+            str(config_path),
+            "--model",
+            model,
+        ]
         if args.max_basins is not None:
             command.extend(["--max-basins", str(args.max_basins)])
         if args.epochs is not None:
@@ -100,10 +125,18 @@ def main() -> None:
             log_path = LOG_DIR / f"{model}.log"
             log_handle = log_path.open("w")
             log_handle.write("COMMAND: " + " ".join(command) + "\n")
-            log_handle.write("CUDA_VISIBLE_DEVICES: " + env["CUDA_VISIBLE_DEVICES"] + "\n\n")
+            log_handle.write(
+                "CUDA_VISIBLE_DEVICES: " + env["CUDA_VISIBLE_DEVICES"] + "\n\n"
+            )
             log_handle.flush()
-            process = subprocess.Popen(command, cwd=PROJECT_DIR, env=env,
-                                       stdout=log_handle, stderr=subprocess.STDOUT, text=True)
+            process = subprocess.Popen(
+                command,
+                cwd=PROJECT_DIR,
+                env=env,
+                stdout=log_handle,
+                stderr=subprocess.STDOUT,
+                text=True,
+            )
             active.append((model, process, log_handle))
             print(f"START {model} pid={process.pid} log={log_path}")
 

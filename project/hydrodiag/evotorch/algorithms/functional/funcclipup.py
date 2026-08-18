@@ -68,7 +68,9 @@ def clipup(
         return torch.as_tensor(x, dtype=dtype, device=device)
 
     if (center_learning_rate is None) and (max_speed is None):
-        raise ValueError("Both `center_learning_rate` and `max_speed` is missing. At least one of them is needed.")
+        raise ValueError(
+            "Both `center_learning_rate` and `max_speed` is missing. At least one of them is needed."
+        )
     elif (center_learning_rate is not None) and (max_speed is None):
         center_learning_rate = as_tensor(center_learning_rate)
         max_speed = center_learning_rate * 2.0

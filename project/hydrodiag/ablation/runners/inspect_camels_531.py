@@ -13,8 +13,12 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from ablation.ic_core.config import environment_snapshot, load_resolved_config
 from ablation.ic_core.data_adapter import (
-    ATTRIBUTE_NAMES, AREA_ATTRIBUTE_INDEX, load_531_bundle, manifest_for_bundle,
-    write_basin_index_csv, write_manifest,
+    AREA_ATTRIBUTE_INDEX,
+    ATTRIBUTE_NAMES,
+    load_531_bundle,
+    manifest_for_bundle,
+    write_basin_index_csv,
+    write_manifest,
 )
 from ablation.ic_core.result_io import atomic_write_json, atomic_write_text
 
@@ -39,7 +43,10 @@ def _write_structure(bundle, config, output_root: Path) -> None:
         "raw_area_field": "area_gages2",
         "raw_area_attribute_index": AREA_ATTRIBUTE_INDEX,
         "raw_area_unit": "km2",
-        "raw_area_range_selected": [float(np.min(bundle.raw_area_km2)), float(np.max(bundle.raw_area_km2))],
+        "raw_area_range_selected": [
+            float(np.min(bundle.raw_area_km2)),
+            float(np.max(bundle.raw_area_km2)),
+        ],
         "missing_encoding": {
             "target_nan_count_selected": int(np.isnan(raw_target).sum()),
             "target_inf_count_selected": int(np.isinf(raw_target).sum()),
@@ -61,8 +68,12 @@ def _write_structure(bundle, config, output_root: Path) -> None:
         "n_timesteps": int(bundle.forcing.shape[1]),
         "date_start": str(bundle.dates[0]),
         "date_end": str(bundle.dates[-1]),
-        "dates_daily_contiguous": bool(np.all(np.diff(bundle.dates.astype("datetime64[D]").astype("int64")) == 1)),
-        "leap_day_count": int(sum(str(value)[5:10] == "02-29" for value in bundle.dates)),
+        "dates_daily_contiguous": bool(
+            np.all(np.diff(bundle.dates.astype("datetime64[D]").astype("int64")) == 1)
+        ),
+        "leap_day_count": int(
+            sum(str(value)[5:10] == "02-29" for value in bundle.dates)
+        ),
         "selected_shapes": {
             "forcing": list(bundle.forcing.shape),
             "target_cfs": list(bundle.target_cfs.shape),
@@ -80,38 +91,44 @@ def _write_structure(bundle, config, output_root: Path) -> None:
         "date_axis_source": bundle.source_metadata["date_axis_source"],
     }
     atomic_write_json(output_root / "dataset_structure.json", structure)
-    markdown = "\n".join([
-        "# CAMELS-531 dataset structure",
-        "",
-        "The source is a pickle tuple `(forcing, target, attributes)` plus",
-        "`gage_id.npy`, `camels_dates.npy`, and the code-defined forcing order.",
-        "No old 559 NPZ is",
-        "loaded by this foundation adapter.",
-        "",
-        f"- source basins: {structure['n_source_basins']}",
-        f"- selected basins: {structure['n_selected_basins']}",
-        f"- timesteps: {structure['n_timesteps']}",
-        f"- dates: {structure['date_start']} to {structure['date_end']}",
-        f"- forcing: {structure['forcing_names']} with shape {structure['selected_shapes']['forcing']}",
-        f"- target raw: ft3/s with shape {structure['selected_shapes']['target_cfs']}",
-        f"- target IC: mm/day with shape {structure['selected_shapes']['target_mm_day']}",
-        f"- attributes: shape {structure['selected_shapes']['attributes']}",
-        f"- area: area_gages2, attribute index {AREA_ATTRIBUTE_INDEX}, km2",
-        f"- selected target NaN count: {structure['missing_encoding']['target_nan_count_selected']}",
-        f"- selected target negative count: {structure['missing_encoding']['target_negative_count_selected']}",
-        f"- leap days: {structure['leap_day_count']}",
-        "",
-        "The tuple has no embedded field names; attribute names and the area",
-        "column are taken from the existing project CAMELS contract and dPL",
-        "loader evidence, recorded above rather than guessed from column values.",
-        "",
-    ])
+    markdown = "\n".join(
+        [
+            "# CAMELS-531 dataset structure",
+            "",
+            "The source is a pickle tuple `(forcing, target, attributes)` plus",
+            "`gage_id.npy`, `camels_dates.npy`, and the code-defined forcing order.",
+            "No old 559 NPZ is",
+            "loaded by this foundation adapter.",
+            "",
+            f"- source basins: {structure['n_source_basins']}",
+            f"- selected basins: {structure['n_selected_basins']}",
+            f"- timesteps: {structure['n_timesteps']}",
+            f"- dates: {structure['date_start']} to {structure['date_end']}",
+            f"- forcing: {structure['forcing_names']} with shape {structure['selected_shapes']['forcing']}",
+            f"- target raw: ft3/s with shape {structure['selected_shapes']['target_cfs']}",
+            f"- target IC: mm/day with shape {structure['selected_shapes']['target_mm_day']}",
+            f"- attributes: shape {structure['selected_shapes']['attributes']}",
+            f"- area: area_gages2, attribute index {AREA_ATTRIBUTE_INDEX}, km2",
+            f"- selected target NaN count: {structure['missing_encoding']['target_nan_count_selected']}",
+            f"- selected target negative count: {structure['missing_encoding']['target_negative_count_selected']}",
+            f"- leap days: {structure['leap_day_count']}",
+            "",
+            "The tuple has no embedded field names; attribute names and the area",
+            "column are taken from the existing project CAMELS contract and dPL",
+            "loader evidence, recorded above rather than guessed from column values.",
+            "",
+        ]
+    )
     atomic_write_text(output_root / "dataset_structure.md", markdown)
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config", type=Path, default=PROJECT_ROOT / "ablation/configs/ic_foundation_531_v1.json")
+    parser.add_argument(
+        "--config",
+        type=Path,
+        default=PROJECT_ROOT / "ablation/configs/ic_foundation_531_v1.json",
+    )
     parser.add_argument("--device", default=None)
     args = parser.parse_args()
     config = load_resolved_config(args.config, device_override=args.device)
@@ -122,34 +139,53 @@ def main() -> None:
     bundle = load_531_bundle(config)
     _write_structure(bundle, config, output_root)
     atomic_write_json(output_root / "period_resolution.json", bundle.periods.as_dict())
-    memory_report = "\n".join([
-        "# Memory and device report",
-        "",
-        "- The source pickle is loaded once by the adapter.",
-        f"- Selected CPU forcing bytes: {bundle.forcing.nbytes}",
-        f"- Selected raw target bytes: {bundle.target_cfs.nbytes}",
-        f"- Selected converted target bytes: {bundle.target_mm_day.nbytes}",
-        f"- Selected attributes bytes: {bundle.raw_attributes.nbytes}",
-        "- The complete selected bundle remains on CPU; runtime transfers only a",
-        f"  basin batch of at most {config['batching']['basin_batch_size']} basins and its candidates.",
-        f"- Configured device: {config['device']}",
-        "- No permanent copied dataset or GPU-resident full dataset is created.",
-        "",
-    ])
+    memory_report = "\n".join(
+        [
+            "# Memory and device report",
+            "",
+            "- The source pickle is loaded once by the adapter.",
+            f"- Selected CPU forcing bytes: {bundle.forcing.nbytes}",
+            f"- Selected raw target bytes: {bundle.target_cfs.nbytes}",
+            f"- Selected converted target bytes: {bundle.target_mm_day.nbytes}",
+            f"- Selected attributes bytes: {bundle.raw_attributes.nbytes}",
+            "- The complete selected bundle remains on CPU; runtime transfers only a",
+            f"  basin batch of at most {config['batching']['basin_batch_size']} basins and its candidates.",
+            f"- Configured device: {config['device']}",
+            "- No permanent copied dataset or GPU-resident full dataset is created.",
+            "",
+        ]
+    )
     atomic_write_text(output_root / "memory_and_device_report.md", memory_report)
     manifest = manifest_for_bundle(bundle, config)
-    write_manifest(bundle, config, PROJECT_ROOT / "ablation/manifests/ic_531_dataset_manifest_v1.json")
+    write_manifest(
+        bundle,
+        config,
+        PROJECT_ROOT / "ablation/manifests/ic_531_dataset_manifest_v1.json",
+    )
     atomic_write_json(output_root / "ic_531_dataset_manifest_resolved.json", manifest)
-    write_basin_index_csv(bundle, PROJECT_ROOT / "ablation/manifests/ic_531_basin_index_v1.csv")
-    atomic_write_json(output_root / "smoke_data.json", {
-        "status": "pass",
-        "n_basins": len(bundle.basin_ids),
-        "basin_order_hash": manifest["basin_order_hash"],
-        "selected_shapes": manifest["selected_shapes"],
-        "date_range": [manifest["date_start"], manifest["date_end"]],
-        "no_559_fallback": True,
-        "target_valid_count_train_min": int(bundle.valid_target_mask[:, bundle.periods.train.start_index:bundle.periods.train.end_index + 1].sum(axis=1).min()),
-    })
+    write_basin_index_csv(
+        bundle, PROJECT_ROOT / "ablation/manifests/ic_531_basin_index_v1.csv"
+    )
+    atomic_write_json(
+        output_root / "smoke_data.json",
+        {
+            "status": "pass",
+            "n_basins": len(bundle.basin_ids),
+            "basin_order_hash": manifest["basin_order_hash"],
+            "selected_shapes": manifest["selected_shapes"],
+            "date_range": [manifest["date_start"], manifest["date_end"]],
+            "no_559_fallback": True,
+            "target_valid_count_train_min": int(
+                bundle.valid_target_mask[
+                    :,
+                    bundle.periods.train.start_index : bundle.periods.train.end_index
+                    + 1,
+                ]
+                .sum(axis=1)
+                .min()
+            ),
+        },
+    )
 
 
 if __name__ == "__main__":

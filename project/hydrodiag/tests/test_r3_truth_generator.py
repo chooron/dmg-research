@@ -88,14 +88,22 @@ def test_recorded_cn_matches_production_forward():
     pet = torch.rand(batch, steps) * 5
     fc = {"precip": precip, "temp": temp, "pet": pet}
     params = {
-        "cn_ctg": torch.full((batch,), 0.4), "cn_kf": torch.full((batch,), 3.0),
-        "xaj_k": torch.full((batch,), 1.0), "xaj_b": torch.full((batch,), 0.3),
-        "xaj_im": torch.full((batch,), 0.02), "xaj_um": torch.full((batch,), 20.0),
-        "xaj_lm": torch.full((batch,), 80.0), "xaj_dm": torch.full((batch,), 40.0),
-        "xaj_c": torch.full((batch,), 0.15), "xaj_sm": torch.full((batch,), 30.0),
-        "xaj_ex": torch.full((batch,), 1.2), "xaj_ki": torch.full((batch,), 0.3),
-        "xaj_kg": torch.full((batch,), 0.2), "xaj_ci": torch.full((batch,), 0.5),
-        "xaj_cg": torch.full((batch,), 0.98), "xaj_a": torch.full((batch,), 2.0),
+        "cn_ctg": torch.full((batch,), 0.4),
+        "cn_kf": torch.full((batch,), 3.0),
+        "xaj_k": torch.full((batch,), 1.0),
+        "xaj_b": torch.full((batch,), 0.3),
+        "xaj_im": torch.full((batch,), 0.02),
+        "xaj_um": torch.full((batch,), 20.0),
+        "xaj_lm": torch.full((batch,), 80.0),
+        "xaj_dm": torch.full((batch,), 40.0),
+        "xaj_c": torch.full((batch,), 0.15),
+        "xaj_sm": torch.full((batch,), 30.0),
+        "xaj_ex": torch.full((batch,), 1.2),
+        "xaj_ki": torch.full((batch,), 0.3),
+        "xaj_kg": torch.full((batch,), 0.2),
+        "xaj_ci": torch.full((batch,), 0.5),
+        "xaj_cg": torch.full((batch,), 0.98),
+        "xaj_a": torch.full((batch,), 2.0),
         "xaj_theta": torch.full((batch,), 1.5),
     }
     recorded = recorded_cn_forward(model, fc, params, torch.device("cpu"), DTYPE)
@@ -116,13 +124,20 @@ def test_recorded_base_matches_production_forward():
     pet = torch.rand(batch, steps) * 5
     fc = {"precip": precip, "temp": temp, "pet": pet}
     params = {
-        "xaj_k": torch.full((batch,), 1.0), "xaj_b": torch.full((batch,), 0.3),
-        "xaj_im": torch.full((batch,), 0.02), "xaj_um": torch.full((batch,), 20.0),
-        "xaj_lm": torch.full((batch,), 80.0), "xaj_dm": torch.full((batch,), 40.0),
-        "xaj_c": torch.full((batch,), 0.15), "xaj_sm": torch.full((batch,), 30.0),
-        "xaj_ex": torch.full((batch,), 1.2), "xaj_ki": torch.full((batch,), 0.3),
-        "xaj_kg": torch.full((batch,), 0.2), "xaj_ci": torch.full((batch,), 0.5),
-        "xaj_cg": torch.full((batch,), 0.98), "xaj_a": torch.full((batch,), 2.0),
+        "xaj_k": torch.full((batch,), 1.0),
+        "xaj_b": torch.full((batch,), 0.3),
+        "xaj_im": torch.full((batch,), 0.02),
+        "xaj_um": torch.full((batch,), 20.0),
+        "xaj_lm": torch.full((batch,), 80.0),
+        "xaj_dm": torch.full((batch,), 40.0),
+        "xaj_c": torch.full((batch,), 0.15),
+        "xaj_sm": torch.full((batch,), 30.0),
+        "xaj_ex": torch.full((batch,), 1.2),
+        "xaj_ki": torch.full((batch,), 0.3),
+        "xaj_kg": torch.full((batch,), 0.2),
+        "xaj_ci": torch.full((batch,), 0.5),
+        "xaj_cg": torch.full((batch,), 0.98),
+        "xaj_a": torch.full((batch,), 2.0),
         "xaj_theta": torch.full((batch,), 1.5),
     }
     recorded = recorded_base_forward(model, fc, params, torch.device("cpu"), DTYPE)
@@ -145,13 +160,20 @@ def test_recorded_tgd2_matches_production_forward():
     params = {
         "tgd_tau_warm": torch.full((batch,), 0.5),
         "tgd_delta_tau_cold": torch.full((batch,), 20.0),
-        "xaj_k": torch.full((batch,), 1.0), "xaj_b": torch.full((batch,), 0.3),
-        "xaj_im": torch.full((batch,), 0.02), "xaj_um": torch.full((batch,), 20.0),
-        "xaj_lm": torch.full((batch,), 80.0), "xaj_dm": torch.full((batch,), 40.0),
-        "xaj_c": torch.full((batch,), 0.15), "xaj_sm": torch.full((batch,), 30.0),
-        "xaj_ex": torch.full((batch,), 1.2), "xaj_ki": torch.full((batch,), 0.3),
-        "xaj_kg": torch.full((batch,), 0.2), "xaj_ci": torch.full((batch,), 0.5),
-        "xaj_cg": torch.full((batch,), 0.98), "xaj_a": torch.full((batch,), 2.0),
+        "xaj_k": torch.full((batch,), 1.0),
+        "xaj_b": torch.full((batch,), 0.3),
+        "xaj_im": torch.full((batch,), 0.02),
+        "xaj_um": torch.full((batch,), 20.0),
+        "xaj_lm": torch.full((batch,), 80.0),
+        "xaj_dm": torch.full((batch,), 40.0),
+        "xaj_c": torch.full((batch,), 0.15),
+        "xaj_sm": torch.full((batch,), 30.0),
+        "xaj_ex": torch.full((batch,), 1.2),
+        "xaj_ki": torch.full((batch,), 0.3),
+        "xaj_kg": torch.full((batch,), 0.2),
+        "xaj_ci": torch.full((batch,), 0.5),
+        "xaj_cg": torch.full((batch,), 0.98),
+        "xaj_a": torch.full((batch,), 2.0),
         "xaj_theta": torch.full((batch,), 1.5),
     }
     recorded = recorded_tgd2_forward(model, fc, params, torch.device("cpu"), DTYPE)
@@ -188,7 +210,11 @@ def test_reordered_531_list_preserves_membership():
 
 
 def test_common_xaj_is_15_shared_parameters():
-    from models.parameter_specs import XAJ_PARAM_SPECS, XAJ_CN_PARAM_SPECS, XAJ_TGD2_PARAM_SPECS
+    from models.parameter_specs import (
+        XAJ_CN_PARAM_SPECS,
+        XAJ_PARAM_SPECS,
+        XAJ_TGD2_PARAM_SPECS,
+    )
 
     assert len(COMMON_XAJ) == 15
     for n in COMMON_XAJ:

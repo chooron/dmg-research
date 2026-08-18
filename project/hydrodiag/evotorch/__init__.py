@@ -35,7 +35,15 @@ from .core import Problem, ProblemBoundEvaluator, Solution, SolutionBatch
 
 import logging as _py_logging
 
-from . import algorithms, decorators, distributions, logging, neuroevolution, optimizers, testing
+from . import (
+    algorithms,
+    decorators,
+    distributions,
+    logging,
+    neuroevolution,
+    optimizers,
+    testing,
+)
 
 # Set verbosity level of EvoTorch
 
@@ -48,7 +56,9 @@ _verbose_level = {
 }.get(_env_verbose_level)
 
 if _verbose_level is None:
-    _py_logging.getLogger("evotorch").warning(f"Unknown value passed to EVOTORCH_VERBOSE_LEVEL ({_env_verbose_level}).")
+    _py_logging.getLogger("evotorch").warning(
+        f"Unknown value passed to EVOTORCH_VERBOSE_LEVEL ({_env_verbose_level})."
+    )
 elif _verbose_level >= 0:
     tools.misc.set_default_logger_config(logger_level=_verbose_level)
 
@@ -70,7 +80,9 @@ __all__ = (
     "testing",
     "tools",
 )
-__author__ = "Nihat Engin Toklu, Timothy Atkinson, Vojtech Micka, Rupesh Kumar Srivastava"
+__author__ = (
+    "Nihat Engin Toklu, Timothy Atkinson, Vojtech Micka, Rupesh Kumar Srivastava"
+)
 __email__ = "engin@nnaisense.com, timothy@nnaisense.com, vojtech@nnaisense.com, rupesh@nnaisense.com"
 
 try:
@@ -79,6 +91,7 @@ except ImportError:
     import sys
 
     print(
-        "Please install the package to ensure correct behavior.\nFrom root folder:\n\tpip install -e .", file=sys.stderr
+        "Please install the package to ensure correct behavior.\nFrom root folder:\n\tpip install -e .",
+        file=sys.stderr,
     )
     __version__ = "undefined"

@@ -18,26 +18,40 @@ no CMA-ES, no checkpoint mutation.
 from __future__ import annotations
 
 import torch
-
 from ablation.ic_core.model_adapter import LITE_MODEL_CLASSES, MODEL_CLASSES
 from ablation.ic_core.parameter_adapter import get_parameter_spec
 from models import (
-    XAJControlledNWithCemaNeige, XAJControlledNWithCemaNeigeLite,
-    XAJDEWithCemaNeige, XAJDEWithCemaNeigeLite,
-    XAJDRWithCemaNeige, XAJDRWithCemaNeigeLite,
-    XAJGEWithCemaNeige, XAJGEWithCemaNeigeLite,
-    XAJGRWithCemaNeige, XAJGRWithCemaNeigeLite,
-    XAJControlledN, XAJDE, XAJGE, XAJDR, XAJGR,
+    XAJDE,
+    XAJDR,
+    XAJGE,
+    XAJGR,
+    XAJControlledN,
+    XAJControlledNWithCemaNeige,
+    XAJControlledNWithCemaNeigeLite,
+    XAJDEWithCemaNeige,
+    XAJDEWithCemaNeigeLite,
+    XAJDRWithCemaNeige,
+    XAJDRWithCemaNeigeLite,
+    XAJGEWithCemaNeige,
+    XAJGEWithCemaNeigeLite,
+    XAJGRWithCemaNeige,
+    XAJGRWithCemaNeigeLite,
 )
 from models.parameter_specs import (
     CEMANEIGE_PARAM_SPECS,
-    CONTROLLED_XAJ_CI_LOWER, CONTROLLED_XAJ_CI_UPPER,
-    CONTROLLED_XAJ_CG_LOWER, CONTROLLED_XAJ_CG_UPPER,
-    XAJ_CONTROLLED_N_PARAM_SPECS, XAJ_DE_PARAM_SPECS, XAJ_GE_PARAM_SPECS,
-    XAJ_DR_PARAM_SPECS, XAJ_GR_PARAM_SPECS,
+    CONTROLLED_XAJ_CG_LOWER,
+    CONTROLLED_XAJ_CG_UPPER,
+    CONTROLLED_XAJ_CI_LOWER,
+    CONTROLLED_XAJ_CI_UPPER,
+    XAJ_CONTROLLED_N_PARAM_SPECS,
+    XAJ_DE_PARAM_SPECS,
+    XAJ_DR_PARAM_SPECS,
+    XAJ_GE_PARAM_SPECS,
+    XAJ_GR_PARAM_SPECS,
 )
 from models.structure_response import (
-    _analytic_subsurface_response_step, native_effective_kss,
+    _analytic_subsurface_response_step,
+    native_effective_kss,
 )
 from models.xaj import _xaj_step_impl
 
@@ -57,14 +71,14 @@ _dynamo.config.cache_size_limit = max(_dynamo.config.cache_size_limit, 256)
 # Shared deterministic forcing / parameter / state fixtures
 # --------------------------------------------------------------------------
 
+
 def forcing(steps: int = 160, dtype: torch.dtype = DTYPE):
     t = torch.arange(steps, dtype=dtype)
     # Dry/wet/snow alternation activates CN snow, EU/EL/ED, runoff and the
     # subsurface response.
-    precip = (
-        torch.where((t % 9) < 4, 6.0 + (t % 5) * 0.7, torch.zeros_like(t))
-        + torch.where((t % 29) == 3, 40.0, torch.zeros_like(t))
-    )
+    precip = torch.where(
+        (t % 9) < 4, 6.0 + (t % 5) * 0.7, torch.zeros_like(t)
+    ) + torch.where((t % 29) == 3, 40.0, torch.zeros_like(t))
     pet = 1.5 + 1.5 * ((t % 11) / 10.0)
     temp = torch.where((t % 17) < 7, torch.full_like(t, -2.5), torch.full_like(t, 4.5))
     return {
@@ -115,6 +129,7 @@ def initial_states(dtype: torch.dtype = DTYPE):
 # 1. Code-level control matrix
 # --------------------------------------------------------------------------
 
+
 def test_code_matrix_matches_frozen_design():
     """Parameter-spec matrix is exactly the frozen single-factor design."""
     n_spec = XAJ_CONTROLLED_N_PARAM_SPECS
@@ -163,10 +178,26 @@ def test_code_matrix_matches_frozen_design():
 
 def test_variant_to_scheme_mapping_is_single_process():
     """Each D/G class replaces exactly one process module."""
-    assert (XAJDE.variant, XAJDE.response_variant, XAJDE.generic_variant) == (0, False, False)
-    assert (XAJGE.variant, XAJGE.response_variant, XAJGE.generic_variant) == (1, False, True)
-    assert (XAJDR.variant, XAJDR.response_variant, XAJDR.generic_variant) == (2, True, False)
-    assert (XAJGR.variant, XAJGR.response_variant, XAJGR.generic_variant) == (3, True, True)
+    assert (XAJDE.variant, XAJDE.response_variant, XAJDE.generic_variant) == (
+        0,
+        False,
+        False,
+    )
+    assert (XAJGE.variant, XAJGE.response_variant, XAJGE.generic_variant) == (
+        1,
+        False,
+        True,
+    )
+    assert (XAJDR.variant, XAJDR.response_variant, XAJDR.generic_variant) == (
+        2,
+        True,
+        False,
+    )
+    assert (XAJGR.variant, XAJGR.response_variant, XAJGR.generic_variant) == (
+        3,
+        True,
+        True,
+    )
     # Code path in _xaj_structure_step_full/_compact maps:
     #   variant 0 -> evaporation 2 (parallel linear),  response 0 (native)
     #   variant 1 -> evaporation 3 (parallel power),   response 0 (native)
@@ -213,7 +244,9 @@ def test_no_inactive_or_dummy_optimizer_parameters():
     # D_E/G_E drop C; the C slot is a constant zero, not an optimizer dim.
     assert "xaj_c" not in XAJ_DE_PARAM_SPECS and "xaj_c" not in XAJ_GE_PARAM_SPECS
     # D_R/G_R drop the response identities; no gamma is present.
-    assert "xaj_gamma" not in XAJ_DR_PARAM_SPECS and "xaj_gamma" not in XAJ_GR_PARAM_SPECS
+    assert (
+        "xaj_gamma" not in XAJ_DR_PARAM_SPECS and "xaj_gamma" not in XAJ_GR_PARAM_SPECS
+    )
     for name in ("xaj_ki", "xaj_kg", "xaj_ci", "xaj_cg"):
         assert name not in XAJ_DR_PARAM_SPECS and name not in XAJ_GR_PARAM_SPECS
 
@@ -235,12 +268,18 @@ def test_no_inactive_or_dummy_optimizer_parameters():
         "G_R": {"xaj_kss", "xaj_tau0", "xaj_beta", "xaj_k", "cn_kf"},
     }
     zero_grad_ok = {"cn_ctg", "xaj_c"}
-    for key, cls in (("N", XAJControlledNWithCemaNeige), ("D_E", XAJDEWithCemaNeige),
-                     ("G_E", XAJGEWithCemaNeige), ("D_R", XAJDRWithCemaNeige),
-                     ("G_R", XAJGRWithCemaNeige)):
+    for key, cls in (
+        ("N", XAJControlledNWithCemaNeige),
+        ("D_E", XAJDEWithCemaNeige),
+        ("G_E", XAJGEWithCemaNeige),
+        ("D_R", XAJDRWithCemaNeige),
+        ("G_R", XAJGRWithCemaNeige),
+    ):
         specs = get_parameter_spec(key)
         params = {
-            name: torch.full((1,), float(spec["default"]), dtype=DTYPE, requires_grad=True)
+            name: torch.full(
+                (1,), float(spec["default"]), dtype=DTYPE, requires_grad=True
+            )
             for name, spec in specs.items()
         }
         if "xaj_im" in params:
@@ -262,15 +301,21 @@ def test_no_inactive_or_dummy_optimizer_parameters():
         if "xaj_kg" in params:
             params["xaj_kg"] = torch.tensor([0.20], dtype=DTYPE, requires_grad=True)
         model = cls(compact_output=False)
-        qsim, _ = model(forcing(48), {**cn_params(), **params}, initial_states=initial_states())
+        qsim, _ = model(
+            forcing(48), {**cn_params(), **params}, initial_states=initial_states()
+        )
         qsim.square().mean().backward()
         for name, value in params.items():
             assert value.grad is not None, f"{key}:{name} got no gradient"
             assert torch.isfinite(value.grad).all(), f"{key}:{name} non-finite gradient"
             if name in must_activate[key]:
-                assert abs(float(value.grad)) > 1e-12, f"{key}:{name} inactive optimizer dimension"
+                assert abs(float(value.grad)) > 1e-12, (
+                    f"{key}:{name} inactive optimizer dimension"
+                )
             elif name not in zero_grad_ok:
-                assert abs(float(value.grad)) > 1e-12, f"{key}:{name} inactive optimizer dimension"
+                assert abs(float(value.grad)) > 1e-12, (
+                    f"{key}:{name} inactive optimizer dimension"
+                )
 
 
 def test_native_et_c_is_forward_active_not_dummy():
@@ -279,26 +324,37 @@ def test_native_et_c_is_forward_active_not_dummy():
     t = torch.arange(steps, dtype=DTYPE)
     # 20-day drydown puts WL inside the C-sensitive band, then partial-wet
     # events let the storage difference reach runoff generation.
-    precip = torch.where(t < 20, torch.zeros_like(t), torch.where((t % 6) < 3, 7.0, 0.0))
+    precip = torch.where(
+        t < 20, torch.zeros_like(t), torch.where((t % 6) < 3, 7.0, 0.0)
+    )
     pet = torch.where(t < 20, torch.full_like(t, 7.0), torch.full_like(t, 2.0))
     temp = torch.full_like(t, 8.0)
-    f = {"precip": precip.unsqueeze(0), "pet": pet.unsqueeze(0), "temp": temp.unsqueeze(0)}
+    f = {
+        "precip": precip.unsqueeze(0),
+        "pet": pet.unsqueeze(0),
+        "temp": temp.unsqueeze(0),
+    }
     base = params_from(XAJ_CONTROLLED_N_PARAM_SPECS)
     base["xaj_um"] = torch.tensor([20.0], dtype=DTYPE)
     base["xaj_lm"] = torch.tensor([80.0], dtype=DTYPE)
     base["xaj_dm"] = torch.tensor([40.0], dtype=DTYPE)
     init = dict(initial_states())
-    init.update({
-        "cn_G": torch.tensor([0.0], dtype=DTYPE), "cn_eTG": torch.tensor([-1.0], dtype=DTYPE),
-        "xaj_wu": torch.tensor([5.0], dtype=DTYPE), "xaj_wl": torch.tensor([50.0], dtype=DTYPE),
-        "xaj_wd": torch.tensor([35.0], dtype=DTYPE),
-    })
+    init.update(
+        {
+            "cn_G": torch.tensor([0.0], dtype=DTYPE),
+            "cn_eTG": torch.tensor([-1.0], dtype=DTYPE),
+            "xaj_wu": torch.tensor([5.0], dtype=DTYPE),
+            "xaj_wl": torch.tensor([50.0], dtype=DTYPE),
+            "xaj_wd": torch.tensor([35.0], dtype=DTYPE),
+        }
+    )
     outs = []
     for c_value in (0.05, 0.25):
         p = {name: value.clone() for name, value in base.items()}
         p["xaj_c"] = torch.tensor([c_value], dtype=DTYPE)
         q, _ = XAJControlledNWithCemaNeige(compact_output=False)(
-            f, {**cn_params(), **p}, initial_states=init)
+            f, {**cn_params(), **p}, initial_states=init
+        )
         outs.append(q)
     assert float((outs[0] - outs[1]).abs().max()) > 1e-6
 
@@ -307,33 +363,86 @@ def test_native_et_c_is_forward_active_not_dummy():
 # 2. Evaporation ladder: N vs D_E vs G_E
 # --------------------------------------------------------------------------
 
-def _step_impl(scheme, st, prcp, pet, *, gamma=None, ki=0.30, kg=0.20,
-               ci=0.55, cg=0.96, im=0.02, c=0.15):
+
+def _step_impl(
+    scheme,
+    st,
+    prcp,
+    pet,
+    *,
+    gamma=None,
+    ki=0.30,
+    kg=0.20,
+    ci=0.55,
+    cg=0.96,
+    im=0.02,
+    c=0.15,
+):
     """Direct _xaj_step_impl with the same native response parameters."""
     wu, wl, wd, s, fr, qi, qg = st
-    k = torch.tensor([1.1], dtype=DTYPE); b = torch.tensor([0.3], dtype=DTYPE)
-    um = torch.tensor([20.0], dtype=DTYPE); lm = torch.tensor([80.0], dtype=DTYPE)
+    k = torch.tensor([1.1], dtype=DTYPE)
+    b = torch.tensor([0.3], dtype=DTYPE)
+    um = torch.tensor([20.0], dtype=DTYPE)
+    lm = torch.tensor([80.0], dtype=DTYPE)
     dm = torch.tensor([40.0], dtype=DTYPE)
-    sm = torch.tensor([30.0], dtype=DTYPE); ex = torch.tensor([1.2], dtype=DTYPE)
+    sm = torch.tensor([30.0], dtype=DTYPE)
+    ex = torch.tensor([1.2], dtype=DTYPE)
     im_t = torch.tensor([im], dtype=DTYPE)
-    ki_t = torch.tensor([ki], dtype=DTYPE); kg_t = torch.tensor([kg], dtype=DTYPE)
-    ci_t = torch.tensor([ci], dtype=DTYPE); cg_t = torch.tensor([cg], dtype=DTYPE)
+    ki_t = torch.tensor([ki], dtype=DTYPE)
+    kg_t = torch.tensor([kg], dtype=DTYPE)
+    ci_t = torch.tensor([ci], dtype=DTYPE)
+    cg_t = torch.tensor([cg], dtype=DTYPE)
     c_t = torch.tensor([c], dtype=DTYPE) if scheme == 0 else torch.zeros(1, dtype=DTYPE)
     wm = um + lm + dm
     ev_scheme = {0: 0, 2: 2, 3: 3}[scheme]
     return _xaj_step_impl(
-        prcp, pet, wu, wl, wd, s, fr, qi, qg,
-        k, b, im_t, um, lm, dm, c_t, sm, ex, ki_t, kg_t, ci_t, cg_t,
-        NEARZERO, wm, wm * (1.0 + b), sm * (1.0 + ex), 1.0 - im_t, 1.0 - ki_t - kg_t,
-        True, ev_scheme, None, 0, gamma, None, None, None,
+        prcp,
+        pet,
+        wu,
+        wl,
+        wd,
+        s,
+        fr,
+        qi,
+        qg,
+        k,
+        b,
+        im_t,
+        um,
+        lm,
+        dm,
+        c_t,
+        sm,
+        ex,
+        ki_t,
+        kg_t,
+        ci_t,
+        cg_t,
+        NEARZERO,
+        wm,
+        wm * (1.0 + b),
+        sm * (1.0 + ex),
+        1.0 - im_t,
+        1.0 - ki_t - kg_t,
+        True,
+        ev_scheme,
+        None,
+        0,
+        gamma,
+        None,
+        None,
+        None,
     )
 
 
 def _dry_state():
     return (
-        torch.tensor([2.0], dtype=DTYPE), torch.tensor([30.0], dtype=DTYPE),
-        torch.tensor([25.0], dtype=DTYPE), torch.tensor([8.0], dtype=DTYPE),
-        torch.tensor([0.5], dtype=DTYPE), torch.tensor([0.2], dtype=DTYPE),
+        torch.tensor([2.0], dtype=DTYPE),
+        torch.tensor([30.0], dtype=DTYPE),
+        torch.tensor([25.0], dtype=DTYPE),
+        torch.tensor([8.0], dtype=DTYPE),
+        torch.tensor([0.5], dtype=DTYPE),
+        torch.tensor([0.2], dtype=DTYPE),
         torch.tensor([0.4], dtype=DTYPE),
     )
 
@@ -362,9 +471,12 @@ def test_evaporation_ladder_response_identity_dry_step():
 def test_evaporation_ladder_wet_step_full_identity():
     """A wet step (remaining PET = 0) is fully identical across schemes."""
     st = (
-        torch.tensor([10.0], dtype=DTYPE), torch.tensor([30.0], dtype=DTYPE),
-        torch.tensor([25.0], dtype=DTYPE), torch.tensor([8.0], dtype=DTYPE),
-        torch.tensor([0.5], dtype=DTYPE), torch.tensor([0.2], dtype=DTYPE),
+        torch.tensor([10.0], dtype=DTYPE),
+        torch.tensor([30.0], dtype=DTYPE),
+        torch.tensor([25.0], dtype=DTYPE),
+        torch.tensor([8.0], dtype=DTYPE),
+        torch.tensor([0.5], dtype=DTYPE),
+        torch.tensor([0.2], dtype=DTYPE),
         torch.tensor([0.4], dtype=DTYPE),
     )
     prcp = torch.tensor([9.0], dtype=DTYPE)
@@ -397,13 +509,18 @@ def test_evaporation_ladder_isolated_response_identity():
     are exactly the injected fixed values and the native response recursion
     is evaluated in isolation for all three evaporation schemes.
     """
-    s = torch.tensor([10.0], dtype=DTYPE)   # fixed
-    fr = torch.tensor([0.4], dtype=DTYPE)   # fixed
+    s = torch.tensor([10.0], dtype=DTYPE)  # fixed
+    fr = torch.tensor([0.4], dtype=DTYPE)  # fixed
     qi0 = torch.tensor([0.7], dtype=DTYPE)  # fixed response initial state
     qg0 = torch.tensor([1.3], dtype=DTYPE)  # fixed response initial state
     st = (
-        torch.tensor([0.0], dtype=DTYPE), torch.tensor([0.0], dtype=DTYPE),
-        torch.tensor([0.0], dtype=DTYPE), s, fr, qi0, qg0,
+        torch.tensor([0.0], dtype=DTYPE),
+        torch.tensor([0.0], dtype=DTYPE),
+        torch.tensor([0.0], dtype=DTYPE),
+        s,
+        fr,
+        qi0,
+        qg0,
     )
     prcp = torch.zeros(1, dtype=DTYPE)
     pet = torch.zeros(1, dtype=DTYPE)
@@ -412,8 +529,8 @@ def test_evaporation_ladder_isolated_response_identity():
     rg_target = 0.20 * s * fr
     outs = [_step_impl(scheme, st, prcp, pet, gamma=gamma) for scheme in (0, 2, 3)]
     for o in outs:
-        assert torch.equal(o[11], ri_target)   # ri
-        assert torch.equal(o[12], rg_target)   # rg
+        assert torch.equal(o[11], ri_target)  # ri
+        assert torch.equal(o[12], rg_target)  # rg
     # Native QI/QG recursions identical to machine precision.
     assert torch.equal(outs[0][2], outs[1][2]) and torch.equal(outs[0][2], outs[2][2])
     assert torch.equal(outs[0][3], outs[1][3]) and torch.equal(outs[0][3], outs[2][3])
@@ -424,14 +541,23 @@ def test_evaporation_ladder_composed_single_factor():
     f = forcing(120)
     cn = cn_params()
     qn, an = XAJControlledNWithCemaNeige(compact_output=False)(
-        f, {**cn, **params_from(XAJ_CONTROLLED_N_PARAM_SPECS)},
-        initial_states=initial_states(), return_states=True)
+        f,
+        {**cn, **params_from(XAJ_CONTROLLED_N_PARAM_SPECS)},
+        initial_states=initial_states(),
+        return_states=True,
+    )
     qde, ade = XAJDEWithCemaNeige(compact_output=False)(
-        f, {**cn, **params_from(XAJ_DE_PARAM_SPECS)},
-        initial_states=initial_states(), return_states=True)
+        f,
+        {**cn, **params_from(XAJ_DE_PARAM_SPECS)},
+        initial_states=initial_states(),
+        return_states=True,
+    )
     qge1, age1 = XAJGEWithCemaNeige(compact_output=False)(
-        f, {**cn, **params_from(XAJ_GE_PARAM_SPECS, xaj_gamma=1.0)},
-        initial_states=initial_states(), return_states=True)
+        f,
+        {**cn, **params_from(XAJ_GE_PARAM_SPECS, xaj_gamma=1.0)},
+        initial_states=initial_states(),
+        return_states=True,
+    )
 
     # 1. CemaNeige effective precipitation is identical across all three.
     for aux in (ade, age1):
@@ -464,29 +590,81 @@ def test_evaporation_ladder_composed_single_factor():
 # 3. Response ladder: N vs D_R vs G_R
 # --------------------------------------------------------------------------
 
-def _step_impl_response(st, prcp, pet, *, beta=None, ki=0.30, kg=0.20,
-                        ci=0.55, cg=0.96, im=0.02, c=0.15, tau0=10.0):
+
+def _step_impl_response(
+    st,
+    prcp,
+    pet,
+    *,
+    beta=None,
+    ki=0.30,
+    kg=0.20,
+    ci=0.55,
+    cg=0.96,
+    im=0.02,
+    c=0.15,
+    tau0=10.0,
+):
     """Direct _xaj_step_impl with native ET and the D_R/G_R response block."""
     wu, wl, wd, s, fr, qi, qg = st
-    k = torch.tensor([1.1], dtype=DTYPE); b = torch.tensor([0.3], dtype=DTYPE)
-    um = torch.tensor([20.0], dtype=DTYPE); lm = torch.tensor([80.0], dtype=DTYPE)
+    k = torch.tensor([1.1], dtype=DTYPE)
+    b = torch.tensor([0.3], dtype=DTYPE)
+    um = torch.tensor([20.0], dtype=DTYPE)
+    lm = torch.tensor([80.0], dtype=DTYPE)
     dm = torch.tensor([40.0], dtype=DTYPE)
-    sm = torch.tensor([30.0], dtype=DTYPE); ex = torch.tensor([1.2], dtype=DTYPE)
+    sm = torch.tensor([30.0], dtype=DTYPE)
+    ex = torch.tensor([1.2], dtype=DTYPE)
     im_t = torch.tensor([im], dtype=DTYPE)
-    ki_t = torch.tensor([ki], dtype=DTYPE); kg_t = torch.tensor([kg], dtype=DTYPE)
+    ki_t = torch.tensor([ki], dtype=DTYPE)
+    kg_t = torch.tensor([kg], dtype=DTYPE)
     c_t = torch.tensor([c], dtype=DTYPE)
     kss = native_effective_kss(ki_t, kg_t)
     wm = um + lm + dm
     response_scheme = 1 if beta is None else 2
-    beta_t = torch.ones(1, dtype=DTYPE) if beta is None else torch.tensor([beta], dtype=DTYPE)
+    beta_t = (
+        torch.ones(1, dtype=DTYPE)
+        if beta is None
+        else torch.tensor([beta], dtype=DTYPE)
+    )
     tau0_t = torch.tensor([tau0], dtype=DTYPE)
     z0 = torch.tensor([3.1553493591016335], dtype=DTYPE)
     return _xaj_step_impl(
-        prcp, pet, wu, wl, wd, s, fr, qi, qg,
-        k, b, im_t, um, lm, dm, c_t, sm, ex,
-        kss, torch.zeros_like(kss), torch.ones_like(kss), torch.ones_like(kss),
-        NEARZERO, wm, wm * (1.0 + b), sm * (1.0 + ex), 1.0 - im_t, 1.0 - kss,
-        True, 0, None, response_scheme, None, tau0_t, beta_t, z0,
+        prcp,
+        pet,
+        wu,
+        wl,
+        wd,
+        s,
+        fr,
+        qi,
+        qg,
+        k,
+        b,
+        im_t,
+        um,
+        lm,
+        dm,
+        c_t,
+        sm,
+        ex,
+        kss,
+        torch.zeros_like(kss),
+        torch.ones_like(kss),
+        torch.ones_like(kss),
+        NEARZERO,
+        wm,
+        wm * (1.0 + b),
+        sm * (1.0 + ex),
+        1.0 - im_t,
+        1.0 - kss,
+        True,
+        0,
+        None,
+        response_scheme,
+        None,
+        tau0_t,
+        beta_t,
+        z0,
     )
 
 
@@ -560,11 +738,17 @@ def test_response_ladder_analytic_kernel_identity():
     z = torch.tensor([0.0, 2.0, 8.0, 30.0], dtype=DTYPE)
     tau = torch.full((4,), 10.0, dtype=DTYPE)
     z0 = torch.full((4,), 3.1553493591016335, dtype=DTYPE)
-    dr = _analytic_subsurface_response_step(r_ss, z, tau, torch.ones(4, dtype=DTYPE), z0, NEARZERO)
-    gr = _analytic_subsurface_response_step(r_ss, z, tau, torch.ones(4, dtype=DTYPE), z0, NEARZERO)
+    dr = _analytic_subsurface_response_step(
+        r_ss, z, tau, torch.ones(4, dtype=DTYPE), z0, NEARZERO
+    )
+    gr = _analytic_subsurface_response_step(
+        r_ss, z, tau, torch.ones(4, dtype=DTYPE), z0, NEARZERO
+    )
     assert torch.equal(dr[0], gr[0]) and torch.equal(dr[1], gr[1])
     # Conservation: Z_next = Z_available - Q_ss.
-    assert torch.allclose(dr[1], torch.clamp(z, min=0.0) + r_ss - dr[0], atol=0.0, rtol=0.0)
+    assert torch.allclose(
+        dr[1], torch.clamp(z, min=0.0) + r_ss - dr[0], atol=0.0, rtol=0.0
+    )
 
 
 def test_response_ladder_composed_single_factor():
@@ -572,14 +756,26 @@ def test_response_ladder_composed_single_factor():
     f = forcing(120)
     cn = cn_params()
     qn, an = XAJControlledNWithCemaNeige(compact_output=False)(
-        f, {**cn, **params_from(XAJ_CONTROLLED_N_PARAM_SPECS)},
-        initial_states=initial_states(), return_states=True)
+        f,
+        {**cn, **params_from(XAJ_CONTROLLED_N_PARAM_SPECS)},
+        initial_states=initial_states(),
+        return_states=True,
+    )
     qdr, adr = XAJDRWithCemaNeige(compact_output=False)(
-        f, {**cn, **params_from(XAJ_DR_PARAM_SPECS, xaj_kss=0.5, xaj_tau0=10.0)},
-        initial_states=initial_states(), return_states=True)
+        f,
+        {**cn, **params_from(XAJ_DR_PARAM_SPECS, xaj_kss=0.5, xaj_tau0=10.0)},
+        initial_states=initial_states(),
+        return_states=True,
+    )
     qgr, agr = XAJGRWithCemaNeige(compact_output=False)(
-        f, {**cn, **params_from(XAJ_GR_PARAM_SPECS, xaj_kss=0.5, xaj_tau0=10.0, xaj_beta=1.0)},
-        initial_states=initial_states(), return_states=True)
+        f,
+        {
+            **cn,
+            **params_from(XAJ_GR_PARAM_SPECS, xaj_kss=0.5, xaj_tau0=10.0, xaj_beta=1.0),
+        },
+        initial_states=initial_states(),
+        return_states=True,
+    )
 
     # CemaNeige identical across all three.
     for aux in (adr, agr):
@@ -634,7 +830,9 @@ def test_full_lite_scientific_kernel_consistent():
         if "xaj_kss" in specs:
             over["xaj_kss"] = 0.5
         params = {**cn, **params_from(specs, **over)}
-        q_full, _ = full_cls(compact_output=False)(f, params, initial_states=initial_states())
+        q_full, _ = full_cls(compact_output=False)(
+            f, params, initial_states=initial_states()
+        )
         q_lite, aux_lite = lite_cls()(f, params, initial_states=initial_states())
         assert torch.allclose(q_full, q_lite, atol=2e-5, rtol=2e-5), key
         assert aux_lite == {}, key
@@ -647,23 +845,38 @@ def test_compiled_fullgraph_and_differential_assertions_hold():
     # D_E vs G_E(gamma=1) must be identical under compiled execution.
     de_p = {**cn, **params_from(XAJ_DE_PARAM_SPECS)}
     ge1_p = {**cn, **params_from(XAJ_GE_PARAM_SPECS, xaj_gamma=1.0)}
-    qde, ade = XAJDEWithCemaNeige(compact_output=False)(f, de_p, initial_states=initial_states())
-    qge1, age1 = XAJGEWithCemaNeige(compact_output=False)(f, ge1_p, initial_states=initial_states())
+    qde, ade = XAJDEWithCemaNeige(compact_output=False)(
+        f, de_p, initial_states=initial_states()
+    )
+    qge1, age1 = XAJGEWithCemaNeige(compact_output=False)(
+        f, ge1_p, initial_states=initial_states()
+    )
     assert torch.equal(qde, qge1)
     assert torch.equal(ade["xaj_eu"], age1["xaj_eu"])
 
     # D_R vs G_R(beta=1) identical under compiled execution.
     dr_p = {**cn, **params_from(XAJ_DR_PARAM_SPECS, xaj_kss=0.5, xaj_tau0=10.0)}
-    gr1_p = {**cn, **params_from(XAJ_GR_PARAM_SPECS, xaj_kss=0.5, xaj_tau0=10.0, xaj_beta=1.0)}
-    qdr, adr = XAJDRWithCemaNeige(compact_output=False)(f, dr_p, initial_states=initial_states())
-    qgr1, agr1 = XAJGRWithCemaNeige(compact_output=False)(f, gr1_p, initial_states=initial_states())
+    gr1_p = {
+        **cn,
+        **params_from(XAJ_GR_PARAM_SPECS, xaj_kss=0.5, xaj_tau0=10.0, xaj_beta=1.0),
+    }
+    qdr, adr = XAJDRWithCemaNeige(compact_output=False)(
+        f, dr_p, initial_states=initial_states()
+    )
+    qgr1, agr1 = XAJGRWithCemaNeige(compact_output=False)(
+        f, gr1_p, initial_states=initial_states()
+    )
     assert torch.equal(qdr, qgr1)
     assert torch.equal(adr["xaj_q_ss"], agr1["xaj_q_ss"])
 
     # N full/lite under compiled execution.
     n_p = {**cn, **params_from(XAJ_CONTROLLED_N_PARAM_SPECS)}
-    qn, _ = XAJControlledNWithCemaNeige(compact_output=False)(f, n_p, initial_states=initial_states())
-    qn_lite, _ = XAJControlledNWithCemaNeigeLite()(f, n_p, initial_states=initial_states())
+    qn, _ = XAJControlledNWithCemaNeige(compact_output=False)(
+        f, n_p, initial_states=initial_states()
+    )
+    qn_lite, _ = XAJControlledNWithCemaNeigeLite()(
+        f, n_p, initial_states=initial_states()
+    )
     assert torch.allclose(qn, qn_lite, atol=2e-5, rtol=2e-5)
 
 
@@ -671,15 +884,15 @@ def test_compiled_fullgraph_and_differential_assertions_hold():
 # 5. Current Phase-0 N checkpoint resolution (read-only)
 # --------------------------------------------------------------------------
 
+
 def test_current_n_checkpoint_resolves_to_phase0_base():
     """Generation-120 N run must resolve to CN + XAJControlledN native base."""
-    ckpt_path = (
-        "results/phase0_ic_60_v1/N/checkpoints/n_batched.pt"
-    )
+    ckpt_path = "results/phase0_ic_60_v1/N/checkpoints/n_batched.pt"
     try:
         ckpt = torch.load(ckpt_path, map_location="cpu", weights_only=False)
     except FileNotFoundError:
         import pytest
+
         pytest.skip("Phase-0 N checkpoint not present in this worktree")
 
     assert ckpt["model"] == "N"
@@ -697,4 +910,8 @@ def test_current_n_checkpoint_resolves_to_phase0_base():
     assert n_spec["xaj_ci"]["upper"] == CONTROLLED_XAJ_CI_UPPER == 0.9
     assert n_spec["xaj_cg"]["upper"] == CONTROLLED_XAJ_CG_UPPER == 0.998
     assert {"xaj_ki", "xaj_kg", "xaj_ci", "xaj_cg", "xaj_c"} <= set(n_spec)
-    assert "xaj_kss" not in n_spec and "xaj_tau0" not in n_spec and "xaj_beta" not in n_spec
+    assert (
+        "xaj_kss" not in n_spec
+        and "xaj_tau0" not in n_spec
+        and "xaj_beta" not in n_spec
+    )

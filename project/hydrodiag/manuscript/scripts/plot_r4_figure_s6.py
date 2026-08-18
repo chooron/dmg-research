@@ -10,6 +10,7 @@ Outputs:
   manuscript/supplement/figures/Fig_S6_r4_multiseed_replication.png (300 DPI, PNG only)
   manuscript/figures/Fig_S6_r4_multiseed_replication.png (300 DPI, PNG only)
 """
+
 from __future__ import annotations
 
 import argparse
@@ -26,7 +27,10 @@ PROJECT_ROOT = HERE.parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from manuscript.scripts.r1_plot_style import apply_clean_spines, setup_publication_style  # noqa: E402
+from manuscript.scripts.r1_plot_style import (  # noqa: E402
+    apply_clean_spines,
+    setup_publication_style,
+)
 from r4.common import default_results_root  # noqa: E402
 from r4.robustness_analysis import bootstrap_median_ci  # noqa: E402
 
@@ -82,9 +86,16 @@ def generate_figure_s6(results_root: Path, out_dir: Path) -> Path:
     df_phase = pd.read_csv(r4_dir / "robustness_process_phase_consistency.csv")
 
     fig, (ax_a, ax_b) = plt.subplots(
-        1, 2,
+        1,
+        2,
         figsize=(7.2, 3.4),
-        gridspec_kw={"wspace": 0.28, "left": 0.08, "right": 0.96, "top": 0.90, "bottom": 0.16}
+        gridspec_kw={
+            "wspace": 0.28,
+            "left": 0.08,
+            "right": 0.96,
+            "top": 0.90,
+            "bottom": 0.16,
+        },
     )
 
     # -----------------------------------------------------------------------
@@ -93,7 +104,16 @@ def generate_figure_s6(results_root: Path, out_dir: Path) -> Path:
     apply_clean_spines(ax_a)
     ax_a.axhline(0, color="#999999", ls="--", lw=0.8, zorder=1)
     ax_a.axvspan(7.5, 9.5, color="#EAF1F8", alpha=0.55, zorder=0)
-    ax_a.text(8.5, 0.22, "Upper SWE tail", ha="center", va="bottom", fontsize=6.8, color="#4A6FA5", zorder=5)
+    ax_a.text(
+        8.5,
+        0.22,
+        "Upper SWE tail",
+        ha="center",
+        va="bottom",
+        fontsize=6.8,
+        color="#4A6FA5",
+        zorder=5,
+    )
 
     x_dec = np.arange(10)
     for reg in REGIMES:
@@ -103,22 +123,47 @@ def generate_figure_s6(results_root: Path, out_dir: Path) -> Path:
         ylo = sub["delta_anomaly_corr_ci_lower"].to_numpy()
         yhi = sub["delta_anomaly_corr_ci_upper"].to_numpy()
         ax_a.errorbar(
-            x_dec, ym, yerr=[ym - ylo, yhi - ym],
-            fmt="none", ecolor=cfg["color"], elinewidth=0.8, capsize=2.0, capthick=0.8,
-            alpha=0.85, zorder=3
+            x_dec,
+            ym,
+            yerr=[ym - ylo, yhi - ym],
+            fmt="none",
+            ecolor=cfg["color"],
+            elinewidth=0.8,
+            capsize=2.0,
+            capthick=0.8,
+            alpha=0.85,
+            zorder=3,
         )
         ax_a.plot(
-            x_dec, ym, color=cfg["color"], marker=cfg["marker"],
-            markersize=4.5, lw=cfg["lw"], ls=cfg["ls"], label=cfg["label"], zorder=4
+            x_dec,
+            ym,
+            color=cfg["color"],
+            marker=cfg["marker"],
+            markersize=4.5,
+            lw=cfg["lw"],
+            ls=cfg["ls"],
+            label=cfg["label"],
+            zorder=4,
         )
 
     ax_a.set_xticks(x_dec)
-    ax_a.set_xticklabels([f"D{i+1:02d}" for i in range(10)], fontsize=7.2)
+    ax_a.set_xticklabels([f"D{i + 1:02d}" for i in range(10)], fontsize=7.2)
     ax_a.set_xlabel("Snow-17 SWE burden decile", fontsize=7.6)
     ax_a.set_ylabel("$\Delta$ anomaly correlation (CN − Base)", fontsize=7.6)
-    ax_a.set_title("(a) Snow-burden dependence replication", loc="left", fontweight="bold", fontsize=8.2)
+    ax_a.set_title(
+        "(a) Snow-burden dependence replication",
+        loc="left",
+        fontweight="bold",
+        fontsize=8.2,
+    )
     ax_a.set_ylim(-0.04, 0.25)
-    ax_a.legend(loc="upper left", fontsize=5.8, frameon=True, facecolor="#FFFFFF", framealpha=0.92)
+    ax_a.legend(
+        loc="upper left",
+        fontsize=5.8,
+        frameon=True,
+        facecolor="#FFFFFF",
+        framealpha=0.92,
+    )
 
     # -----------------------------------------------------------------------
     # (b) Process phase fingerprints replication
@@ -134,7 +179,9 @@ def generate_figure_s6(results_root: Path, out_dir: Path) -> Path:
         df_r = df_phase[df_phase["regime"] == reg]
         ym, ylo, yhi = [], [], []
         for p in PHASE_ORDER:
-            vals = df_r.loc[df_r["phase_name"] == p, "delta_anomaly_corr"].to_numpy(dtype=float)
+            vals = df_r.loc[df_r["phase_name"] == p, "delta_anomaly_corr"].to_numpy(
+                dtype=float
+            )
             m, l, h = bootstrap_median_ci(vals)
             ym.append(m)
             ylo.append(l)
@@ -142,22 +189,46 @@ def generate_figure_s6(results_root: Path, out_dir: Path) -> Path:
         ym, ylo, yhi = np.array(ym), np.array(ylo), np.array(yhi)
         xp = x_phase + offsets[idx]
         ax_b.errorbar(
-            xp, ym, yerr=[ym - ylo, yhi - ym],
-            fmt="none", ecolor=cfg["color"], elinewidth=0.8, capsize=2.0, capthick=0.8,
-            alpha=0.85, zorder=3
+            xp,
+            ym,
+            yerr=[ym - ylo, yhi - ym],
+            fmt="none",
+            ecolor=cfg["color"],
+            elinewidth=0.8,
+            capsize=2.0,
+            capthick=0.8,
+            alpha=0.85,
+            zorder=3,
         )
         ax_b.plot(
-            xp, ym, color=cfg["color"], marker=cfg["marker"],
-            markersize=4.5, ls="none", label=cfg["label"], zorder=4
+            xp,
+            ym,
+            color=cfg["color"],
+            marker=cfg["marker"],
+            markersize=4.5,
+            ls="none",
+            label=cfg["label"],
+            zorder=4,
         )
 
     ax_b.set_xticks(x_phase)
     ax_b.set_xticklabels(PHASE_LABELS, fontsize=6.8)
     ax_b.set_xlabel("Hydroclimatic process phase", fontsize=7.6)
     ax_b.set_ylabel("$\Delta$ anomaly correlation (CN − Base)", fontsize=7.6)
-    ax_b.set_title("(b) Phase localization replication", loc="left", fontweight="bold", fontsize=8.2)
+    ax_b.set_title(
+        "(b) Phase localization replication",
+        loc="left",
+        fontweight="bold",
+        fontsize=8.2,
+    )
     ax_b.set_ylim(-0.06, 0.35)
-    ax_b.legend(loc="upper left", fontsize=5.8, frameon=True, facecolor="#FFFFFF", framealpha=0.92)
+    ax_b.legend(
+        loc="upper left",
+        fontsize=5.8,
+        frameon=True,
+        facecolor="#FFFFFF",
+        framealpha=0.92,
+    )
 
     out_png = out_dir / "Fig_S6_r4_multiseed_replication.png"
     fig.savefig(out_png, dpi=300)

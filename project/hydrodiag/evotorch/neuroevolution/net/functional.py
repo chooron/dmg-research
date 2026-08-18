@@ -144,7 +144,9 @@ class ModuleExpectingFlatParameters:
             x: The tensor whose device will also store the buffer tensors.
         """
         for bname in self.__buffer_dict.keys():
-            self.__buffer_dict[bname] = torch.as_tensor(self.__buffer_dict[bname], device=x.device)
+            self.__buffer_dict[bname] = torch.as_tensor(
+                self.__buffer_dict[bname], device=x.device
+            )
 
     @property
     def buffers(self) -> tuple:
@@ -155,7 +157,9 @@ class ModuleExpectingFlatParameters:
     def parameter_length(self) -> int:
         return self.__param_length
 
-    def __call__(self, parameter_vector: torch.Tensor, x: torch.Tensor, h: Any = None) -> Any:
+    def __call__(
+        self, parameter_vector: torch.Tensor, x: torch.Tensor, h: Any = None
+    ) -> Any:
         """
         Call the wrapped module's forward pass procedure.
 
@@ -197,10 +201,14 @@ class ModuleExpectingFlatParameters:
 
         # Run the module and return the results
         with context:
-            return functional_call(self.__net, params_and_buffers, tuple([x, *state_args]))
+            return functional_call(
+                self.__net, params_and_buffers, tuple([x, *state_args])
+            )
 
 
-def make_functional_module(net: nn.Module, *, disable_autograd_tracking: bool = False) -> ModuleExpectingFlatParameters:
+def make_functional_module(
+    net: nn.Module, *, disable_autograd_tracking: bool = False
+) -> ModuleExpectingFlatParameters:
     """
     Wrap a torch module so that it has a functional interface.
 
@@ -256,4 +264,6 @@ def make_functional_module(net: nn.Module, *, disable_autograd_tracking: bool = 
         The functional wrapper, as an instance of
         `evotorch.neuroevolution.net.ModuleExpectingFlatParameters`.
     """
-    return ModuleExpectingFlatParameters(net, disable_autograd_tracking=disable_autograd_tracking)
+    return ModuleExpectingFlatParameters(
+        net, disable_autograd_tracking=disable_autograd_tracking
+    )

@@ -9,7 +9,6 @@ from .base import BaseHydrologicalModel
 from .parameter_specs import CEMANEIGE_HYST_PARAM_SPECS, CEMANEIGE_PARAM_SPECS
 from .utils import validate_forcings
 
-
 CEMANEIGE_MIN_THACC = 1e-6
 
 
@@ -42,7 +41,9 @@ def _cemaneige_step(
     kf: torch.Tensor,
     g_thresh: torch.Tensor,
     nearzero: float,
-) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+) -> tuple[
+    torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor
+]:
     """One step of the two-parameter CemaNeige snow routine.
 
     This is the PyTorch/batched counterpart of RRMPG's ``run_cemaneige``:
@@ -87,7 +88,15 @@ def _cemaneige_hyst_step(
     rsp: torch.Tensor,
     psol_annual: torch.Tensor,
     nearzero: float,
-) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+) -> tuple[
+    torch.Tensor,
+    torch.Tensor,
+    torch.Tensor,
+    torch.Tensor,
+    torch.Tensor,
+    torch.Tensor,
+    torch.Tensor,
+]:
     snow, rain, _frac_solid = _solid_liquid_partition(precip_t, temp_t)
 
     G = G + snow
@@ -226,9 +235,7 @@ class CemaNeige(BaseHydrologicalModel):
         rain_store = torch.zeros(batch, nsteps, device=device, dtype=dtype)
         melt_store = torch.zeros(batch, nsteps, device=device, dtype=dtype)
         for t in range(nsteps):
-            (
-                outflow[:, t], G, eTG, sca_t, rain_t, melt_t
-            ) = self._step(
+            (outflow[:, t], G, eTG, sca_t, rain_t, melt_t) = self._step(
                 precip[:, t], temp[:, t], G, eTG, ctg, kf, g_thresh, self.nearzero
             )
             sca_store[:, t] = sca_t
@@ -297,9 +304,21 @@ class CemaNeigeHyst(BaseHydrologicalModel):
         G, eTG, sca, swe_max = self._init_states(batch, device, dtype, initial_states)
 
         outflow, (G, eTG, sca, swe_max, rain_out, melt_out) = self._step_loop(
-            precip, temp, nsteps, batch, device, dtype,
-            G, eTG, sca, swe_max,
-            ctg, kf, thacc, rsp, psol_annual,
+            precip,
+            temp,
+            nsteps,
+            batch,
+            device,
+            dtype,
+            G,
+            eTG,
+            sca,
+            swe_max,
+            ctg,
+            kf,
+            thacc,
+            rsp,
+            psol_annual,
         )
 
         aux = {
@@ -348,9 +367,15 @@ class CemaNeigeHyst(BaseHydrologicalModel):
         if initial_states is not None:
             return (
                 initial_states.get("G", torch.zeros(batch, device=device, dtype=dtype)),
-                initial_states.get("eTG", torch.zeros(batch, device=device, dtype=dtype)),
-                initial_states.get("sca", torch.zeros(batch, device=device, dtype=dtype)),
-                initial_states.get("swe_max", torch.zeros(batch, device=device, dtype=dtype)),
+                initial_states.get(
+                    "eTG", torch.zeros(batch, device=device, dtype=dtype)
+                ),
+                initial_states.get(
+                    "sca", torch.zeros(batch, device=device, dtype=dtype)
+                ),
+                initial_states.get(
+                    "swe_max", torch.zeros(batch, device=device, dtype=dtype)
+                ),
             )
         return (
             torch.zeros(batch, device=device, dtype=dtype),

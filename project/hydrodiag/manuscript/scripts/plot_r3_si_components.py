@@ -27,18 +27,20 @@ three seeds (42/123/2026) BEFORE the basin-level median/bootstrap.
 
 Output: manuscript/supplement/figures/Fig_S5_R3_components.png (PNG only, 600 dpi).
 """
+
 from __future__ import annotations
 
 import json
 import sys
 from pathlib import Path
 
+import matplotlib
 import numpy as np
 import pandas as pd
-import matplotlib
+
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
+import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 
 HERE = Path(__file__).resolve().parent
@@ -49,8 +51,8 @@ if str(PROJECT) not in sys.path:
 sys.path.insert(0, str(HERE))
 from r1_plot_style import (  # noqa: E402
     MODEL_COLORS,
-    setup_publication_style,
     apply_clean_spines,
+    setup_publication_style,
 )
 
 DEFAULT_RESULTS_ROOT = Path("/home/jingxin/code/dmg-research/project/hydrodiag/results")
@@ -62,15 +64,27 @@ SEEDS = (42, 123, 2026)
 BOOT_N = 2000
 BOOT_SEED = 20260730
 
-C_BASE = MODEL_COLORS["Base"]   # #EE7733  omitted-process baseline (fitted)
-C_TGD = MODEL_COLORS["TGD"]     # #009988  generic temperature-memory control
+C_BASE = MODEL_COLORS["Base"]  # #EE7733  omitted-process baseline (fitted)
+C_TGD = MODEL_COLORS["TGD"]  # #009988  generic temperature-memory control
 C_TEXT = "#333333"
 C_GREY = "#999999"
 
 # Frozen shared-XAJ parameter order (r3/common.py COMMON_XAJ) - top to bottom
 COMMON_XAJ = [
-    "xaj_k", "xaj_b", "xaj_im", "xaj_um", "xaj_lm", "xaj_dm", "xaj_c",
-    "xaj_sm", "xaj_ex", "xaj_ki", "xaj_kg", "xaj_ci", "xaj_cg", "xaj_a",
+    "xaj_k",
+    "xaj_b",
+    "xaj_im",
+    "xaj_um",
+    "xaj_lm",
+    "xaj_dm",
+    "xaj_c",
+    "xaj_sm",
+    "xaj_ex",
+    "xaj_ki",
+    "xaj_kg",
+    "xaj_ci",
+    "xaj_cg",
+    "xaj_a",
     "xaj_theta",
 ]
 # Primary states of the C_state aggregate (protocol state_estimands).
@@ -93,7 +107,9 @@ def per_basin_values_long(df, value_col, group_cols, reg):
     """Per-basin values with dPL seed-median aggregation (IC passthrough)."""
     if reg == "dPL":
         sub = df[df["paradigm"] == "dPL"]
-        return sub.groupby(["basin_id"] + group_cols, as_index=False)[value_col].median()
+        return sub.groupby(["basin_id"] + group_cols, as_index=False)[
+            value_col
+        ].median()
     sub = df[df["paradigm"] == "IC"]
     return sub[["basin_id"] + group_cols + [value_col]].copy()
 
@@ -102,9 +118,13 @@ def load_tiers(protocol_path: Path) -> dict:
     proto = json.loads(protocol_path.read_text())
     return {
         "ic_primary": set(proto["predeclared_parameter_tiers"]["ic_primary"]),
-        "ic_secondary": set(proto["predeclared_parameter_tiers"]["ic_secondary_supporting"]),
+        "ic_secondary": set(
+            proto["predeclared_parameter_tiers"]["ic_secondary_supporting"]
+        ),
         "dpl_primary": set(proto["predeclared_parameter_tiers"]["dpl_primary"]),
-        "dpl_secondary": set(proto["predeclared_parameter_tiers"]["dpl_secondary_supporting"]),
+        "dpl_secondary": set(
+            proto["predeclared_parameter_tiers"]["dpl_secondary_supporting"]
+        ),
     }
 
 
@@ -138,12 +158,20 @@ def prepare_parameter_data(results_root: Path, tiers: dict) -> dict:
                     continue
                 lo, hi = boot_ci_median(vals)
                 st = tier_style(reg, p, tiers)
-                rows.append({
-                    "reg": reg, "structure": struct, "parameter": p,
-                    "median": float(np.median(vals)), "ci_lo": lo, "ci_hi": hi,
-                    "bold": st["bold"], "size": st["size"], "fill": st["fill"],
-                    "grey": st["grey"],
-                })
+                rows.append(
+                    {
+                        "reg": reg,
+                        "structure": struct,
+                        "parameter": p,
+                        "median": float(np.median(vals)),
+                        "ci_lo": lo,
+                        "ci_hi": hi,
+                        "bold": st["bold"],
+                        "size": st["size"],
+                        "fill": st["fill"],
+                        "grey": st["grey"],
+                    }
+                )
         out[reg] = pd.DataFrame(rows)
     return out
 
@@ -165,22 +193,32 @@ def prepare_state_data(results_root: Path) -> dict:
                     continue
                 lo, hi = boot_ci_median(vals)
                 is_sec = v in SECONDARY_STATES
-                rows.append({
-                    "reg": reg, "structure": struct, "variable": v,
-                    "median": float(np.median(vals)), "ci_lo": lo, "ci_hi": hi,
-                    "bold": not is_sec, "size": 7.5 if not is_sec else 6.5,
-                    "fill": not is_sec, "grey": False,
-                })
+                rows.append(
+                    {
+                        "reg": reg,
+                        "structure": struct,
+                        "variable": v,
+                        "median": float(np.median(vals)),
+                        "ci_lo": lo,
+                        "ci_hi": hi,
+                        "bold": not is_sec,
+                        "size": 7.5 if not is_sec else 6.5,
+                        "fill": not is_sec,
+                        "grey": False,
+                    }
+                )
         out[reg] = pd.DataFrame(rows)
     return out
 
 
 def shared_xlim(df_ic: pd.DataFrame, df_dpl: pd.DataFrame) -> tuple:
     """Common x-limits across the IC/dPL facets of one panel."""
-    all_x = np.concatenate([
-        np.concatenate([df_ic["ci_hi"].to_numpy(), df_ic["ci_lo"].to_numpy()]),
-        np.concatenate([df_dpl["ci_hi"].to_numpy(), df_dpl["ci_lo"].to_numpy()]),
-    ])
+    all_x = np.concatenate(
+        [
+            np.concatenate([df_ic["ci_hi"].to_numpy(), df_ic["ci_lo"].to_numpy()]),
+            np.concatenate([df_dpl["ci_hi"].to_numpy(), df_dpl["ci_lo"].to_numpy()]),
+        ]
+    )
     all_x = all_x[np.isfinite(all_x)]
     xmax = float(np.max(np.abs(all_x)))
     xlo = min(0.0, float(np.min(all_x)) - 0.06 * xmax)
@@ -190,8 +228,7 @@ def shared_xlim(df_ic: pd.DataFrame, df_dpl: pd.DataFrame) -> tuple:
 # ---------------------------------------------------------------------------
 # Panels
 # ---------------------------------------------------------------------------
-def _draw_forest(ax, df, y_order, y_key, reg, show_labels, xlim, xlabel,
-                 show_legend):
+def _draw_forest(ax, df, y_order, y_key, reg, show_labels, xlim, xlabel, show_legend):
     """Forest plot: y = component (top-to-bottom), x = median effect + CI.
 
     Base = orange circles, TGD2 = teal triangles; rows offset slightly so both
@@ -200,8 +237,10 @@ def _draw_forest(ax, df, y_order, y_key, reg, show_labels, xlim, xlabel,
     """
     ypos = {name: len(y_order) - 1 - i for i, name in enumerate(y_order)}
 
-    for struct, marker, color, off in (("Base", "o", C_BASE, -0.18),
-                                       ("TGD2", "^", C_TGD, +0.18)):
+    for struct, marker, color, off in (
+        ("Base", "o", C_BASE, -0.18),
+        ("TGD2", "^", C_TGD, +0.18),
+    ):
         sub = df[(df["structure"] == struct) & (df["reg"] == reg)]
         xs, ys, xerr_lo, xerr_hi, fills, sizes = [], [], [], [], [], []
         for _, row in sub.iterrows():
@@ -212,11 +251,29 @@ def _draw_forest(ax, df, y_order, y_key, reg, show_labels, xlim, xlabel,
             xerr_hi.append(row["ci_hi"] - row["median"])
             fills.append(row["fill"])
             sizes.append(row["size"])
-        ax.errorbar(xs, ys, xerr=[xerr_lo, xerr_hi], fmt="none", ecolor=color,
-                    elinewidth=1.0, capsize=2.2, capthick=1.0, alpha=0.9, zorder=3)
-        ax.scatter(xs, ys, marker=marker, s=np.asarray(sizes) ** 2, color=color,
-                   facecolors=[color if f else "white" for f in fills],
-                   edgecolors=color, linewidths=0.9, zorder=4)
+        ax.errorbar(
+            xs,
+            ys,
+            xerr=[xerr_lo, xerr_hi],
+            fmt="none",
+            ecolor=color,
+            elinewidth=1.0,
+            capsize=2.2,
+            capthick=1.0,
+            alpha=0.9,
+            zorder=3,
+        )
+        ax.scatter(
+            xs,
+            ys,
+            marker=marker,
+            s=np.asarray(sizes) ** 2,
+            color=color,
+            facecolors=[color if f else "white" for f in fills],
+            edgecolors=color,
+            linewidths=0.9,
+            zorder=4,
+        )
 
     # y tick labels (tier styling per facet)
     if show_labels:
@@ -243,18 +300,50 @@ def _draw_forest(ax, df, y_order, y_key, reg, show_labels, xlim, xlabel,
     ax.set_xlabel(xlabel, labelpad=2)
     ax.axvline(0.0, color=C_GREY, linestyle="--", linewidth=0.9, zorder=1)
     ax.grid(True, axis="x", linestyle=":", alpha=0.25)
-    ax.text(0.02, 0.97, f"{reg} regime", transform=ax.transAxes, ha="left",
-            va="top", fontsize=9.0, fontweight="bold", color=C_TEXT)
+    ax.text(
+        0.02,
+        0.97,
+        f"{reg} regime",
+        transform=ax.transAxes,
+        ha="left",
+        va="top",
+        fontsize=9.0,
+        fontweight="bold",
+        color=C_TEXT,
+    )
 
     if show_legend:
         handles = [
-            Line2D([0], [0], marker="o", color=C_BASE, linestyle="none",
-                   markerfacecolor=C_BASE, markersize=6.5, label="Base"),
-            Line2D([0], [0], marker="^", color=C_TGD, linestyle="none",
-                   markerfacecolor=C_TGD, markersize=7.0, label="TGD2"),
+            Line2D(
+                [0],
+                [0],
+                marker="o",
+                color=C_BASE,
+                linestyle="none",
+                markerfacecolor=C_BASE,
+                markersize=6.5,
+                label="Base",
+            ),
+            Line2D(
+                [0],
+                [0],
+                marker="^",
+                color=C_TGD,
+                linestyle="none",
+                markerfacecolor=C_TGD,
+                markersize=7.0,
+                label="TGD2",
+            ),
         ]
-        ax.legend(handles=handles, loc="upper right", bbox_to_anchor=(0.98, 0.97),
-                  frameon=True, framealpha=0.92, edgecolor="none", fontsize=8.0)
+        ax.legend(
+            handles=handles,
+            loc="upper right",
+            bbox_to_anchor=(0.98, 0.97),
+            frameon=True,
+            framealpha=0.92,
+            edgecolor="none",
+            fontsize=8.0,
+        )
 
 
 def build_figure(results_root: Path, protocol_path: Path, out_path: Path) -> None:
@@ -263,44 +352,108 @@ def build_figure(results_root: Path, protocol_path: Path, out_path: Path) -> Non
     state_data = prepare_state_data(results_root)
 
     fig = plt.figure(figsize=(8.8, 9.6))
-    gs = gridspec.GridSpec(2, 1, height_ratios=[1.0, 0.92], hspace=0.34,
-                           left=0.11, right=0.985, top=0.95, bottom=0.06)
+    gs = gridspec.GridSpec(
+        2,
+        1,
+        height_ratios=[1.0, 0.92],
+        hspace=0.34,
+        left=0.11,
+        right=0.985,
+        top=0.95,
+        bottom=0.06,
+    )
 
     # --- Panel (a): parameters (IC | dPL facets sharing one x-axis) ---
-    gsa = gridspec.GridSpecFromSubplotSpec(1, 2, subplot_spec=gs[0],
-                                           width_ratios=[1.0, 1.0], wspace=0.10)
-    ax_p_ic = fig.add_subplot(gsa[0, 0]); apply_clean_spines(ax_p_ic)
-    ax_p_dp = fig.add_subplot(gsa[0, 1]); apply_clean_spines(ax_p_dp)
-    ax_p_ic.set_title("(a) Parameter-level excess errors", weight="bold",
-                      loc="left", pad=6)
+    gsa = gridspec.GridSpecFromSubplotSpec(
+        1, 2, subplot_spec=gs[0], width_ratios=[1.0, 1.0], wspace=0.10
+    )
+    ax_p_ic = fig.add_subplot(gsa[0, 0])
+    apply_clean_spines(ax_p_ic)
+    ax_p_dp = fig.add_subplot(gsa[0, 1])
+    apply_clean_spines(ax_p_dp)
+    ax_p_ic.set_title(
+        "(a) Parameter-level excess errors", weight="bold", loc="left", pad=6
+    )
     xlim_p = shared_xlim(param_data["IC"], param_data["dPL"])
     xlab_p = "Median $|e_M - e_{CN}|$"
-    _draw_forest(ax_p_ic, param_data["IC"], COMMON_XAJ, "parameter", "IC",
-                 show_labels=True, xlim=xlim_p, xlabel=xlab_p, show_legend=True)
-    _draw_forest(ax_p_dp, param_data["dPL"], COMMON_XAJ, "parameter", "dPL",
-                 show_labels=True, xlim=xlim_p, xlabel=xlab_p, show_legend=False)
-    ax_p_dp.text(0.98, 0.03,
-                 "filled = primary (aggregate members)\nopen = secondary / exploratory",
-                 transform=ax_p_dp.transAxes, ha="right", va="bottom",
-                 fontsize=7.5, color=C_GREY, linespacing=1.4)
+    _draw_forest(
+        ax_p_ic,
+        param_data["IC"],
+        COMMON_XAJ,
+        "parameter",
+        "IC",
+        show_labels=True,
+        xlim=xlim_p,
+        xlabel=xlab_p,
+        show_legend=True,
+    )
+    _draw_forest(
+        ax_p_dp,
+        param_data["dPL"],
+        COMMON_XAJ,
+        "parameter",
+        "dPL",
+        show_labels=True,
+        xlim=xlim_p,
+        xlabel=xlab_p,
+        show_legend=False,
+    )
+    ax_p_dp.text(
+        0.98,
+        0.03,
+        "filled = primary (aggregate members)\nopen = secondary / exploratory",
+        transform=ax_p_dp.transAxes,
+        ha="right",
+        va="bottom",
+        fontsize=7.5,
+        color=C_GREY,
+        linespacing=1.4,
+    )
 
     # --- Panel (b): states (same grammar) ---
-    gsb = gridspec.GridSpecFromSubplotSpec(1, 2, subplot_spec=gs[1],
-                                           width_ratios=[1.0, 1.0], wspace=0.10)
-    ax_s_ic = fig.add_subplot(gsb[0, 0]); apply_clean_spines(ax_s_ic)
-    ax_s_dp = fig.add_subplot(gsb[0, 1]); apply_clean_spines(ax_s_dp)
-    ax_s_ic.set_title("(b) State-level excess errors", weight="bold",
-                      loc="left", pad=6)
+    gsb = gridspec.GridSpecFromSubplotSpec(
+        1, 2, subplot_spec=gs[1], width_ratios=[1.0, 1.0], wspace=0.10
+    )
+    ax_s_ic = fig.add_subplot(gsb[0, 0])
+    apply_clean_spines(ax_s_ic)
+    ax_s_dp = fig.add_subplot(gsb[0, 1])
+    apply_clean_spines(ax_s_dp)
+    ax_s_ic.set_title("(b) State-level excess errors", weight="bold", loc="left", pad=6)
     state_order = PRIMARY_STATES + SECONDARY_STATES
     xlim_s = shared_xlim(state_data["IC"], state_data["dPL"])
     xlab_s = "Median $\\Delta$NRMSE (test)"
-    _draw_forest(ax_s_ic, state_data["IC"], state_order, "variable", "IC",
-                 show_labels=True, xlim=xlim_s, xlabel=xlab_s, show_legend=True)
-    _draw_forest(ax_s_dp, state_data["dPL"], state_order, "variable", "dPL",
-                 show_labels=True, xlim=xlim_s, xlabel=xlab_s, show_legend=False)
-    ax_s_dp.text(0.98, 0.03, "open = secondary state (wd)",
-                 transform=ax_s_dp.transAxes, ha="right", va="bottom",
-                 fontsize=7.5, color=C_GREY)
+    _draw_forest(
+        ax_s_ic,
+        state_data["IC"],
+        state_order,
+        "variable",
+        "IC",
+        show_labels=True,
+        xlim=xlim_s,
+        xlabel=xlab_s,
+        show_legend=True,
+    )
+    _draw_forest(
+        ax_s_dp,
+        state_data["dPL"],
+        state_order,
+        "variable",
+        "dPL",
+        show_labels=True,
+        xlim=xlim_s,
+        xlabel=xlab_s,
+        show_legend=False,
+    )
+    ax_s_dp.text(
+        0.98,
+        0.03,
+        "open = secondary state (wd)",
+        transform=ax_s_dp.transAxes,
+        ha="right",
+        va="bottom",
+        fontsize=7.5,
+        color=C_GREY,
+    )
 
     SUPP_FIG_DIR.mkdir(parents=True, exist_ok=True)
     plt.savefig(out_path, dpi=600)
@@ -310,14 +463,16 @@ def build_figure(results_root: Path, protocol_path: Path, out_path: Path) -> Non
 
 def main() -> None:
     setup_publication_style()
-    plt.rcParams.update({
-        "font.size": 9.5,
-        "axes.labelsize": 10.0,
-        "axes.titlesize": 10.5,
-        "xtick.labelsize": 9.5,
-        "ytick.labelsize": 9.0,
-        "legend.fontsize": 8.5,
-    })
+    plt.rcParams.update(
+        {
+            "font.size": 9.5,
+            "axes.labelsize": 10.0,
+            "axes.titlesize": 10.5,
+            "xtick.labelsize": 9.5,
+            "ytick.labelsize": 9.0,
+            "legend.fontsize": 8.5,
+        }
+    )
     results_root = DEFAULT_RESULTS_ROOT / RUN_ID
     protocol_path = PROJECT / "r3" / "protocol_misspec_v1.json"
     out_path = SUPP_FIG_DIR / OUT_NAME

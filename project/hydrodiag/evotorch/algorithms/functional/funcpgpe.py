@@ -37,11 +37,15 @@ def _make_sample_and_grad_funcs(symmetric: bool) -> tuple:
     )
 
     sample = make_functional_sampler(
-        distribution, required_parameters=required_parameters, fixed_parameters=fixed_parameters
+        distribution,
+        required_parameters=required_parameters,
+        fixed_parameters=fixed_parameters,
     )
 
     grad = make_functional_grad_estimator(
-        distribution, required_parameters=required_parameters, fixed_parameters=fixed_parameters
+        distribution,
+        required_parameters=required_parameters,
+        fixed_parameters=fixed_parameters,
     )
 
     return sample, grad
@@ -228,7 +232,9 @@ def pgpe(
     if solution_length == 0:
         raise ValueError("Solution length cannot be 0")
 
-    stdev_init = _get_stdev_init(center_init=center_init, stdev_init=stdev_init, radius_init=radius_init)
+    stdev_init = _get_stdev_init(
+        center_init=center_init, stdev_init=stdev_init, radius_init=radius_init
+    )
 
     device = center_init.device
     dtype = center_init.dtype
@@ -279,7 +285,9 @@ def pgpe(
         optimizer_config = {}
     optimizer_init_func, _, _ = get_functional_optimizer(optimizer)
     optimizer_state = optimizer_init_func(
-        center_init=center_init, center_learning_rate=center_learning_rate, **optimizer_config
+        center_init=center_init,
+        center_learning_rate=center_learning_rate,
+        **optimizer_config,
     )
 
     symmetric = bool(symmetric)
@@ -365,9 +373,15 @@ def pgpe_tell(state: PGPEState, values: torch.Tensor, evals: torch.Tensor) -> PG
 
     new_optimizer_state = optimizer_tell(state.optimizer_state, follow_grad=grads["mu"])
 
-    target_stdev = _follow_stdev_grad(state.stdev, state.stdev_learning_rate, grads["sigma"])
+    target_stdev = _follow_stdev_grad(
+        state.stdev, state.stdev_learning_rate, grads["sigma"]
+    )
     new_stdev = modify_vector(
-        state.stdev, target_stdev, lb=state.stdev_min, ub=state.stdev_max, max_change=state.stdev_max_change
+        state.stdev,
+        target_stdev,
+        lb=state.stdev_min,
+        ub=state.stdev_max,
+        max_change=state.stdev_max_change,
     )
 
     return PGPEState(

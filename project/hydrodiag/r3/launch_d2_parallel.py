@@ -63,8 +63,15 @@ def main() -> None:
         cfg_file = config_dir / f"dpl_xaj_cn_seed_{seed}.json"
         cfg_file.write_text(json.dumps(config, indent=2) + "\n")
         command = [
-            sys.executable, str(PROJECT / "training/dpl/run_dpl_model.py"),
-            "--config", str(cfg_file), "--model", "XAJ_CN", "--lite", "--seed", str(seed),
+            sys.executable,
+            str(PROJECT / "training/dpl/run_dpl_model.py"),
+            "--config",
+            str(cfg_file),
+            "--model",
+            "XAJ_CN",
+            "--lite",
+            "--seed",
+            str(seed),
         ]
         print("COMMAND:", " ".join(command), flush=True)
         if args.dry_run:
@@ -72,17 +79,27 @@ def main() -> None:
         output_dir = Path(config["output_dir"])
         output_dir.mkdir(parents=True, exist_ok=True)
         env = os.environ.copy()
-        env.update({
-            "CUDA_VISIBLE_DEVICES": "0",
-            "OMP_NUM_THREADS": "1", "MKL_NUM_THREADS": "1",
-            "OPENBLAS_NUM_THREADS": "1", "NUMEXPR_NUM_THREADS": "1",
-            "TORCHINDUCTOR_COMPILE_THREADS": "1",
-        })
+        env.update(
+            {
+                "CUDA_VISIBLE_DEVICES": "0",
+                "OMP_NUM_THREADS": "1",
+                "MKL_NUM_THREADS": "1",
+                "OPENBLAS_NUM_THREADS": "1",
+                "NUMEXPR_NUM_THREADS": "1",
+                "TORCHINDUCTOR_COMPILE_THREADS": "1",
+            }
+        )
         handle = (output_dir / "train.log").open("a")
         handle.write("COMMAND: " + " ".join(command) + "\n")
         handle.flush()
-        proc = subprocess.Popen(command, cwd=PROJECT, env=env,
-                                stdout=handle, stderr=subprocess.STDOUT, text=True)
+        proc = subprocess.Popen(
+            command,
+            cwd=PROJECT,
+            env=env,
+            stdout=handle,
+            stderr=subprocess.STDOUT,
+            text=True,
+        )
         processes.append((seed, proc, handle))
         print(f"launched seed {seed} pid={proc.pid}", flush=True)
 

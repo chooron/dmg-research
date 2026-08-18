@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
-
 from training.dpl.run_dpl_model import convert_streamflow_ft3s_to_mm_day
 
 
@@ -16,9 +15,7 @@ def test_ft3s_target_is_converted_to_basin_average_mm_day() -> None:
 
     converted = convert_streamflow_ft3s_to_mm_day(streamflow, area_km2)
 
-    expected = np.array(
-        [[2.446572, 4.893143], [2.446572, 4.893143]], dtype=np.float32
-    )
+    expected = np.array([[2.446572, 4.893143], [2.446572, 4.893143]], dtype=np.float32)
     np.testing.assert_allclose(converted, expected, rtol=1e-6, atol=1e-6)
 
 

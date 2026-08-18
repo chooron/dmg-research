@@ -72,7 +72,9 @@ def _to_numpy(x: Iterable, *, dtype: _MaybeDType = None) -> np.ndarray:
     return result
 
 
-def _to_torch(x: Iterable, *, dtype: Optional[Union[np.dtype, torch.dtype, str]] = None) -> torch.Tensor:
+def _to_torch(
+    x: Iterable, *, dtype: Optional[Union[np.dtype, torch.dtype, str]] = None
+) -> torch.Tensor:
     from .core import Solution, SolutionBatch
     from .tools import to_torch_dtype
 
@@ -151,11 +153,17 @@ def assert_allclose(
     desired = _to_numpy(desired)
     actual = _to_numpy(actual, dtype=desired.dtype)
 
-    np.testing.assert_allclose(actual, desired, rtol=rtol, atol=atol, equal_nan=bool(equal_nan))
+    np.testing.assert_allclose(
+        actual, desired, rtol=rtol, atol=atol, equal_nan=bool(equal_nan)
+    )
 
 
 def assert_almost_between(
-    x: Iterable, lb: Union[float, Iterable], ub: Union[float, Iterable], *, atol: Optional[float] = None
+    x: Iterable,
+    lb: Union[float, Iterable],
+    ub: Union[float, Iterable],
+    *,
+    atol: Optional[float] = None,
 ):
     """
     Assert that the given Iterable has its values between the desired bounds.
@@ -225,7 +233,9 @@ def assert_dtype_matches(x: Iterable, dtype: Union[str, Type, np.dtype, torch.dt
     else:
         dtype = np.dtype(dtype)
 
-    assert dtype == actual_dtype, f"dtype mismatch. Encountered dtype: {actual_dtype}, expected dtype: {dtype}"
+    assert dtype == actual_dtype, (
+        f"dtype mismatch. Encountered dtype: {actual_dtype}, expected dtype: {dtype}"
+    )
 
 
 def assert_shape_matches(x: Iterable, shape: Union[tuple, int]):
@@ -248,10 +258,18 @@ def assert_shape_matches(x: Iterable, shape: Union[tuple, int]):
     if not isinstance(shape, Iterable):
         shape = (int(shape),)
 
-    assert x.shape == shape, f"Encountered a shape mismatch. Shape of the tensor: {x.shape}. Expected shape: {shape}"
+    assert x.shape == shape, (
+        f"Encountered a shape mismatch. Shape of the tensor: {x.shape}. Expected shape: {shape}"
+    )
 
 
-def assert_eachclose(x: Iterable, value: Any, *, rtol: Optional[float] = None, atol: Optional[float] = None):
+def assert_eachclose(
+    x: Iterable,
+    value: Any,
+    *,
+    rtol: Optional[float] = None,
+    atol: Optional[float] = None,
+):
     """
     Assert that the given tensor or array consists of a single value.
 

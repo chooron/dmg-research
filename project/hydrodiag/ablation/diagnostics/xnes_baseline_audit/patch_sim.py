@@ -1,24 +1,28 @@
 import re
-with open('/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/ablation/diagnostics/xnes_baseline_audit/audit_main.py', 'r') as f:
+
+with open(
+    "/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/ablation/diagnostics/xnes_baseline_audit/audit_main.py",
+    "r",
+) as f:
     content = f.read()
 
 # Fix evaluate_candidates calls
 content = re.sub(
     r'evals = runtime\.evaluate_candidates\(\s*\[b_idx\],\s*cand_tensor\.unsqueeze\(0\),\s*#\s*"train"\s*\)',
     'evals = runtime.evaluate_candidates(cand_tensor.unsqueeze(0), basin_indices=[b_idx], split="train")',
-    content
+    content,
 )
 
 content = re.sub(
     r'ev = runtime\.evaluate_candidates\(\[b_idx\], c_tensor, "train"\)',
     'ev = runtime.evaluate_candidates(c_tensor, basin_indices=[b_idx], split="train")',
-    content
+    content,
 )
 
 content = re.sub(
     r'evals = runtime\.evaluate_candidates\(cand_tensor, basin_indices=\[b_idx\], split="train"\) #\[b_idx\], cands_tensor, "train"\)',
     'evals = runtime.evaluate_candidates(cands_tensor, basin_indices=[b_idx], split="train")',
-    content
+    content,
 )
 
 # Fix sims extraction and CPU KGE calculation
@@ -44,13 +48,16 @@ sim_patch = """
 """
 
 content = re.sub(
-    r'gpu_kge = evals\[0\].fitness\[0\].item\(\).*?valid = valid_mask\[b_idx\].numpy\(\)',
+    r"gpu_kge = evals\[0\].fitness\[0\].item\(\).*?valid = valid_mask\[b_idx\].numpy\(\)",
     sim_patch,
     content,
-    flags=re.DOTALL
+    flags=re.DOTALL,
 )
 
 content = content.replace("ev[0].fitness[0].item()", "ev.fitness[0, 0].item()")
 
-with open('/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/ablation/diagnostics/xnes_baseline_audit/audit_main.py', 'w') as f:
+with open(
+    "/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/ablation/diagnostics/xnes_baseline_audit/audit_main.py",
+    "w",
+) as f:
     f.write(content)

@@ -99,49 +99,71 @@ class GaussianSearchAlgorithm(SearchAlgorithm, SinglePopulationAlgorithmMixin):
             # If a starting point for the search distribution is given,
             # then we make sure that its length, dtype, and device
             # are correct.
-            mu = problem.ensure_tensor_length_and_dtype(center_init, allow_scalar=False, about="center_init")
+            mu = problem.ensure_tensor_length_and_dtype(
+                center_init, allow_scalar=False, about="center_init"
+            )
 
         # Get the standard deviation or the radius configuration from the arguments
         stdev_init = to_stdev_init(
-            solution_length=problem.solution_length, stdev_init=stdev_init, radius_init=radius_init
+            solution_length=problem.solution_length,
+            stdev_init=stdev_init,
+            radius_init=radius_init,
         )
 
         # Make sure that the provided initial standard deviation is
         # of correct length, dtype, and device.
-        sigma = problem.ensure_tensor_length_and_dtype(stdev_init, about="stdev_init", allow_scalar=False)
+        sigma = problem.ensure_tensor_length_and_dtype(
+            stdev_init, about="stdev_init", allow_scalar=False
+        )
 
         # Create the distribution
         dist_cls = self.DISTRIBUTION_TYPE
-        dist_params = deepcopy(self.DISTRIBUTION_PARAMS) if self.DISTRIBUTION_PARAMS is not None else {}
+        dist_params = (
+            deepcopy(self.DISTRIBUTION_PARAMS)
+            if self.DISTRIBUTION_PARAMS is not None
+            else {}
+        )
         dist_params.update({"mu": mu, "sigma": sigma})
-        self._distribution: Distribution = dist_cls(dist_params, dtype=problem.dtype, device=problem.device)
+        self._distribution: Distribution = dist_cls(
+            dist_params, dtype=problem.dtype, device=problem.device
+        )
 
         # Store the following keyword arguments to use later
         self._popsize = int(popsize)
         self._popsize_max = None if popsize_max is None else int(popsize_max)
-        self._num_interactions = None if num_interactions is None else int(num_interactions)
+        self._num_interactions = (
+            None if num_interactions is None else int(num_interactions)
+        )
 
         self._center_learning_rate = float(center_learning_rate)
         self._stdev_learning_rate = float(stdev_learning_rate)
-        self._optimizer = self._initialize_optimizer(self._center_learning_rate, optimizer, optimizer_config)
+        self._optimizer = self._initialize_optimizer(
+            self._center_learning_rate, optimizer, optimizer_config
+        )
         self._ranking_method = None if ranking_method is None else str(ranking_method)
 
         self._stdev_min = (
             None
             if stdev_min is None
-            else problem.ensure_tensor_length_and_dtype(stdev_min, about="stdev_min", allow_scalar=True)
+            else problem.ensure_tensor_length_and_dtype(
+                stdev_min, about="stdev_min", allow_scalar=True
+            )
         )
 
         self._stdev_max = (
             None
             if stdev_max is None
-            else problem.ensure_tensor_length_and_dtype(stdev_max, about="stdev_max", allow_scalar=True)
+            else problem.ensure_tensor_length_and_dtype(
+                stdev_max, about="stdev_max", allow_scalar=True
+            )
         )
 
         self._stdev_max_change = (
             None
             if stdev_max_change is None
-            else problem.ensure_tensor_length_and_dtype(stdev_max_change, about="stdev_max_change", allow_scalar=True)
+            else problem.ensure_tensor_length_and_dtype(
+                stdev_max_change, about="stdev_max_change", allow_scalar=True
+            )
         )
 
         self._obj_index = problem.normalize_obj_index(obj_index)
@@ -175,10 +197,15 @@ class GaussianSearchAlgorithm(SearchAlgorithm, SinglePopulationAlgorithmMixin):
         # Additionally, we enable the reporting services of `SinglePopulationAlgorithmMixin` only when we are
         # in the non-distributed mode. This is because we do not have a centrally stored population at all in the
         # distributed mode.
-        SinglePopulationAlgorithmMixin.__init__(self, exclude="mean_eval", enable=(not distributed))
+        SinglePopulationAlgorithmMixin.__init__(
+            self, exclude="mean_eval", enable=(not distributed)
+        )
 
     def _initialize_optimizer(
-        self, learning_rate: float, optimizer=None, optimizer_config: Optional[dict] = None
+        self,
+        learning_rate: float,
+        optimizer=None,
+        optimizer_config: Optional[dict] = None,
     ) -> object:
         if optimizer is None:
             return None
@@ -240,13 +267,17 @@ class GaussianSearchAlgorithm(SearchAlgorithm, SinglePopulationAlgorithmMixin):
         total_weighted_eval = 0
         for i in range(n):
             total_num_solutions += list_of.num_solutions[i]
-            total_weighted_eval += float(list_of.num_solutions[i] * list_of.mean_eval[i])
+            total_weighted_eval += float(
+                list_of.num_solutions[i] * list_of.mean_eval[i]
+            )
         avg_mean_eval = total_weighted_eval / total_num_solutions
 
         # For each gradient (in most cases among 'mu' and 'sigma'), we allocate a new 0-filled tensor.
         avg_gradients = {}
         for key in grad_keys:
-            avg_gradients[key] = self._distribution.make_zeros(num_solutions=1).reshape(-1)
+            avg_gradients[key] = self._distribution.make_zeros(num_solutions=1).reshape(
+                -1
+            )
 
         # Below, we iterate over all collected results and add their gradients, in a weighted manner, onto the
         # `avg_gradients` we allocated above.
@@ -285,11 +316,16 @@ class GaussianSearchAlgorithm(SearchAlgorithm, SinglePopulationAlgorithmMixin):
                 # not in the adaptive population size mode) is allocated.
                 if self._population is None:
                     self._population = SolutionBatch(
-                        self.problem, popsize=self._popsize, device=self._distribution.device, empty=True
+                        self.problem,
+                        popsize=self._popsize,
+                        device=self._distribution.device,
+                        empty=True,
                     )
 
                 # Now, we do in-place sampling on the population.
-                self._distribution.sample(out=self._population.access_values(), generator=self.problem)
+                self._distribution.sample(
+                    out=self._population.access_values(), generator=self.problem
+                )
 
                 # Finally, here, the solutions are evaluated.
                 self.problem.evaluate(self._population)
@@ -302,7 +338,9 @@ class GaussianSearchAlgorithm(SearchAlgorithm, SinglePopulationAlgorithmMixin):
                 # The 'total_interaction_count' status reported by the problem object shows the global interaction count.
                 # Therefore, to properly count the simulator interactions we made during this generation, we need
                 # to get the interaction count before starting our sampling and evaluation operations.
-                first_num_interactions = self.problem.status.get("total_interaction_count", 0)
+                first_num_interactions = self.problem.status.get(
+                    "total_interaction_count", 0
+                )
 
                 # We will keep allocating and evaluating new populations until the interaction count threshold is reached.
                 # These newly allocated populations will eventually concatenated into one.
@@ -324,7 +362,9 @@ class GaussianSearchAlgorithm(SearchAlgorithm, SinglePopulationAlgorithmMixin):
                     total_popsize += len(newpop)
 
                     # Sample new solutions within the newly allocated population
-                    self._distribution.sample(out=newpop.access_values(), generator=self.problem)
+                    self._distribution.sample(
+                        out=newpop.access_values(), generator=self.problem
+                    )
 
                     # Evaluate the new population
                     self.problem.evaluate(newpop)
@@ -334,12 +374,17 @@ class GaussianSearchAlgorithm(SearchAlgorithm, SinglePopulationAlgorithmMixin):
 
                     # In addition to the num_interactions threshold, we might also have a popsize_max threshold.
                     # We now check this threshold.
-                    if (self._popsize_max is not None) and (total_popsize >= self._popsize_max):
+                    if (self._popsize_max is not None) and (
+                        total_popsize >= self._popsize_max
+                    ):
                         # If the popsize_max threshold is reached, we leave the loop.
                         break
 
                     # We now compute the number of interactions we have made during this while loop.
-                    interactions_made = self.problem.status["total_interaction_count"] - first_num_interactions
+                    interactions_made = (
+                        self.problem.status["total_interaction_count"]
+                        - first_num_interactions
+                    )
 
                     if interactions_made > self._num_interactions:
                         # If the number of interactions exceeds our threshold, we leave the loop.
@@ -361,7 +406,10 @@ class GaussianSearchAlgorithm(SearchAlgorithm, SinglePopulationAlgorithmMixin):
             obj_sense = self.problem.senses[self._obj_index]
             ranking_method = self._ranking_method
             gradients = self._distribution.compute_gradients(
-                samples, fitnesses, objective_sense=obj_sense, ranking_method=ranking_method
+                samples,
+                fitnesses,
+                objective_sense=obj_sense,
+                ranking_method=ranking_method,
             )
             self._update_distribution(gradients)
             fill_and_eval_pop()
@@ -373,7 +421,9 @@ class GaussianSearchAlgorithm(SearchAlgorithm, SinglePopulationAlgorithmMixin):
         # standard deviation (do we have imposed lower and upper bounds for the standard deviation,
         # and do we have a maximum change limiter?)
         controlled_stdev_update = (
-            (self._stdev_min is not None) or (self._stdev_max is not None) or (self._stdev_max_change is not None)
+            (self._stdev_min is not None)
+            or (self._stdev_max is not None)
+            or (self._stdev_max_change is not None)
         )
 
         if controlled_stdev_update:
@@ -718,7 +768,10 @@ class PGPE(GaussianSearchAlgorithm):
             self.DISTRIBUTION_TYPE = SeparableGaussian
             divide_by = "num_solutions"
 
-        self.DISTRIBUTION_PARAMS = {"divide_mu_grad_by": divide_by, "divide_sigma_grad_by": divide_by}
+        self.DISTRIBUTION_PARAMS = {
+            "divide_mu_grad_by": divide_by,
+            "divide_sigma_grad_by": divide_by,
+        }
 
         super().__init__(
             problem,

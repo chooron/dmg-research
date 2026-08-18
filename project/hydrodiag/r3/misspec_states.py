@@ -21,6 +21,7 @@ Outputs under results/<run-id>/: state_metrics_basin.csv, state_excess.csv
 
 Usage: python r3/misspec_states.py [--skip-ic|--skip-dpl] [--device cuda]
 """
+
 from __future__ import annotations
 
 import argparse
@@ -79,8 +80,18 @@ def build_models(device: torch.device) -> dict[str, object]:
     }
 
 
-def recorded_pass(models, structure, theta_hat, bundle, pi, x_star, months,
-                  device, dtype, primary_only=False) -> list[dict]:
+def recorded_pass(
+    models,
+    structure,
+    theta_hat,
+    bundle,
+    pi,
+    x_star,
+    months,
+    device,
+    dtype,
+    primary_only=False,
+) -> list[dict]:
     """Recorded-forward over the full axis; return state metric rows."""
     from ablation.ic_core.parameter_adapter import get_parameter_spec
 
@@ -90,25 +101,54 @@ def recorded_pass(models, structure, theta_hat, bundle, pi, x_star, months,
     model = models[structure]
     for left in range(0, n, BATCH):
         right = min(n, left + BATCH)
-        fc = build_forcing_dict(bundle.forcing[left:right].astype(np.float32), device, dtype)
-        params = {name: torch.from_numpy(theta_hat[left:right, i]).to(device, dtype=dtype)
-                  for i, name in enumerate(names)}
+        fc = build_forcing_dict(
+            bundle.forcing[left:right].astype(np.float32), device, dtype
+        )
+        params = {
+            name: torch.from_numpy(theta_hat[left:right, i]).to(device, dtype=dtype)
+            for i, name in enumerate(names)
+        }
         _qsim, stores, _fs = recorded_forward_for_structure(
-            structure, model, fc, params, device, dtype)
+            structure, model, fc, params, device, dtype
+        )
         for k in range(left, right):
             b = k - left
             for period, (si, ei) in (("train", pi["train"]), ("test", pi["test"])):
                 for var in STATE_KEYS:
-                    sim = stores[var].detach().cpu().numpy()[b, si:ei + 1].astype(np.float64)
-                    rows.append({"basin_id": "", "variable": var, "period": period,
-                                 **state_metrics(sim, x_star[var][k, si:ei + 1])})
+                    sim = (
+                        stores[var]
+                        .detach()
+                        .cpu()
+                        .numpy()[b, si : ei + 1]
+                        .astype(np.float64)
+                    )
+                    rows.append(
+                        {
+                            "basin_id": "",
+                            "variable": var,
+                            "period": period,
+                            **state_metrics(sim, x_star[var][k, si : ei + 1]),
+                        }
+                    )
             if not primary_only:
                 for season, ms in SEASONS.items():
                     sel = np.isin(months, list(ms))
                     for var in PRIMARY_STATES:
-                        sim = stores[var].detach().cpu().numpy()[b, sel].astype(np.float64)
-                        rows.append({"basin_id": "", "variable": var, "period": season,
-                                     **state_metrics(sim, x_star[var][k, sel])})
+                        sim = (
+                            stores[var]
+                            .detach()
+                            .cpu()
+                            .numpy()[b, sel]
+                            .astype(np.float64)
+                        )
+                        rows.append(
+                            {
+                                "basin_id": "",
+                                "variable": var,
+                                "period": season,
+                                **state_metrics(sim, x_star[var][k, sel]),
+                            }
+                        )
             # wt = wu + wl + wd, secondary derived; emitted for the same
             # train/test periods as the correct-CN gate baseline
             # (r3_gate_v1/gate_state_metrics_basin.csv) so delta_E pairs by ID.
@@ -118,8 +158,14 @@ def recorded_pass(models, structure, theta_hat, bundle, pi, x_star, months,
             wt_np = wu_np + wl_np + wd_np
             wt_truth_np = x_star["wu"][k] + x_star["wl"][k] + x_star["wd"][k]
             for period, (si, ei) in (("train", pi["train"]), ("test", pi["test"])):
-                rows.append({"basin_id": "", "variable": "wt", "period": period,
-                             **state_metrics(wt_np[si:ei + 1], wt_truth_np[si:ei + 1])})
+                rows.append(
+                    {
+                        "basin_id": "",
+                        "variable": "wt",
+                        "period": period,
+                        **state_metrics(wt_np[si : ei + 1], wt_truth_np[si : ei + 1]),
+                    }
+                )
         # assign basin ids in a second sweep (rows appended in basin-major order)
     return rows
 
@@ -135,7 +181,9 @@ def main() -> None:
     parser.add_argument("--base-dpl-prefix", default="r3_misspec_dpl_xaj_seed_")
     parser.add_argument("--tgd2-dpl-prefix", default="r3_misspec_dpl_xaj_tgd2_seed_")
     parser.add_argument("--run-id", default="r3_misspec_analysis_v1")
-    parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
+    parser.add_argument(
+        "--device", default="cuda" if torch.cuda.is_available() else "cpu"
+    )
     parser.add_argument("--skip-ic", action="store_true")
     parser.add_argument("--skip-dpl", action="store_true")
     args = parser.parse_args()
@@ -158,24 +206,37 @@ def main() -> None:
 
     fits: dict[str, dict] = {}
     if not args.skip_ic:
-        for label, run_id, key in [("Base_IC", args.base_ic_run_id, "XAJ"),
-                                   ("TGD2_IC", args.tgd2_ic_run_id, "XAJ_TGD2")]:
+        for label, run_id, key in [
+            ("Base_IC", args.base_ic_run_id, "XAJ"),
+            ("TGD2_IC", args.tgd2_ic_run_id, "XAJ_TGD2"),
+        ]:
             d = RES / run_id
             if not (d / "DONE.json").exists():
                 raise SystemExit(f"refusing: IC results incomplete for {label} ({d})")
             est = load_ic_estimates(d, basin_ids)
-            fits[label] = {"theta_hat": np.stack([est[b]["theta_hat"] for b in basin_ids]),
-                           "structure": key, "paradigm": "IC"}
+            fits[label] = {
+                "theta_hat": np.stack([est[b]["theta_hat"] for b in basin_ids]),
+                "structure": key,
+                "paradigm": "IC",
+            }
     if not args.skip_dpl:
-        for label, prefix, key in [("Base_dPL", args.base_dpl_prefix, "XAJ"),
-                                   ("TGD2_dPL", args.tgd2_dpl_prefix, "XAJ_TGD2")]:
+        for label, prefix, key in [
+            ("Base_dPL", args.base_dpl_prefix, "XAJ"),
+            ("TGD2_dPL", args.tgd2_dpl_prefix, "XAJ_TGD2"),
+        ]:
             for s in (42, 123, 2026):
                 d = RES / f"{prefix}{s}"
                 if not (d / "COMPLETE").exists():
-                    raise SystemExit(f"refusing: dPL results incomplete for {label} seed {s} ({d})")
+                    raise SystemExit(
+                        f"refusing: dPL results incomplete for {label} seed {s} ({d})"
+                    )
                 est = load_dpl_estimates(d, basin_ids)
-                fits[f"{label}_seed{s}"] = {"theta_hat": np.stack([est[b]["theta_hat"] for b in basin_ids]),
-                                            "structure": key, "paradigm": "dPL", "seed": s}
+                fits[f"{label}_seed{s}"] = {
+                    "theta_hat": np.stack([est[b]["theta_hat"] for b in basin_ids]),
+                    "structure": key,
+                    "paradigm": "dPL",
+                    "seed": s,
+                }
     if not fits:
         raise SystemExit("no fits selected")
 
@@ -188,9 +249,20 @@ def main() -> None:
     models = build_models(device)
     all_rows: list[dict] = []
     for fit_name, fit in fits.items():
-        print(f"[states] {fit_name} ({fit['structure']}) recorded forward ...", flush=True)
-        rows = recorded_pass(models, fit["structure"], fit["theta_hat"], bundle,
-                             pi, x_star, months, device, dtype)
+        print(
+            f"[states] {fit_name} ({fit['structure']}) recorded forward ...", flush=True
+        )
+        rows = recorded_pass(
+            models,
+            fit["structure"],
+            fit["theta_hat"],
+            bundle,
+            pi,
+            x_star,
+            months,
+            device,
+            dtype,
+        )
         # rows were collected without basin ids in per-basin order; tag them
         for idx, row in enumerate(rows):
             row["fit"] = fit_name
@@ -215,21 +287,30 @@ def main() -> None:
         cn_sub = cn[(cn["run"] == cn_run) & (cn["variable"].isin(STATE_KEYS + ["wt"]))]
         sub = df[df["fit"] == fit_name]
         for _, r in sub.iterrows():
-            match = cn_sub[(cn_sub["basin_id"] == r["basin_id"]) &
-                           (cn_sub["variable"] == r["variable"]) &
-                           (cn_sub["period"] == r["period"])]
+            match = cn_sub[
+                (cn_sub["basin_id"] == r["basin_id"])
+                & (cn_sub["variable"] == r["variable"])
+                & (cn_sub["period"] == r["period"])
+            ]
             if match.empty:
                 continue
             m = match.iloc[0]
             for metric in ("rmse", "nrmse", "bias"):
-                excess_rows.append({
-                    "basin_id": r["basin_id"], "fit": fit_name,
-                    "paradigm": fit["paradigm"], "seed": fit.get("seed"),
-                    "structure": r["structure"], "variable": r["variable"],
-                    "period": r["period"], "metric": metric,
-                    "e_M": float(r[metric]), "e_CN": float(m[metric]),
-                    "delta_E": float(r[metric]) - float(m[metric]),
-                })
+                excess_rows.append(
+                    {
+                        "basin_id": r["basin_id"],
+                        "fit": fit_name,
+                        "paradigm": fit["paradigm"],
+                        "seed": fit.get("seed"),
+                        "structure": r["structure"],
+                        "variable": r["variable"],
+                        "period": r["period"],
+                        "metric": metric,
+                        "e_M": float(r[metric]),
+                        "e_CN": float(m[metric]),
+                        "delta_E": float(r[metric]) - float(m[metric]),
+                    }
+                )
     excess = pd.DataFrame(excess_rows)
     excess.to_csv(out_dir / "state_excess.csv", index=False)
 
@@ -245,22 +326,31 @@ def main() -> None:
         for structure in ["Base", "TGD2"]:
             for paradigm in ["IC", "dPL"]:
                 key = f"{structure}_{paradigm}"
-                ssub = sub[(sub["structure"] == structure) & (sub["paradigm"] == paradigm)]
+                ssub = sub[
+                    (sub["structure"] == structure) & (sub["paradigm"] == paradigm)
+                ]
                 per_var = {}
                 for var in STATE_KEYS + ["wt"]:
                     v = ssub[ssub["variable"] == var]["delta_E"]
                     if v.empty:
                         continue
-                    entry = {"median_delta_E": float(v.median()),
-                             "q25": float(v.quantile(0.25)),
-                             "q75": float(v.quantile(0.75)),
-                             "frac_positive": float((v > 0).mean())}
-                    snow_vals = np.array([snow[b] for b in ssub[ssub["variable"] == var]["basin_id"]])
+                    entry = {
+                        "median_delta_E": float(v.median()),
+                        "q25": float(v.quantile(0.25)),
+                        "q75": float(v.quantile(0.75)),
+                        "frac_positive": float((v > 0).mean()),
+                    }
+                    snow_vals = np.array(
+                        [snow[b] for b in ssub[ssub["variable"] == var]["basin_id"]]
+                    )
                     de = v.to_numpy()
                     if snow_vals.std() > 0 and np.isfinite(de).all():
                         entry["spearman_delta_E_vs_frac_snow"] = float(
-                            np.corrcoef(np.argsort(np.argsort(snow_vals)),
-                                        np.argsort(np.argsort(de)))[0, 1])
+                            np.corrcoef(
+                                np.argsort(np.argsort(snow_vals)),
+                                np.argsort(np.argsort(de)),
+                            )[0, 1]
+                        )
                     per_var[var] = entry
                 summary_full[key] = per_var
     summary["periods"] = {"headline": "test", "available": ["test", "train"]}

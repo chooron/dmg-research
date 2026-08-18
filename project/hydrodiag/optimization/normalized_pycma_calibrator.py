@@ -17,7 +17,6 @@ from typing import Any, Optional
 import cma
 import numpy as np
 import torch
-
 from models.base import BaseHydrologicalModel
 
 
@@ -94,7 +93,6 @@ class RestartSummary:
 
 
 class NormalizedCMAESCalibrator:
-
     def __init__(
         self,
         model_cls: type[BaseHydrologicalModel],
@@ -126,8 +124,12 @@ class NormalizedCMAESCalibrator:
         self.N = len(basin_ids)
         self.P = model_config["population"]
 
-        self.lower = np.array([param_specs[n]["lower"] for n in self.param_names], dtype=np.float64)
-        self.upper = np.array([param_specs[n]["upper"] for n in self.param_names], dtype=np.float64)
+        self.lower = np.array(
+            [param_specs[n]["lower"] for n in self.param_names], dtype=np.float64
+        )
+        self.upper = np.array(
+            [param_specs[n]["upper"] for n in self.param_names], dtype=np.float64
+        )
         self.param_range = self.upper - self.lower
 
         self.warmup_days = config["time_periods"]["warmup_days"]
@@ -136,7 +138,9 @@ class NormalizedCMAESCalibrator:
         self.model_offset = model_config["model_offset"]
         self.model = None
 
-        self.snow_class = np.where(frac_snow >= config["data"]["snow_threshold"], "snow", "non_snow")
+        self.snow_class = np.where(
+            frac_snow >= config["data"]["snow_threshold"], "snow", "non_snow"
+        )
 
     def _ensure_model(self):
         if self.model is None:
@@ -149,9 +153,13 @@ class NormalizedCMAESCalibrator:
     def _denormalize(self, x_norm: np.ndarray) -> np.ndarray:
         return self.lower + x_norm * self.param_range
 
-    def _params_to_dict(self, theta: np.ndarray, batch: int, device: torch.device) -> dict[str, torch.Tensor]:
-        return {n: torch.from_numpy(theta[:, i]).float().to(device)
-                for i, n in enumerate(self.param_names)}
+    def _params_to_dict(
+        self, theta: np.ndarray, batch: int, device: torch.device
+    ) -> dict[str, torch.Tensor]:
+        return {
+            n: torch.from_numpy(theta[:, i]).float().to(device)
+            for i, n in enumerate(self.param_names)
+        }
 
     def _make_cma_opts(self, seed: int, sigma0: float) -> dict:
         disabled = dict(self.cma_config["disabled_stop_conditions"])
@@ -164,15 +172,24 @@ class NormalizedCMAESCalibrator:
         }
 
     def _make_sobol_center(self, sobol_seed: int) -> np.ndarray:
-        engine = torch.quasirandom.SobolEngine(dimension=self.D, scramble=True, seed=sobol_seed)
+        engine = torch.quasirandom.SobolEngine(
+            dimension=self.D, scramble=True, seed=sobol_seed
+        )
         pts = engine.draw(self.N).cpu().numpy().astype(np.float64)
         eps = self.cma_config["boundary_near_threshold"]
         pts = np.clip(pts, eps, 1.0 - eps)
         return pts
 
-    def _check_early_stop(self, best_kge_history: list, es, gen: int,
-                          min_generations: int, tol_history_kge: float,
-                          tol_coord_std: float, history_window: int) -> tuple:
+    def _check_early_stop(
+        self,
+        best_kge_history: list,
+        es,
+        gen: int,
+        min_generations: int,
+        tol_history_kge: float,
+        tol_coord_std: float,
+        history_window: int,
+    ) -> tuple:
         info = {"history_kge_range": np.nan, "max_coordinate_std": np.nan}
         if gen < min_generations:
             return False, "", info
@@ -187,17 +204,25 @@ class NormalizedCMAESCalibrator:
         except Exception:
             info["max_coordinate_std"] = np.nan
 
-        hist_ok = (not np.isnan(info["history_kge_range"]) and
-                   info["history_kge_range"] <= tol_history_kge)
-        std_ok = (not np.isnan(info["max_coordinate_std"]) and
-                  info["max_coordinate_std"] <= tol_coord_std)
+        hist_ok = (
+            not np.isnan(info["history_kge_range"])
+            and info["history_kge_range"] <= tol_history_kge
+        )
+        std_ok = (
+            not np.isnan(info["max_coordinate_std"])
+            and info["max_coordinate_std"] <= tol_coord_std
+        )
 
         if hist_ok and std_ok:
             return True, STOP_COMPOSITE_CONVERGED, info
         return False, "", info
 
-    def _gpu_batch_eval(self, theta_norm: np.ndarray, fc_rep: dict[str, np.ndarray],
-                        active_indices: list[int]) -> np.ndarray:
+    def _gpu_batch_eval(
+        self,
+        theta_norm: np.ndarray,
+        fc_rep: dict[str, np.ndarray],
+        active_indices: list[int],
+    ) -> np.ndarray:
         """Single GPU forward pass for all candidates. Returns KGE array."""
         self._ensure_model()
         n_total = len(theta_norm)
@@ -217,7 +242,7 @@ class NormalizedCMAESCalibrator:
             obs = self.obs_train[bi]
             for p in range(self.P):
                 idx = i * self.P + p
-                sim = q_all[idx, self.warmup_days:]
+                sim = q_all[idx, self.warmup_days :]
                 kge_vals[idx] = compute_kge(sim, obs)
 
         del fc, pdict, q_all
@@ -281,7 +306,7 @@ class NormalizedCMAESCalibrator:
 
             for i, bi in enumerate(cur):
                 sols = np.array(es_dict[bi].ask(), dtype=np.float64)
-                theta_flat[i * self.P:(i + 1) * self.P] = sols
+                theta_flat[i * self.P : (i + 1) * self.P] = sols
 
             fc_rep = {}
             for key in ["precip", "pet", "temp"]:
@@ -306,11 +331,16 @@ class NormalizedCMAESCalibrator:
                     fc_chunk = {}
                     for key in ["precip", "pet", "temp"]:
                         fc_chunk[key] = np.concatenate(
-                            [np.tile(self.forcing_data[key][bi], (self.P, 1)) for bi in cb],
+                            [
+                                np.tile(self.forcing_data[key][bi], (self.P, 1))
+                                for bi in cb
+                            ],
                             axis=0,
                         ).astype(np.float32)
                     try:
-                        kge_vals[sl] = self._gpu_batch_eval(theta_flat[sl], fc_chunk, cb)
+                        kge_vals[sl] = self._gpu_batch_eval(
+                            theta_flat[sl], fc_chunk, cb
+                        )
                     except torch.cuda.OutOfMemoryError:
                         chunk_size = max(1, chunk_size // 2)
                         torch.cuda.empty_cache()
@@ -319,7 +349,9 @@ class NormalizedCMAESCalibrator:
 
             kge_matrix = kge_vals.reshape(n_cur, self.P)
             eps = self.cma_config["boundary_near_threshold"]
-            boundary_count = int(np.sum((theta_flat <= eps) | (theta_flat >= 1.0 - eps)))
+            boundary_count = int(
+                np.sum((theta_flat <= eps) | (theta_flat >= 1.0 - eps))
+            )
 
             ctrl_info = {}
             for i, bi in enumerate(cur):
@@ -349,11 +381,15 @@ class NormalizedCMAESCalibrator:
                 kge_hist[bi].append(best_kge[bi])
 
                 penalty = self.cma_config["failure_penalty"]
-                fitness = np.where(invalid_mask, penalty, -basin_kges.astype(np.float64))
+                fitness = np.where(
+                    invalid_mask, penalty, -basin_kges.astype(np.float64)
+                )
 
                 try:
-                    sols_tell = [(float(theta_flat[i * self.P + p, d]) for d in range(self.D))
-                                 for p in range(self.P)]
+                    sols_tell = [
+                        (float(theta_flat[i * self.P + p, d]) for d in range(self.D))
+                        for p in range(self.P)
+                    ]
                     es_dict[bi].tell(sols_tell, fitness.tolist())
                 except Exception:
                     active[bi] = False
@@ -365,20 +401,31 @@ class NormalizedCMAESCalibrator:
 
                 gen_mean = float(np.mean(valid_kges)) if len(valid_kges) > 0 else np.nan
                 gen_worst = float(np.min(valid_kges)) if len(valid_kges) > 0 else np.nan
-                gen_range = float(np.max(valid_kges) - np.min(valid_kges)) if len(valid_kges) > 1 else 0.0
+                gen_range = (
+                    float(np.max(valid_kges) - np.min(valid_kges))
+                    if len(valid_kges) > 1
+                    else 0.0
+                )
 
                 try:
                     sigma_val = float(es_dict[bi].sigma)
                     final_sigma[bi] = sigma_val
-                    max_std = float(np.max(np.asarray(es_dict[bi].stds, dtype=np.float64)))
+                    max_std = float(
+                        np.max(np.asarray(es_dict[bi].stds, dtype=np.float64))
+                    )
                     final_max_std[bi] = max_std
                 except Exception:
                     sigma_val = np.nan
                     max_std = np.nan
 
                 ctrl_stop, ctrl_reason, stop_info = self._check_early_stop(
-                    kge_hist[bi], es_dict[bi], gen + 1,
-                    min_generations, tol_history_kge, tol_coord_std, history_window,
+                    kge_hist[bi],
+                    es_dict[bi],
+                    gen + 1,
+                    min_generations,
+                    tol_history_kge,
+                    tol_coord_std,
+                    history_window,
                 )
                 ctrl_info[bi] = stop_info
 
@@ -414,10 +461,14 @@ class NormalizedCMAESCalibrator:
                     max_coordinate_std=si.get("max_coordinate_std", np.nan),
                     boundary_candidate_count=boundary_count,
                     invalid_candidate_count=n_invalid,
-                    stop_trigger_history=(not np.isnan(si.get("history_kge_range", np.nan)) and
-                                          si.get("history_kge_range", np.nan) <= tol_history_kge),
-                    stop_trigger_std=(not np.isnan(si.get("max_coordinate_std", np.nan)) and
-                                      si.get("max_coordinate_std", np.nan) <= tol_coord_std),
+                    stop_trigger_history=(
+                        not np.isnan(si.get("history_kge_range", np.nan))
+                        and si.get("history_kge_range", np.nan) <= tol_history_kge
+                    ),
+                    stop_trigger_std=(
+                        not np.isnan(si.get("max_coordinate_std", np.nan))
+                        and si.get("max_coordinate_std", np.nan) <= tol_coord_std
+                    ),
                     stop_reason=stop_reason.get(bi, ""),
                 )
                 traces[bi].append(trace)
@@ -426,14 +477,28 @@ class NormalizedCMAESCalibrator:
             if gen % 20 == 0 or gen + 1 >= max_generations:
                 act_kges = [best_kge[bi] for bi in ba if active[bi]]
                 med = np.median(act_kges) if act_kges else 0.0
-                print(f"    gen {gen + 1:4d}: active={len(ba)-done}/{len(ba)} done={done} "
-                      f"best_med={med:.4f}", flush=True)
+                print(
+                    f"    gen {gen + 1:4d}: active={len(ba) - done}/{len(ba)} done={done} "
+                    f"best_med={med:.4f}",
+                    flush=True,
+                )
 
             if (gen + 1) % self.cma_config["checkpoint_interval_generations"] == 0:
-                self._save_checkpoint(restart_id, gen + 1, ba, es_dict,
-                                     best_kge, best_x_norm, best_gen, kge_hist,
-                                     active, stop_reason, total_evals, invalid_count,
-                                     checkpoint_dir)
+                self._save_checkpoint(
+                    restart_id,
+                    gen + 1,
+                    ba,
+                    es_dict,
+                    best_kge,
+                    best_x_norm,
+                    best_gen,
+                    kge_hist,
+                    active,
+                    stop_reason,
+                    total_evals,
+                    invalid_count,
+                    checkpoint_dir,
+                )
 
         summaries = {}
         for bi in ba:
@@ -454,7 +519,9 @@ class NormalizedCMAESCalibrator:
                 total_invalid_candidates=invalid_count[bi],
                 final_sigma=final_sigma[bi],
                 final_max_coordinate_std=final_max_std.get(bi, np.nan),
-                final_history_kge_range=(traces[bi][-1].history_kge_range if ht > 0 else np.nan),
+                final_history_kge_range=(
+                    traces[bi][-1].history_kge_range if ht > 0 else np.nan
+                ),
                 sobol_seed=sobol_seed,
                 cma_seed=self.model_offset * 1_000_000 + restart_id * 10_000 + bi,
                 initial_center=sobol_centers[bi].tolist(),
@@ -466,10 +533,22 @@ class NormalizedCMAESCalibrator:
 
         return summaries
 
-    def _save_checkpoint(self, restart_id, gen, basin_indices, es_dict,
-                        best_kge, best_x_norm, best_gen, kge_hist,
-                        active, stop_reason, total_evals, invalid_count,
-                        checkpoint_dir):
+    def _save_checkpoint(
+        self,
+        restart_id,
+        gen,
+        basin_indices,
+        es_dict,
+        best_kge,
+        best_x_norm,
+        best_gen,
+        kge_hist,
+        active,
+        stop_reason,
+        total_evals,
+        invalid_count,
+        checkpoint_dir,
+    ):
         ckpt = {
             "restart_id": restart_id,
             "generation": gen,
@@ -508,12 +587,22 @@ class NormalizedCMAESCalibrator:
             return
         arrays = {}
         float_fields = [
-            "generation_best_train_kge", "global_best_train_kge",
-            "generation_mean_train_kge", "generation_worst_train_kge",
-            "generation_kge_range", "history_kge_range", "sigma", "max_coordinate_std",
+            "generation_best_train_kge",
+            "global_best_train_kge",
+            "generation_mean_train_kge",
+            "generation_worst_train_kge",
+            "generation_kge_range",
+            "history_kge_range",
+            "sigma",
+            "max_coordinate_std",
         ]
-        int_fields = ["generation", "population_size", "cumulative_evaluations",
-                      "boundary_candidate_count", "invalid_candidate_count"]
+        int_fields = [
+            "generation",
+            "population_size",
+            "cumulative_evaluations",
+            "boundary_candidate_count",
+            "invalid_candidate_count",
+        ]
         bool_fields = ["stop_trigger_history", "stop_trigger_std"]
         for fn in float_fields:
             arrays[fn] = np.array([getattr(t, fn) for t in all_t], dtype=np.float32)

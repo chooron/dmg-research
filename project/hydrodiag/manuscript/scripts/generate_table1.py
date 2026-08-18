@@ -6,6 +6,7 @@ Main-text predictive performance sanity check across all 531 basins.
 
 import os
 import sys
+
 import pandas as pd
 
 
@@ -15,7 +16,9 @@ def format_stat(med, ci_low, ci_high, decimals):
 
 
 def main():
-    project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    project_root = os.path.dirname(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    )
     r1_dir = os.path.join(project_root, "manuscript/results/R1")
 
     out_stats_dir = os.path.join(project_root, "manuscript/stats/tables")
@@ -28,12 +31,12 @@ def main():
 
     row_specs = [
         ("XAJ-Base", "IC-CMA-ES", "Base", "IC"),
-        ("XAJ-Base", "dPL-MLP",   "Base", "dPL"),
-        ("XAJ-TGD",  "IC-CMA-ES", "TGD",  "IC"),
-        ("XAJ-TGD",  "dPL-MLP",   "TGD",  "dPL"),
-        ("XAJ-CN",   "IC-CMA-ES", "CN",   "IC"),
-        ("XAJ-CN",   "dPL-MLP",   "CN",   "dPL"),
-        ("HBV",      "dPL-MLP",   "HBV (reference)", "dPL"),
+        ("XAJ-Base", "dPL-MLP", "Base", "dPL"),
+        ("XAJ-TGD", "IC-CMA-ES", "TGD", "IC"),
+        ("XAJ-TGD", "dPL-MLP", "TGD", "dPL"),
+        ("XAJ-CN", "IC-CMA-ES", "CN", "IC"),
+        ("XAJ-CN", "dPL-MLP", "CN", "dPL"),
+        ("HBV", "dPL-MLP", "HBV (reference)", "dPL"),
     ]
 
     metrics_config = [
@@ -64,9 +67,13 @@ def main():
                     & (fs["period"] == period)
                 ]
                 if len(sub) == 0:
-                    raise ValueError(f"Missing metric summary for {p_query} {model_query} {metric} {period}")
+                    raise ValueError(
+                        f"Missing metric summary for {p_query} {model_query} {metric} {period}"
+                    )
                 r = sub.iloc[0]
-                stat_str = format_stat(r["median"], r["bootstrap_ci_low"], r["bootstrap_ci_high"], decs)
+                stat_str = format_stat(
+                    r["median"], r["bootstrap_ci_low"], r["bootstrap_ci_high"], decs
+                )
                 col_name = metric.upper() if metric != "rmse" else "RMSE (mm d⁻¹)"
                 if metric == "pbias":
                     col_name = "PBIAS (%)"
@@ -94,7 +101,12 @@ def main():
         "dPL reference benchmark and is not part of the controlled XAJ structural progression."
     )
 
-    full_md = "# Table 1: Streamflow Simulation Performance Across Structural Configurations and Parameter-Estimation Regimes\n\n" + md_header + md_rows_str + md_note
+    full_md = (
+        "# Table 1: Streamflow Simulation Performance Across Structural Configurations and Parameter-Estimation Regimes\n\n"
+        + md_header
+        + md_rows_str
+        + md_note
+    )
 
     # Write Markdown files
     for d in (out_stats_dir, out_table_dir):
@@ -106,7 +118,8 @@ def main():
     for r_vals in rows_tex:
         tex_rows_str += " & ".join(r_vals) + " \\\\\n"
 
-    full_tex = r"""\begin{table*}[t]
+    full_tex = (
+        r"""\begin{table*}[t]
 \centering
 \caption{Streamflow simulation performance across structural configurations and parameter-estimation regimes ($n = 531$).}
 \label{tab:table1_absolute_performance}
@@ -115,7 +128,9 @@ def main():
 \toprule
 Configuration & Regime & Period & KGE & NSE & PBIAS (\%) & RMSE (mm d$^{-1}$) \\
 \midrule
-""" + tex_rows_str + r"""\bottomrule
+"""
+        + tex_rows_str
+        + r"""\bottomrule
 \end{tabular}
 \begin{tablenotes}[flushleft]
 \small
@@ -124,6 +139,7 @@ Configuration & Regime & Period & KGE & NSE & PBIAS (\%) & RMSE (mm d$^{-1}$) \\
 \end{threeparttable}
 \end{table*}
 """
+    )
 
     for d in (out_stats_dir, out_table_dir):
         with open(os.path.join(d, "Table1_absolute_performance.tex"), "w") as f:

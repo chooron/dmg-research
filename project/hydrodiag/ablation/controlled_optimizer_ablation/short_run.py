@@ -1,6 +1,9 @@
-import json
 import copy
-from ablation.controlled_optimizer_ablation.experiment_matrix import generate_phase1_matrix
+import json
+
+from ablation.controlled_optimizer_ablation.experiment_matrix import (
+    generate_phase1_matrix,
+)
 from ablation.controlled_optimizer_ablation.runner import run_tasks
 
 with open("ablation/configs/controlled_optimizer_ablation/phase1_optimizer.json") as f:

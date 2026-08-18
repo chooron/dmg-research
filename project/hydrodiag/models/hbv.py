@@ -32,7 +32,9 @@ def _hbv_step(
     parK1: torch.Tensor,
     parK2: torch.Tensor,
     nearzero: float,
-) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+) -> tuple[
+    torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor
+]:
     RAIN = precip_t * (temp_t >= parTT).float()
     SNOW = precip_t * (temp_t < parTT).float()
     SNOWPACK = SNOWPACK + SNOW
@@ -106,7 +108,9 @@ class HBV(BaseHydrologicalModel):
         dtype = precip.dtype
         validate_params(params, self.parameter_specs, batch, device, dtype)
 
-        SNOWPACK, MELTWATER, SM, SUZ, SLZ = self._init_states(batch, device, dtype, initial_states)
+        SNOWPACK, MELTWATER, SM, SUZ, SLZ = self._init_states(
+            batch, device, dtype, initial_states
+        )
 
         parTT = params["parTT"]
         parCFMAX = params["parCFMAX"]
@@ -122,11 +126,29 @@ class HBV(BaseHydrologicalModel):
         parK2 = params["parK2"]
 
         qsim, (SNOWPACK, MELTWATER, SM, SUZ, SLZ) = self._step_loop(
-            precip, pet, temp, nsteps, batch,
-            SNOWPACK, MELTWATER, SM, SUZ, SLZ,
-            parTT, parCFMAX, parCFR, parCWH,
-            parFC, parBETA, parLP, parPERC, parUZL,
-            parK0, parK1, parK2, device,
+            precip,
+            pet,
+            temp,
+            nsteps,
+            batch,
+            SNOWPACK,
+            MELTWATER,
+            SM,
+            SUZ,
+            SLZ,
+            parTT,
+            parCFMAX,
+            parCFR,
+            parCWH,
+            parFC,
+            parBETA,
+            parLP,
+            parPERC,
+            parUZL,
+            parK0,
+            parK1,
+            parK2,
+            device,
         )
 
         if self.compact_output and not return_states:
@@ -158,11 +180,21 @@ class HBV(BaseHydrologicalModel):
     ) -> tuple[torch.Tensor, ...]:
         if initial_states is not None:
             return (
-                initial_states.get("SNOWPACK", torch.zeros(batch, device=device, dtype=dtype)),
-                initial_states.get("MELTWATER", torch.zeros(batch, device=device, dtype=dtype)),
-                initial_states.get("SM", torch.full((batch,), 0.5, device=device, dtype=dtype)),
-                initial_states.get("SUZ", torch.zeros(batch, device=device, dtype=dtype)),
-                initial_states.get("SLZ", torch.zeros(batch, device=device, dtype=dtype)),
+                initial_states.get(
+                    "SNOWPACK", torch.zeros(batch, device=device, dtype=dtype)
+                ),
+                initial_states.get(
+                    "MELTWATER", torch.zeros(batch, device=device, dtype=dtype)
+                ),
+                initial_states.get(
+                    "SM", torch.full((batch,), 0.5, device=device, dtype=dtype)
+                ),
+                initial_states.get(
+                    "SUZ", torch.zeros(batch, device=device, dtype=dtype)
+                ),
+                initial_states.get(
+                    "SLZ", torch.zeros(batch, device=device, dtype=dtype)
+                ),
             )
         return (
             torch.zeros(batch, device=device, dtype=dtype),

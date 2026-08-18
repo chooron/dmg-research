@@ -47,8 +47,20 @@ PERIODS = {
 # R2 canonical shared-XAJ parameter order (15 parameters common to Base,
 # CN and TGD2), reused verbatim from run_r2_within_structure_baseline.py.
 COMMON_XAJ = [
-    "xaj_k", "xaj_b", "xaj_im", "xaj_um", "xaj_lm", "xaj_dm", "xaj_c",
-    "xaj_sm", "xaj_ex", "xaj_ki", "xaj_kg", "xaj_ci", "xaj_cg", "xaj_a",
+    "xaj_k",
+    "xaj_b",
+    "xaj_im",
+    "xaj_um",
+    "xaj_lm",
+    "xaj_dm",
+    "xaj_c",
+    "xaj_sm",
+    "xaj_ex",
+    "xaj_ki",
+    "xaj_kg",
+    "xaj_ci",
+    "xaj_cg",
+    "xaj_a",
     "xaj_theta",
 ]
 
@@ -71,9 +83,11 @@ def git_commit(project_root: Path) -> dict[str, str]:
     except Exception:
         head = "UNVERIFIED"
     try:
-        dirty = bool(subprocess.check_output(
-            ["git", "status", "--porcelain"], cwd=project_root, text=True
-        ).strip())
+        dirty = bool(
+            subprocess.check_output(
+                ["git", "status", "--porcelain"], cwd=project_root, text=True
+            ).strip()
+        )
     except Exception:
         dirty = True
     return {"commit": head, "dirty": dirty}
@@ -87,7 +101,9 @@ def sha256_file(path: str | Path) -> str:
     return digest.hexdigest()
 
 
-def load_bundle(project_root: Path = DEFAULT_PROJECT_ROOT, data_root: Path = DEFAULT_DATA_ROOT):
+def load_bundle(
+    project_root: Path = DEFAULT_PROJECT_ROOT, data_root: Path = DEFAULT_DATA_ROOT
+):
     """Load the canonical 531-basin IC bundle (reuses ablation.ic_core)."""
     import sys
 
@@ -132,9 +148,7 @@ def bundle_with_synthetic_target(bundle, target_mm_day: np.ndarray) -> Any:
 
 def frac_snow_series(bundle) -> pd.DataFrame:
     values = np.asarray(bundle.raw_attributes[:, FRAC_SNOW_INDEX], dtype=np.float64)
-    return pd.DataFrame(
-        {"basin_id": list(bundle.basin_ids), "frac_snow": values}
-    )
+    return pd.DataFrame({"basin_id": list(bundle.basin_ids), "frac_snow": values})
 
 
 def period_indices(bundle) -> dict[str, tuple[int, int]]:
@@ -237,13 +251,18 @@ def water_year_errors(
     if joined.empty:
         return {"ct_error_absolute": math.nan, "amjj_error_absolute": math.nan}
     return {
-        "ct_error_absolute": float(np.median(np.abs(joined["ct_day_sim"] - joined["ct_day_obs"]))),
-        "amjj_error_absolute": float(np.median(np.abs(joined["amjj_sim"] - joined["amjj_obs"]))),
+        "ct_error_absolute": float(
+            np.median(np.abs(joined["ct_day_sim"] - joined["ct_day_obs"]))
+        ),
+        "amjj_error_absolute": float(
+            np.median(np.abs(joined["amjj_sim"] - joined["amjj_obs"]))
+        ),
     }
 
 
-def pilot_basin_subset(basin_ids: Iterable[str], frac_snow: np.ndarray,
-                       per_tercile: int = 4) -> list[str]:
+def pilot_basin_subset(
+    basin_ids: Iterable[str], frac_snow: np.ndarray, per_tercile: int = 4
+) -> list[str]:
     """Deterministic stratified pilot subset across the frac_snow terciles.
 
     Engineering gate only: covers low/mid/high frac_snow but is not a final
@@ -268,7 +287,9 @@ def pilot_basin_subset(basin_ids: Iterable[str], frac_snow: np.ndarray,
         fracs = np.linspace(1 / 8, 7 / 8, per_tercile)
         picks = sorted({int(round(f * (len(positions) - 1))) for f in fracs})
         while len(picks) < per_tercile:
-            picks.append(picks[-1] + 1 if picks[-1] + 1 < len(positions) else picks[-1] - 1)
+            picks.append(
+                picks[-1] + 1 if picks[-1] + 1 < len(positions) else picks[-1] - 1
+            )
         for p in picks[:per_tercile]:
             selected.append(str(sorted_ids[positions[p]]).zfill(8))
     return selected

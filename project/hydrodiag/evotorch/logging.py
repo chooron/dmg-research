@@ -52,7 +52,9 @@ except ImportError:
 try:
     import neptune
 
-    if hasattr(neptune, "__version__") and (Version(neptune.__version__) < Version("1.0")):
+    if hasattr(neptune, "__version__") and (
+        Version(neptune.__version__) < Version("1.0")
+    ):
         import neptune.new as neptune
 except ImportError:
     neptune = None
@@ -67,7 +69,13 @@ except ImportError:
 class Logger:
     """Base class for all logging classes."""
 
-    def __init__(self, searcher: SearchAlgorithm, *, interval: int = 1, after_first_step: bool = False):
+    def __init__(
+        self,
+        searcher: SearchAlgorithm,
+        *,
+        interval: int = 1,
+        after_first_step: bool = False,
+    ):
         """`__init__(...)`: Initialize the Logger.
 
         Args:
@@ -208,7 +216,9 @@ class PicklingLogger(Logger):
             self._items_to_save = tuple(items_to_save)
 
         # Store the status key that will be used to get the current solution for making the policy.
-        self._make_policy_from = None if make_policy_from is None else str(make_policy_from)
+        self._make_policy_from = (
+            None if make_policy_from is None else str(make_policy_from)
+        )
 
         if prefix is None:
             # If a file name prefix is not given by the user, then we prepare one using the current date and time,
@@ -298,7 +308,9 @@ class PicklingLogger(Logger):
                 # For each item key, get the object with that key from the algorithm's status dictionary, and then put
                 # that object into our data dictionary.
                 if item_to_save in searcher.status:
-                    data[item_to_save] = self._as_cpu_tensor(searcher.status[item_to_save])
+                    data[item_to_save] = self._as_cpu_tensor(
+                        searcher.status[item_to_save]
+                    )
 
             if (
                 hasattr(problem, "observation_normalization")
@@ -346,7 +358,9 @@ class PicklingLogger(Logger):
                 # Make a policy from the solution
                 policy = problem.to_policy(policy_solution)
 
-                if isinstance(policy, nn.Module) and (device_of_module(policy) != torch.device("cpu")):
+                if isinstance(policy, nn.Module) and (
+                    device_of_module(policy) != torch.device("cpu")
+                ):
                     # If the created policy is a PyTorch module, and this module is not on the cpu, then we make
                     # a copy of this module on the cpu.
                     policy = clone(policy).to("cpu")
@@ -481,7 +495,13 @@ if pandas is not None:
         generates a pandas.DataFrame at the end.
         """
 
-        def __init__(self, searcher: SearchAlgorithm, *, interval: int = 1, after_first_step: bool = False):
+        def __init__(
+            self,
+            searcher: SearchAlgorithm,
+            *,
+            interval: int = 1,
+            after_first_step: bool = False,
+        ):
             """`__init__(...)`: Initialize the PandasLogger.
 
             Args:
@@ -498,7 +518,9 @@ if pandas is not None:
                     then the logging will be done at steps 1, 11, 21, 31, and
                     so on.
             """
-            super().__init__(searcher, interval=interval, after_first_step=after_first_step)
+            super().__init__(
+                searcher, interval=interval, after_first_step=after_first_step
+            )
             self._data = []
 
         def _log(self, status: dict):
@@ -556,7 +578,9 @@ if sacred is not None:
                     then the logging will be done at steps 1, 11, 21, 31,
                     and so on.
             """
-            super().__init__(searcher, interval=interval, after_first_step=after_first_step)
+            super().__init__(
+                searcher, interval=interval, after_first_step=after_first_step
+            )
             self._result = result
             self._run = run
 
@@ -607,7 +631,9 @@ if mlflow is not None:
                     and so on.
             """
 
-            super().__init__(searcher, interval=interval, after_first_step=after_first_step)
+            super().__init__(
+                searcher, interval=interval, after_first_step=after_first_step
+            )
 
             self._client = client
             self._run_id: Optional[MlflowID] = None
@@ -674,7 +700,9 @@ if neptune is not None:
                     to `neptune.init_run()` when creating a new run.
                     For example, `project="my-project"` or `tags=["my-tag"]`.
             """
-            super().__init__(searcher, interval=interval, after_first_step=after_first_step)
+            super().__init__(
+                searcher, interval=interval, after_first_step=after_first_step
+            )
             self._group = group
             if run is None:
                 self._run = neptune.init_run(**neptune_kwargs)
@@ -734,7 +762,9 @@ if wandb is not None:
                     For example, WandbLogger(searcher, project=my-project, entity=my-organization)
                     will result in calling `wandb.init(project=my-project, entity=my-organization)`
             """
-            super().__init__(searcher, interval=interval, after_first_step=after_first_step)
+            super().__init__(
+                searcher, interval=interval, after_first_step=after_first_step
+            )
             self._group = group
             if init:
                 wandb.init(**wandb_kwargs)

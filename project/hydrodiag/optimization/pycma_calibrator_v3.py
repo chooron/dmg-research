@@ -18,35 +18,67 @@ import numpy as np
 import torch
 
 
-def compute_kge_fp64(sim_fp32: np.ndarray, obs_fp32: np.ndarray,
-                     min_samples: int = 30) -> tuple[float, dict]:
+def compute_kge_fp64(
+    sim_fp32: np.ndarray, obs_fp32: np.ndarray, min_samples: int = 30
+) -> tuple[float, dict]:
     """KGE with FP64 accumulation. Returns (kge, components_dict)."""
-    mask = np.isfinite(obs_fp32) & np.isfinite(sim_fp32) & (obs_fp32 >= 0) & (sim_fp32 >= 0)
+    mask = (
+        np.isfinite(obs_fp32)
+        & np.isfinite(sim_fp32)
+        & (obs_fp32 >= 0)
+        & (sim_fp32 >= 0)
+    )
     n_valid = int(mask.sum())
     if n_valid < min_samples:
-        return -999.0, {"r": np.nan, "alpha": np.nan, "beta": np.nan, "n_valid": n_valid}
+        return -999.0, {
+            "r": np.nan,
+            "alpha": np.nan,
+            "beta": np.nan,
+            "n_valid": n_valid,
+        }
 
     s = sim_fp32[mask].astype(np.float64)
     o = obs_fp32[mask].astype(np.float64)
 
     o_std = o.std()
     if o_std < 1e-10:
-        return -999.0, {"r": np.nan, "alpha": np.nan, "beta": np.nan, "n_valid": n_valid}
+        return -999.0, {
+            "r": np.nan,
+            "alpha": np.nan,
+            "beta": np.nan,
+            "n_valid": n_valid,
+        }
 
     r = np.corrcoef(s, o)[0, 1]
     alpha = s.std() / o_std
     beta = s.mean() / o.mean()
-    kge = float(1.0 - np.sqrt((r - 1.0)**2 + (alpha - 1.0)**2 + (beta - 1.0)**2))
-    return kge, {"r": float(r), "alpha": float(alpha), "beta": float(beta), "n_valid": n_valid}
+    kge = float(1.0 - np.sqrt((r - 1.0) ** 2 + (alpha - 1.0) ** 2 + (beta - 1.0) ** 2))
+    return kge, {
+        "r": float(r),
+        "alpha": float(alpha),
+        "beta": float(beta),
+        "n_valid": n_valid,
+    }
 
 
-def compute_kge_invq(sim_fp32: np.ndarray, obs_fp32: np.ndarray,
-                     epsilon: float, min_samples: int = 30) -> tuple[float, dict]:
+def compute_kge_invq(
+    sim_fp32: np.ndarray, obs_fp32: np.ndarray, epsilon: float, min_samples: int = 30
+) -> tuple[float, dict]:
     """KGE on 1/Q with basin-specific epsilon. FP64 accumulation."""
-    mask = np.isfinite(obs_fp32) & np.isfinite(sim_fp32) & (obs_fp32 >= 0) & (sim_fp32 >= 0)
+    mask = (
+        np.isfinite(obs_fp32)
+        & np.isfinite(sim_fp32)
+        & (obs_fp32 >= 0)
+        & (sim_fp32 >= 0)
+    )
     n_valid = int(mask.sum())
     if n_valid < min_samples:
-        return -999.0, {"r": np.nan, "alpha": np.nan, "beta": np.nan, "n_valid": n_valid}
+        return -999.0, {
+            "r": np.nan,
+            "alpha": np.nan,
+            "beta": np.nan,
+            "n_valid": n_valid,
+        }
 
     eps = max(epsilon, 1e-8)
     y_o = 1.0 / (obs_fp32[mask].astype(np.float64) + eps)
@@ -54,13 +86,23 @@ def compute_kge_invq(sim_fp32: np.ndarray, obs_fp32: np.ndarray,
 
     o_std = y_o.std()
     if o_std < 1e-10:
-        return -999.0, {"r": np.nan, "alpha": np.nan, "beta": np.nan, "n_valid": n_valid}
+        return -999.0, {
+            "r": np.nan,
+            "alpha": np.nan,
+            "beta": np.nan,
+            "n_valid": n_valid,
+        }
 
     r = np.corrcoef(y_s, y_o)[0, 1]
     alpha = y_s.std() / o_std
     beta = y_s.mean() / y_o.mean()
-    kge = float(1.0 - np.sqrt((r - 1.0)**2 + (alpha - 1.0)**2 + (beta - 1.0)**2))
-    return kge, {"r": float(r), "alpha": float(alpha), "beta": float(beta), "n_valid": n_valid}
+    kge = float(1.0 - np.sqrt((r - 1.0) ** 2 + (alpha - 1.0) ** 2 + (beta - 1.0) ** 2))
+    return kge, {
+        "r": float(r),
+        "alpha": float(alpha),
+        "beta": float(beta),
+        "n_valid": n_valid,
+    }
 
 
 STOP_COMPOSITE_CONVERGED = "COMPOSITE_CONVERGED"
@@ -75,20 +117,28 @@ STOP_INTERRUPTED = "INTERRUPTED"
 
 @dataclass
 class RestartSummary:
-    basin_id: str; basin_index: int; snow_class: str
-    restart_type: str; restart_id: int
+    basin_id: str
+    basin_index: int
+    snow_class: str
+    restart_type: str
+    restart_id: int
     best_train_objective: float
     best_train_objective_raw: float
-    best_params_norm: list; best_params_physical: list
+    best_params_norm: list
+    best_params_physical: list
     best_generation: int
     search_termination_label: str
-    total_evaluations: int; total_generations: int
+    total_evaluations: int
+    total_generations: int
     total_invalid_candidates: int
-    final_sigma: float; final_max_coordinate_std: float
+    final_sigma: float
+    final_max_coordinate_std: float
     sigma_resets: int
     sigma_cap_triggers: int
-    sobol_seed: int; cma_seed: int
-    initial_center: list; initial_sigma: float
+    sobol_seed: int
+    cma_seed: int
+    initial_center: list
+    initial_sigma: float
     profiler_summary: str
 
 
@@ -99,8 +149,21 @@ class PycmaCalibratorV3:
     FP32 model forward, FP64 metric accumulation.
     """
 
-    def __init__(self, model_cls, param_specs, forcing, obs_cal, obs_eval,
-                 basin_ids, frac_snow, config, model_cfg, obj_cfg, out_dir, device):
+    def __init__(
+        self,
+        model_cls,
+        param_specs,
+        forcing,
+        obs_cal,
+        obs_eval,
+        basin_ids,
+        frac_snow,
+        config,
+        model_cfg,
+        obj_cfg,
+        out_dir,
+        device,
+    ):
         self.model_cls = model_cls
         self.param_specs = param_specs
         self.forcing = forcing
@@ -119,8 +182,12 @@ class PycmaCalibratorV3:
         self.N = len(basin_ids)
         self.P = model_cfg["population"]
 
-        self.lower = np.array([param_specs[n]["lower"] for n in self.param_names], dtype=np.float64)
-        self.upper = np.array([param_specs[n]["upper"] for n in self.param_names], dtype=np.float64)
+        self.lower = np.array(
+            [param_specs[n]["lower"] for n in self.param_names], dtype=np.float64
+        )
+        self.upper = np.array(
+            [param_specs[n]["upper"] for n in self.param_names], dtype=np.float64
+        )
         self.param_range = self.upper - self.lower
 
         self.warmup_days = config["time_periods"]["warmup"]["days"]
@@ -130,7 +197,7 @@ class PycmaCalibratorV3:
         self.obj_offset = obj_cfg["objective_offset"]
         self.model = None
 
-        self.is_invq = (obj_cfg["key"] == "invq")
+        self.is_invq = obj_cfg["key"] == "invq"
         self.epsilons = self._compute_epsilons() if self.is_invq else None
 
         self.snow_class = np.where(frac_snow >= 0.1, "snow", "non_snow")
@@ -139,15 +206,21 @@ class PycmaCalibratorV3:
         # this contract explicit and fail early if a malformed parameter spec
         # would create a degenerate physical-to-normalized mapping.
         if np.any(~np.isfinite(self.param_range)) or np.any(self.param_range <= 0):
-            raise ValueError("All parameter ranges must be finite and strictly positive")
-        self.boundary_handler_name = str(self.cma_cfg.get("boundary_handler", "BoundTransform"))
+            raise ValueError(
+                "All parameter ranges must be finite and strictly positive"
+            )
+        self.boundary_handler_name = str(
+            self.cma_cfg.get("boundary_handler", "BoundTransform")
+        )
         if self.boundary_handler_name != "BoundTransform":
             raise ValueError(
                 "The repaired calibrator requires BoundaryHandler=BoundTransform; "
                 f"got {self.boundary_handler_name!r}"
             )
         self.objective_floor = float(self.cma_cfg.get("optimization_kge_floor", -1.0))
-        self.objective_tie_break = float(self.cma_cfg.get("optimization_tie_break_scale", 0.0))
+        self.objective_tie_break = float(
+            self.cma_cfg.get("optimization_tie_break_scale", 0.0)
+        )
         self.sigma_cap = float(self.cma_cfg.get("sigma_cap", 1.0))
         self.max_sigma_resets = int(self.cma_cfg.get("max_sigma_resets", 0))
         self.condition_cap = float(self.cma_cfg.get("condition_cap", 1e8))
@@ -165,7 +238,9 @@ class PycmaCalibratorV3:
 
     def _make_es(self, x0, seed):
         opts = {
-            "popsize": self.P, "seed": seed, "verbose": -9,
+            "popsize": self.P,
+            "seed": seed,
+            "verbose": -9,
             "bounds": [0.0, 1.0],
             "BoundaryHandler": self.boundary_handler_name,
         }
@@ -173,7 +248,13 @@ class PycmaCalibratorV3:
             opts["tolconditioncov"] = float(self.cma_cfg["tolconditioncov"])
         if "tolupsigma" in self.cma_cfg:
             opts["tolupsigma"] = float(self.cma_cfg["tolupsigma"])
-        for key in ("CMA_active", "CMA_diagonal", "CMA_const_trace", "CMA_on", "CSA_dampfac"):
+        for key in (
+            "CMA_active",
+            "CMA_diagonal",
+            "CMA_const_trace",
+            "CMA_on",
+            "CSA_dampfac",
+        ):
             if key in self.cma_cfg:
                 opts[key] = self.cma_cfg[key]
         disabled = dict(self.cma_cfg["disabled_stops"])
@@ -214,8 +295,10 @@ class PycmaCalibratorV3:
             stop = dict(es.stop())
         except Exception as exc:
             return {"stop_error": f"{type(exc).__name__}:{exc}"}
-        return {str(k): (float(v) if isinstance(v, (np.floating, float, int)) else str(v))
-                for k, v in stop.items()}
+        return {
+            str(k): (float(v) if isinstance(v, (np.floating, float, int)) else str(v))
+            for k, v in stop.items()
+        }
 
     @staticmethod
     def _distribution_diagnostics(es):
@@ -252,10 +335,14 @@ class PycmaCalibratorV3:
             self.model = self.model_cls().to(self.device, torch.float32)
             self.model.eval()
             # Pre-warm: trigger torch.compile with a tiny batch
-            dummy_fc = {k: torch.zeros(2, 100, device=self.device, dtype=torch.float32)
-                        for k in ["precip", "pet", "temp"]}
-            dummy_p = {n: torch.ones(2, device=self.device, dtype=torch.float32)
-                       for n in self.param_names}
+            dummy_fc = {
+                k: torch.zeros(2, 100, device=self.device, dtype=torch.float32)
+                for k in ["precip", "pet", "temp"]
+            }
+            dummy_p = {
+                n: torch.ones(2, device=self.device, dtype=torch.float32)
+                for n in self.param_names
+            }
             with torch.no_grad():
                 _ = self.model(forcings=dummy_fc, params=dummy_p)
 
@@ -265,8 +352,10 @@ class PycmaCalibratorV3:
         fc = {}
         for k in ["precip", "pet", "temp"]:
             fc[k] = torch.from_numpy(fc_rep[k].astype(np.float32)).to(self.device)
-        pdict = {n: torch.from_numpy(theta_phys[:, i]).float().to(self.device)
-                 for i, n in enumerate(self.param_names)}
+        pdict = {
+            n: torch.from_numpy(theta_phys[:, i]).float().to(self.device)
+            for i, n in enumerate(self.param_names)
+        }
 
         with torch.no_grad():
             q_all, _ = self.model(forcings=fc, params=pdict)
@@ -278,7 +367,7 @@ class PycmaCalibratorV3:
             obs = self.obs_cal[bi]
             for p in range(self.P):
                 idx = i * self.P + p
-                sim = q_all[idx, self.warmup_days:]
+                sim = q_all[idx, self.warmup_days :]
                 kge, _ = self._compute_kge_for_model(sim, obs, bi)
                 raw_vals[idx] = kge
                 kge_vals[idx] = self._protect_objective(kge)
@@ -286,9 +375,22 @@ class PycmaCalibratorV3:
         del fc, pdict, q_all
         return kge_vals, raw_vals
 
-    def run_restart(self, restart_id, basin_indices, restart_type, sobol_seed,
-                    sigma0, max_gens, min_gens, tol_kge, tol_std, hw,
-                    ckpt_dir, trace_dir, custom_centers=None):
+    def run_restart(
+        self,
+        restart_id,
+        basin_indices,
+        restart_type,
+        sobol_seed,
+        sigma0,
+        max_gens,
+        min_gens,
+        tol_kge,
+        tol_std,
+        hw,
+        ckpt_dir,
+        trace_dir,
+        custom_centers=None,
+    ):
         ba = list(basin_indices)
         if not ba:
             return {}
@@ -301,14 +403,28 @@ class PycmaCalibratorV3:
                     centers[bi] = np.array(custom_centers[bi], dtype=np.float64)
         else:
             centers = self._sobol_centers(sobol_seed)
-        es_d = {}; best_kge = {}; best_kge_raw = {}; best_x = {}; best_g = {}
-        kge_hist = {}; active = {}; stop_label = {}
-        total_evals = {}; invalid_cnt = {}
-        traces = {}; final_sig = {}; final_mstd = {}; sigma_resets = {}; sigma_cap_triggers = {}; event_label = {}
+        es_d = {}
+        best_kge = {}
+        best_kge_raw = {}
+        best_x = {}
+        best_g = {}
+        kge_hist = {}
+        active = {}
+        stop_label = {}
+        total_evals = {}
+        invalid_cnt = {}
+        traces = {}
+        final_sig = {}
+        final_mstd = {}
+        sigma_resets = {}
+        sigma_cap_triggers = {}
+        event_label = {}
 
         for bi in ba:
             x0 = centers[bi].tolist()
-            seed = int(self.model_offset * 1e6 + self.obj_offset * 1e5 + restart_id * 1e4 + bi)
+            seed = int(
+                self.model_offset * 1e6 + self.obj_offset * 1e5 + restart_id * 1e4 + bi
+            )
             es_d[bi] = self._make_es(x0, seed)
             best_kge[bi] = -999.0
             best_kge_raw[bi] = -999.0
@@ -337,7 +453,7 @@ class PycmaCalibratorV3:
             theta_flat = np.zeros((n_cur * self.P, self.D), dtype=np.float64)
             for i, bi in enumerate(cur):
                 sols = np.array(es_d[bi].ask(), dtype=np.float64)
-                theta_flat[i * self.P:(i + 1) * self.P] = sols
+                theta_flat[i * self.P : (i + 1) * self.P] = sols
 
             fc_rep = {}
             for key in ["precip", "pet", "temp"]:
@@ -353,15 +469,19 @@ class PycmaCalibratorV3:
                 kge_vals = np.full(n_cur * self.P, -999.0, dtype=np.float32)
                 raw_vals = np.full(n_cur * self.P, -999.0, dtype=np.float32)
                 for cs in range(0, n_cur, chunk_size):
-                    ce = min(cs + chunk_size, n_cur); cb = cur[cs:ce]
+                    ce = min(cs + chunk_size, n_cur)
+                    cb = cur[cs:ce]
                     sl = slice(cs * self.P, ce * self.P)
                     fc_c = {}
                     for key in ["precip", "pet", "temp"]:
                         fc_c[key] = np.concatenate(
-                            [np.tile(self.forcing[key][bi], (self.P, 1)) for bi in cb], axis=0
+                            [np.tile(self.forcing[key][bi], (self.P, 1)) for bi in cb],
+                            axis=0,
                         ).astype(np.float32)
                     try:
-                        kge_vals[sl], raw_vals[sl] = self._gpu_eval(theta_flat[sl], fc_c, cb)
+                        kge_vals[sl], raw_vals[sl] = self._gpu_eval(
+                            theta_flat[sl], fc_c, cb
+                        )
                     except torch.cuda.OutOfMemoryError:
                         chunk_size = max(1, chunk_size // 2)
                         torch.cuda.empty_cache()
@@ -399,8 +519,10 @@ class PycmaCalibratorV3:
 
                 penalty = self.cma_cfg["failure_penalty"]
                 fit = np.where(invalid_mask, penalty, -bk.astype(np.float64))
-                st = [(float(theta_flat[i * self.P + p, d]) for d in range(self.D))
-                      for p in range(self.P)]
+                st = [
+                    (float(theta_flat[i * self.P + p, d]) for d in range(self.D))
+                    for p in range(self.P)
+                ]
                 try:
                     es_d[bi].tell(st, fit.tolist())
                 except Exception:
@@ -416,7 +538,8 @@ class PycmaCalibratorV3:
                 final_mstd[bi] = mstd
 
                 cstop, creason, cinfo = self._check_stop(
-                    kge_hist[bi], es_d[bi], gen + 1, min_gens, tol_kge, tol_std, hw)
+                    kge_hist[bi], es_d[bi], gen + 1, min_gens, tol_kge, tol_std, hw
+                )
 
                 if cstop:
                     active[bi] = False
@@ -425,8 +548,13 @@ class PycmaCalibratorV3:
                     sigma_cap_triggers[bi] += 1
                     if sigma_resets[bi] < self.max_sigma_resets:
                         sigma_resets[bi] += 1
-                        reset_seed = int(self.model_offset * 1e6 + self.obj_offset * 1e5
-                                         + restart_id * 1e4 + bi + sigma_resets[bi] * 1000003)
+                        reset_seed = int(
+                            self.model_offset * 1e6
+                            + self.obj_offset * 1e5
+                            + restart_id * 1e4
+                            + bi
+                            + sigma_resets[bi] * 1000003
+                        )
                         es_d[bi] = self._make_es(best_x[bi].tolist(), reset_seed)
                         event_label[bi] = (
                             f"{STOP_SIGMA_CAP}_RESET#{sigma_resets[bi]}"
@@ -453,32 +581,57 @@ class PycmaCalibratorV3:
                         detail_text = ",".join(f"{k}={v}" for k, v in detail.items())
                         stop_label[bi] = f"{STOP_PYCMA_INTERNAL}:{detail_text}"
 
-                traces[bi].append({
-                    "gen": gen + 1, "gen_best": gen_best, "global_best": best_kge[bi],
-                    "sigma": sigma_val, "max_std": mstd, "condition": condition,
-                    "hist_range": cinfo.get("hist_range", np.nan),
-                    "stop_label": event_label[bi] or stop_label[bi],
-                    "bdy_count": bdy, "invalid": n_inv, "evals": total_evals[bi],
-                })
+                traces[bi].append(
+                    {
+                        "gen": gen + 1,
+                        "gen_best": gen_best,
+                        "global_best": best_kge[bi],
+                        "sigma": sigma_val,
+                        "max_std": mstd,
+                        "condition": condition,
+                        "hist_range": cinfo.get("hist_range", np.nan),
+                        "stop_label": event_label[bi] or stop_label[bi],
+                        "bdy_count": bdy,
+                        "invalid": n_inv,
+                        "evals": total_evals[bi],
+                    }
+                )
                 event_label[bi] = ""
 
             done = sum(1 for bi in ba if not active[bi])
             if gen % 20 == 0 or gen + 1 >= max_gens:
                 ak = [best_kge[bi] for bi in ba if active[bi]]
                 med = np.median(ak) if ak else 0.0
-                print(f"    gen {gen+1:4d}: active={len(ba)-done}/{len(ba)} done={done} "
-                      f"best_med={med:.4f}", flush=True)
+                print(
+                    f"    gen {gen + 1:4d}: active={len(ba) - done}/{len(ba)} done={done} "
+                    f"best_med={med:.4f}",
+                    flush=True,
+                )
 
             if (gen + 1) % self.cma_cfg["checkpoint_interval"] == 0:
-                self._save_ckpt(restart_id, gen + 1, ba, es_d, best_kge, best_x, best_g,
-                               kge_hist, active, stop_label, total_evals, ckpt_dir)
+                self._save_ckpt(
+                    restart_id,
+                    gen + 1,
+                    ba,
+                    es_d,
+                    best_kge,
+                    best_x,
+                    best_g,
+                    kge_hist,
+                    active,
+                    stop_label,
+                    total_evals,
+                    ckpt_dir,
+                )
 
         summaries = {}
         for bi in ba:
             summaries[bi] = RestartSummary(
-                basin_id=self.basin_ids[bi], basin_index=bi,
+                basin_id=self.basin_ids[bi],
+                basin_index=bi,
                 snow_class=self.snow_class[bi],
-                restart_type=restart_type, restart_id=restart_id,
+                restart_type=restart_type,
+                restart_id=restart_id,
                 best_train_objective=best_kge[bi],
                 best_train_objective_raw=best_kge_raw[bi],
                 best_params_norm=best_x[bi].tolist(),
@@ -492,7 +645,8 @@ class PycmaCalibratorV3:
                 final_max_coordinate_std=final_mstd.get(bi, np.nan),
                 sigma_resets=sigma_resets[bi],
                 sigma_cap_triggers=sigma_cap_triggers[bi],
-                sobol_seed=sobol_seed, cma_seed=0,
+                sobol_seed=sobol_seed,
+                cma_seed=0,
                 initial_center=centers[bi].tolist(),
                 initial_sigma=sigma0,
                 profiler_summary="",
@@ -503,19 +657,27 @@ class PycmaCalibratorV3:
         return summaries
 
     def _save_ckpt(self, rid, gen, ba, es_d, bk, bx, bg, kh, active, sl, te, d):
-        ckpt = {"restart_id": rid, "generation": gen, "basins": ba,
-                "best_kge": {str(k): v for k, v in bk.items()},
-                "best_x": {str(k): v.tolist() for k, v in bx.items()},
-                "best_gen": bg, "kge_hist": {str(k): v for k, v in kh.items()},
-                "active": {str(k): v for k, v in active.items()},
-                "stop_label": sl, "total_evals": te,
-                "cma_states": {}}
+        ckpt = {
+            "restart_id": rid,
+            "generation": gen,
+            "basins": ba,
+            "best_kge": {str(k): v for k, v in bk.items()},
+            "best_x": {str(k): v.tolist() for k, v in bx.items()},
+            "best_gen": bg,
+            "kge_hist": {str(k): v for k, v in kh.items()},
+            "active": {str(k): v for k, v in active.items()},
+            "stop_label": sl,
+            "total_evals": te,
+            "cma_states": {},
+        }
         for bi in ba:
             try:
                 es = es_d[bi]
                 ckpt["cma_states"][str(bi)] = {
-                    "mean": es.mean.tolist(), "sigma": float(es.sigma),
-                    "C": es.C.tolist(), "countiter": int(es.countiter),
+                    "mean": es.mean.tolist(),
+                    "sigma": float(es.sigma),
+                    "C": es.C.tolist(),
+                    "countiter": int(es.countiter),
                 }
             except Exception:
                 ckpt["cma_states"][str(bi)] = None
@@ -529,8 +691,18 @@ class PycmaCalibratorV3:
         if not all_t:
             return
         a = {}
-        for fn in ["gen", "gen_best", "global_best", "sigma", "max_std",
-                    "condition", "hist_range", "bdy_count", "invalid", "evals"]:
+        for fn in [
+            "gen",
+            "gen_best",
+            "global_best",
+            "sigma",
+            "max_std",
+            "condition",
+            "hist_range",
+            "bdy_count",
+            "invalid",
+            "evals",
+        ]:
             a[fn] = np.array([t[fn] for t in all_t], dtype=np.float32)
         np.savez_compressed(d / f"traces_r{rid:02d}.npz", **a)
 

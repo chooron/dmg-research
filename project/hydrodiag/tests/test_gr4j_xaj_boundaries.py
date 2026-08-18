@@ -4,20 +4,22 @@ from __future__ import annotations
 
 import pytest
 import torch
-
 from models import (
-    GR4J, GR4JWithCemaNeige, GR4JWithPrecipitationDelay,
-    XAJ, XAJWithCemaNeige, XAJWithPrecipitationDelay,
+    GR4J,
+    XAJ,
+    GR4JWithCemaNeige,
+    GR4JWithPrecipitationDelay,
+    XAJWithCemaNeige,
+    XAJWithPrecipitationDelay,
 )
 from models.parameter_specs import (
     GR4J_CN_PARAM_SPECS,
-    GR4J_PD_PARAM_SPECS,
     GR4J_PARAM_SPECS,
+    GR4J_PD_PARAM_SPECS,
     XAJ_CN_PARAM_SPECS,
-    XAJ_PD_PARAM_SPECS,
     XAJ_PARAM_SPECS,
+    XAJ_PD_PARAM_SPECS,
 )
-
 
 torch._dynamo.config.cache_size_limit = 64
 torch._dynamo.config.recompile_limit = 64

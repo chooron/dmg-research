@@ -50,6 +50,7 @@ Outputs (results/r3_misspec_analysis_v1/):
 
 Usage: python r3/posthoc_validation.py [--self-test] [--n-boot 2000] [--seed 20260730]
 """
+
 from __future__ import annotations
 
 import argparse
@@ -154,16 +155,24 @@ def self_test() -> None:
     rng = np.random.default_rng(12345)
     n = 400
     z = rng.uniform(0, 1, n)
-    x = 0.8 * z + 0.2 * rng.uniform(0, 1, n)          # x confounded with z
+    x = 0.8 * z + 0.2 * rng.uniform(0, 1, n)  # x confounded with z
     y1 = 0.5 * x + 0.5 * z + 0.1 * rng.normal(size=n)  # partial > 0
     y2 = 0.0 * x + 1.0 * z + 0.05 * rng.normal(size=n)  # partial ~ 0
-    y3 = 1.0 * x + 0.0 * z + 0.1 * rng.normal(size=n)  # partial < raw (x itself confounded)
+    y3 = (
+        1.0 * x + 0.0 * z + 0.1 * rng.normal(size=n)
+    )  # partial < raw (x itself confounded)
     raw1, part1 = spearman(x, y1), partial_spearman(x, y1, z)
     raw2, part2 = spearman(x, y2), partial_spearman(x, y2, z)
     raw3, part3 = spearman(x, y3), partial_spearman(x, y3, z)
-    print(f"[selftest] confounded: raw {raw1:+.3f} partial {part1:+.3f} (expect partial<raw, >0)")
-    print(f"[selftest] z-driven : raw {raw2:+.3f} partial {part2:+.3f} (expect partial ~0)")
-    print(f"[selftest] x-driven : raw {raw3:+.3f} partial {part3:+.3f} (expect partial ~raw)")
+    print(
+        f"[selftest] confounded: raw {raw1:+.3f} partial {part1:+.3f} (expect partial<raw, >0)"
+    )
+    print(
+        f"[selftest] z-driven : raw {raw2:+.3f} partial {part2:+.3f} (expect partial ~0)"
+    )
+    print(
+        f"[selftest] x-driven : raw {raw3:+.3f} partial {part3:+.3f} (expect partial ~raw)"
+    )
     ok = (0 < part1 < raw1) and (abs(part2) < 0.12) and (0 < part3 < raw3)
     if not ok:
         raise SystemExit(f"SELFTEST FAIL: {part1:.3f} {part2:.3f} {part3:.3f}")
@@ -216,50 +225,82 @@ def main() -> None:
     for paradigm, seeds in [("IC", [None]), ("dPL", list(SEEDS))]:
         for period in ("test", "train"):
             for seed in seeds:
-                key = f"{paradigm}{'_'+str(seed) if seed is not None else ''}_{period}"
+                key = (
+                    f"{paradigm}{'_' + str(seed) if seed is not None else ''}_{period}"
+                )
                 b = sel(paradigm, seed, period)
                 ct = cost(paradigm, seed, "Base", "C_theta_primary")
                 cs = cost(paradigm, seed, "Base", "C_state_primary")
                 fs = b["frac_snow"]
                 for xname, cname in PRIMARY_PAIRS:
                     x = b[xname].to_numpy()
-                    c = (ct if cname == "C_theta_primary" else cs).reindex(b.index).to_numpy()
+                    c = (
+                        (ct if cname == "C_theta_primary" else cs)
+                        .reindex(b.index)
+                        .to_numpy()
+                    )
                     ok = np.isfinite(x) & np.isfinite(c) & np.isfinite(fs.to_numpy())
                     if ok.sum() < 20:
                         continue
                     raw = spearman(x[ok], c[ok])
                     part = partial_spearman(x[ok], c[ok], fs.to_numpy()[ok])
-                    raw_ci = boot_corr_ci(x[ok], c[ok], spearman, args.n_boot, args.seed)
-                    part_ci = boot_partial_ci(x[ok], c[ok], fs.to_numpy()[ok], args.n_boot, args.seed)
-                    partial_rows.append({
-                        "paradigm": paradigm, "seed": "" if seed is None else seed,
-                        "period": period, "pair": f"{xname}|{cname}",
-                        "n": int(ok.sum()),
-                        "raw_spearman": raw, "raw_ci_lo": raw_ci[0], "raw_ci_hi": raw_ci[1],
-                        "partial_spearman": part, "partial_ci_lo": part_ci[0], "partial_ci_hi": part_ci[1],
-                    })
+                    raw_ci = boot_corr_ci(
+                        x[ok], c[ok], spearman, args.n_boot, args.seed
+                    )
+                    part_ci = boot_partial_ci(
+                        x[ok], c[ok], fs.to_numpy()[ok], args.n_boot, args.seed
+                    )
+                    partial_rows.append(
+                        {
+                            "paradigm": paradigm,
+                            "seed": "" if seed is None else seed,
+                            "period": period,
+                            "pair": f"{xname}|{cname}",
+                            "n": int(ok.sum()),
+                            "raw_spearman": raw,
+                            "raw_ci_lo": raw_ci[0],
+                            "raw_ci_hi": raw_ci[1],
+                            "partial_spearman": part,
+                            "partial_ci_lo": part_ci[0],
+                            "partial_ci_hi": part_ci[1],
+                        }
+                    )
                 # within-quartile Spearman (G_base primary; also C-state)
                 x = b["G_base"].to_numpy()
                 c = ct.reindex(b.index).to_numpy()
                 csn = cs.reindex(b.index).to_numpy()
                 fsv = fs.to_numpy()
                 qs = np.quantile(fsv, [0.25, 0.5, 0.75])
-                bins = [(-np.inf, qs[0]), (qs[0], qs[1]), (qs[1], qs[2]), (qs[2], np.inf)]
+                bins = [
+                    (-np.inf, qs[0]),
+                    (qs[0], qs[1]),
+                    (qs[1], qs[2]),
+                    (qs[2], np.inf),
+                ]
                 for qi, (lo, hi) in enumerate(bins):
                     m = (fsv > lo) & (fsv <= hi)
                     for cname, cv in [("C_theta", c), ("C_state", csn)]:
                         mm = m & np.isfinite(x) & np.isfinite(cv)
                         if mm.sum() < 20:
                             continue
-                        quart_rows.append({
-                            "paradigm": paradigm, "seed": "" if seed is None else seed,
-                            "period": period, "quartile": qi + 1,
-                            "frac_snow_range": [float(lo), float(hi)], "n": int(mm.sum()),
-                            "pair": f"G_base|{cname}",
-                            "spearman": spearman(x[mm], cv[mm]),
-                        })
-    pd.DataFrame(partial_rows).to_csv(out_dir / "posthoc_validation_partial.csv", index=False)
-    pd.DataFrame(quart_rows).to_csv(out_dir / "posthoc_validation_quartiles.csv", index=False)
+                        quart_rows.append(
+                            {
+                                "paradigm": paradigm,
+                                "seed": "" if seed is None else seed,
+                                "period": period,
+                                "quartile": qi + 1,
+                                "frac_snow_range": [float(lo), float(hi)],
+                                "n": int(mm.sum()),
+                                "pair": f"G_base|{cname}",
+                                "spearman": spearman(x[mm], cv[mm]),
+                            }
+                        )
+    pd.DataFrame(partial_rows).to_csv(
+        out_dir / "posthoc_validation_partial.csv", index=False
+    )
+    pd.DataFrame(quart_rows).to_csv(
+        out_dir / "posthoc_validation_quartiles.csv", index=False
+    )
 
     # ---------------- V2: decay train - test ----------------
     for paradigm, seeds in [("IC", [None]), ("dPL", list(SEEDS))]:
@@ -267,8 +308,12 @@ def main() -> None:
             tr = sel(paradigm, seed, "train")
             te = sel(paradigm, seed, "test")
             idx = tr.index.intersection(te.index)
-            for dname, col in [("decay_G_base", "G_base"), ("decay_F_close", "F_close"),
-                               ("decay_G_tgd2", "G_tgd2"), ("decay_F_tgd2", "F_tgd2")]:
+            for dname, col in [
+                ("decay_G_base", "G_base"),
+                ("decay_F_close", "F_close"),
+                ("decay_G_tgd2", "G_tgd2"),
+                ("decay_F_tgd2", "F_tgd2"),
+            ]:
                 d = tr.loc[idx, col].to_numpy() - te.loc[idx, col].to_numpy()
                 fs = te.loc[idx, "frac_snow"].to_numpy()
                 valid = np.isfinite(d)
@@ -276,20 +321,35 @@ def main() -> None:
                 lo, hi = boot_ci(dv, np.median, args.n_boot, args.seed)
                 lo_m, hi_m = boot_ci(dv, np.mean, args.n_boot, args.seed + 3)
                 for i, b in enumerate(idx):
-                    decay_rows.append({
-                        "basin_id": b, "paradigm": paradigm,
-                        "seed": "" if seed is None else seed, "metric": dname,
-                        "decay": d[i], "frac_snow": fs[i],
-                    })
-                summary[f"{paradigm}{'_'+str(seed) if seed is not None else ''}_{dname}"] = {
-                    "n": int(len(idx)), "n_valid": int(valid.sum()),
-                    "median": float(np.median(dv)), "mean": float(np.mean(dv)),
-                    "q25": float(np.quantile(dv, 0.25)), "q75": float(np.quantile(dv, 0.75)),
-                    "boot_ci_median": [lo, hi], "boot_ci_mean": [lo_m, hi_m],
+                    decay_rows.append(
+                        {
+                            "basin_id": b,
+                            "paradigm": paradigm,
+                            "seed": "" if seed is None else seed,
+                            "metric": dname,
+                            "decay": d[i],
+                            "frac_snow": fs[i],
+                        }
+                    )
+                summary[
+                    f"{paradigm}{'_' + str(seed) if seed is not None else ''}_{dname}"
+                ] = {
+                    "n": int(len(idx)),
+                    "n_valid": int(valid.sum()),
+                    "median": float(np.median(dv)),
+                    "mean": float(np.mean(dv)),
+                    "q25": float(np.quantile(dv, 0.25)),
+                    "q75": float(np.quantile(dv, 0.75)),
+                    "boot_ci_median": [lo, hi],
+                    "boot_ci_mean": [lo_m, hi_m],
                     "frac_gt_0": float((dv > 0).mean()),
-                    "spearman_vs_frac_snow": spearman(fs[np.isfinite(d)], d[np.isfinite(d)]),
+                    "spearman_vs_frac_snow": spearman(
+                        fs[np.isfinite(d)], d[np.isfinite(d)]
+                    ),
                 }
-    pd.DataFrame(decay_rows).to_csv(out_dir / "posthoc_validation_decay.csv", index=False)
+    pd.DataFrame(decay_rows).to_csv(
+        out_dir / "posthoc_validation_decay.csv", index=False
+    )
 
     # ---------------- V3: TGD2 internal reduction ----------------
     for paradigm, seeds in [("IC", [None]), ("dPL", list(SEEDS))]:
@@ -305,20 +365,28 @@ def main() -> None:
             fs = b.loc[idx, "frac_snow"].to_numpy()
             g_tgd2 = b.loc[idx, "G_tgd2"].to_numpy()
             f_tgd2 = b.loc[idx, "F_tgd2"].to_numpy()
-            key = f"{paradigm}{'_'+str(seed) if seed is not None else ''}"
+            key = f"{paradigm}{'_' + str(seed) if seed is not None else ''}"
             summary.setdefault("V3", {})[key] = {
                 "n": int(len(idx)),
                 "R_theta_tgd2": {
-                    "median": float(np.median(r_theta)), "mean": float(np.mean(r_theta)),
-                    "q25": float(np.quantile(r_theta, 0.25)), "q75": float(np.quantile(r_theta, 0.75)),
-                    "boot_ci_median": boot_ci(r_theta, np.median, args.n_boot, args.seed + 5),
+                    "median": float(np.median(r_theta)),
+                    "mean": float(np.mean(r_theta)),
+                    "q25": float(np.quantile(r_theta, 0.25)),
+                    "q75": float(np.quantile(r_theta, 0.75)),
+                    "boot_ci_median": boot_ci(
+                        r_theta, np.median, args.n_boot, args.seed + 5
+                    ),
                     "frac_gt_0": float((r_theta > 0).mean()),
                     "spearman_vs_frac_snow": spearman(fs, r_theta),
                 },
                 "R_state_tgd2": {
-                    "median": float(np.median(r_state)), "mean": float(np.mean(r_state)),
-                    "q25": float(np.quantile(r_state, 0.25)), "q75": float(np.quantile(r_state, 0.75)),
-                    "boot_ci_median": boot_ci(r_state, np.median, args.n_boot, args.seed + 6),
+                    "median": float(np.median(r_state)),
+                    "mean": float(np.mean(r_state)),
+                    "q25": float(np.quantile(r_state, 0.25)),
+                    "q75": float(np.quantile(r_state, 0.75)),
+                    "boot_ci_median": boot_ci(
+                        r_state, np.median, args.n_boot, args.seed + 6
+                    ),
                     "frac_gt_0": float((r_state > 0).mean()),
                     "spearman_vs_frac_snow": spearman(fs, r_state),
                 },
@@ -329,20 +397,34 @@ def main() -> None:
             ]:
                 fok = np.isfinite(fv)
                 summary["V3"][key][f"spearman_{gname}_vs_{rlabel}"] = spearman(gv, rv)
-                summary["V3"][key][f"partial_{gname}_vs_{rlabel}"] = partial_spearman(gv, rv, fs)
-                summary["V3"][key][f"boot_partial_{gname}_vs_{rlabel}"] = boot_partial_ci(
-                    gv, rv, fs, args.n_boot, args.seed + 7)
-                summary["V3"][key][f"spearman_F_tgd2_vs_{rlabel}"] = spearman(fv[fok], rv[fok])
+                summary["V3"][key][f"partial_{gname}_vs_{rlabel}"] = partial_spearman(
+                    gv, rv, fs
+                )
+                summary["V3"][key][f"boot_partial_{gname}_vs_{rlabel}"] = (
+                    boot_partial_ci(gv, rv, fs, args.n_boot, args.seed + 7)
+                )
+                summary["V3"][key][f"spearman_F_tgd2_vs_{rlabel}"] = spearman(
+                    fv[fok], rv[fok]
+                )
                 summary["V3"][key][f"partial_F_tgd2_vs_{rlabel}"] = partial_spearman(
-                    fv[fok], rv[fok], fs[fok])
+                    fv[fok], rv[fok], fs[fok]
+                )
             for i, b in enumerate(idx):
-                red_rows.append({
-                    "basin_id": b, "paradigm": paradigm,
-                    "seed": "" if seed is None else seed,
-                    "R_theta_tgd2": r_theta[i], "R_state_tgd2": r_state[i],
-                    "G_tgd2": g_tgd2[i], "F_tgd2": f_tgd2[i], "frac_snow": fs[i],
-                })
-    pd.DataFrame(red_rows).to_csv(out_dir / "posthoc_validation_tgd2_reduction.csv", index=False)
+                red_rows.append(
+                    {
+                        "basin_id": b,
+                        "paradigm": paradigm,
+                        "seed": "" if seed is None else seed,
+                        "R_theta_tgd2": r_theta[i],
+                        "R_state_tgd2": r_state[i],
+                        "G_tgd2": g_tgd2[i],
+                        "F_tgd2": f_tgd2[i],
+                        "frac_snow": fs[i],
+                    }
+                )
+    pd.DataFrame(red_rows).to_csv(
+        out_dir / "posthoc_validation_tgd2_reduction.csv", index=False
+    )
 
     # ---------------- V4: residual CN-over-TGD2 ----------------
     for paradigm, seeds in [("IC", [None]), ("dPL", list(SEEDS))]:
@@ -351,20 +433,32 @@ def main() -> None:
                 b = sel(paradigm, seed, period)
                 g_cn_tgd2 = b["kge_cn"].to_numpy() - b["kge_tgd2"].to_numpy()
                 denom = b["kge_cn"].to_numpy() - b["kge_base"].to_numpy()
-                f_res = np.where(denom > DENOM_TOL, g_cn_tgd2 / np.where(denom > DENOM_TOL, denom, np.nan), np.nan)
+                f_res = np.where(
+                    denom > DENOM_TOL,
+                    g_cn_tgd2 / np.where(denom > DENOM_TOL, denom, np.nan),
+                    np.nan,
+                )
                 # algebraic consistency: F_explicit_residual == 1 - F_tgd2 where both valid
                 f_tgd2 = b["F_tgd2"].to_numpy()
                 both = np.isfinite(f_res) & np.isfinite(f_tgd2)
-                maxdiff = float(np.max(np.abs(f_res[both] - (1.0 - f_tgd2[both])))) if both.any() else float("nan")
+                maxdiff = (
+                    float(np.max(np.abs(f_res[both] - (1.0 - f_tgd2[both]))))
+                    if both.any()
+                    else float("nan")
+                )
                 fs = b["frac_snow"].to_numpy()
-                key = f"{paradigm}{'_'+str(seed) if seed is not None else ''}_{period}"
+                key = (
+                    f"{paradigm}{'_' + str(seed) if seed is not None else ''}_{period}"
+                )
                 summary.setdefault("V4", {})[key] = {
                     "n": int(len(b)),
                     "G_CN_over_TGD2": {
                         "median": float(np.median(g_cn_tgd2)),
                         "q25": float(np.quantile(g_cn_tgd2, 0.25)),
                         "q75": float(np.quantile(g_cn_tgd2, 0.75)),
-                        "boot_ci_median": boot_ci(g_cn_tgd2, np.median, args.n_boot, args.seed + 9),
+                        "boot_ci_median": boot_ci(
+                            g_cn_tgd2, np.median, args.n_boot, args.seed + 9
+                        ),
                         "frac_gt_0": float((g_cn_tgd2 > 0).mean()),
                         "spearman_vs_frac_snow": spearman(fs, g_cn_tgd2),
                     },
@@ -372,19 +466,27 @@ def main() -> None:
                         "median": float(np.nanmedian(f_res)),
                         "n_valid_denominator": int(np.isfinite(f_res).sum()),
                         "n_excluded": int((~np.isfinite(f_res)).sum()),
-                        "frac_gt_0": float((f_res[np.isfinite(f_res)] > 0).mean()) if np.isfinite(f_res).any() else np.nan,
+                        "frac_gt_0": float((f_res[np.isfinite(f_res)] > 0).mean())
+                        if np.isfinite(f_res).any()
+                        else np.nan,
                     },
                     "algebraic_maxdiff_vs_1_minus_F_tgd2": maxdiff,
                 }
                 for i, b_id in enumerate(b.index):
-                    resid_rows.append({
-                        "basin_id": b_id, "paradigm": paradigm,
-                        "seed": "" if seed is None else seed, "period": period,
-                        "G_CN_over_TGD2": g_cn_tgd2[i],
-                        "F_explicit_residual": f_res[i],
-                        "frac_snow": fs[i],
-                    })
-    pd.DataFrame(resid_rows).to_csv(out_dir / "posthoc_validation_residual.csv", index=False)
+                    resid_rows.append(
+                        {
+                            "basin_id": b_id,
+                            "paradigm": paradigm,
+                            "seed": "" if seed is None else seed,
+                            "period": period,
+                            "G_CN_over_TGD2": g_cn_tgd2[i],
+                            "F_explicit_residual": f_res[i],
+                            "frac_snow": fs[i],
+                        }
+                    )
+    pd.DataFrame(resid_rows).to_csv(
+        out_dir / "posthoc_validation_residual.csv", index=False
+    )
 
     # quartiles for G_CN_over_TGD2 (test)
     for paradigm, seeds in [("IC", [None]), ("dPL", list(SEEDS))]:
@@ -395,19 +497,35 @@ def main() -> None:
             qs = np.quantile(fs, [0.25, 0.5, 0.75])
             bins = [(-np.inf, qs[0]), (qs[0], qs[1]), (qs[1], qs[2]), (qs[2], np.inf)]
             summary.setdefault("V4_quartiles", {})[
-                f"{paradigm}{'_'+str(seed) if seed is not None else ''}"] = [
-                    {"frac_snow_range": [float(lo), float(hi)], "n": int(((fs > lo) & (fs <= hi)).sum()),
-                     "G_CN_over_TGD2_median": float(np.median(g[(fs > lo) & (fs <= hi)]))}
-                    for lo, hi in bins
-                ]
+                f"{paradigm}{'_' + str(seed) if seed is not None else ''}"
+            ] = [
+                {
+                    "frac_snow_range": [float(lo), float(hi)],
+                    "n": int(((fs > lo) & (fs <= hi)).sum()),
+                    "G_CN_over_TGD2_median": float(
+                        np.median(g[(fs > lo) & (fs <= hi)])
+                    ),
+                }
+                for lo, hi in bins
+            ]
 
     # process-conditioned support: CN-TGD2 RMSE gap on snow-active vs complementary
     proc_support = {}
-    for paradigm, fits in [("IC", ("CN_IC", "TGD2_IC")),
-                           ("dPL", ("CN_dPL_s42", "TGD2_dPL_s42"))]:
+    for paradigm, fits in [
+        ("IC", ("CN_IC", "TGD2_IC")),
+        ("dPL", ("CN_dPL_s42", "TGD2_dPL_s42")),
+    ]:
         for cond in ("snow_active", "melt_active", "no_snow_active"):
-            a = proc[(proc["fit"] == fits[0]) & (proc["period"] == "test") & (proc["condition"] == cond)]
-            b_ = proc[(proc["fit"] == fits[1]) & (proc["period"] == "test") & (proc["condition"] == cond)]
+            a = proc[
+                (proc["fit"] == fits[0])
+                & (proc["period"] == "test")
+                & (proc["condition"] == cond)
+            ]
+            b_ = proc[
+                (proc["fit"] == fits[1])
+                & (proc["period"] == "test")
+                & (proc["condition"] == cond)
+            ]
             if a.empty or b_.empty:
                 continue
             gap = b_["rmse"].median() - a["rmse"].median()
@@ -425,21 +543,31 @@ def main() -> None:
         for seed in seeds:
             b = sel(paradigm, seed, "test")
             m = b["frac_snow"] <= 1e-6
-            v5[f"{paradigm}{'_'+str(seed) if seed is not None else ''}"] = {
+            v5[f"{paradigm}{'_' + str(seed) if seed is not None else ''}"] = {
                 "n": int(m.sum()),
-                "kge_base_no_refit_median": float(np.median(b.loc[m, "kge_base_no_refit"])),
+                "kge_base_no_refit_median": float(
+                    np.median(b.loc[m, "kge_base_no_refit"])
+                ),
                 "kge_cn_median": float(np.median(b.loc[m, "kge_cn"])),
                 "kge_tgd2_median": float(np.median(b.loc[m, "kge_tgd2"])),
                 "kge_base_median": float(np.median(b.loc[m, "kge_base"])),
                 "G_base_median": float(np.median(b.loc[m, "G_base"])),
-                "G_CN_over_TGD2_median": float(np.median(b.loc[m, "kge_cn"] - b.loc[m, "kge_tgd2"])),
+                "G_CN_over_TGD2_median": float(
+                    np.median(b.loc[m, "kge_cn"] - b.loc[m, "kge_tgd2"])
+                ),
             }
     # component contribution decomposition (test), linearized dKGE per component
     comp_summary = {}
-    for pair, (fit_a, fit_b) in [("recalibration", ("Base_no_refit", "Base_IC")),
-                                 ("tgd2_mitigation", ("Base_IC", "TGD2_IC"))]:
-        a = comp[(comp["fit"] == fit_a) & (comp["period"] == "test")].set_index("basin_id")
-        b_ = comp[(comp["fit"] == fit_b) & (comp["period"] == "test")].set_index("basin_id")
+    for pair, (fit_a, fit_b) in [
+        ("recalibration", ("Base_no_refit", "Base_IC")),
+        ("tgd2_mitigation", ("Base_IC", "TGD2_IC")),
+    ]:
+        a = comp[(comp["fit"] == fit_a) & (comp["period"] == "test")].set_index(
+            "basin_id"
+        )
+        b_ = comp[(comp["fit"] == fit_b) & (comp["period"] == "test")].set_index(
+            "basin_id"
+        )
         idx = a.index.intersection(b_.index)
         contrib = {c: np.full(len(idx), np.nan) for c in ("r", "alpha", "beta")}
         dk = np.full(len(idx), np.nan)
@@ -462,8 +590,14 @@ def main() -> None:
             "contrib_r_median": float(np.median(contrib["r"][ok])),
             "contrib_alpha_median": float(np.median(contrib["alpha"][ok])),
             "contrib_beta_median": float(np.median(contrib["beta"][ok])),
-            "contrib_sum_reconstruction_max_abs_diff": float(np.max(np.abs(
-                (contrib["r"][ok] + contrib["alpha"][ok] + contrib["beta"][ok]) - dk[ok]))),
+            "contrib_sum_reconstruction_max_abs_diff": float(
+                np.max(
+                    np.abs(
+                        (contrib["r"][ok] + contrib["alpha"][ok] + contrib["beta"][ok])
+                        - dk[ok]
+                    )
+                )
+            ),
         }
     v5["component_contributions"] = comp_summary
     summary["V5"] = v5
@@ -492,23 +626,37 @@ def main() -> None:
 
     s["S1_limited_calibration_compensation"] = {
         "rule": "F_close median (test) < 0.25 in both regimes (from posthoc_summary.json)",
-        "value": {k: prev_get(f"{k}_test", "F_close") for k in
-                  ["IC", "dPL_42", "dPL_123", "dPL_2026"]},
+        "value": {
+            k: prev_get(f"{k}_test", "F_close")
+            for k in ["IC", "dPL_42", "dPL_123", "dPL_2026"]
+        },
     }
-    s["S1_supported"] = all(v is not None and v < 0.25 for v in
-                            s["S1_limited_calibration_compensation"]["value"].values())
+    s["S1_supported"] = all(
+        v is not None and v < 0.25
+        for v in s["S1_limited_calibration_compensation"]["value"].values()
+    )
     s["S2_limited_generalization"] = {
         "rule": "median decay_G_base > 0 (train > test) in both regimes",
-        "value": {k: get(f"{k}.median") for k in ["IC_decay_G_base", "dPL_42_decay_G_base",
-                                                  "dPL_123_decay_G_base", "dPL_2026_decay_G_base"]},
+        "value": {
+            k: get(f"{k}.median")
+            for k in [
+                "IC_decay_G_base",
+                "dPL_42_decay_G_base",
+                "dPL_123_decay_G_base",
+                "dPL_2026_decay_G_base",
+            ]
+        },
     }
-    s["S2_supported"] = all(v is not None and v > 0 for v in s["S2_limited_generalization"]["value"].values())
+    s["S2_supported"] = all(
+        v is not None and v > 0
+        for v in s["S2_limited_generalization"]["value"].values()
+    )
     # S3: Base excess cost relative to CN positive
     # S3: Base excess cost relative to CN positive (verified from cost tables)
     s3_vals = {}
     for paradigm, seeds in [("IC", [None]), ("dPL", list(SEEDS))]:
         for seed in seeds:
-            k = f"{paradigm}{'_'+str(seed) if seed is not None else ''}"
+            k = f"{paradigm}{'_' + str(seed) if seed is not None else ''}"
             ct = cost(paradigm, seed, "Base", "C_theta_primary")
             cs = cost(paradigm, seed, "Base", "C_state_primary")
             s3_vals[k] = {
@@ -519,8 +667,10 @@ def main() -> None:
         "rule": "median C_theta[Base] > 0 and median C_state[Base] > 0 (test)",
         "values": s3_vals,
     }
-    s["S3_supported"] = all(v["C_theta_Base_median"] > 0 and v["C_state_Base_median"] > 0
-                            for v in s3_vals.values())
+    s["S3_supported"] = all(
+        v["C_theta_Base_median"] > 0 and v["C_state_Base_median"] > 0
+        for v in s3_vals.values()
+    )
     # S4: partial G_base<->C_theta and <->C_state controlling frac_snow (test)
     part = pd.DataFrame(partial_rows)
     s4 = {}
@@ -542,27 +692,37 @@ def main() -> None:
     # every regime/seed (test).  Primary pair per the task.
     s4_supported = True
     for paradigm in ("IC", "dPL"):
-        sub = part[(part["paradigm"] == paradigm) & (part["period"] == "test")
-                   & (part["pair"] == "G_base|C_theta_primary")]
+        sub = part[
+            (part["paradigm"] == paradigm)
+            & (part["period"] == "test")
+            & (part["pair"] == "G_base|C_theta_primary")
+        ]
         for _, row in sub.iterrows():
             if not (row["partial_ci_lo"] > 0.0):
                 s4_supported = False
     s["S4_supported"] = s4_supported
     s["S4_interpretation"] = (
         "raw association driven by the shared snow gradient; partial association "
-        "attenuates to ~0 (IC) or weak positive borderline (dPL)" if not s4_supported
-        else "output recovery remains positively associated with internal cost beyond the snow gradient")
+        "attenuates to ~0 (IC) or weak positive borderline (dPL)"
+        if not s4_supported
+        else "output recovery remains positively associated with internal cost beyond the snow gradient"
+    )
     # within-quartile sign consistency (G_base|C_theta)
     q = pd.DataFrame(quart_rows)
     sq = {}
     for paradigm in ("IC", "dPL"):
-        sub = q[(q["paradigm"] == paradigm) & (q["period"] == "test") & (q["pair"] == "G_base|C_theta")]
+        sub = q[
+            (q["paradigm"] == paradigm)
+            & (q["period"] == "test")
+            & (q["pair"] == "G_base|C_theta")
+        ]
         by_seed = sub.groupby("seed")
         sq[paradigm] = {}
         for seed, g in by_seed:
             pos = int((g["spearman"] > 0).sum())
             sq[paradigm][str(seed) if seed else "IC"] = {
-                "n_quartiles_positive": pos, "n_quartiles": int(len(g)),
+                "n_quartiles_positive": pos,
+                "n_quartiles": int(len(g)),
                 "quartile_rhos": [float(x) for x in g["spearman"]],
             }
     s["S4_within_quartile_sign"] = sq
@@ -574,7 +734,9 @@ def main() -> None:
             k = f"{paradigm}_{sd}" if sd else "IC"
             e = v3.get(k, {})
             s5[k] = {
-                "G_tgd2_median_test": prev_get(f"{paradigm}{'_'+sd if sd else ''}_test", "G_tgd2"),
+                "G_tgd2_median_test": prev_get(
+                    f"{paradigm}{'_' + sd if sd else ''}_test", "G_tgd2"
+                ),
                 "R_theta_median": e.get("R_theta_tgd2", {}).get("median"),
                 "R_state_median": e.get("R_state_tgd2", {}).get("median"),
                 "frac_R_theta_gt_0": e.get("R_theta_tgd2", {}).get("frac_gt_0"),
@@ -582,19 +744,29 @@ def main() -> None:
             }
     s["S5_tgd2_mitigation"] = s5
     s["S5_supported"] = all(
-        v.get("G_tgd2_median_test") is not None and v["G_tgd2_median_test"] > 0 for v in s5.values())
+        v.get("G_tgd2_median_test") is not None and v["G_tgd2_median_test"] > 0
+        for v in s5.values()
+    )
     s["S5_internal_reduction_supported"] = all(
-        v.get("R_theta_median") is not None and v["R_theta_median"] > 0
-        and v.get("R_state_median") is not None and v["R_state_median"] > 0 for v in s5.values())
+        v.get("R_theta_median") is not None
+        and v["R_theta_median"] > 0
+        and v.get("R_state_median") is not None
+        and v["R_state_median"] > 0
+        for v in s5.values()
+    )
     # S6: residual CN advantage + process support
     v4 = summary.get("V4", {})
     s6 = {}
     for paradigm, seeds in [("IC", [""]), ("dPL", ["42", "123", "2026"])]:
         for sd in seeds:
-            k = f"{paradigm}{'_'+sd if sd else ''}_test"
+            k = f"{paradigm}{'_' + sd if sd else ''}_test"
             s6[k if sd else f"{paradigm}_test"] = {
-                "G_CN_over_TGD2_median": v4.get(k, {}).get("G_CN_over_TGD2", {}).get("median"),
-                "boot_ci": v4.get(k, {}).get("G_CN_over_TGD2", {}).get("boot_ci_median"),
+                "G_CN_over_TGD2_median": v4.get(k, {})
+                .get("G_CN_over_TGD2", {})
+                .get("median"),
+                "boot_ci": v4.get(k, {})
+                .get("G_CN_over_TGD2", {})
+                .get("boot_ci_median"),
                 "frac_gt_0": v4.get(k, {}).get("G_CN_over_TGD2", {}).get("frac_gt_0"),
             }
     s["S6_residual_explicit_advantage"] = s6
@@ -604,8 +776,9 @@ def main() -> None:
     s["S6_process_concentration"] = {
         "IC TGD2-CN rmse gap on snow_active": snow_gap,
         "IC TGD2-CN rmse gap on no_snow_active": nosnow_gap,
-        "concentrated_on_snow_active": bool(snow_gap is not None and nosnow_gap is not None
-                                           and snow_gap > nosnow_gap),
+        "concentrated_on_snow_active": bool(
+            snow_gap is not None and nosnow_gap is not None and snow_gap > nosnow_gap
+        ),
     }
 
     summary["S"] = s

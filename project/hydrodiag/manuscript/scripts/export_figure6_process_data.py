@@ -6,6 +6,7 @@ it does not train, calibrate, or alter canonical results.  The replay uses the
 same recorded-forward kernels as ``r3/posthoc_stats.py`` and retains only
 per-basin water-year-month means over the frozen test period.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -40,23 +41,53 @@ from r3.recorded_forward import (  # noqa: E402
 
 SEEDS = (42, 123, 2026)
 BATCH = 50
-MONTH_LABELS = ("Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep")
+MONTH_LABELS = (
+    "Oct",
+    "Nov",
+    "Dec",
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+)
 
 
 def fit_catalog(results_root: Path):
     """Return fit -> (structure, run directory, loader kind, seed)."""
     out = {
         "Base_IC": ("XAJ", results_root / "r3_misspec_ic_xaj_531_v1", "ic", None),
-        "TGD2_IC": ("XAJ_TGD2", results_root / "r3_misspec_ic_xaj_tgd2_531_v1", "ic", None),
+        "TGD2_IC": (
+            "XAJ_TGD2",
+            results_root / "r3_misspec_ic_xaj_tgd2_531_v1",
+            "ic",
+            None,
+        ),
         "CN_IC": ("XAJ_CN", results_root / "r3_gate_ic_xaj_cn_531_v1", "ic", None),
     }
     for seed in SEEDS:
         out[f"Base_dPL_s{seed}"] = (
-            "XAJ", results_root / f"r3_misspec_dpl_xaj_seed_{seed}", "dpl", seed)
+            "XAJ",
+            results_root / f"r3_misspec_dpl_xaj_seed_{seed}",
+            "dpl",
+            seed,
+        )
         out[f"TGD2_dPL_s{seed}"] = (
-            "XAJ_TGD2", results_root / f"r3_misspec_dpl_xaj_tgd2_seed_{seed}", "dpl", seed)
+            "XAJ_TGD2",
+            results_root / f"r3_misspec_dpl_xaj_tgd2_seed_{seed}",
+            "dpl",
+            seed,
+        )
         out[f"CN_dPL_s{seed}"] = (
-            "XAJ_CN", results_root / f"r3_gate_dpl_xaj_cn_seed_{seed}", "dpl", seed)
+            "XAJ_CN",
+            results_root / f"r3_gate_dpl_xaj_cn_seed_{seed}",
+            "dpl",
+            seed,
+        )
     return out
 
 
@@ -74,7 +105,9 @@ def month_means(values: np.ndarray, wy_month: np.ndarray) -> np.ndarray:
     return result
 
 
-def theta_matrix(run_dir: Path, kind: str, structure: str, basin_ids: list[str]) -> np.ndarray:
+def theta_matrix(
+    run_dir: Path, kind: str, structure: str, basin_ids: list[str]
+) -> np.ndarray:
     if kind == "ic":
         estimates = load_ic_estimates(run_dir, basin_ids)
     else:
@@ -82,9 +115,18 @@ def theta_matrix(run_dir: Path, kind: str, structure: str, basin_ids: list[str])
     return np.stack([estimates[b]["theta_hat"] for b in basin_ids]).astype(np.float64)
 
 
-def replay_profile(model, structure: str, theta_hat: np.ndarray, forcing: np.ndarray,
-                   parameter_names: tuple[str, ...], test_start: int, test_end: int,
-                   wy_month: np.ndarray, keep: np.ndarray, device: torch.device) -> tuple[np.ndarray, np.ndarray]:
+def replay_profile(
+    model,
+    structure: str,
+    theta_hat: np.ndarray,
+    forcing: np.ndarray,
+    parameter_names: tuple[str, ...],
+    test_start: int,
+    test_end: int,
+    wy_month: np.ndarray,
+    keep: np.ndarray,
+    device: torch.device,
+) -> tuple[np.ndarray, np.ndarray]:
     """Replay one fit and return [n_selected,12] input and wt profiles."""
     n = theta_hat.shape[0]
     input_profile = np.empty((n, 12), dtype=np.float32)
@@ -94,7 +136,9 @@ def replay_profile(model, structure: str, theta_hat: np.ndarray, forcing: np.nda
         right = min(n, left + BATCH)
         fc = build_forcing_dict(forcing[left:right].astype(np.float32), device, dtype)
         params = {
-            name: torch.from_numpy(theta_hat[left:right, i]).to(device=device, dtype=dtype)
+            name: torch.from_numpy(theta_hat[left:right, i]).to(
+                device=device, dtype=dtype
+            )
             for i, name in enumerate(parameter_names)
         }
         with torch.no_grad():
@@ -104,13 +148,25 @@ def replay_profile(model, structure: str, theta_hat: np.ndarray, forcing: np.nda
             if structure == "XAJ":
                 inp = forcing[left:right, test_start : test_end + 1, 0]
             else:
-                inp = stores["effective_precip"][:, test_start : test_end + 1].detach().cpu().numpy()
+                inp = (
+                    stores["effective_precip"][:, test_start : test_end + 1]
+                    .detach()
+                    .cpu()
+                    .numpy()
+                )
             wt = (
-                stores["wu"][:, test_start : test_end + 1]
-                + stores["wl"][:, test_start : test_end + 1]
-                + stores["wd"][:, test_start : test_end + 1]
-            ).detach().cpu().numpy()
-        input_profile[left:right] = month_means(np.asarray(inp, dtype=np.float32), wy_month)
+                (
+                    stores["wu"][:, test_start : test_end + 1]
+                    + stores["wl"][:, test_start : test_end + 1]
+                    + stores["wd"][:, test_start : test_end + 1]
+                )
+                .detach()
+                .cpu()
+                .numpy()
+            )
+        input_profile[left:right] = month_means(
+            np.asarray(inp, dtype=np.float32), wy_month
+        )
         state_profile[left:right] = month_means(wt.astype(np.float32), wy_month)
         print(f"    batch {left}:{right}/{n}", flush=True)
     return input_profile[keep], state_profile[keep]
@@ -121,8 +177,14 @@ def main() -> None:
     parser.add_argument("--project-root", type=Path, default=PROJECT)
     parser.add_argument("--data-root", type=Path, default=DEFAULT_DATA_ROOT)
     parser.add_argument("--results-root", type=Path, default=DEFAULT_RESULTS_ROOT)
-    parser.add_argument("--output-dir", type=Path, default=PROJECT / "manuscript/results/R3/fig6_seasonal")
-    parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=PROJECT / "manuscript/results/R3/fig6_seasonal",
+    )
+    parser.add_argument(
+        "--device", default="cuda" if torch.cuda.is_available() else "cpu"
+    )
     args = parser.parse_args()
 
     t0 = time.time()
@@ -133,12 +195,23 @@ def main() -> None:
     test_start, test_end = pi["test"]
     wy_month = monthly_index(bundle.dates, test_start, test_end)
 
-    fs = frac_snow_series(bundle).set_index("basin_id").loc[ids, "frac_snow"].to_numpy(float)
+    fs = (
+        frac_snow_series(bundle)
+        .set_index("basin_id")
+        .loc[ids, "frac_snow"]
+        .to_numpy(float)
+    )
     threshold = float(np.quantile(fs, 0.75))
     keep = np.flatnonzero(fs >= threshold)
     high_ids = [ids[i] for i in keep]
-    print(f"device={device}; high-snow threshold={threshold:.12g}; n={len(keep)}", flush=True)
-    print(f"test indices={test_start}:{test_end}; days={test_end-test_start+1}", flush=True)
+    print(
+        f"device={device}; high-snow threshold={threshold:.12g}; n={len(keep)}",
+        flush=True,
+    )
+    print(
+        f"test indices={test_start}:{test_end}; days={test_end - test_start + 1}",
+        flush=True,
+    )
 
     models = {
         "XAJ": XAJLite().to(device).eval(),
@@ -158,8 +231,16 @@ def main() -> None:
         theta = theta_matrix(run_dir, kind, structure, ids)
         names = tuple(get_parameter_spec(structure))
         inp, state = replay_profile(
-            models[structure], structure, theta, bundle.forcing,
-            names, test_start, test_end, wy_month, keep, device,
+            models[structure],
+            structure,
+            theta,
+            bundle.forcing,
+            names,
+            test_start,
+            test_end,
+            wy_month,
+            keep,
+            device,
         )
         profiles[fit] = {"input": inp, "state": state}
         if device.type == "cuda":
@@ -172,7 +253,10 @@ def main() -> None:
         for quantity in ("input", "state"):
             ic = profiles[f"{structure_name}_IC"][quantity]
             dpl = np.median(
-                np.stack([profiles[f"{structure_name}_dPL_s{s}"][quantity] for s in SEEDS]), axis=0
+                np.stack(
+                    [profiles[f"{structure_name}_dPL_s{s}"][quantity] for s in SEEDS]
+                ),
+                axis=0,
             )
             result[quantity][f"{structure_name}_IC"] = ic
             result[quantity][f"{structure_name}_dPL"] = dpl
@@ -192,13 +276,30 @@ def main() -> None:
         "provenance": "deterministic recorded-forward replay of frozen fitted parameters; no training, calibration, or new experiment",
         "git": git_commit(args.project_root),
         "device": str(device),
-        "fit_catalog": {k: {"structure": v[0], "run_dir": str(v[1]), "kind": v[2], "seed": v[3]} for k, v in catalog.items()},
+        "fit_catalog": {
+            k: {"structure": v[0], "run_dir": str(v[1]), "kind": v[2], "seed": v[3]}
+            for k, v in catalog.items()
+        },
         "quantity": "effective liquid-water input entering the shared XAJ core (Base raw precipitation; TGD2 delayed effective precipitation; CN rain plus snowmelt)",
         "state": "wt = wu + wl + wd, total XAJ tension-water storage (shared derived state)",
         "shared_state_components": ["wu", "wl", "wd"],
-        "subset": {"criterion": "frac_snow >= upper quartile", "threshold": threshold, "n_basins": len(keep), "basin_ids": high_ids},
-        "period": {"name": "test", "start": str(bundle.dates[test_start]), "end": str(bundle.dates[test_end]), "n_days": int(test_end - test_start + 1)},
-        "seasonal_axis": {"type": "water-year month", "start": "October 1", "labels": list(MONTH_LABELS)},
+        "subset": {
+            "criterion": "frac_snow >= upper quartile",
+            "threshold": threshold,
+            "n_basins": len(keep),
+            "basin_ids": high_ids,
+        },
+        "period": {
+            "name": "test",
+            "start": str(bundle.dates[test_start]),
+            "end": str(bundle.dates[test_end]),
+            "n_days": int(test_end - test_start + 1),
+        },
+        "seasonal_axis": {
+            "type": "water-year month",
+            "start": "October 1",
+            "labels": list(MONTH_LABELS),
+        },
         "aggregation": "per-basin mean over each water-year month across the test period; dPL median across seeds per basin; plot median and IQR across high-snow basins",
         "output_shapes": {k: list(v.shape) for k, v in result["input"].items()},
         "runtime_seconds": time.time() - t0,

@@ -14,7 +14,6 @@ import torch.nn as nn
 from .parameter_specs import EVAPORATION_GAMMA_PARAM_SPECS
 from .structure_utils import log_map_normalized, stable_positive_power
 
-
 EVAPORATION_POWER_FLOOR = 1e-6
 
 
@@ -49,7 +48,9 @@ def _parallel_evaporation_step(
     dm_safe = torch.where(dm > nearzero, dm, torch.ones_like(dm))
     root_capacity = lm + dm
     root_capacity_safe = torch.where(
-        root_capacity > nearzero, root_capacity, torch.ones_like(root_capacity),
+        root_capacity > nearzero,
+        root_capacity,
+        torch.ones_like(root_capacity),
     )
 
     x_l = torch.clamp(wl / lm_safe, min=0.0, max=1.0)
@@ -72,8 +73,17 @@ def _parallel_evaporation_step(
     wd_new = wd - ed
 
     return (
-        el, ed, er, wl_new, wd_new,
-        el_raw, ed_raw, x_l, x_d, r_l, r_d,
+        el,
+        ed,
+        er,
+        wl_new,
+        wd_new,
+        el_raw,
+        ed_raw,
+        x_l,
+        x_d,
+        r_l,
+        r_d,
     )
 
 
@@ -87,7 +97,13 @@ def _de_evaporation_step(
 ) -> tuple[torch.Tensor, ...]:
     """Full D_E kernel; the unity exponent is an exact linear reduction."""
     return _parallel_evaporation_step(
-        remaining_pet, wl, wd, lm, dm, torch.ones_like(wl), nearzero,
+        remaining_pet,
+        wl,
+        wd,
+        lm,
+        dm,
+        torch.ones_like(wl),
+        nearzero,
     )
 
 
@@ -102,7 +118,13 @@ def _ge_evaporation_step(
 ) -> tuple[torch.Tensor, ...]:
     """Full G_E kernel using one basin-specific exponent."""
     return _parallel_evaporation_step(
-        remaining_pet, wl, wd, lm, dm, gamma, nearzero,
+        remaining_pet,
+        wl,
+        wd,
+        lm,
+        dm,
+        gamma,
+        nearzero,
     )
 
 
@@ -125,7 +147,9 @@ class _EvaporationModule(nn.Module):
     _lite_step = staticmethod(_parallel_evaporation_step)
     uses_gamma = False
 
-    def __init__(self, nearzero: float = 1e-8, *, lite: bool = False, compile_step: bool = True):
+    def __init__(
+        self, nearzero: float = 1e-8, *, lite: bool = False, compile_step: bool = True
+    ):
         super().__init__()
         self.nearzero = nearzero
         self.lite = lite
@@ -149,7 +173,13 @@ class _EvaporationModule(nn.Module):
         gamma: torch.Tensor | None = None,
     ) -> tuple[torch.Tensor, ...]:
         out = self._step(
-            remaining_pet, wl, wd, lm, dm, self._gamma(wl, gamma), self.nearzero,
+            remaining_pet,
+            wl,
+            wd,
+            lm,
+            dm,
+            self._gamma(wl, gamma),
+            self.nearzero,
         )
         if self.lite:
             return out[0], out[1], out[3], out[4]
@@ -188,9 +218,18 @@ GE = EvaporationGE
 GELite = EvaporationGELite
 
 __all__ = [
-    "DE", "DELite", "GE", "GELite",
-    "EvaporationDE", "EvaporationDELite", "EvaporationGE", "EvaporationGELite",
-    "EVAPORATION_POWER_FLOOR", "normalized_to_gamma",
-    "_de_evaporation_step", "_de_evaporation_step_lite",
-    "_ge_evaporation_step", "_ge_evaporation_step_lite",
+    "DE",
+    "DELite",
+    "GE",
+    "GELite",
+    "EvaporationDE",
+    "EvaporationDELite",
+    "EvaporationGE",
+    "EvaporationGELite",
+    "EVAPORATION_POWER_FLOOR",
+    "normalized_to_gamma",
+    "_de_evaporation_step",
+    "_de_evaporation_step_lite",
+    "_ge_evaporation_step",
+    "_ge_evaporation_step_lite",
 ]

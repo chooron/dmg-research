@@ -17,7 +17,11 @@ from typing import Iterable, NamedTuple, Optional, Union
 import torch
 
 from ...decorators import expects_ndim
-from ...distributions import SeparableGaussian, make_functional_grad_estimator, make_functional_sampler
+from ...distributions import (
+    SeparableGaussian,
+    make_functional_grad_estimator,
+    make_functional_sampler,
+)
 from ...tools import BatchableScalar, BatchableVector, modify_vector
 
 
@@ -133,7 +137,9 @@ def cem(
     if solution_length == 0:
         raise ValueError("Solution length cannot be 0")
 
-    stdev_init = _get_stdev_init(center_init=center_init, stdev_init=stdev_init, radius_init=radius_init)
+    stdev_init = _get_stdev_init(
+        center_init=center_init, stdev_init=stdev_init, radius_init=radius_init
+    )
 
     device = center_init.device
     dtype = center_init.dtype
@@ -185,13 +191,21 @@ def cem(
 
 
 _required_parameters = ["mu", "sigma", "parenthood_ratio"]
-_cem_sample = make_functional_sampler(SeparableGaussian, required_parameters=_required_parameters)
-_cem_grad = make_functional_grad_estimator(SeparableGaussian, required_parameters=_required_parameters)
+_cem_sample = make_functional_sampler(
+    SeparableGaussian, required_parameters=_required_parameters
+)
+_cem_grad = make_functional_grad_estimator(
+    SeparableGaussian, required_parameters=_required_parameters
+)
 
 
 @expects_ndim(1, 1, None, None, randomness="different")
-def _cem_ask(center: torch.Tensor, stdev: torch.Tensor, parenthood_ratio: float, popsize: int) -> torch.Tensor:
-    return _cem_sample(popsize, mu=center, sigma=stdev, parenthood_ratio=parenthood_ratio)
+def _cem_ask(
+    center: torch.Tensor, stdev: torch.Tensor, parenthood_ratio: float, popsize: int
+) -> torch.Tensor:
+    return _cem_sample(
+        popsize, mu=center, sigma=stdev, parenthood_ratio=parenthood_ratio
+    )
 
 
 @expects_ndim(1, 1, 1, None, None, 1, 1, 2, 1, randomness="different")

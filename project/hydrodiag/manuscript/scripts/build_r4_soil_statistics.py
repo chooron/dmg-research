@@ -13,6 +13,7 @@ Orchestrates the formal R4 soil-water state consistency evaluation:
 Usage:
     python manuscript/scripts/build_r4_soil_statistics.py [--device cuda]
 """
+
 from __future__ import annotations
 
 import argparse
@@ -23,6 +24,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import pandas as pd
+
 HERE = Path(__file__).resolve().parent
 PROJECT_ROOT = HERE.parents[1]
 if str(PROJECT_ROOT) not in sys.path:
@@ -43,7 +45,9 @@ logger = logging.getLogger("R4_Build")
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--device", default="cuda" if __import__("torch").cuda.is_available() else "cpu")
+    parser.add_argument(
+        "--device", default="cuda" if __import__("torch").cuda.is_available() else "cpu"
+    )
     parser.add_argument("--data-root", type=Path, default=None)
     parser.add_argument("--results-root", type=Path, default=None)
     parser.add_argument("--force-extract-caravan", action="store_true")
@@ -59,17 +63,27 @@ def main() -> None:
     logger.info(f"Device: {args.device}")
 
     # 1. Caravan cache check
-    caravan_cache = results_root / "r4_caravan_soil_reference_v1" / "caravan_soil_ensemble.npz"
+    caravan_cache = (
+        results_root / "r4_caravan_soil_reference_v1" / "caravan_soil_ensemble.npz"
+    )
     if not caravan_cache.is_file() or args.force_extract_caravan:
-        logger.info(f"Caravan cache missing or force re-extraction requested; extracting from {STAGE_ROOT}...")
-        extract_all(STAGE_ROOT, data_root, results_root / "r4_caravan_soil_reference_v1")
+        logger.info(
+            f"Caravan cache missing or force re-extraction requested; extracting from {STAGE_ROOT}..."
+        )
+        extract_all(
+            STAGE_ROOT, data_root, results_root / "r4_caravan_soil_reference_v1"
+        )
     else:
-        logger.info(f"Caravan soil cache found: {caravan_cache} ({caravan_cache.stat().st_size / (1024*1024):.2f} MB)")
+        logger.info(
+            f"Caravan soil cache found: {caravan_cache} ({caravan_cache.stat().st_size / (1024 * 1024):.2f} MB)"
+        )
 
     # 2. Run formal soil consistency analysis
     logger.info("Executing formal Base vs CN soil-state consistency analysis...")
     soil_report = run_soil_consistency_analysis()
-    logger.info(f"Soil consistency analysis complete. Tag: {soil_report.get('regimes', {}).get('dPL_seed42', {}).get('tag', 'OFFICIAL')}")
+    logger.info(
+        f"Soil consistency analysis complete. Tag: {soil_report.get('regimes', {}).get('dPL_seed42', {}).get('tag', 'OFFICIAL')}"
+    )
 
     # 3. Run full robustness suite
     logger.info("Executing full suite of 4 robustness modules...")
@@ -81,14 +95,18 @@ def main() -> None:
     tables = sorted(p.name for p in out_dir.glob("*.csv"))
     reports = sorted(p.name for p in out_dir.glob("*.json"))
 
-    logger.info(f"Successfully generated {len(tables)} figure-ready tables and {len(reports)} JSON reports in {out_dir}/:")
+    logger.info(
+        f"Successfully generated {len(tables)} figure-ready tables and {len(reports)} JSON reports in {out_dir}/:"
+    )
     for t in tables:
         n_rows = len(pd.read_csv(out_dir / t))
         logger.info(f"  [Table] {t:<42s} ({n_rows} rows)")
     for r in reports:
         logger.info(f"  [Report] {r}")
 
-    logger.info("R4 build completed successfully. Ready for manuscript table & figure generation.")
+    logger.info(
+        "R4 build completed successfully. Ready for manuscript table & figure generation."
+    )
 
 
 if __name__ == "__main__":

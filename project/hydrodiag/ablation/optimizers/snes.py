@@ -1,20 +1,23 @@
+from typing import Any
+
 import numpy as np
 import torch
-from typing import Any
-from evotorch.algorithms import SNES
 from evotorch import Problem
+from evotorch.algorithms import SNES
+
 from .base import OptimizerAdapter
 from .registry import register
+
 
 @register("SNES")
 class SNESAdapter(OptimizerAdapter):
     def __init__(self):
         self.snes = None
         self.best_candidate = None
-        self.best_fitness = -float('inf')
+        self.best_fitness = -float("inf")
         self.generation = 0
         self.dimension = None
-        
+
     def initialize(
         self,
         dimension: int,
@@ -30,98 +33,102 @@ class SNESAdapter(OptimizerAdapter):
         self.population = population
         self.device = device
         self.dtype = getattr(torch, dtype) if isinstance(dtype, str) else dtype
-        self.np_dtype = np.float64 if str(self.dtype) == 'torch.float64' else np.float32
-        
+        self.np_dtype = np.float64 if str(self.dtype) == "torch.float64" else np.float32
+
         torch.manual_seed(seed)
-        
+
         def dummy_fn(x):
             return torch.zeros(x.shape[0], dtype=torch.float64)
-            
+
         self.problem = Problem(
-            'max', 
-            dummy_fn, 
-            solution_length=dimension, 
+            "max",
+            dummy_fn,
+            solution_length=dimension,
             initial_bounds=(0.0, 1.0),
             dtype=self.dtype,
-            eval_dtype=torch.float64, 
-            vectorized=True, 
-            device=device
+            eval_dtype=torch.float64,
+            vectorized=True,
+            device=device,
         )
-        
+
         c_init = torch.tensor(center_init, dtype=self.dtype, device=device)
         self.snes = SNES(
-            self.problem, 
-            popsize=population, 
-            stdev_init=stdev_init,
-            center_init=c_init
+            self.problem, popsize=population, stdev_init=stdev_init, center_init=c_init
         )
-        
+
         self.best_candidate = None
-        self.best_fitness = -float('inf')
+        self.best_fitness = -float("inf")
         self.generation = 0
         self.latest_samples = None
 
     def ask(self) -> np.ndarray:
         self.latest_samples = self.snes._distribution.sample(
-            num_solutions=self.population, 
-            generator=self.problem
+            num_solutions=self.population, generator=self.problem
         )
         return self.latest_samples.cpu().numpy().astype(self.np_dtype)
 
     def tell(self, fitness: np.ndarray) -> None:
         fit_t = torch.tensor(fitness, dtype=torch.float64, device=self.device)
-        
+
         max_idx = torch.argmax(fit_t)
         max_fit = fit_t[max_idx].item()
         if max_fit > self.best_fitness:
             self.best_fitness = max_fit
-            self.best_candidate = self.latest_samples[max_idx].clone().cpu().numpy().astype(self.np_dtype)
-            
+            self.best_candidate = (
+                self.latest_samples[max_idx].clone().cpu().numpy().astype(self.np_dtype)
+            )
+
         grads = self.snes._distribution.compute_gradients(
-            self.latest_samples, 
-            fit_t, 
-            objective_sense='max',
-            ranking_method=self.snes._ranking_method
+            self.latest_samples,
+            fit_t,
+            objective_sense="max",
+            ranking_method=self.snes._ranking_method,
         )
         self.snes._update_distribution(grads)
         self.generation += 1
 
     def get_center(self) -> np.ndarray:
-        if hasattr(self.snes._distribution, 'mu'):
+        if hasattr(self.snes._distribution, "mu"):
             return self.snes._distribution.mu.cpu().numpy().astype(self.np_dtype)
-        elif hasattr(self.snes._distribution, 'center'):
+        elif hasattr(self.snes._distribution, "center"):
             return self.snes._distribution.center.cpu().numpy().astype(self.np_dtype)
         return np.zeros(self.dimension)
 
     def get_best(self) -> tuple[np.ndarray, float]:
         if self.best_candidate is None:
-            return np.zeros(self.dimension), -float('inf')
+            return np.zeros(self.dimension), -float("inf")
         return self.best_candidate, self.best_fitness
 
     def state_dict(self) -> dict[str, Any]:
         state = {
-            'generation': self.generation,
-            'best_fitness': self.best_fitness,
-            'best_candidate': self.best_candidate.tolist() if self.best_candidate is not None else None,
+            "generation": self.generation,
+            "best_fitness": self.best_fitness,
+            "best_candidate": self.best_candidate.tolist()
+            if self.best_candidate is not None
+            else None,
         }
-        
-        if hasattr(self.snes._distribution, 'mu'):
-            state['mu'] = self.snes._distribution.mu.cpu().numpy().tolist()
-        if hasattr(self.snes._distribution, 'sigma'):
-            state['sigma'] = self.snes._distribution.sigma.cpu().numpy().tolist()
-            
+
+        if hasattr(self.snes._distribution, "mu"):
+            state["mu"] = self.snes._distribution.mu.cpu().numpy().tolist()
+        if hasattr(self.snes._distribution, "sigma"):
+            state["sigma"] = self.snes._distribution.sigma.cpu().numpy().tolist()
+
         return state
 
     def load_state_dict(self, state: dict[str, Any]) -> None:
-        self.generation = state['generation']
-        self.best_fitness = state['best_fitness']
-        if state['best_candidate'] is not None:
-            self.best_candidate = np.array(state['best_candidate'], dtype=self.np_dtype)
-            
-        if 'mu' in state and hasattr(self.snes._distribution, 'mu'):
-            self.snes._distribution.mu.copy_(torch.tensor(state['mu'], dtype=self.dtype, device=self.device))
-        if 'sigma' in state and hasattr(self.snes._distribution, 'sigma'):
-            self.snes._distribution.sigma.copy_(torch.tensor(state['sigma'], dtype=self.dtype, device=self.device))
+        self.generation = state["generation"]
+        self.best_fitness = state["best_fitness"]
+        if state["best_candidate"] is not None:
+            self.best_candidate = np.array(state["best_candidate"], dtype=self.np_dtype)
+
+        if "mu" in state and hasattr(self.snes._distribution, "mu"):
+            self.snes._distribution.mu.copy_(
+                torch.tensor(state["mu"], dtype=self.dtype, device=self.device)
+            )
+        if "sigma" in state and hasattr(self.snes._distribution, "sigma"):
+            self.snes._distribution.sigma.copy_(
+                torch.tensor(state["sigma"], dtype=self.dtype, device=self.device)
+            )
 
     def get_diagnostics(self) -> dict:
         return {}

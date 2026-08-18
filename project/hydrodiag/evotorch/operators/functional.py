@@ -132,7 +132,6 @@ print(pop_best_cost)
 ```
 """
 
-
 from typing import Iterable, NamedTuple, Optional, Union
 
 import torch
@@ -205,7 +204,9 @@ def _dominates(
     if num_objs != n2:
         raise ValueError("The lengths of the evaluation results vectors do not match.")
     if num_objs != len(objective_sense):
-        raise ValueError("The lengths of the evaluation results vectors do not match the number of objectives")
+        raise ValueError(
+            "The lengths of the evaluation results vectors do not match the number of objectives"
+        )
 
     # For easier internal representation, we generate a sign adjustment tensor.
     # The motivation is to be able to multiply the evaluation tensors with this adjustment tensor,
@@ -291,7 +292,9 @@ def _domination_matrix(
     objective_sense: list,
 ) -> torch.Tensor:
     num_solutions, _ = evals.shape
-    indices1, indices2, _ = _index_comparison_matrices(num_solutions, device=evals.device)
+    indices1, indices2, _ = _index_comparison_matrices(
+        num_solutions, device=evals.device
+    )
     return _domination_check_via_indices(evals, indices2, indices1, objective_sense)
 
 
@@ -382,7 +385,9 @@ def _crowding_distances_considering_single_objective(
     # This function does not receive objective sense information (i.e. it does not know if the objective is 'min'
     # or 'max'). Therefore, it does not know if the result of the sorting will be best-to-worst or worst-to-best.
     # This should not be a problem because we just want to establish which solutions are fitness-wise neighbors.
-    weights = (div(evals - min_eval, eval_gap) * 0.99) + torch.as_tensor(domination_counts, dtype=evals.dtype)
+    weights = (div(evals - min_eval, eval_gap) * 0.99) + torch.as_tensor(
+        domination_counts, dtype=evals.dtype
+    )
 
     # Sort the population and the associated data (evals, domination counts, original index within the population)
     indices_for_sorting = torch.argsort(weights, descending=True)
@@ -427,14 +432,18 @@ def _crowding_distances_considering_single_objective(
 
 
 @expects_ndim(2, 1)
-def _crowding_distances(evals: torch.Tensor, domination_counts: torch.Tensor) -> torch.Tensor:
+def _crowding_distances(
+    evals: torch.Tensor, domination_counts: torch.Tensor
+) -> torch.Tensor:
     _, num_objectives = evals.shape
 
     # Get the crowding distances for each objective, then, for each solution, sum the distances over
     # its objectives to obtain its overall crowding distance.
-    result = vmap(_crowding_distances_considering_single_objective, in_dims=(1, None), out_dims=(1,))(
-        evals, domination_counts
-    ).sum(dim=-1)
+    result = vmap(
+        _crowding_distances_considering_single_objective,
+        in_dims=(1, None),
+        out_dims=(1,),
+    )(evals, domination_counts).sum(dim=-1)
 
     # Replace the infinity values within the distance values with a large-enough number
     is_finite = torch.isfinite(result)
@@ -446,7 +455,9 @@ def _crowding_distances(evals: torch.Tensor, domination_counts: torch.Tensor) ->
 
 
 @expects_ndim(2, None, None)
-def _pareto_utility(evals: torch.Tensor, objective_sense: list, crowdsort: bool) -> torch.Tensor:
+def _pareto_utility(
+    evals: torch.Tensor, objective_sense: list, crowdsort: bool
+) -> torch.Tensor:
     num_solutions, _ = evals.shape
     domination_counts = _domination_counts(evals, objective_sense)
 
@@ -461,14 +472,18 @@ def _pareto_utility(evals: torch.Tensor, objective_sense: list, crowdsort: bool)
         min_distance = distances.min()
         max_distance = distances.max()
         distance_range = max_distance - min_distance
-        rescaled_distances = 0.99 * _divide_by_non_negative(distances - min_distance, distance_range)
+        rescaled_distances = 0.99 * _divide_by_non_negative(
+            distances - min_distance, distance_range
+        )
         # Add the rescaled distances to the resulting utility values
         result = result + rescaled_distances
 
     return result
 
 
-def pareto_utility(evals: torch.Tensor, *, objective_sense: list, crowdsort: bool = True) -> torch.Tensor:
+def pareto_utility(
+    evals: torch.Tensor, *, objective_sense: list, crowdsort: bool = True
+) -> torch.Tensor:
     """
     Compute utility values for the solutions of a multi-objective problem.
 
@@ -513,7 +528,12 @@ def _generate_first_parent_candidate_indices(
     half_num_tournaments = num_tournaments // 2
 
     num_solutions, _ = solutions.shape
-    return torch.randint(0, num_solutions, (half_num_tournaments, tournament_size), device=solutions.device)
+    return torch.randint(
+        0,
+        num_solutions,
+        (half_num_tournaments, tournament_size),
+        device=solutions.device,
+    )
 
 
 @expects_ndim(None, 1, 0, randomness="different")
@@ -522,7 +542,9 @@ def _generate_second_parent_candidate_indices(
     parent1_candidate_indices: torch.Tensor,
     parent1_winner_index: torch.Tensor,
 ) -> torch.Tensor:
-    parent2_candidate_indices = torch.randint_like(parent1_candidate_indices, 0, num_solutions - 1)
+    parent2_candidate_indices = torch.randint_like(
+        parent1_candidate_indices, 0, num_solutions - 1
+    )
     parent2_candidate_indices = torch.where(
         parent2_candidate_indices >= parent1_winner_index,
         parent2_candidate_indices + 1,
@@ -538,18 +560,26 @@ def _run_two_tournaments_using_utilities(
     parent1_candidate_indices: torch.Tensor,
 ) -> tuple:
     argbest = torch.argmax if higher_utility_is_better else torch.argmin
-    parent1_candidate_evals = torch.index_select(utilities, 0, parent1_candidate_indices)
+    parent1_candidate_evals = torch.index_select(
+        utilities, 0, parent1_candidate_indices
+    )
     winner1_indirect_index = argbest(parent1_candidate_evals)
-    winner1_index = torch.index_select(parent1_candidate_indices, 0, winner1_indirect_index.reshape(1))[0]
+    winner1_index = torch.index_select(
+        parent1_candidate_indices, 0, winner1_indirect_index.reshape(1)
+    )[0]
 
     [num_solutions] = utilities.shape
     parent2_candidate_indices = _generate_second_parent_candidate_indices(
         num_solutions, parent1_candidate_indices, winner1_index
     )
 
-    parent2_candidate_evals = torch.index_select(utilities, 0, parent2_candidate_indices)
+    parent2_candidate_evals = torch.index_select(
+        utilities, 0, parent2_candidate_indices
+    )
     winner2_indirect_index = argbest(parent2_candidate_evals)
-    winner2_index = torch.index_select(parent2_candidate_indices, 0, winner2_indirect_index.reshape(1))[0]
+    winner2_index = torch.index_select(
+        parent2_candidate_indices, 0, winner2_indirect_index.reshape(1)
+    )[0]
 
     return winner1_index, winner2_index
 
@@ -600,7 +630,9 @@ def _undecorated_take_solutions(
             combine_evals_fn = torch.vstack if multi_objective else torch.cat
             return SelectedAndStackedParents(
                 parent_values=torch.vstack([parent1_values, parent2_values]),
-                parent_evals=combine_evals_fn([evals[parent1_indices], evals[parent2_indices]]),
+                parent_evals=combine_evals_fn(
+                    [evals[parent1_indices], evals[parent2_indices]]
+                ),
             )
     else:
         if split_results:
@@ -622,7 +654,13 @@ def _take_solutions_with_single_objective(
     split_results: bool,
 ) -> Union[torch.Tensor, tuple]:
     return _undecorated_take_solutions(
-        solutions, evals, parent1_indices, parent2_indices, with_evals, split_results, False
+        solutions,
+        evals,
+        parent1_indices,
+        parent2_indices,
+        with_evals,
+        split_results,
+        False,
     )
 
 
@@ -636,7 +674,13 @@ def _take_solutions_with_multi_objective(
     split_results: bool,
 ) -> Union[torch.Tensor, tuple]:
     return _undecorated_take_solutions(
-        solutions, evals, parent1_indices, parent2_indices, with_evals, split_results, True
+        solutions,
+        evals,
+        parent1_indices,
+        parent2_indices,
+        with_evals,
+        split_results,
+        True,
     )
 
 
@@ -654,7 +698,9 @@ def _pick_pairs_via_tournament_with_single_objective(
     num_solutions, _ = solutions.shape
     [num_evals] = evals.shape
     if num_solutions != num_evals:
-        raise ValueError("Number of evaluation results does not match the number of solutions")
+        raise ValueError(
+            "Number of evaluation results does not match the number of solutions"
+        )
 
     if objective_sense == "min":
         higher_utility_is_better = False
@@ -663,19 +709,28 @@ def _pick_pairs_via_tournament_with_single_objective(
     else:
         raise ValueError(f"Unrecognized `objective_sense`: {repr(objective_sense)}")
 
-    first_parent_indices = _generate_first_parent_candidate_indices(solutions, num_tournaments, tournament_size)
+    first_parent_indices = _generate_first_parent_candidate_indices(
+        solutions, num_tournaments, tournament_size
+    )
     winner1_indices, winner2_indices = _run_two_tournaments_using_utilities(
         evals, higher_utility_is_better, first_parent_indices
     )
 
     if return_indices:
         if split_results:
-            return SelectedParentIndices(parent1_indices=winner1_indices, parent2_indices=winner2_indices)
+            return SelectedParentIndices(
+                parent1_indices=winner1_indices, parent2_indices=winner2_indices
+            )
         else:
             return torch.cat([winner1_indices, winner2_indices])
     else:
         return _take_solutions_with_single_objective(
-            solutions, evals, winner1_indices, winner2_indices, with_evals, split_results
+            solutions,
+            evals,
+            winner1_indices,
+            winner2_indices,
+            with_evals,
+            split_results,
         )
 
 
@@ -693,20 +748,33 @@ def _pick_pairs_via_tournament_with_multi_objective(
     num_solutions, _ = solutions.shape
     num_evals, _ = evals.shape
     if num_solutions != num_evals:
-        raise ValueError("Number of evaluation results does not match the number of solutions")
+        raise ValueError(
+            "Number of evaluation results does not match the number of solutions"
+        )
 
     utils = pareto_utility(evals, objective_sense=objective_sense, crowdsort=False)
-    first_parent_indices = _generate_first_parent_candidate_indices(solutions, num_tournaments, tournament_size)
-    winner1_indices, winner2_indices = _run_two_tournaments_using_utilities(utils, True, first_parent_indices)
+    first_parent_indices = _generate_first_parent_candidate_indices(
+        solutions, num_tournaments, tournament_size
+    )
+    winner1_indices, winner2_indices = _run_two_tournaments_using_utilities(
+        utils, True, first_parent_indices
+    )
 
     if return_indices:
         if split_results:
-            return SelectedParentIndices(parent1_indices=winner1_indices, parent2_indices=winner2_indices)
+            return SelectedParentIndices(
+                parent1_indices=winner1_indices, parent2_indices=winner2_indices
+            )
         else:
             return torch.cat([winner1_indices, winner2_indices])
     else:
         return _take_solutions_with_multi_objective(
-            solutions, evals, winner1_indices, winner2_indices, with_evals, split_results
+            solutions,
+            evals,
+            winner1_indices,
+            winner2_indices,
+            with_evals,
+            split_results,
         )
 
 
@@ -753,7 +821,9 @@ def _pick_pairs_via_tournament_considering_objects(
         raise TypeError(f"Unrecognized `objective_sense`: {repr(objective_sense)}")
 
     if num_solutions != num_evals:
-        raise ValueError("Number of evaluation results does not match the number of solutions")
+        raise ValueError(
+            "Number of evaluation results does not match the number of solutions"
+        )
 
     num_tournaments = int(num_tournaments)
     if (num_tournaments % 2) != 0:
@@ -761,7 +831,9 @@ def _pick_pairs_via_tournament_considering_objects(
             f"`num_tournaments` was expected as a number divisible by 2. However, its value is {num_tournaments}."
         )
     half_num_tournaments = num_tournaments // 2
-    first_parent_indices = torch.randint(0, num_solutions, (half_num_tournaments, tournament_size), device=evals.device)
+    first_parent_indices = torch.randint(
+        0, num_solutions, (half_num_tournaments, tournament_size), device=evals.device
+    )
 
     winner1_indices, winner2_indices = _run_two_tournaments_using_utilities(
         utils, higher_utility_is_better, first_parent_indices
@@ -769,7 +841,9 @@ def _pick_pairs_via_tournament_considering_objects(
 
     if return_indices:
         if split_results:
-            return SelectedParentIndices(parent1_indices=winner1_indices, parent2_indices=winner2_indices)
+            return SelectedParentIndices(
+                parent1_indices=winner1_indices, parent2_indices=winner2_indices
+            )
         else:
             return torch.cat([winner1_indices, winner2_indices])
     else:
@@ -779,7 +853,9 @@ def _pick_pairs_via_tournament_considering_objects(
             combined_values = None
         else:
             combined_values = make_tensor(
-                [*parent1_values, *parent2_values], read_only=solutions.is_read_only, dtype=object
+                [*parent1_values, *parent2_values],
+                read_only=solutions.is_read_only,
+                dtype=object,
             )
 
         if with_evals:
@@ -792,8 +868,12 @@ def _pick_pairs_via_tournament_considering_objects(
                 )
             else:
                 evals_combiner_fn = torch.vstack if multi_objective else torch.cat
-                combined_evals = evals_combiner_fn([evals[winner1_indices], evals[winner2_indices]])
-                return SelectedAndStackedParents(parent_values=combined_values, parent_evals=combined_evals)
+                combined_evals = evals_combiner_fn(
+                    [evals[winner1_indices], evals[winner2_indices]]
+                )
+                return SelectedAndStackedParents(
+                    parent_values=combined_values, parent_evals=combined_evals
+                )
         else:
             if split_results:
                 return SelectedParentValues(
@@ -985,7 +1065,14 @@ def tournament(
         else:
             raise TypeError(f"Unrecognized `objective_sense`: {repr(objective_sense)}")
     return pick_fn(
-        solutions, evals, num_tournaments, tournament_size, objective_sense, return_indices, with_evals, split_results
+        solutions,
+        evals,
+        num_tournaments,
+        tournament_size,
+        objective_sense,
+        return_indices,
+        with_evals,
+        split_results,
     )
 
 
@@ -1012,7 +1099,9 @@ def _pair_solutions_for_cross_over(solutions: torch.Tensor) -> tuple:
 
     # Ensure that the number of solutions is divisible by 2.
     if (popsize % 2) != 0:
-        raise ValueError(f"The number of `solutions` was expected as an even number. However, it is {popsize}.")
+        raise ValueError(
+            f"The number of `solutions` was expected as an even number. However, it is {popsize}."
+        )
 
     # Compute the number of pairs to be generated as the half of `num_children`.
     num_pairings = popsize // 2
@@ -1021,7 +1110,9 @@ def _pair_solutions_for_cross_over(solutions: torch.Tensor) -> tuple:
 
 
 @expects_ndim(1, 1, None, randomness="different")
-def _do_cross_over_between_two_solutions(solution1: torch.Tensor, solution2: torch.Tensor, num_points: int) -> tuple:
+def _do_cross_over_between_two_solutions(
+    solution1: torch.Tensor, solution2: torch.Tensor, num_points: int
+) -> tuple:
     """
     Do cross-over between two solutions (or between batches of solutions).
 
@@ -1041,7 +1132,9 @@ def _do_cross_over_between_two_solutions(solution1: torch.Tensor, solution2: tor
     # Randomly generate the tensor `cut_points` that represents the indices at which the decision values of the
     # parent solutions will be cut.
     like_what = (solution1[:1] + solution2[:1]).reshape(tuple()).expand(num_points)
-    cut_points = torch.randint_like(like_what, 1, solution_length - 1, dtype=torch.int64)
+    cut_points = torch.randint_like(
+        like_what, 1, solution_length - 1, dtype=torch.int64
+    )
 
     item_indices = torch.arange(solution_length, dtype=torch.int64, device=device)
 
@@ -1051,7 +1144,9 @@ def _do_cross_over_between_two_solutions(solution1: torch.Tensor, solution2: tor
     # For each cutting point, flip the booleans within `switch_parent` whose indices are greater than or equal to
     # the encountered cutting point.
     for i_num_point in range(num_points):
-        cut_point_index = torch.as_tensor([i_num_point], dtype=torch.int64, device=device)
+        cut_point_index = torch.as_tensor(
+            [i_num_point], dtype=torch.int64, device=device
+        )
         cut_point = torch.index_select(cut_points, 0, cut_point_index).reshape(tuple())
         switch_parent = (item_indices >= cut_point) ^ switch_parent
 
@@ -1084,7 +1179,9 @@ def _do_cross_over(solutions: torch.Tensor, num_points: int) -> torch.Tensor:
         of the child solutions.
     """
     parents1, parents2 = _pair_solutions_for_cross_over(solutions)
-    children1, children2 = _do_cross_over_between_two_solutions(parents1, parents2, num_points)
+    children1, children2 = _do_cross_over_between_two_solutions(
+        parents1, parents2, num_points
+    )
     return torch.vstack([children1, children2])
 
 
@@ -1386,7 +1483,9 @@ def two_point_cross_over(
 
 
 @expects_ndim(1, 1, 0, randomness="different")
-def _do_sbx_between_two_solutions(parent1: torch.Tensor, parent2: torch.Tensor, eta: torch.Tensor) -> tuple:
+def _do_sbx_between_two_solutions(
+    parent1: torch.Tensor, parent2: torch.Tensor, eta: torch.Tensor
+) -> tuple:
     u = torch.rand_like(parent1)
 
     beta = torch.where(
@@ -1509,7 +1608,11 @@ def simulated_binary_cross_over(
 
 
 @expects_ndim(1, None, None)
-def _utility(evals: torch.Tensor, objective_sense: str, ranking_method: Optional[str] = "centered") -> torch.Tensor:
+def _utility(
+    evals: torch.Tensor,
+    objective_sense: str,
+    ranking_method: Optional[str] = "centered",
+) -> torch.Tensor:
     """
     Return utility values representing how good the evaluation results are.
 
@@ -1543,7 +1646,9 @@ def _utility(evals: torch.Tensor, objective_sense: str, ranking_method: Optional
         # (and therefore with the highest rank).
         descending = False
     else:
-        raise ValueError(f"Expected `objective_sense` as 'min' or 'max', but received it as {repr(objective_sense)}")
+        raise ValueError(
+            f"Expected `objective_sense` as 'min' or 'max', but received it as {repr(objective_sense)}"
+        )
 
     if (ranking_method is None) or (ranking_method == "raw"):
         # This is the case where `ranking_method` is "raw" (or is None), which means that we do not even need to
@@ -1634,7 +1739,9 @@ def utility(
 
 
 @expects_ndim(1, randomness="different")
-def _cosyne_permutation_for_entire_subpopulation(subpopulation: torch.Tensor) -> torch.Tensor:
+def _cosyne_permutation_for_entire_subpopulation(
+    subpopulation: torch.Tensor,
+) -> torch.Tensor:
     """
     Return the permuted (i.e. shuffled) version of the given subpopulation.
 
@@ -1683,7 +1790,9 @@ def _partial_cosyne_permutation_for_subpopulation(
     [num_evals] = evals.shape
 
     if n != num_evals:
-        raise ValueError(f"The population size is {n}, but the number of evaluations is different ({num_evals})")
+        raise ValueError(
+            f"The population size is {n}, but the number of evaluations is different ({num_evals})"
+        )
 
     ranks = utility(evals, objective_sense=objective_sense, ranking_method="linear")
     permutation_probs = 1 - ranks.pow(1 / float(n))
@@ -1731,7 +1840,9 @@ def _partial_cosyne_permutation_for_population(
     Returns:
         The shuffled counterpart of the given population, as a new tensor.
     """
-    return _partial_cosyne_permutation_for_subpopulation(population.T, evals, objective_sense).T
+    return _partial_cosyne_permutation_for_subpopulation(
+        population.T, evals, objective_sense
+    ).T
 
 
 def cosyne_permutation(
@@ -1787,8 +1898,12 @@ def cosyne_permutation(
         if evals is None:
             raise ValueError("When `permute_all` is False, `evals` is required")
         if objective_sense is None:
-            raise ValueError("When `permute_all` is False, `objective_sense` is required")
-        return _partial_cosyne_permutation_for_population(values, evals, objective_sense)
+            raise ValueError(
+                "When `permute_all` is False, `objective_sense` is required"
+            )
+        return _partial_cosyne_permutation_for_population(
+            values, evals, objective_sense
+        )
 
 
 @expects_ndim(2, 2)
@@ -1798,14 +1913,20 @@ def _combine_values(values1: torch.Tensor, values2: torch.Tensor) -> torch.Tenso
 
 @expects_ndim(2, 1, 2, 1)
 def _combine_values_and_evals(
-    values1: torch.Tensor, evals1: torch.Tensor, values2: torch.Tensor, evals2: torch.Tensor
+    values1: torch.Tensor,
+    evals1: torch.Tensor,
+    values2: torch.Tensor,
+    evals2: torch.Tensor,
 ) -> tuple:
     return torch.vstack([values1, values2]), torch.hstack([evals1, evals2])
 
 
 @expects_ndim(2, 2, 2, 2)
 def _combine_values_and_multiobjective_evals(
-    values1: torch.Tensor, evals1: torch.Tensor, values2: torch.Tensor, evals2: torch.Tensor
+    values1: torch.Tensor,
+    evals1: torch.Tensor,
+    values2: torch.Tensor,
+    evals2: torch.Tensor,
 ) -> tuple:
     return torch.vstack([values1, values2]), torch.vstack([evals1, evals2])
 
@@ -1818,7 +1939,10 @@ def _combine_object_arrays(values1: ObjectArray, values2: ObjectArray) -> Object
 
 
 def _combine_object_arrays_and_evals(
-    values1: ObjectArray, evals1: torch.Tensor, values2: ObjectArray, evals2: torch.Tensor
+    values1: ObjectArray,
+    evals1: torch.Tensor,
+    values2: ObjectArray,
+    evals2: torch.Tensor,
 ) -> tuple:
     eval_shapes_are_valid = (evals1.ndim == 1) and (evals2.ndim == 1)
     if not eval_shapes_are_valid:
@@ -1830,7 +1954,10 @@ def _combine_object_arrays_and_evals(
 
 
 def _combine_object_arrays_and_multiobjective_evals(
-    values1: ObjectArray, evals1: torch.Tensor, values2: ObjectArray, evals2: torch.Tensor
+    values1: ObjectArray,
+    evals1: torch.Tensor,
+    values2: ObjectArray,
+    evals2: torch.Tensor,
 ) -> tuple:
     eval_shapes_are_valid = (evals1.ndim == 2) and (evals2.ndim == 2)
     if not eval_shapes_are_valid:
@@ -1969,7 +2096,9 @@ def combine(
             if _both_are_tensors(values1, values2):
                 return _combine_values_and_evals(values1, evals1, values2, evals2)
             elif _both_are_object_arrays(values1, values2):
-                return _combine_object_arrays_and_evals(values1, evals1, values2, evals2)
+                return _combine_object_arrays_and_evals(
+                    values1, evals1, values2, evals2
+                )
             else:
                 raise TypeError(
                     "Both decision values arrays must be `Tensor`s or `ObjectArray`s."
@@ -1977,9 +2106,13 @@ def combine(
                 )
         elif isinstance(objective_sense, Iterable):
             if _both_are_tensors(values1, values2):
-                return _combine_values_and_multiobjective_evals(values1, evals1, values2, evals2)
+                return _combine_values_and_multiobjective_evals(
+                    values1, evals1, values2, evals2
+                )
             elif _both_are_object_arrays(values1, values2):
-                return _combine_object_arrays_and_multiobjective_evals(values1, evals1, values2, evals2)
+                return _combine_object_arrays_and_multiobjective_evals(
+                    values1, evals1, values2, evals2
+                )
             else:
                 raise TypeError(
                     "Both decision values arrays must be `Tensor`s or `ObjectArray`s."
@@ -2011,7 +2144,9 @@ def combine(
 
 
 @expects_ndim(2, 1, None)
-def _take_single_best(values: torch.Tensor, evals: torch.Tensor, objective_sense: str) -> tuple:
+def _take_single_best(
+    values: torch.Tensor, evals: torch.Tensor, objective_sense: str
+) -> tuple:
     if objective_sense == "min":
         argfn = torch.argmin
     elif objective_sense == "max":
@@ -2029,7 +2164,9 @@ def _take_single_best(values: torch.Tensor, evals: torch.Tensor, objective_sense
 
 
 @expects_ndim(2, 1, None, None)
-def _take_multiple_best(values: torch.Tensor, evals: torch.Tensor, n: int, objective_sense: str) -> tuple:
+def _take_multiple_best(
+    values: torch.Tensor, evals: torch.Tensor, n: int, objective_sense: str
+) -> tuple:
     if objective_sense == "min":
         descending = False
     elif objective_sense == "max":
@@ -2090,14 +2227,18 @@ def _take_best_considering_objects(
                 f" However, the shape of `evals` is {evals.shape}."
             )
         multi_objective = True
-        utils = pareto_utility(evals, objective_sense=objective_sense, crowdsort=crowdsort)
+        utils = pareto_utility(
+            evals, objective_sense=objective_sense, crowdsort=crowdsort
+        )
         descending = True
     else:
         raise TypeError(f"Unrecognized `objective_sense`: {repr(objective_sense)}")
 
     if n is None:
         if multi_objective:
-            raise ValueError("When there are multiple objectives, the number of solutions to take cannot be omitted.")
+            raise ValueError(
+                "When there are multiple objectives, the number of solutions to take cannot be omitted."
+            )
         argbest = torch.argmax if descending else torch.argmin
         best_index = argbest(utils)
         return values[torch.as_tensor(best_index, device="cpu")], evals[best_index]
@@ -2169,7 +2310,9 @@ def take_best(
         is the evaluation results tensor for the taken solution(s).
     """
     if isinstance(values, ObjectArray):
-        return _take_best_considering_objects(values, evals, n, objective_sense, crowdsort)
+        return _take_best_considering_objects(
+            values, evals, n, objective_sense, crowdsort
+        )
 
     if isinstance(objective_sense, str):
         multi_objective = False
@@ -2188,6 +2331,8 @@ def take_best(
         return _take_single_best(values, evals, objective_sense)
     else:
         if multi_objective:
-            return _take_multiple_best_with_multiobjective(values, evals, n, objective_sense, crowdsort)
+            return _take_multiple_best_with_multiobjective(
+                values, evals, n, objective_sense, crowdsort
+            )
         else:
             return _take_multiple_best(values, evals, n, objective_sense)

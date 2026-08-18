@@ -39,7 +39,9 @@ def _gpu_memory() -> dict[str, int]:
     }
 
 
-def _record_failure(model_key: str, lite_class: str, started: float, exc: Exception) -> dict[str, object]:
+def _record_failure(
+    model_key: str, lite_class: str, started: float, exc: Exception
+) -> dict[str, object]:
     return {
         "status": "fail",
         "model_key": model_key,
@@ -51,8 +53,14 @@ def _record_failure(model_key: str, lite_class: str, started: float, exc: Except
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Small GPU-only validation for all IC Lite model variants.")
-    parser.add_argument("--config", type=Path, default=PROJECT_ROOT / "ablation/configs/ic_foundation_531_v1.json")
+    parser = argparse.ArgumentParser(
+        description="Small GPU-only validation for all IC Lite model variants."
+    )
+    parser.add_argument(
+        "--config",
+        type=Path,
+        default=PROJECT_ROOT / "ablation/configs/ic_foundation_531_v1.json",
+    )
     parser.add_argument("--basin-index", type=int, default=0)
     parser.add_argument("--population", type=int, default=2)
     parser.add_argument("--models", nargs="*", default=None)
@@ -66,7 +74,9 @@ def main() -> None:
     except RuntimeError:
         pass
     if not torch.cuda.is_available():
-        raise SystemExit("CUDA is unavailable; this validation is intentionally GPU-only")
+        raise SystemExit(
+            "CUDA is unavailable; this validation is intentionally GPU-only"
+        )
     if args.population < 1:
         raise SystemExit("--population must be positive")
 
@@ -99,10 +109,13 @@ def main() -> None:
     }
     atomic_write_json(output_root / "resolved_config.json", resolved)
     atomic_write_json(output_root / "environment.json", environment_snapshot(config))
-    atomic_write_json(output_root / "lite_model_inventory.json", {
-        "model_variant": "lite",
-        "models": model_variant_inventory(),
-    })
+    atomic_write_json(
+        output_root / "lite_model_inventory.json",
+        {
+            "model_variant": "lite",
+            "models": model_variant_inventory(),
+        },
+    )
 
     torch.cuda.empty_cache()
     torch.cuda.reset_peak_memory_stats()
@@ -110,10 +123,16 @@ def main() -> None:
     rows: list[dict[str, object]] = []
     for model_key in models:
         started = time.perf_counter()
-        lite_class = next(row["lite_class"] for row in model_variant_inventory() if row["model_key"] == model_key)
+        lite_class = next(
+            row["lite_class"]
+            for row in model_variant_inventory()
+            if row["model_key"] == model_key
+        )
         try:
             theta = _candidate_matrix(model_key, args.population)
-            runtime = ICObjectiveRuntime(bundle, config, model_key, model_variant="lite")
+            runtime = ICObjectiveRuntime(
+                bundle, config, model_key, model_variant="lite"
+            )
             torch.cuda.synchronize()
             gpu_started = time.perf_counter()
             evaluation = runtime.evaluate_candidates(
@@ -150,22 +169,35 @@ def main() -> None:
         atomic_write_json(output_root / f"{model_key}_result.json", row)
 
     after_memory = _gpu_memory()
-    atomic_write_json(output_root / "lite_gpu_validation.json", {
-        "status": "pass" if all(row["status"] == "pass" for row in rows) else "fail",
-        "device": torch.cuda.get_device_name(0),
-        "torch": torch.__version__,
-        "cuda": torch.version.cuda,
-        "cpu_threads": torch.get_num_threads(),
-        "basin_index": args.basin_index,
-        "basin_id": bundle.basin_ids[args.basin_index],
-        "population": args.population,
-        "models_requested": models,
-        "models": rows,
-        "gpu_memory_before": before_memory,
-        "gpu_memory_after": after_memory,
-        "note": "Each model used one 531 basin and a small candidate batch; no optimizer generation was started.",
-    })
-    fieldnames = ["model_key", "status", "lite_class", "candidate_evaluations", "runtime_seconds", "gpu_timed_seconds", "error"]
+    atomic_write_json(
+        output_root / "lite_gpu_validation.json",
+        {
+            "status": "pass"
+            if all(row["status"] == "pass" for row in rows)
+            else "fail",
+            "device": torch.cuda.get_device_name(0),
+            "torch": torch.__version__,
+            "cuda": torch.version.cuda,
+            "cpu_threads": torch.get_num_threads(),
+            "basin_index": args.basin_index,
+            "basin_id": bundle.basin_ids[args.basin_index],
+            "population": args.population,
+            "models_requested": models,
+            "models": rows,
+            "gpu_memory_before": before_memory,
+            "gpu_memory_after": after_memory,
+            "note": "Each model used one 531 basin and a small candidate batch; no optimizer generation was started.",
+        },
+    )
+    fieldnames = [
+        "model_key",
+        "status",
+        "lite_class",
+        "candidate_evaluations",
+        "runtime_seconds",
+        "gpu_timed_seconds",
+        "error",
+    ]
     with (output_root / "lite_gpu_validation.csv").open("w", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=fieldnames)
         writer.writeheader()
@@ -190,18 +222,23 @@ def main() -> None:
             f"| {row['model_key']} | {row['lite_class']} | {row['status']} | "
             f"{row.get('gpu_timed_seconds', '')} | {row.get('fitness', row.get('error', ''))} |"
         )
-    atomic_write_text(output_root / "lite_gpu_validation_report.md", "\n".join(lines) + "\n")
+    atomic_write_text(
+        output_root / "lite_gpu_validation_report.md", "\n".join(lines) + "\n"
+    )
     atomic_write_text(
         output_root / "logs" / "validation.log",
-        "\n".join([
-            "command: python -m ablation.runners.run_lite_gpu_validation",
-            f"device: {torch.cuda.get_device_name(0)}",
-            "cpu_threads: 1",
-            f"basin: {bundle.basin_ids[args.basin_index]}",
-            f"population: {args.population}",
-            f"models: {','.join(models)}",
-            f"status: {'PASS' if all(row['status'] == 'pass' for row in rows) else 'FAIL'}",
-        ]) + "\n",
+        "\n".join(
+            [
+                "command: python -m ablation.runners.run_lite_gpu_validation",
+                f"device: {torch.cuda.get_device_name(0)}",
+                "cpu_threads: 1",
+                f"basin: {bundle.basin_ids[args.basin_index]}",
+                f"population: {args.population}",
+                f"models: {','.join(models)}",
+                f"status: {'PASS' if all(row['status'] == 'pass' for row in rows) else 'FAIL'}",
+            ]
+        )
+        + "\n",
     )
     if not all(row["status"] == "pass" for row in rows):
         raise SystemExit("one or more Lite GPU validations failed")

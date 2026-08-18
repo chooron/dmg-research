@@ -1,4 +1,7 @@
-from training.ic.run_tgd2_batched_cmaes_531 import MODEL_DIMENSIONS, population_for_dimension
+from training.ic.run_tgd2_batched_cmaes_531 import (
+    MODEL_DIMENSIONS,
+    population_for_dimension,
+)
 
 
 def test_tgd2_cmaes_population_scales_from_xaj_reference_dimension():

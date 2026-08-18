@@ -58,7 +58,9 @@ class Restart(SearchAlgorithm):
 
     def _restart(self) -> None:
         """Restart the search algorithm"""
-        self.search_algorithm = self._algorithm_class(self._problem, **self._algorithm_args)
+        self.search_algorithm = self._algorithm_class(
+            self._problem, **self._algorithm_args
+        )
         self.num_restarts += 1
 
     def _search_algorithm_terminated(self) -> bool:

@@ -70,13 +70,23 @@ def main() -> None:
     parser.add_argument("--data-root", type=Path, default=DEFAULT_DATA_ROOT)
     parser.add_argument("--results-root", type=Path, default=DEFAULT_RESULTS_ROOT)
     parser.add_argument("--run-id", default="r3_synthetic_truth_v1")
-    parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
+    parser.add_argument(
+        "--device", default="cuda" if torch.cuda.is_available() else "cpu"
+    )
     parser.add_argument("--batch-basins", type=int, default=32)
-    parser.add_argument("--n-components", type=int, default=None,
-                        help="Override the data-driven rank K (diagnostics only).")
+    parser.add_argument(
+        "--n-components",
+        type=int,
+        default=None,
+        help="Override the data-driven rank K (diagnostics only).",
+    )
     parser.add_argument("--skip-roundtrip", action="store_true")
-    parser.add_argument("--max-basins", type=int, default=None,
-                        help="Engineering smoke run: limit basins (never used for the formal truth).")
+    parser.add_argument(
+        "--max-basins",
+        type=int,
+        default=None,
+        help="Engineering smoke run: limit basins (never used for the formal truth).",
+    )
     args = parser.parse_args()
 
     device = torch.device(args.device)
@@ -92,18 +102,27 @@ def main() -> None:
     smoke_limit = None
     if args.max_basins is not None:
         if args.max_basins >= len(bundle.basin_ids):
-            raise ValueError("--max-basins must be below the full basin count for a smoke run")
+            raise ValueError(
+                "--max-basins must be below the full basin count for a smoke run"
+            )
         smoke_limit = args.max_basins
     cn_field = load_cn_ic_field(args.results_root)
     # g* is always fitted on the full 531 field (canonical normalization and
     # manifold); a smoke run only limits which basins get simulated below.
     fit, theta_star, clip_mask = build_and_save_truth(
-        bundle, cn_field, output_dir, args.project_root, args.results_root, args.data_root,
+        bundle,
+        cn_field,
+        output_dir,
+        args.project_root,
+        args.results_root,
+        args.data_root,
         n_components=args.n_components,
     )
-    print(f"g* fitted: K={fit.k} ridge_alpha={fit.alpha:.4g} "
-          f"cv_r2_total={fit.cv_r2_total:.4f} clipped_entries={int(clip_mask.sum())}",
-          flush=True)
+    print(
+        f"g* fitted: K={fit.k} ridge_alpha={fit.alpha:.4g} "
+        f"cv_r2_total={fit.cv_r2_total:.4f} clipped_entries={int(clip_mask.sum())}",
+        flush=True,
+    )
 
     from models import XAJWithCemaNeigeLite
 
@@ -114,7 +133,9 @@ def main() -> None:
     sim_basins = smoke_limit if smoke_limit is not None else n_basins
 
     q_star = np.empty((sim_basins, n_time), dtype=np.float32)
-    states = {key: np.empty((sim_basins, n_time), dtype=np.float32) for key in STATE_KEYS}
+    states = {
+        key: np.empty((sim_basins, n_time), dtype=np.float32) for key in STATE_KEYS
+    }
     snow = {key: np.empty((sim_basins, n_time), dtype=np.float32) for key in SNOW_KEYS}
     final_states_all = np.empty((sim_basins, 9), dtype=np.float32)
     basin_ids_out = np.asarray(bundle.basin_ids[:sim_basins])
@@ -124,7 +145,10 @@ def main() -> None:
     for left in range(0, sim_basins, args.batch_basins):
         right = min(n_basins, left + args.batch_basins)
         fc = build_forcing_dict(forcing[left:right], device, dtype)
-        p = {name: params_t[left:right, i] for i, name in enumerate(cn_field["parameter_names"])}
+        p = {
+            name: params_t[left:right, i]
+            for i, name in enumerate(cn_field["parameter_names"])
+        }
         recorded = recorded_cn_forward(model, fc, p, device, dtype)
         qsim, stores, final_states = recorded
         q_star[left:right] = qsim.detach().cpu().numpy()
@@ -161,16 +185,25 @@ def main() -> None:
         for left in range(0, sim_basins, args.batch_basins):
             right = min(n_basins, left + args.batch_basins)
             fc = build_forcing_dict(forcing[left:right], device, dtype)
-            p = {name: params_t[left:right, i] for i, name in enumerate(cn_field["parameter_names"])}
+            p = {
+                name: params_t[left:right, i]
+                for i, name in enumerate(cn_field["parameter_names"])
+            }
             _q, aux = model(forcings=fc, params=p, return_states=True)
             fs = aux["final_states"]
-            prod_final[left:right] = np.column_stack([
-                fs["xaj_wu"].detach().cpu().numpy(), fs["xaj_wl"].detach().cpu().numpy(),
-                fs["xaj_wd"].detach().cpu().numpy(), fs["xaj_s"].detach().cpu().numpy(),
-                fs["xaj_fr"].detach().cpu().numpy(), fs["xaj_qi"].detach().cpu().numpy(),
-                fs["xaj_qg"].detach().cpu().numpy(), fs["cn_G"].detach().cpu().numpy(),
-                fs["cn_eTG"].detach().cpu().numpy(),
-            ])
+            prod_final[left:right] = np.column_stack(
+                [
+                    fs["xaj_wu"].detach().cpu().numpy(),
+                    fs["xaj_wl"].detach().cpu().numpy(),
+                    fs["xaj_wd"].detach().cpu().numpy(),
+                    fs["xaj_s"].detach().cpu().numpy(),
+                    fs["xaj_fr"].detach().cpu().numpy(),
+                    fs["xaj_qi"].detach().cpu().numpy(),
+                    fs["xaj_qg"].detach().cpu().numpy(),
+                    fs["cn_G"].detach().cpu().numpy(),
+                    fs["cn_eTG"].detach().cpu().numpy(),
+                ]
+            )
     final_state_max_abs = float(np.abs(final_states_all - prod_final).max())
 
     np.savez_compressed(
@@ -181,8 +214,12 @@ def main() -> None:
         dates=np.asarray(bundle.dates),
         time_axis_full=True,
     )
-    np.savez_compressed(output_dir / "x_star.npz", **states, basin_ids=np.asarray(bundle.basin_ids))
-    np.savez_compressed(output_dir / "snow_star.npz", **snow, basin_ids=np.asarray(bundle.basin_ids))
+    np.savez_compressed(
+        output_dir / "x_star.npz", **states, basin_ids=np.asarray(bundle.basin_ids)
+    )
+    np.savez_compressed(
+        output_dir / "snow_star.npz", **snow, basin_ids=np.asarray(bundle.basin_ids)
+    )
     np.savez_compressed(
         output_dir / "final_states.npz",
         final_states=final_states_all,
@@ -202,7 +239,10 @@ def main() -> None:
             "snow": {k: list(v.shape) for k, v in snow.items()},
             "theta_star": list(theta_star.shape),
         },
-        "periods": {name: [str(v) for v in indices] for name, indices in period_indices(bundle).items()},
+        "periods": {
+            name: [str(v) for v in indices]
+            for name, indices in period_indices(bundle).items()
+        },
         "warmup_convention": "365-day warm-up before each scored period; Q* generated over the full 1980-10-01..2010-09-30 axis (12418 days) with warm-up days retained in the stored arrays",
         "split_identifiers": {
             "warmup": "1980-10-01..1981-09-30",
@@ -211,7 +251,9 @@ def main() -> None:
         },
         "roundtrip": {
             "method": "production XAJWithCemaNeigeLite forward with stored theta* vs recorded Q* and final states",
-            "q_max_abs_diff_per_chunk": roundtrip_max_abs if roundtrip_max_abs else "skipped",
+            "q_max_abs_diff_per_chunk": roundtrip_max_abs
+            if roundtrip_max_abs
+            else "skipped",
             "q_max_abs_diff_overall": max(roundtrip_max_abs, default=float("nan")),
             "final_state_max_abs_diff": final_state_max_abs,
             "tolerance": "1e-5 (float32)",

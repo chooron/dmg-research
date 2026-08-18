@@ -140,7 +140,9 @@ class PyCMAES(SearchAlgorithm, SinglePopulationAlgorithmMixin):
 
         # Make sure that the cma module is installed
         if cma is None:
-            raise ImportError(f"The class {type(self).__name__} is only available if the package `cma` is installed.")
+            raise ImportError(
+                f"The class {type(self).__name__} is only available if the package `cma` is installed."
+            )
 
         # Initialize the base class
         SearchAlgorithm.__init__(self, problem, center=self._get_center)
@@ -156,7 +158,13 @@ class PyCMAES(SearchAlgorithm, SinglePopulationAlgorithmMixin):
         # Otherwise, use the given initial solution as the starting
         # point in the search space.
         if center_init is None:
-            x0 = self._problem.generate_values(1).to("cpu").view(-1).numpy().astype(dtype=float)
+            x0 = (
+                self._problem.generate_values(1)
+                .to("cpu")
+                .view(-1)
+                .numpy()
+                .astype(dtype=float)
+            )
         else:
             x0 = numpy_copy(center_init, dtype=float)
 
@@ -230,7 +238,9 @@ class PyCMAES(SearchAlgorithm, SinglePopulationAlgorithmMixin):
                 if is_sequence(bounds):
                     bounds = numpy_copy(bounds)
                 else:
-                    bounds = np.array(float(bounds)).repeat(self._problem.solution_length)
+                    bounds = np.array(float(bounds)).repeat(
+                        self._problem.solution_length
+                    )
                 return bounds
 
         lb = process_bounds(self._problem.lower_bounds)
@@ -251,13 +261,17 @@ class PyCMAES(SearchAlgorithm, SinglePopulationAlgorithmMixin):
 
         # Generate a random seed using the problem object for the sake of reproducibility.
         if "seed" not in inopts:
-            inopts["seed"] = int(self._problem.make_randint(tuple(), n=(2**32) - 100) + 100)
+            inopts["seed"] = int(
+                self._problem.make_randint(tuple(), n=(2**32) - 100) + 100
+            )
 
         # Instantiate the CMAEvolutionStrategy with the prepared configuration items.
         self._es = cma.CMAEvolutionStrategy(x0, sigma0, inopts)
 
         # Initialize the population.
-        self._population: SolutionBatch = self._problem.generate_batch(self._es.popsize, empty=True)
+        self._population: SolutionBatch = self._problem.generate_batch(
+            self._es.popsize, empty=True
+        )
 
         # Use the SinglePopulationAlgorithmMixin to enable additional status reports regarding the population.
         SinglePopulationAlgorithmMixin.__init__(self)
@@ -278,7 +292,11 @@ class PyCMAES(SearchAlgorithm, SinglePopulationAlgorithmMixin):
         self._es.tell(asked, -1.0 * scores)
 
     def _get_center(self) -> torch.Tensor:
-        return torch.as_tensor(self._es.result[5], dtype=self._population.dtype, device=self._population.device)
+        return torch.as_tensor(
+            self._es.result[5],
+            dtype=self._population.dtype,
+            device=self._population.device,
+        )
 
     @property
     def obj_index(self) -> int:

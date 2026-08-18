@@ -65,7 +65,9 @@ def _utcnow() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-def load_ic_estimates(run_dir: Path, model: str, basin_ids: list[str]) -> dict[str, dict]:
+def load_ic_estimates(
+    run_dir: Path, model: str, basin_ids: list[str]
+) -> dict[str, dict]:
     """Best train-KGE restart per basin (R1 canonical rule)."""
     raw_dir = run_dir / "raw" / model.lower()
     records: dict[str, list[tuple[float, int, dict]]] = {}
@@ -97,31 +99,47 @@ def load_ic_estimates(run_dir: Path, model: str, basin_ids: list[str]) -> dict[s
     return out
 
 
-def load_dpl_estimates(run_dir: Path, model: str, basin_ids: list[str]) -> dict[str, dict]:
+def load_dpl_estimates(
+    run_dir: Path, model: str, basin_ids: list[str]
+) -> dict[str, dict]:
     params = np.load(run_dir / "best_parameters_physical.npz")["params"]
     config = json.loads((run_dir / "config.json").read_text())
     names = tuple(config["parameter_names"])
     if params.shape[0] != len(basin_ids):
-        raise ValueError(f"dPL parameter rows {params.shape[0]} != pilot basins {len(basin_ids)}")
+        raise ValueError(
+            f"dPL parameter rows {params.shape[0]} != pilot basins {len(basin_ids)}"
+        )
     out: dict[str, dict] = {}
     for i, basin in enumerate(basin_ids):
-        out[basin] = {"theta_hat": params[i].astype(np.float64), "names": names,
-                      "restart": None, "seed": config.get("training", {}).get("seed"),
-                      "source_file": str(run_dir / "best_parameters_physical.npz"),
-                      "train_kge": np.nan, "stored_test_kge": np.nan,
-                      "candidate_evaluations": None, "generations": None}
+        out[basin] = {
+            "theta_hat": params[i].astype(np.float64),
+            "names": names,
+            "restart": None,
+            "seed": config.get("training", {}).get("seed"),
+            "source_file": str(run_dir / "best_parameters_physical.npz"),
+            "train_kge": np.nan,
+            "stored_test_kge": np.nan,
+            "candidate_evaluations": None,
+            "generations": None,
+        }
     return out
 
 
-def oracle_kge_cn(bundle, q_star: np.ndarray, theta_star: np.ndarray,
-                  basin_ids: list[str], device: torch.device) -> dict[str, np.ndarray]:
+def oracle_kge_cn(
+    bundle,
+    q_star: np.ndarray,
+    theta_star: np.ndarray,
+    basin_ids: list[str],
+    device: torch.device,
+) -> dict[str, np.ndarray]:
     """KGE of theta* through the exact IC objective path (Q* target)."""
     from ablation.ic_core.parameter_adapter import physical_to_normalized
     from ablation.ic_core.runtime import ICObjectiveRuntime
 
     syn_bundle = bundle_with_synthetic_target(bundle, q_star)
     config = {
-        "device": str(device), "model_variant": "lite",
+        "device": str(device),
+        "model_variant": "lite",
         "batching": {"basin_batch_size": 4, "cache_device_data": False},
         "objective": {"min_samples": 30},
         "canonical_cn_psol_annual": True,
@@ -129,12 +147,15 @@ def oracle_kge_cn(bundle, q_star: np.ndarray, theta_star: np.ndarray,
     runtime = ICObjectiveRuntime(syn_bundle, config, "XAJ_CN", model_variant="lite")
     index = {b: i for i, b in enumerate(bundle.basin_ids)}
     basin_indices = [index[b] for b in basin_ids]
-    theta_01 = physical_to_normalized("XAJ_CN", theta_star[np.asarray(basin_indices)], clip=False)
+    theta_01 = physical_to_normalized(
+        "XAJ_CN", theta_star[np.asarray(basin_indices)], clip=False
+    )
     result = {}
     for split in ("train", "test"):
         fit, _ = runtime.evaluate_candidates_tensor(
             torch.from_numpy(theta_01).unsqueeze(1).to(device, dtype=torch.float64),
-            basin_indices=basin_indices, split=split,
+            basin_indices=basin_indices,
+            split=split,
         )
         result[split] = fit[:, 0].detach().cpu().numpy()
     return result
@@ -148,7 +169,9 @@ def main() -> None:
     parser.add_argument("--truth-run-id", default="r3_synthetic_truth_v1")
     parser.add_argument("--pilot-run-id", default="r3_pilot_v1")
     parser.add_argument("--run-id", default="r3_pilot_analysis_v1")
-    parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
+    parser.add_argument(
+        "--device", default="cuda" if torch.cuda.is_available() else "cpu"
+    )
     args = parser.parse_args()
 
     device = torch.device(args.device)
@@ -162,16 +185,26 @@ def main() -> None:
     bundle, _config = load_bundle(args.project_root, args.data_root)
     pi = period_indices(bundle)
     dates = pd.to_datetime(bundle.dates)
-    q_star = np.asarray(np.load(truth_dir / "q_star.npz")["target_mm_day"], dtype=np.float64)
+    q_star = np.asarray(
+        np.load(truth_dir / "q_star.npz")["target_mm_day"], dtype=np.float64
+    )
     x_star = np.load(truth_dir / "x_star.npz")
     theta_npz = np.load(truth_dir / "theta_star.npz")
     theta_star = theta_npz["parameters"]
     star_names = [str(n) for n in theta_npz["parameter_names"]]
     shared_star = theta_star[:, [star_names.index(n) for n in COMMON_XAJ]]
 
-    from models.parameter_specs import XAJ_CN_PARAM_SPECS, XAJ_PARAM_SPECS, XAJ_TGD2_PARAM_SPECS
+    from models.parameter_specs import (
+        XAJ_CN_PARAM_SPECS,
+        XAJ_PARAM_SPECS,
+        XAJ_TGD2_PARAM_SPECS,
+    )
 
-    spec_for = {"XAJ_CN": XAJ_CN_PARAM_SPECS, "XAJ": XAJ_PARAM_SPECS, "XAJ_TGD2": XAJ_TGD2_PARAM_SPECS}
+    spec_for = {
+        "XAJ_CN": XAJ_CN_PARAM_SPECS,
+        "XAJ": XAJ_PARAM_SPECS,
+        "XAJ_TGD2": XAJ_TGD2_PARAM_SPECS,
+    }
 
     snow = frac_snow_series(bundle).set_index("basin_id")["frac_snow"]
 
@@ -205,7 +238,9 @@ def main() -> None:
             run_dir = Path(stage["output_dir"])
             estimates = load_dpl_estimates(run_dir, model, basin_ids)
             run_flags[stage_key] = {
-                "status": "complete" if (run_dir / "COMPLETE").exists() else "missing_COMPLETE",
+                "status": "complete"
+                if (run_dir / "COMPLETE").exists()
+                else "missing_COMPLETE",
                 "checkpoint": str(run_dir / "best_checkpoint.pt"),
                 "epoch_history": (run_dir / "epoch_history.csv").exists(),
                 "records": len(estimates),
@@ -215,14 +250,20 @@ def main() -> None:
         if model == "XAJ_CN" and cn_oracle is None and kind == "ic":
             cn_oracle = oracle_kge_cn(bundle, q_star, theta_star, basin_ids, device)
             for i, basin in enumerate(basin_ids):
-                param_rows.append({
-                    "basin_id": basin, "paradigm": "oracle", "structure": "CN",
-                    "run": "theta*", "parameter": "KGE_oracle",
-                    "z_hat": float("nan"), "z_star": float("nan"),
-                    "delta_z": float("nan"),
-                    "kge_train": float(cn_oracle["train"][i]),
-                    "kge_test": float(cn_oracle["test"][i]),
-                })
+                param_rows.append(
+                    {
+                        "basin_id": basin,
+                        "paradigm": "oracle",
+                        "structure": "CN",
+                        "run": "theta*",
+                        "parameter": "KGE_oracle",
+                        "z_hat": float("nan"),
+                        "z_star": float("nan"),
+                        "delta_z": float("nan"),
+                        "kge_train": float(cn_oracle["train"][i]),
+                        "kge_test": float(cn_oracle["test"][i]),
+                    }
+                )
 
         for basin in basin_ids:
             est = estimates[basin]
@@ -234,56 +275,90 @@ def main() -> None:
             theta_hat = est["theta_hat"]
 
             # simulate with the fitted parameters on the full axis
-            from ablation.ic_core.model_adapter import LITE_MODEL_CLASSES  # noqa: PLC0415
+            from ablation.ic_core.model_adapter import (
+                LITE_MODEL_CLASSES,  # noqa: PLC0415
+            )
+
             model_cls = LITE_MODEL_CLASSES[model]
             m = model_cls().to(device).eval()
             idx = list(bundle.basin_ids).index(basin)
-            fc = build_forcing_dict(bundle.forcing[idx:idx + 1].astype(np.float32), device, torch.float32)
-            p = {name: torch.tensor([theta_hat[i]], device=device, dtype=torch.float32)
-                 for i, name in enumerate(names)}
+            fc = build_forcing_dict(
+                bundle.forcing[idx : idx + 1].astype(np.float32), device, torch.float32
+            )
+            p = {
+                name: torch.tensor([theta_hat[i]], device=device, dtype=torch.float32)
+                for i, name in enumerate(names)
+            }
             qsim, stores, _fs = recorded_forward_for_structure(
                 model, m, fc, p, device, torch.float32
             )
             q_full = qsim.detach().cpu().numpy()[0].astype(np.float64)
 
-            metric_row = {"basin_id": basin, "paradigm": "IC" if kind == "ic" else "dPL",
-                          "structure": model, "run": run_label}
+            metric_row = {
+                "basin_id": basin,
+                "paradigm": "IC" if kind == "ic" else "dPL",
+                "structure": model,
+                "run": run_label,
+            }
             for period, (si, ei) in (("train", pi["train"]), ("test", pi["test"])):
-                sim = q_full[si:ei + 1]
-                obs = q_star[idx, si:ei + 1]
+                sim = q_full[si : ei + 1]
+                obs = q_star[idx, si : ei + 1]
                 metric_row[f"kge_{period}"] = standard_kge(sim, obs)
                 metric_row[f"nse_{period}"] = nse(sim, obs)
                 metric_row[f"pbias_{period}"] = pbias(sim, obs)
             metric_rows.append(metric_row)
 
             # shared-parameter deviations
-            z_star_shared = (shared_star[idx] - np.asarray(
-                [XAJ_PARAM_SPECS[n]["lower"] for n in COMMON_XAJ])) / (
+            z_star_shared = (
+                shared_star[idx]
+                - np.asarray([XAJ_PARAM_SPECS[n]["lower"] for n in COMMON_XAJ])
+            ) / (
                 np.asarray([XAJ_PARAM_SPECS[n]["upper"] for n in COMMON_XAJ])
-                - np.asarray([XAJ_PARAM_SPECS[n]["lower"] for n in COMMON_XAJ]))
+                - np.asarray([XAJ_PARAM_SPECS[n]["lower"] for n in COMMON_XAJ])
+            )
             for n in COMMON_XAJ:
                 if n not in names:
                     raise ValueError(f"shared parameter {n} missing from {model} fit")
                 j = names.index(n)
                 z_hat = z_hat_full[j]
-                param_rows.append({
-                    "basin_id": basin, "paradigm": "IC" if kind == "ic" else "dPL",
-                    "structure": model, "run": run_label,
-                    "parameter": n, "value_physical": float(theta_hat[j]),
-                    "z_hat": float(z_hat), "z_star": float(z_star_shared[COMMON_XAJ.index(n)]),
-                    "delta_z": float(z_hat - z_star_shared[COMMON_XAJ.index(n)]),
-                    "restart_or_seed": est["restart"] if est["restart"] is not None else est["seed"],
-                    "kge_train": float(est["train_kge"]) if np.isfinite(est["train_kge"]) else metric_row["kge_train"],
-                })
+                param_rows.append(
+                    {
+                        "basin_id": basin,
+                        "paradigm": "IC" if kind == "ic" else "dPL",
+                        "structure": model,
+                        "run": run_label,
+                        "parameter": n,
+                        "value_physical": float(theta_hat[j]),
+                        "z_hat": float(z_hat),
+                        "z_star": float(z_star_shared[COMMON_XAJ.index(n)]),
+                        "delta_z": float(z_hat - z_star_shared[COMMON_XAJ.index(n)]),
+                        "restart_or_seed": est["restart"]
+                        if est["restart"] is not None
+                        else est["seed"],
+                        "kge_train": float(est["train_kge"])
+                        if np.isfinite(est["train_kge"])
+                        else metric_row["kge_train"],
+                    }
+                )
 
             # state errors vs X* (common states only)
-            state_row = {"basin_id": basin, "paradigm": "IC" if kind == "ic" else "dPL",
-                         "structure": model, "run": run_label}
+            state_row = {
+                "basin_id": basin,
+                "paradigm": "IC" if kind == "ic" else "dPL",
+                "structure": model,
+                "run": run_label,
+            }
             months = dates.month.to_numpy()
             for period, (si, ei) in (("train", pi["train"]), ("test", pi["test"])):
                 for key in COMMON_STATES:
-                    sim = stores[key].detach().cpu().numpy()[0, si:ei + 1].astype(np.float64)
-                    truth = x_star[key][idx, si:ei + 1].astype(np.float64)
+                    sim = (
+                        stores[key]
+                        .detach()
+                        .cpu()
+                        .numpy()[0, si : ei + 1]
+                        .astype(np.float64)
+                    )
+                    truth = x_star[key][idx, si : ei + 1].astype(np.float64)
                     state_row[f"rmse_{key}_{period}"] = state_rmse(sim, truth)
             for season, months_tuple in SEASON_MONTHS.items():
                 sel = np.isin(months, list(months_tuple))
@@ -293,7 +368,9 @@ def main() -> None:
                     state_row[f"rmse_{key}_{season}"] = state_rmse(sim, truth)
             state_rows.append(state_row)
 
-    pd.DataFrame(param_rows).to_csv(output_dir / "parameter_deviations.csv", index=False)
+    pd.DataFrame(param_rows).to_csv(
+        output_dir / "parameter_deviations.csv", index=False
+    )
     pd.DataFrame(metric_rows).to_csv(output_dir / "discharge_metrics.csv", index=False)
     pd.DataFrame(state_rows).to_csv(output_dir / "state_metrics.csv", index=False)
     write_json(output_dir / "run_flags.json", run_flags)

@@ -3,9 +3,7 @@
 from __future__ import annotations
 
 import torch
-
 from training.dpl.run_dpl_model import kge_per_basin
-
 
 EPS = 1e-6
 TIME = 96

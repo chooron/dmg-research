@@ -4,7 +4,6 @@ from typing import Any
 
 import numpy as np
 
-
 FT3_TO_M3 = 0.028316846592
 SECONDS_PER_DAY = 86400.0
 MM_PER_M = 1000.0
@@ -39,7 +38,12 @@ def convert_ft3s_to_mm_day(
     output = np.full(raw.shape, np.nan, dtype=np.float64)
     valid = np.isfinite(raw) & (raw >= 0.0)
     factor = FT3S_TO_MMDAY_FACTOR / areas.astype(np.float64)
-    output[valid] = raw[valid] * np.broadcast_to(factor.reshape((-1,) + (1,) * (raw.ndim - 1)), raw.shape)[valid]
+    output[valid] = (
+        raw[valid]
+        * np.broadcast_to(factor.reshape((-1,) + (1,) * (raw.ndim - 1)), raw.shape)[
+            valid
+        ]
+    )
     if return_valid_mask:
         return output, valid
     return output

@@ -396,14 +396,22 @@ TGD2_T_SCALE_C = 2.0
 TGD2_EPS_DAYS = 1e-6
 TGD2_PARAM_SPECS = {
     "tgd_tau_warm": {
-        "lower": 1e-4, "upper": 3.0, "default": 0.25,
-        "unit": "day", "description": "Warm-condition generic residence time",
-        "process": "temperature_dependent_generic_delay2", "is_snow": False,
+        "lower": 1e-4,
+        "upper": 3.0,
+        "default": 0.25,
+        "unit": "day",
+        "description": "Warm-condition generic residence time",
+        "process": "temperature_dependent_generic_delay2",
+        "is_snow": False,
     },
     "tgd_delta_tau_cold": {
-        "lower": 0.1, "upper": 180.0, "default": 10.0,
-        "unit": "day", "description": "Additional cold-condition generic residence time",
-        "process": "temperature_dependent_generic_delay2", "is_snow": False,
+        "lower": 0.1,
+        "upper": 180.0,
+        "default": 10.0,
+        "unit": "day",
+        "description": "Additional cold-condition generic residence time",
+        "process": "temperature_dependent_generic_delay2",
+        "is_snow": False,
     },
 }
 
@@ -425,74 +433,139 @@ XAJ_RWPE_PARAM_SPECS = {
     **CEMANEIGE_CORE_PARAM_SPECS,
     **{name: spec for name, spec in XAJ_PARAM_SPECS.items() if name != "xaj_c"},
     "xaj_tau_e": {
-        "lower": 0.05, "upper": 1.0, "default": 0.5,
-        "unit": "-", "description": "Aggregated root-zone evaporation stress threshold",
-        "process": "soil", "is_snow": False,
+        "lower": 0.05,
+        "upper": 1.0,
+        "default": 0.5,
+        "unit": "-",
+        "description": "Aggregated root-zone evaporation stress threshold",
+        "process": "soil",
+        "is_snow": False,
     },
 }
 
 XAJ_2S_PARAM_SPECS = {
     **CEMANEIGE_CORE_PARAM_SPECS,
-    **{name: spec for name, spec in XAJ_PARAM_SPECS.items()
-       if name not in {"xaj_ki", "xaj_kg", "xaj_ci", "xaj_cg"}},
+    **{
+        name: spec
+        for name, spec in XAJ_PARAM_SPECS.items()
+        if name not in {"xaj_ki", "xaj_kg", "xaj_ci", "xaj_cg"}
+    },
     "xaj_kb": {
         # KI and KG are each [0, .7] and are normalized to a total below one
         # by the baseline.  This open interval therefore covers the baseline
         # attainable total-release range without a forward-pass clamp.
-        "lower": 1e-6, "upper": 1.0 - 1e-5, "default": 0.5,
-        "unit": "1/day", "description": "Merged slow-flow release coefficient",
-        "process": "routing", "is_snow": False,
+        "lower": 1e-6,
+        "upper": 1.0 - 1e-5,
+        "default": 0.5,
+        "unit": "1/day",
+        "description": "Merged slow-flow release coefficient",
+        "process": "routing",
+        "is_snow": False,
     },
     "xaj_cb": {
         # Union of the existing CI [.1, 1] and CG [.9, 1] memory ranges,
         # made open at the upper end so the reservoir always has release.
-        "lower": 0.1, "upper": 1.0 - 1e-5, "default": 0.8,
-        "unit": "-", "description": "Merged slow-flow recession constant",
-        "process": "routing", "is_snow": False,
+        "lower": 0.1,
+        "upper": 1.0 - 1e-5,
+        "default": 0.8,
+        "unit": "-",
+        "description": "Merged slow-flow recession constant",
+        "process": "routing",
+        "is_snow": False,
     },
 }
 
 
 SIMHYD_PARAM_SPECS = {
     "simhyd_insc": {
-        "lower": 1e-6, "upper": 50.0, "default": 2.0, "unit": "mm",
-        "description": "Interception capacity", "process": "interception", "is_snow": False,
+        "lower": 1e-6,
+        "upper": 50.0,
+        "default": 2.0,
+        "unit": "mm",
+        "description": "Interception capacity",
+        "process": "interception",
+        "is_snow": False,
     },
     "simhyd_coeff": {
-        "lower": 1e-6, "upper": 400.0, "default": 200.0, "unit": "mm/day",
-        "description": "Maximum infiltration capacity", "process": "soil", "is_snow": False,
+        "lower": 1e-6,
+        "upper": 400.0,
+        "default": 200.0,
+        "unit": "mm/day",
+        "description": "Maximum infiltration capacity",
+        "process": "soil",
+        "is_snow": False,
     },
     "simhyd_sq": {
-        "lower": 0.0, "upper": 10.0, "default": 2.0, "unit": "-",
-        "description": "Infiltration capacity exponent", "process": "soil", "is_snow": False,
+        "lower": 0.0,
+        "upper": 10.0,
+        "default": 2.0,
+        "unit": "-",
+        "description": "Infiltration capacity exponent",
+        "process": "soil",
+        "is_snow": False,
     },
     "simhyd_smsc": {
-        "lower": 1.0, "upper": 1000.0, "default": 250.0, "unit": "mm",
-        "description": "Soil moisture storage capacity", "process": "soil", "is_snow": False,
+        "lower": 1.0,
+        "upper": 1000.0,
+        "default": 250.0,
+        "unit": "mm",
+        "description": "Soil moisture storage capacity",
+        "process": "soil",
+        "is_snow": False,
     },
     "simhyd_sub": {
-        "lower": 0.0, "upper": 1.0, "default": 0.4, "unit": "-",
-        "description": "Interflow proportionality coefficient", "process": "routing", "is_snow": False,
+        "lower": 0.0,
+        "upper": 1.0,
+        "default": 0.4,
+        "unit": "-",
+        "description": "Interflow proportionality coefficient",
+        "process": "routing",
+        "is_snow": False,
     },
     "simhyd_crak": {
-        "lower": 0.0, "upper": 1.0, "default": 0.1, "unit": "-",
-        "description": "Groundwater recharge proportionality coefficient", "process": "groundwater", "is_snow": False,
+        "lower": 0.0,
+        "upper": 1.0,
+        "default": 0.1,
+        "unit": "-",
+        "description": "Groundwater recharge proportionality coefficient",
+        "process": "groundwater",
+        "is_snow": False,
     },
     "simhyd_k": {
-        "lower": 0.0, "upper": 1.0, "default": 0.3, "unit": "1/day",
-        "description": "Groundwater recession coefficient", "process": "groundwater", "is_snow": False,
+        "lower": 0.0,
+        "upper": 1.0,
+        "default": 0.3,
+        "unit": "1/day",
+        "description": "Groundwater recession coefficient",
+        "process": "groundwater",
+        "is_snow": False,
     },
     "simhyd_etmul": {
-        "lower": 0.1, "upper": 3.0, "default": 1.0, "unit": "-",
-        "description": "Potential evapotranspiration multiplier", "process": "soil", "is_snow": False,
+        "lower": 0.1,
+        "upper": 3.0,
+        "default": 1.0,
+        "unit": "-",
+        "description": "Potential evapotranspiration multiplier",
+        "process": "soil",
+        "is_snow": False,
     },
     "simhyd_a": {
-        "lower": 0.0, "upper": 2.9, "default": 2.5, "unit": "-",
-        "description": "HBV-compatible Gamma-UH shape parameter", "process": "routing", "is_snow": False,
+        "lower": 0.0,
+        "upper": 2.9,
+        "default": 2.5,
+        "unit": "-",
+        "description": "HBV-compatible Gamma-UH shape parameter",
+        "process": "routing",
+        "is_snow": False,
     },
     "simhyd_theta": {
-        "lower": 0.0, "upper": 6.5, "default": 1.5, "unit": "day",
-        "description": "HBV-compatible Gamma-UH scale parameter", "process": "routing", "is_snow": False,
+        "lower": 0.0,
+        "upper": 6.5,
+        "default": 1.5,
+        "unit": "day",
+        "description": "HBV-compatible Gamma-UH scale parameter",
+        "process": "routing",
+        "is_snow": False,
     },
 }
 
@@ -529,9 +602,13 @@ SIMHYD_TGD2_PARAM_SPECS = {**TGD2_PARAM_SPECS, **SIMHYD_PARAM_SPECS}
 # residence times use the same log-coordinate convention as TGD2 adapters.
 EVAPORATION_GAMMA_PARAM_SPECS = {
     "gamma": {
-        "lower": 0.2, "upper": 5.0, "default": 1.0,
-        "unit": "-", "description": "Generic lower/deep evaporation stress exponent",
-        "process": "structure_diagnosis_evaporation", "is_snow": False,
+        "lower": 0.2,
+        "upper": 5.0,
+        "default": 1.0,
+        "unit": "-",
+        "description": "Generic lower/deep evaporation stress exponent",
+        "process": "structure_diagnosis_evaporation",
+        "is_snow": False,
     },
 }
 
@@ -559,8 +636,10 @@ SUBSURFACE_TAU0_PARAM_SPECS = {
         "lower": NATIVE_XAJ_TAU0_LOWER,
         "upper": NATIVE_XAJ_TAU0_UPPER,
         "default": 10.0,
-        "unit": "day", "description": "Single subsurface response residence time",
-        "process": "structure_diagnosis_subsurface_response", "is_snow": False,
+        "unit": "day",
+        "description": "Single subsurface response residence time",
+        "process": "structure_diagnosis_subsurface_response",
+        "is_snow": False,
     },
 }
 
@@ -569,9 +648,13 @@ SUBSURFACE_TAU0_PARAM_SPECS = {
 # recession without introducing a second generic parameter.
 SUBSURFACE_BETA_PARAM_SPECS = {
     "beta": {
-        "lower": 0.5, "upper": 2.0, "default": 1.0,
-        "unit": "-", "description": "Generic subsurface response exponent",
-        "process": "structure_diagnosis_subsurface_response", "is_snow": False,
+        "lower": 0.5,
+        "upper": 2.0,
+        "default": 1.0,
+        "unit": "-",
+        "description": "Generic subsurface response exponent",
+        "process": "structure_diagnosis_subsurface_response",
+        "is_snow": False,
     },
 }
 
@@ -601,9 +684,13 @@ XAJ_KSS_PARAM_SPEC = {
         # Native KI+KG is in [0, 1.4], then _prepare_xaj_parameters maps every
         # sum >= 1 to 1-1e-5.  Hence the effective attainable KSS interval is
         # exactly [0, 1-1e-5].
-        "lower": 0.0, "upper": 1.0 - 1e-5, "default": 0.5,
-        "unit": "1/day", "description": "Effective total subsurface generation coefficient",
-        "process": "structure_diagnosis_subsurface_response", "is_snow": False,
+        "lower": 0.0,
+        "upper": 1.0 - 1e-5,
+        "default": 0.5,
+        "unit": "1/day",
+        "description": "Effective total subsurface generation coefficient",
+        "process": "structure_diagnosis_subsurface_response",
+        "is_snow": False,
     },
 }
 XAJ_TAU0_PARAM_SPEC = {
@@ -626,12 +713,20 @@ XAJ_GAMMA_PARAM_SPEC = {
 }
 
 XAJ_DE_PARAM_SPECS = {
-    **{name: spec for name, spec in XAJ_CONTROLLED_N_PARAM_SPECS.items() if name != "xaj_c"},
+    **{
+        name: spec
+        for name, spec in XAJ_CONTROLLED_N_PARAM_SPECS.items()
+        if name != "xaj_c"
+    },
 }
 XAJ_GE_PARAM_SPECS = {**XAJ_DE_PARAM_SPECS, **XAJ_GAMMA_PARAM_SPEC}
 XAJ_DR_PARAM_SPECS = {
-    **{name: spec for name, spec in XAJ_CONTROLLED_N_PARAM_SPECS.items()
-       if name not in {"xaj_ki", "xaj_kg", "xaj_ci", "xaj_cg"}},
-    **XAJ_KSS_PARAM_SPEC, **XAJ_TAU0_PARAM_SPEC,
+    **{
+        name: spec
+        for name, spec in XAJ_CONTROLLED_N_PARAM_SPECS.items()
+        if name not in {"xaj_ki", "xaj_kg", "xaj_ci", "xaj_cg"}
+    },
+    **XAJ_KSS_PARAM_SPEC,
+    **XAJ_TAU0_PARAM_SPEC,
 }
 XAJ_GR_PARAM_SPECS = {**XAJ_DR_PARAM_SPECS, **XAJ_BETA_PARAM_SPEC}

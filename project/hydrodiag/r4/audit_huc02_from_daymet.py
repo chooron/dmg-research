@@ -8,14 +8,15 @@ The CAMELS-US Daymet layout is expected to be::
 This uses the directory name as HUC02 and the file stem as basin ID. It never
 infers HUC02 from a basin/gauge ID prefix.
 """
+
 from __future__ import annotations
 
 import argparse
 import json
 import re
+import subprocess
 from collections import Counter, defaultdict
 from pathlib import Path
-import subprocess
 
 import pandas as pd
 
@@ -44,13 +45,20 @@ def windows_dir(path: str, dirs: bool) -> list[str]:
     proc = subprocess.run(["cmd.exe", "/d", "/c", cmd], capture_output=True)
     if proc.returncode not in (0, 1):
         raise RuntimeError(proc.stderr.decode(errors="replace").strip())
-    return [line.strip() for line in proc.stdout.decode("utf-8", errors="replace").splitlines() if line.strip()]
+    return [
+        line.strip()
+        for line in proc.stdout.decode("utf-8", errors="replace").splitlines()
+        if line.strip()
+    ]
 
 
 def child_dirs(root: str | Path) -> list[tuple[str, str]]:
     if is_windows_path(root):
         root_str = str(root)
-        return [(name, root_str.rstrip("\\/") + "\\" + name) for name in windows_dir(root_str, True)]
+        return [
+            (name, root_str.rstrip("\\/") + "\\" + name)
+            for name in windows_dir(root_str, True)
+        ]
     path = Path(root)
     return [(p.name, str(p)) for p in sorted(p for p in path.iterdir() if p.is_dir())]
 
@@ -95,9 +103,9 @@ def audit(daymet_root: str | Path, paired_csv: Path) -> tuple[dict, pd.DataFrame
             {
                 "basin_id": basin,
                 "huc02": hucs[0] if len(hucs) == 1 else None,
-                "join_status": "matched" if len(hucs) == 1 else (
-                    "missing" if not hucs else "conflict"
-                ),
+                "join_status": "matched"
+                if len(hucs) == 1
+                else ("missing" if not hucs else "conflict"),
                 "candidate_huc02": ";".join(hucs),
             }
         )

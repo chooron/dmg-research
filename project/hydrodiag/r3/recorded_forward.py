@@ -33,18 +33,39 @@ from .common import COMMON_XAJ
 COMMON_STATES = ("wu", "wl", "wd", "s", "fr", "qi", "qg")
 
 
-def _prepare_loop_quantities(xaj_params: dict[str, torch.Tensor]) -> dict[str, torch.Tensor]:
+def _prepare_loop_quantities(
+    xaj_params: dict[str, torch.Tensor],
+) -> dict[str, torch.Tensor]:
     from models.xaj import _prepare_xaj_parameters
 
-    names = ("k", "b", "im", "um", "lm", "dm", "c", "sm", "ex", "ki", "kg",
-             "ci", "cg", "a_uh", "theta_uh")
+    names = (
+        "k",
+        "b",
+        "im",
+        "um",
+        "lm",
+        "dm",
+        "c",
+        "sm",
+        "ex",
+        "ki",
+        "kg",
+        "ci",
+        "cg",
+        "a_uh",
+        "theta_uh",
+    )
     values = _prepare_xaj_parameters(xaj_params)
     return dict(zip(names, values))
 
 
-def recorded_cn_forward(model, forcings: dict[str, torch.Tensor],
-                        params: dict[str, torch.Tensor],
-                        device: torch.device, dtype: torch.dtype):
+def recorded_cn_forward(
+    model,
+    forcings: dict[str, torch.Tensor],
+    params: dict[str, torch.Tensor],
+    device: torch.device,
+    dtype: torch.dtype,
+):
     """Mirror ``XAJWithCemaNeigeLite.forward`` and record per-day states.
 
     Returns (qsim, states) where ``states`` holds per-day tensors
@@ -65,22 +86,77 @@ def recorded_cn_forward(model, forcings: dict[str, torch.Tensor],
     G, eTG = _init_basic_states(batch, device, dtype, None)
     xaj_params = {k: v for k, v in params.items() if k.startswith("xaj_")}
     q = _prepare_loop_quantities(xaj_params)
-    xaj_step_params = tuple(q[n] for n in (
-        "k", "b", "im", "um", "lm", "dm", "c", "sm", "ex", "ki", "kg", "ci", "cg"))
+    xaj_step_params = tuple(
+        q[n]
+        for n in (
+            "k",
+            "b",
+            "im",
+            "um",
+            "lm",
+            "dm",
+            "c",
+            "sm",
+            "ex",
+            "ki",
+            "kg",
+            "ci",
+            "cg",
+        )
+    )
     a_uh, theta_uh = q["a_uh"], q["theta_uh"]
     (wu, wl, wd, s, fr, qi, qg, rs_uh_buffer) = model._xaj._init_states(
         batch, device, dtype, None, q["um"], q["lm"], q["dm"], q["sm"]
     )
 
-    stores = {name: torch.zeros(batch, nsteps, device=device, dtype=dtype)
-              for name in ("wu", "wl", "wd", "s", "fr", "qi", "qg",
-                           "rs_instant", "evap", "G", "eTG", "sca", "rain",
-                           "melt", "effective_precip")}
+    stores = {
+        name: torch.zeros(batch, nsteps, device=device, dtype=dtype)
+        for name in (
+            "wu",
+            "wl",
+            "wd",
+            "s",
+            "fr",
+            "qi",
+            "qg",
+            "rs_instant",
+            "evap",
+            "G",
+            "eTG",
+            "sca",
+            "rain",
+            "melt",
+            "effective_precip",
+        )
+    }
     for t in range(nsteps):
-        (effective_t, G, eTG, sca_t, rain_t, melt_t,
-         _q_out, rs_adj_t, qi_t, qg_t, evap_t,
-         wu, wl, wd, s, fr, _rs, _ri, _rg, _eu, _el, _ed) = model._fused_step(
-            precip[:, t], temp[:, t], pet[:, t],
+        (
+            effective_t,
+            G,
+            eTG,
+            sca_t,
+            rain_t,
+            melt_t,
+            _q_out,
+            rs_adj_t,
+            qi_t,
+            qg_t,
+            evap_t,
+            wu,
+            wl,
+            wd,
+            s,
+            fr,
+            _rs,
+            _ri,
+            _rg,
+            _eu,
+            _el,
+            _ed,
+        ) = model._fused_step(
+            precip[:, t],
+            temp[:, t],
+            pet[:, t],
             (G, eTG),
             (wu, wl, wd, s, fr, qi, qg),
             (ctg, kf, g_thresh),
@@ -102,16 +178,26 @@ def recorded_cn_forward(model, forcings: dict[str, torch.Tensor],
     )
     qsim = rs_routed + stores["qi"] + stores["qg"]
     final_states = {
-        "wu": wu, "wl": wl, "wd": wd, "s": s, "fr": fr,
-        "qi": stores["qi"][:, -1], "qg": stores["qg"][:, -1],
-        "G": G, "eTG": eTG,
+        "wu": wu,
+        "wl": wl,
+        "wd": wd,
+        "s": s,
+        "fr": fr,
+        "qi": stores["qi"][:, -1],
+        "qg": stores["qg"][:, -1],
+        "G": G,
+        "eTG": eTG,
     }
     return qsim, stores, final_states
 
 
-def recorded_base_forward(model, forcings: dict[str, torch.Tensor],
-                          params: dict[str, torch.Tensor],
-                          device: torch.device, dtype: torch.dtype):
+def recorded_base_forward(
+    model,
+    forcings: dict[str, torch.Tensor],
+    params: dict[str, torch.Tensor],
+    device: torch.device,
+    dtype: torch.dtype,
+):
     """Mirror ``XAJLite._step_loop_lite`` and record per-day states."""
     from models.xaj import _route_xaj_surface_runoff_hydrodl2
 
@@ -128,16 +214,44 @@ def recorded_base_forward(model, forcings: dict[str, torch.Tensor],
     (wu, wl, wd, s, fr, qi, qg, rs_uh_buffer) = model._init_states(
         batch, device, dtype, None, q["um"], q["lm"], q["dm"], q["sm"]
     )
-    step_args = (q["k"], q["b"], q["im"], q["um"], q["lm"], q["dm"], q["c"],
-                 q["sm"], q["ex"], q["ki"], q["kg"], q["ci"], q["cg"])
+    step_args = (
+        q["k"],
+        q["b"],
+        q["im"],
+        q["um"],
+        q["lm"],
+        q["dm"],
+        q["c"],
+        q["sm"],
+        q["ex"],
+        q["ki"],
+        q["kg"],
+        q["ci"],
+        q["cg"],
+    )
 
-    stores = {name: torch.zeros(batch, nsteps, device=device, dtype=dtype)
-              for name in ("wu", "wl", "wd", "s", "fr", "qi", "qg", "rs_instant")}
+    stores = {
+        name: torch.zeros(batch, nsteps, device=device, dtype=dtype)
+        for name in ("wu", "wl", "wd", "s", "fr", "qi", "qg", "rs_instant")
+    }
     for t in range(nsteps):
         rs_adj_t, qi_t, qg_t, wu, wl, wd, s, fr = model._compact_step(
-            precip[:, t].contiguous(), pet[:, t].contiguous(),
-            wu, wl, wd, s, fr, qi, qg,
-            *step_args, model.nearzero, wm, wmm, ms, one_minus_im, one_minus_ki_kg,
+            precip[:, t].contiguous(),
+            pet[:, t].contiguous(),
+            wu,
+            wl,
+            wd,
+            s,
+            fr,
+            qi,
+            qg,
+            *step_args,
+            model.nearzero,
+            wm,
+            wmm,
+            ms,
+            one_minus_im,
+            one_minus_ki_kg,
         )
         stores["wu"][:, t], stores["wl"][:, t] = wu, wl
         stores["wd"][:, t], stores["s"][:, t] = wd, s
@@ -150,15 +264,24 @@ def recorded_base_forward(model, forcings: dict[str, torch.Tensor],
     )
     qsim = rs_routed + stores["qi"] + stores["qg"]
     final_states = {
-        "wu": wu, "wl": wl, "wd": wd, "s": s, "fr": fr,
-        "qi": stores["qi"][:, -1], "qg": stores["qg"][:, -1],
+        "wu": wu,
+        "wl": wl,
+        "wd": wd,
+        "s": s,
+        "fr": fr,
+        "qi": stores["qi"][:, -1],
+        "qg": stores["qg"][:, -1],
     }
     return qsim, stores, final_states
 
 
-def recorded_tgd2_forward(model, forcings: dict[str, torch.Tensor],
-                          params: dict[str, torch.Tensor],
-                          device: torch.device, dtype: torch.dtype):
+def recorded_tgd2_forward(
+    model,
+    forcings: dict[str, torch.Tensor],
+    params: dict[str, torch.Tensor],
+    device: torch.device,
+    dtype: torch.dtype,
+):
     """Mirror ``XAJWithTGD2Lite.forward`` and record per-day states.
 
     The TGD2 delay runs over the full sequence first (as in the production
@@ -185,13 +308,18 @@ def recorded_tgd2_forward(model, forcings: dict[str, torch.Tensor],
         )
         effective[:, t] = effective_t
         storage_trace[:, t], tau_trace[:, t], retention_trace[:, t] = (
-            storage, tau_t, retention_t
+            storage,
+            tau_t,
+            retention_t,
         )
 
     xaj_params = {k: v for k, v in params.items() if k.startswith("xaj_")}
     qsim, stores, final_states = recorded_base_forward(
-        model._runoff, {"precip": effective, "pet": pet, "temp": temp},
-        xaj_params, device, dtype,
+        model._runoff,
+        {"precip": effective, "pet": pet, "temp": temp},
+        xaj_params,
+        device,
+        dtype,
     )
     # Expose the already-computed delayed input for deterministic diagnostics.
     stores["effective_precip"] = effective
@@ -202,9 +330,15 @@ def recorded_tgd2_forward(model, forcings: dict[str, torch.Tensor],
     return qsim, stores, final_states
 
 
-def validate_recorded_forward(model, recorded: tuple, forcings: dict[str, torch.Tensor],
-                              params: dict[str, torch.Tensor], *,
-                              atol: float = 1e-5, rtol: float = 1e-5) -> dict[str, float]:
+def validate_recorded_forward(
+    model,
+    recorded: tuple,
+    forcings: dict[str, torch.Tensor],
+    params: dict[str, torch.Tensor],
+    *,
+    atol: float = 1e-5,
+    rtol: float = 1e-5,
+) -> dict[str, float]:
     """Compare a recorded forward against the production model forward.
 
     Returns a dict with max absolute discharge diff, max relative discharge
@@ -222,7 +356,9 @@ def validate_recorded_forward(model, recorded: tuple, forcings: dict[str, torch.
     prod_final = aux.get("final_states", {})
     for key, value in final_states.items():
         if key in prod_final:
-            state_diffs[key] = float((value.detach() - prod_final[key]).abs().max().item())
+            state_diffs[key] = float(
+                (value.detach() - prod_final[key]).abs().max().item()
+            )
     max_state = max(state_diffs.values(), default=0.0)
     if abs_diff > atol or max_state > atol:
         raise RuntimeError(
@@ -233,8 +369,12 @@ def validate_recorded_forward(model, recorded: tuple, forcings: dict[str, torch.
 
 
 def recorded_forward_for_structure(
-    structure: str, model, forcings: dict[str, torch.Tensor],
-    params: dict[str, torch.Tensor], device: torch.device, dtype: torch.dtype,
+    structure: str,
+    model,
+    forcings: dict[str, torch.Tensor],
+    params: dict[str, torch.Tensor],
+    device: torch.device,
+    dtype: torch.dtype,
 ):
     """Dispatch to the recorded forward matching the fitted structure key."""
     if structure == "XAJ_CN":
@@ -246,12 +386,16 @@ def recorded_forward_for_structure(
     raise KeyError(f"unknown structure: {structure}")
 
 
-def structure_shared_params(structure: str, full_params: dict[str, torch.Tensor]) -> dict[str, torch.Tensor]:
+def structure_shared_params(
+    structure: str, full_params: dict[str, torch.Tensor]
+) -> dict[str, torch.Tensor]:
     """Extract the 15 shared XAJ parameters from a full structure's params."""
     return {name: full_params[name] for name in COMMON_XAJ}
 
 
-def build_forcing_dict(forcing_np: Any, device: torch.device, dtype: torch.dtype) -> dict[str, torch.Tensor]:
+def build_forcing_dict(
+    forcing_np: Any, device: torch.device, dtype: torch.dtype
+) -> dict[str, torch.Tensor]:
     """Convert a [batch, time, 3] P,T,PET array into the model forcing dict."""
     forcing = torch.as_tensor(np_float32(forcing_np), device=device, dtype=dtype)
     return {

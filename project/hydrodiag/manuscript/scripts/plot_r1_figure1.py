@@ -6,11 +6,12 @@ Follows HESS / Copernicus figure standards and Nature visual style principles.
 
 import os
 import sys
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-from matplotlib.lines import Line2D
 from matplotlib.gridspec import GridSpec
+from matplotlib.lines import Line2D
 
 # Add script directory to sys.path to load r1_plot_style
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -22,8 +23,8 @@ from r1_plot_style import (
     MODEL_MARKERS,
     PERIOD_STYLES,
     RESOLVED_FONT,
-    setup_publication_style,
     apply_clean_spines,
+    setup_publication_style,
 )
 
 
@@ -35,7 +36,9 @@ def main():
     setup_publication_style()
 
     # Paths
-    project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    project_root = os.path.dirname(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    )
     r1_dir = os.path.join(project_root, "manuscript/results/R1")
 
     # Output directory (canonical main-figure location)
@@ -55,8 +58,7 @@ def main():
         "S5": 55,
     }
     kge_strata = df_abs[
-        (df_abs["metric"] == "kge")
-        & (df_abs["summary_level"] == "snow_stratum")
+        (df_abs["metric"] == "kge") & (df_abs["summary_level"] == "snow_stratum")
     ]
     test_strata = kge_strata[kge_strata["period"] == "test"]
     for s_name, exp_n in expected_counts.items():

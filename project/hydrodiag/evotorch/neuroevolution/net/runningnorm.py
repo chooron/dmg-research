@@ -212,10 +212,18 @@ class RunningNorm:
         return x
 
     def _has_no_data(self) -> bool:
-        return (self._sum is None) and (self._sum_of_squares is None) and (self._count == 0)
+        return (
+            (self._sum is None)
+            and (self._sum_of_squares is None)
+            and (self._count == 0)
+        )
 
     def _has_data(self) -> bool:
-        return (self._sum is not None) and (self._sum_of_squares is not None) and (self._count > 0)
+        return (
+            (self._sum is not None)
+            and (self._sum_of_squares is not None)
+            and (self._count > 0)
+        )
 
     def reset(self):
         """
@@ -226,7 +234,13 @@ class RunningNorm:
         self._count = 0
 
     @torch.no_grad()
-    def update(self, x: Union[Iterable, "RunningNorm"], mask: Optional[Iterable] = None, *, verify: bool = True):
+    def update(
+        self,
+        x: Union[Iterable, "RunningNorm"],
+        mask: Optional[Iterable] = None,
+        *,
+        verify: bool = True,
+    ):
         """
         Update the stored stats with new observation data.
 
@@ -291,7 +305,9 @@ class RunningNorm:
                     self._sum_of_squares += self._like_its_own(x._sum_of_squares)
                     self._count += x._count
                 else:
-                    assert False, "RunningNorm is in an invalid state! This might be a bug."
+                    assert False, (
+                        "RunningNorm is in an invalid state! This might be a bug."
+                    )
         else:
             # This is the case where the received argument x is not a
             # RunningNorm object, but an Iterable.
@@ -356,12 +372,20 @@ class RunningNorm:
 
                     # We compute how many True items we have in the mask.
                     # This integer gives us how many observations we extract from x.
-                    n = int(torch.sum(torch.as_tensor(mask, dtype=torch.int64, device=self._device)))
+                    n = int(
+                        torch.sum(
+                            torch.as_tensor(
+                                mask, dtype=torch.int64, device=self._device
+                            )
+                        )
+                    )
 
                     # We now re-cast the mask as the observation dtype (so that True items turn to 1.0
                     # and False items turn to 0.0), and then increase its number of dimensions so that
                     # it can operate directly with x.
-                    mask = self._like_its_own(mask).reshape(torch.Size([x.shape[0]] + ([1] * (x.ndim - 1))))
+                    mask = self._like_its_own(mask).reshape(
+                        torch.Size([x.shape[0]] + ([1] * (x.ndim - 1)))
+                    )
 
                     # Finally, we multiply x with the mask. This means that the observations with corresponding
                     # mask values as False are zeroed out.
@@ -468,7 +492,13 @@ class RunningNorm:
         return self._count
 
     @torch.no_grad()
-    def normalize(self, x: Iterable, *, result_as_numpy: Optional[bool] = None, verify: bool = True) -> Iterable:
+    def normalize(
+        self,
+        x: Iterable,
+        *,
+        result_as_numpy: Optional[bool] = None,
+        verify: bool = True,
+    ) -> Iterable:
         """
         Normalize the given observation x.
 
@@ -497,7 +527,9 @@ class RunningNorm:
             # If this RunningNorm instance has no data yet,
             # then we do not know how to do the normalization.
             # We therefore raise an error.
-            raise ValueError("Cannot do normalization because no data is collected yet.")
+            raise ValueError(
+                "Cannot do normalization because no data is collected yet."
+            )
 
         if verify:
             # Here we verify the type and shape of x.
@@ -532,7 +564,9 @@ class RunningNorm:
         return result
 
     @torch.no_grad()
-    def update_and_normalize(self, x: Iterable, mask: Optional[Iterable] = None) -> Iterable:
+    def update_and_normalize(
+        self, x: Iterable, mask: Optional[Iterable] = None
+    ) -> Iterable:
         """
         Update the observation stats according to x, then normalize x.
 
@@ -586,7 +620,11 @@ class ObsNormLayer(nn.Module):
     """
 
     def __init__(
-        self, mean: torch.Tensor, stdev: torch.Tensor, low: Optional[float] = None, high: Optional[float] = None
+        self,
+        mean: torch.Tensor,
+        stdev: torch.Tensor,
+        low: Optional[float] = None,
+        high: Optional[float] = None,
     ) -> None:
         """
         `__init__(...)`: Initialize the ObsNormLayer.

@@ -8,8 +8,9 @@ Single compact R1 results SI table covering:
 
 import os
 import sys
-import pandas as pd
+
 import numpy as np
+import pandas as pd
 
 
 def format_stat(med, ci_low, ci_high, decimals=3):
@@ -18,7 +19,9 @@ def format_stat(med, ci_low, ci_high, decimals=3):
 
 
 def main():
-    project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    project_root = os.path.dirname(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    )
     r1_dir = os.path.join(project_root, "manuscript/results/R1")
 
     out_stats_dir = os.path.join(project_root, "manuscript/stats/tables")
@@ -41,11 +44,11 @@ def main():
 
     contrasts = [
         ("CN-TGD", "IC-CMA-ES", "CN − TGD (IC)"),
-        ("CN-TGD", "dPL-MLP",   "CN − TGD (dPL)"),
+        ("CN-TGD", "dPL-MLP", "CN − TGD (dPL)"),
         ("CN-Base", "IC-CMA-ES", "CN − Base (IC)"),
-        ("CN-Base", "dPL-MLP",   "CN − Base (dPL)"),
+        ("CN-Base", "dPL-MLP", "CN − Base (dPL)"),
         ("TGD-Base", "IC-CMA-ES", "TGD − Base (IC)"),
-        ("TGD-Base", "dPL-MLP",   "TGD − Base (dPL)"),
+        ("TGD-Base", "dPL-MLP", "TGD − Base (dPL)"),
     ]
 
     panel_a_md_rows = []
@@ -56,11 +59,22 @@ def main():
         row_tex_vals = [label, str(n)]
         for eff, p_query, c_label in contrasts:
             if s_level == "full_sample":
-                sub = sub_p[(sub_p["effect"] == eff) & (sub_p["paradigm"] == p_query) & (sub_p["summary_level"] == "full_sample")]
+                sub = sub_p[
+                    (sub_p["effect"] == eff)
+                    & (sub_p["paradigm"] == p_query)
+                    & (sub_p["summary_level"] == "full_sample")
+                ]
             else:
-                sub = sub_p[(sub_p["effect"] == eff) & (sub_p["paradigm"] == p_query) & (sub_p["summary_level"] == "snow_stratum") & (sub_p["snow_stratum"] == s_stratum)]
+                sub = sub_p[
+                    (sub_p["effect"] == eff)
+                    & (sub_p["paradigm"] == p_query)
+                    & (sub_p["summary_level"] == "snow_stratum")
+                    & (sub_p["snow_stratum"] == s_stratum)
+                ]
             r = sub.iloc[0]
-            stat_str = format_stat(r["median"], r["bootstrap_ci_low"], r["bootstrap_ci_high"], 3)
+            stat_str = format_stat(
+                r["median"], r["bootstrap_ci_low"], r["bootstrap_ci_high"], 3
+            )
             row_md[c_label] = stat_str
             row_tex_vals.append(stat_str)
         panel_a_md_rows.append(row_md)
@@ -75,12 +89,26 @@ def main():
     panel_b_md_rows = []
     panel_b_tex_rows = []
 
-    for model_name, code in [("Base", "XAJ-Base"), ("TGD", "XAJ-TGD"), ("CN", "XAJ-CN")]:
+    for model_name, code in [
+        ("Base", "XAJ-Base"),
+        ("TGD", "XAJ-TGD"),
+        ("CN", "XAJ-CN"),
+    ]:
         for paradigm, p_label in [("IC-CMA-ES", "IC"), ("dPL-MLP", "dPL")]:
-            k_series = perf[(perf["paradigm"] == paradigm) & (perf["model"] == code) & (perf["period"] == "test")].set_index("basin_id")["kge"]
-            sub_sig = sig[(sig["paradigm"] == paradigm) & (sig["model"] == code) & (sig["period"] == "test")]
+            k_series = perf[
+                (perf["paradigm"] == paradigm)
+                & (perf["model"] == code)
+                & (perf["period"] == "test")
+            ].set_index("basin_id")["kge"]
+            sub_sig = sig[
+                (sig["paradigm"] == paradigm)
+                & (sig["model"] == code)
+                & (sig["period"] == "test")
+            ]
             if paradigm == "IC-CMA-ES":
-                ct_series = sub_sig[sub_sig["seed_or_restart"] == "selected_restart"].set_index("basin_id")["ct_error_signed"]
+                ct_series = sub_sig[
+                    sub_sig["seed_or_restart"] == "selected_restart"
+                ].set_index("basin_id")["ct_error_signed"]
             else:
                 ct_series = sub_sig.groupby("basin_id")["ct_error_signed"].median()
 
@@ -99,15 +127,19 @@ def main():
             str_15 = f"{n_15}/{n_screen} ({pct_15:.1f}%)"
             str_20 = f"{n_20}/{n_screen} ({pct_20:.1f}%)"
 
-            panel_b_md_rows.append({
-                "Configuration": model_name,
-                "Regime": p_label,
-                "N_screen": n_screen,
-                "|ΔCT| ≥ 10 d": str_10,
-                "|ΔCT| ≥ 15 d": str_15,
-                "|ΔCT| ≥ 20 d": str_20,
-            })
-            panel_b_tex_rows.append([model_name, p_label, str(n_screen), str_10, str_15, str_20])
+            panel_b_md_rows.append(
+                {
+                    "Configuration": model_name,
+                    "Regime": p_label,
+                    "N_screen": n_screen,
+                    "|ΔCT| ≥ 10 d": str_10,
+                    "|ΔCT| ≥ 15 d": str_15,
+                    "|ΔCT| ≥ 20 d": str_20,
+                }
+            )
+            panel_b_tex_rows.append(
+                [model_name, p_label, str(n_screen), str_10, str_15, str_20]
+            )
 
     # ── Build Markdown Output ────────────────────────────────────────────────
     md_content = """# Table S1: Paired Structural Effects Across Snow Regimes and Sensitivity of Large Center-of-Timing Errors
@@ -150,7 +182,8 @@ def main():
     for r_vals in panel_b_tex_rows:
         tex_b_str += " & ".join(r_vals) + " \\\\\n"
 
-    tex_content = r"""\begin{table*}[t]
+    tex_content = (
+        r"""\begin{table*}[t]
 \centering
 \caption{Paired structural effects across snow regimes (Panel A) and sensitivity of large center-of-timing errors to the timing threshold at $\text{KGE} \ge 0.60$ (Panel B).}
 \label{tab:tables1_paired_and_sensitivity}
@@ -161,12 +194,16 @@ def main():
 \midrule
 Snow regime & $n$ & CN $-$ TGD (IC) & CN $-$ TGD (dPL) & CN $-$ Base (IC) & CN $-$ Base (dPL) & TGD $-$ Base (IC) & TGD $-$ Base (dPL) \\
 \midrule
-""" + tex_a_str + r"""\midrule
+"""
+        + tex_a_str
+        + r"""\midrule
 \multicolumn{7}{l}{\textbf{Panel B: Sensitivity of Screened Large Center-of-Timing Errors to Threshold Definition ($\text{KGE} \ge 0.60$)}} \\
 \midrule
 Configuration & Regime & Screened $N$ & $|\Delta\text{CT}| \ge 10$~d & $|\Delta\text{CT}| \ge 15$~d & $|\Delta\text{CT}| \ge 20$~d \\
 \midrule
-""" + tex_b_str + r"""\bottomrule
+"""
+        + tex_b_str
+        + r"""\bottomrule
 \end{tabular}
 \begin{tablenotes}[flushleft]
 \small
@@ -175,12 +212,17 @@ Configuration & Regime & Screened $N$ & $|\Delta\text{CT}| \ge 10$~d & $|\Delta\
 \end{threeparttable}
 \end{table*}
 """
+    )
 
     # Write files
     for d in (out_stats_dir, out_table_dir):
-        with open(os.path.join(d, "TableS1_paired_effects_and_sensitivity.md"), "w") as f:
+        with open(
+            os.path.join(d, "TableS1_paired_effects_and_sensitivity.md"), "w"
+        ) as f:
             f.write(md_content)
-        with open(os.path.join(d, "TableS1_paired_effects_and_sensitivity.tex"), "w") as f:
+        with open(
+            os.path.join(d, "TableS1_paired_effects_and_sensitivity.tex"), "w"
+        ) as f:
             f.write(tex_content)
 
     print("Supplementary Table S1 generated successfully.")

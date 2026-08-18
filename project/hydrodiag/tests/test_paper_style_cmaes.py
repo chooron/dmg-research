@@ -17,7 +17,6 @@ import time
 import numpy as np
 import pytest
 import torch
-
 from optimization.paper_style_cmaes import (
     CMAESConfig,
     CMAESGenerationRecord,
@@ -68,21 +67,27 @@ class TestNormalizedPhysicalMapping:
         lb = np.array([10.0, 50.0])
         ub = np.array([110.0, 150.0])
         x_norm = np.array([0.0, 0.0])
-        physical = normalized_to_physical(torch.tensor(x_norm), torch.tensor(lb), torch.tensor(ub))
+        physical = normalized_to_physical(
+            torch.tensor(x_norm), torch.tensor(lb), torch.tensor(ub)
+        )
         np.testing.assert_allclose(physical.numpy(), lb)
 
     def test_boundary_1(self):
         lb = np.array([10.0, 50.0])
         ub = np.array([110.0, 150.0])
         x_norm = np.array([1.0, 1.0])
-        physical = normalized_to_physical(torch.tensor(x_norm), torch.tensor(lb), torch.tensor(ub))
+        physical = normalized_to_physical(
+            torch.tensor(x_norm), torch.tensor(lb), torch.tensor(ub)
+        )
         np.testing.assert_allclose(physical.numpy(), ub)
 
     def test_roundtrip(self):
         lb = np.array([1.0, -5.0, 20.0])
         ub = np.array([6.0, 3.0, 5000.0])
         x_phys = np.array([2.0, 0.0, 350.0])
-        x_norm = physical_to_normalized(torch.tensor(x_phys), torch.tensor(lb), torch.tensor(ub))
+        x_norm = physical_to_normalized(
+            torch.tensor(x_phys), torch.tensor(lb), torch.tensor(ub)
+        )
         x_back = normalized_to_physical(x_norm, torch.tensor(lb), torch.tensor(ub))
         np.testing.assert_allclose(x_back.numpy(), x_phys, atol=1e-6)
 
@@ -91,7 +96,9 @@ class TestNormalizedPhysicalMapping:
         ub = np.array([100.0, 20.0])
         x_norm = np.array([0.5, 0.5])
         expected = (lb + ub) / 2.0
-        physical = normalized_to_physical(torch.tensor(x_norm), torch.tensor(lb), torch.tensor(ub))
+        physical = normalized_to_physical(
+            torch.tensor(x_norm), torch.tensor(lb), torch.tensor(ub)
+        )
         np.testing.assert_allclose(physical.numpy(), expected)
 
 
@@ -233,7 +240,9 @@ class TestExtractDistributionState:
             return torch.sum((x - 0.5) ** 2, dim=-1)
 
         prob = Problem("min", obj, solution_length=2, initial_bounds=(0.0, 1.0))
-        searcher = CMAES(prob, stdev_init=0.01, popsize=6, center_init=torch.tensor([0.5, 0.5]))
+        searcher = CMAES(
+            prob, stdev_init=0.01, popsize=6, center_init=torch.tensor([0.5, 0.5])
+        )
         searcher.step()
 
         config = CMAESConfig(n_dim=2, tol_x=1e-3)
@@ -253,7 +262,12 @@ class TestExtractDistributionState:
         config = CMAESConfig(n_dim=2, tol_x=1e-3)
         stopper = PaperStyleCMAESStopper(config)
         # Direct test using a dict
-        dist_state = {"max_coordinate_std": 0.002, "sigma": 0.02, "C_diag": None, "center": None}
+        dist_state = {
+            "max_coordinate_std": 0.002,
+            "sigma": 0.02,
+            "C_diag": None,
+            "center": None,
+        }
         triggered, val = stopper.check_tol_x(dist_state["max_coordinate_std"])
         assert not triggered
 
@@ -269,6 +283,7 @@ class TestExtractDistributionState:
         C = torch.tensor([-0.001, 0.01], dtype=torch.float32)
         sigma = 0.1
         import numpy as np
+
         C_np = C.numpy()
         coord_std = sigma * np.sqrt(np.maximum(C_np, 0.0))
         assert np.all(np.isfinite(coord_std))
@@ -310,9 +325,14 @@ class TestStopLogic:
         assert not tx
 
         primary, all_r = _determine_stop_reasons(
-            tol_fun_triggered=t, tol_hist_fun_triggered=th, tol_x_triggered=tx,
-            generation=1, max_generations=1000, min_generations=1,
-            invalid_fitness=False, evotorch_terminated=False,
+            tol_fun_triggered=t,
+            tol_hist_fun_triggered=th,
+            tol_x_triggered=tx,
+            generation=1,
+            max_generations=1000,
+            min_generations=1,
+            invalid_fitness=False,
+            evotorch_terminated=False,
         )
         assert primary == StopReason.TOL_FUN
         assert StopReason.TOL_FUN in all_r
@@ -320,33 +340,53 @@ class TestStopLogic:
     def test_tol_hist_fun_only(self):
         config = CMAESConfig(n_dim=2, tol_hist_fun=1e-3, min_generations=10)
         primary, all_r = _determine_stop_reasons(
-            tol_fun_triggered=False, tol_hist_fun_triggered=True, tol_x_triggered=False,
-            generation=10, max_generations=1000, min_generations=10,
-            invalid_fitness=False, evotorch_terminated=False,
+            tol_fun_triggered=False,
+            tol_hist_fun_triggered=True,
+            tol_x_triggered=False,
+            generation=10,
+            max_generations=1000,
+            min_generations=10,
+            invalid_fitness=False,
+            evotorch_terminated=False,
         )
         assert primary == StopReason.TOL_HIST_FUN
 
     def test_tol_x_only(self):
         primary, all_r = _determine_stop_reasons(
-            tol_fun_triggered=False, tol_hist_fun_triggered=False, tol_x_triggered=True,
-            generation=10, max_generations=1000, min_generations=10,
-            invalid_fitness=False, evotorch_terminated=False,
+            tol_fun_triggered=False,
+            tol_hist_fun_triggered=False,
+            tol_x_triggered=True,
+            generation=10,
+            max_generations=1000,
+            min_generations=10,
+            invalid_fitness=False,
+            evotorch_terminated=False,
         )
         assert primary == StopReason.TOL_X
 
     def test_max_generations(self):
         primary, all_r = _determine_stop_reasons(
-            tol_fun_triggered=False, tol_hist_fun_triggered=False, tol_x_triggered=False,
-            generation=1000, max_generations=1000, min_generations=10,
-            invalid_fitness=False, evotorch_terminated=False,
+            tol_fun_triggered=False,
+            tol_hist_fun_triggered=False,
+            tol_x_triggered=False,
+            generation=1000,
+            max_generations=1000,
+            min_generations=10,
+            invalid_fitness=False,
+            evotorch_terminated=False,
         )
         assert primary == StopReason.MAX_GENERATIONS
 
     def test_multiple_triggers_same_generation(self):
         primary, all_r = _determine_stop_reasons(
-            tol_fun_triggered=True, tol_hist_fun_triggered=True, tol_x_triggered=True,
-            generation=20, max_generations=1000, min_generations=10,
-            invalid_fitness=False, evotorch_terminated=False,
+            tol_fun_triggered=True,
+            tol_hist_fun_triggered=True,
+            tol_x_triggered=True,
+            generation=20,
+            max_generations=1000,
+            min_generations=10,
+            invalid_fitness=False,
+            evotorch_terminated=False,
         )
         assert StopReason.TOL_FUN in all_r
         assert StopReason.TOL_HIST_FUN in all_r
@@ -355,27 +395,42 @@ class TestStopLogic:
 
     def test_min_generations_blocks_early_stop(self):
         primary, all_r = _determine_stop_reasons(
-            tol_fun_triggered=True, tol_hist_fun_triggered=True, tol_x_triggered=True,
-            generation=3, max_generations=1000, min_generations=10,
-            invalid_fitness=False, evotorch_terminated=False,
+            tol_fun_triggered=True,
+            tol_hist_fun_triggered=True,
+            tol_x_triggered=True,
+            generation=3,
+            max_generations=1000,
+            min_generations=10,
+            invalid_fitness=False,
+            evotorch_terminated=False,
         )
         assert primary is None
         assert len(all_r) == 0
 
     def test_no_conditions_trigger_no_stop(self):
         primary, all_r = _determine_stop_reasons(
-            tol_fun_triggered=False, tol_hist_fun_triggered=False, tol_x_triggered=False,
-            generation=50, max_generations=1000, min_generations=10,
-            invalid_fitness=False, evotorch_terminated=False,
+            tol_fun_triggered=False,
+            tol_hist_fun_triggered=False,
+            tol_x_triggered=False,
+            generation=50,
+            max_generations=1000,
+            min_generations=10,
+            invalid_fitness=False,
+            evotorch_terminated=False,
         )
         assert primary is None
         assert len(all_r) == 0
 
     def test_invalid_fitness_overrides(self):
         primary, all_r = _determine_stop_reasons(
-            tol_fun_triggered=True, tol_hist_fun_triggered=True, tol_x_triggered=True,
-            generation=10, max_generations=1000, min_generations=10,
-            invalid_fitness=True, evotorch_terminated=False,
+            tol_fun_triggered=True,
+            tol_hist_fun_triggered=True,
+            tol_x_triggered=True,
+            generation=10,
+            max_generations=1000,
+            min_generations=10,
+            invalid_fitness=True,
+            evotorch_terminated=False,
         )
         assert StopReason.INVALID_FITNESS in all_r
         assert primary == StopReason.INVALID_FITNESS
@@ -466,7 +521,10 @@ class TestSphereIntegration:
         assert np.all(best >= 0.0)
         assert np.all(best <= 1.0)
 
-        assert result.number_of_evaluations == config.population_size * result.stop_generation
+        assert (
+            result.number_of_evaluations
+            == config.population_size * result.stop_generation
+        )
 
         assert len(result.complete_generation_history) == result.stop_generation
 
@@ -497,7 +555,11 @@ class TestSphereIntegration:
 
         assert result1.stop_generation == result2.stop_generation
         assert result1.best_eval == pytest.approx(result2.best_eval, rel=1e-5)
-        np.testing.assert_allclose(result1.best_solution_normalized, result2.best_solution_normalized, atol=1e-5)
+        np.testing.assert_allclose(
+            result1.best_solution_normalized,
+            result2.best_solution_normalized,
+            atol=1e-5,
+        )
 
     def test_sphere_final_parameter_in_bounds(self):
         n_dim = 5

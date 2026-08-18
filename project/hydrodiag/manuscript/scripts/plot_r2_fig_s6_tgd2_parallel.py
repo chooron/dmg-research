@@ -29,24 +29,27 @@ regime n in the y-axis labels.
 Output: manuscript/supplement/figures/Fig_S6_R2_tgd2_parallel_figure4.png (600 DPI)
 and vector PDF, consistent with the supplement figure convention.
 """
+
 from __future__ import annotations
 
 import sys
 from pathlib import Path
 
+import matplotlib
 import numpy as np
 import pandas as pd
-import matplotlib
+
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
+import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import plot_r2_figure4 as F4  # noqa: E402  (read-only reuse of grammar/constants)
 from r1_plot_style import (  # noqa: E402
     MODEL_COLORS,
-    setup_publication_style, apply_clean_spines,
+    apply_clean_spines,
+    setup_publication_style,
 )
 
 PROJECT = Path(__file__).resolve().parents[2]
@@ -65,7 +68,7 @@ REGIMES = F4.REGIMES
 REGIME_N = F4.REGIME_N
 COLOR_CN = F4.COLOR_CN
 COLOR_BASE = F4.COLOR_BASE
-COLOR_TGD2 = MODEL_COLORS["TGD"]        # #009988  teal (Base-TGD2 contrast)
+COLOR_TGD2 = MODEL_COLORS["TGD"]  # #009988  teal (Base-TGD2 contrast)
 COLOR_REF = F4.COLOR_REF
 RIDGE_EDGE = F4.RIDGE_EDGE
 KEY_ROW_SHADE = F4.KEY_ROW_SHADE
@@ -99,8 +102,11 @@ def load_base_tgd2_paired() -> pd.DataFrame:
     canon["basin_id"] = canon["basin_id"].astype(str).str.zfill(8)
     base = canon[canon["structure"] == "Base"].rename(columns={"z": "z_base"})
     gd = canon[canon["structure"] == "GD"].rename(columns={"z": "z_tgd2"})
-    df = base.merge(gd[["paradigm", "basin_id", "parameter", "z_tgd2"]],
-                    on=["paradigm", "basin_id", "parameter"], how="inner")
+    df = base.merge(
+        gd[["paradigm", "basin_id", "parameter", "z_tgd2"]],
+        on=["paradigm", "basin_id", "parameter"],
+        how="inner",
+    )
     assert len(df) == 531 * 15 * 2
     df["delta_base_minus_tgd2"] = df["z_base"] - df["z_tgd2"]
     return df
@@ -117,11 +123,22 @@ def panel_a_gradients(ax, df_tgd2, paradigm, shared_lim=None):
     for i, p in enumerate(PARAM_ORDER):
         slope, lo, hi = F4.slope_ci_param(df_tgd2, paradigm, p)
         y = y_pos[i]
-        ax.errorbar(slope, y, xerr=[[slope - lo], [hi - slope]], fmt="^",
-                    color=COLOR_TGD2, ecolor=COLOR_TGD2, elinewidth=1.1,
-                    capsize=2.4, capthick=0.9, markersize=5.2,
-                    markerfacecolor=COLOR_TGD2, markeredgecolor="none",
-                    linestyle="none", zorder=3)
+        ax.errorbar(
+            slope,
+            y,
+            xerr=[[slope - lo], [hi - slope]],
+            fmt="^",
+            color=COLOR_TGD2,
+            ecolor=COLOR_TGD2,
+            elinewidth=1.1,
+            capsize=2.4,
+            capthick=0.9,
+            markersize=5.2,
+            markerfacecolor=COLOR_TGD2,
+            markeredgecolor="none",
+            linestyle="none",
+            zorder=3,
+        )
     ax.axvline(0, color=COLOR_REF, linestyle="--", linewidth=0.85, zorder=1)
     ax.set_yticks(y_pos)
     ax.set_yticklabels([DISPLAY[p] for p in PARAM_ORDER], fontsize=7.5)
@@ -149,24 +166,42 @@ def _dz_ridge_pair(ax, df_dz, parameter, xlabel=False):
             ("IC", +1.0, IC_FILL_ALPHA, COLOR_CN, RIDGE_EDGE, "-"),
             ("dPL", -1.0, DPL_FILL_ALPHA, COLOR_BASE, COLOR_BASE, DPL_LINESTYLE),
         ]:
-            vals = df_dz[(df_dz["paradigm"] == paradigm)
-                         & (df_dz["parameter"] == parameter)
-                         & (df_dz["snow_regime"] == reg)]["delta_base_minus_tgd2"].to_numpy(float)
+            vals = df_dz[
+                (df_dz["paradigm"] == paradigm)
+                & (df_dz["parameter"] == parameter)
+                & (df_dz["snow_regime"] == reg)
+            ]["delta_base_minus_tgd2"].to_numpy(float)
             d = F4.ridge_density(vals, DZ_GRID, DZ_BW)
             curve = y + sign * RIDGE_HEIGHT * d
-            ax.fill_between(DZ_GRID, y, curve, color=fill, alpha=alpha,
-                            linewidth=0, zorder=2)
+            ax.fill_between(
+                DZ_GRID, y, curve, color=fill, alpha=alpha, linewidth=0, zorder=2
+            )
             ax.plot(DZ_GRID, curve, color=edge, linestyle=ls, linewidth=0.7, zorder=3)
             med = float(np.median(vals))
-            ax.plot([med], [y + sign * RIDGE_HEIGHT * d[np.argmin(np.abs(DZ_GRID - med))]],
-                    marker="o", color=edge, markersize=2.4,
-                    markerfacecolor=edge, markeredgecolor="none", zorder=5)
+            ax.plot(
+                [med],
+                [y + sign * RIDGE_HEIGHT * d[np.argmin(np.abs(DZ_GRID - med))]],
+                marker="o",
+                color=edge,
+                markersize=2.4,
+                markerfacecolor=edge,
+                markeredgecolor="none",
+                zorder=5,
+            )
             q1, q3 = np.percentile(vals, [25, 75])
-            ax.plot([q1, q3], [y + sign * 0.015, y + sign * 0.015],
-                    color=edge, linewidth=0.9, solid_capstyle="butt", zorder=5)
+            ax.plot(
+                [q1, q3],
+                [y + sign * 0.015, y + sign * 0.015],
+                color=edge,
+                linewidth=0.9,
+                solid_capstyle="butt",
+                zorder=5,
+            )
     ax.axvline(0, color=ZERO_LINE_COLOR, linestyle="--", linewidth=0.8, zorder=1)
     ax.set_yticks(y_pos)
-    ax.set_yticklabels([f"{r} (n={n})" for r, n in zip(REGIMES, REGIME_N)], fontsize=7.0)
+    ax.set_yticklabels(
+        [f"{r} (n={n})" for r, n in zip(REGIMES, REGIME_N)], fontsize=7.0
+    )
     ax.set_xlim(-1.0, 1.0)
     ax.set_ylim(-0.5, float(len(REGIMES)) + 0.5)
     ax.set_xticks(DZ_XTICKS)
@@ -177,12 +212,25 @@ def _dz_ridge_pair(ax, df_dz, parameter, xlabel=False):
 
 
 def panel_ridge(ax, df_dz, parameter, letter, xlabel=False, snow_cue=False):
-    ax.set_title(f"({letter}) {DISPLAY[parameter]}", weight="bold", loc="left",
-                 pad=5, fontsize=9.0)
+    ax.set_title(
+        f"({letter}) {DISPLAY[parameter]}",
+        weight="bold",
+        loc="left",
+        pad=5,
+        fontsize=9.0,
+    )
     _dz_ridge_pair(ax, df_dz, parameter, xlabel=xlabel)
     if snow_cue:
-        ax.text(0.02, 0.985, "Increasing snow influence \u2191", transform=ax.transAxes,
-                ha="left", va="top", fontsize=6.4, color="#999999")
+        ax.text(
+            0.02,
+            0.985,
+            "Increasing snow influence \u2191",
+            transform=ax.transAxes,
+            ha="left",
+            va="top",
+            fontsize=6.4,
+            color="#999999",
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -191,18 +239,37 @@ def panel_ridge(ax, df_dz, parameter, letter, xlabel=False, snow_cue=False):
 def build_figure(df_tgd2, df_dz) -> None:
     fig = plt.figure(figsize=(10.0, 9.6))
     TOP, BOT = 0.955, 0.060
-    c1 = (0.070, 0.465)   # panel (a)
-    c2 = (0.560, 0.985)   # panels (b)(c)(d)
-    gsL = gridspec.GridSpec(2, 1, left=c1[0], right=c1[1], top=TOP, bottom=BOT, hspace=0.30)
-    gsM = gridspec.GridSpec(3, 1, left=c2[0], right=c2[1], top=TOP, bottom=BOT, hspace=0.26)
+    c1 = (0.070, 0.465)  # panel (a)
+    c2 = (0.560, 0.985)  # panels (b)(c)(d)
+    gsL = gridspec.GridSpec(
+        2, 1, left=c1[0], right=c1[1], top=TOP, bottom=BOT, hspace=0.30
+    )
+    gsM = gridspec.GridSpec(
+        3, 1, left=c2[0], right=c2[1], top=TOP, bottom=BOT, hspace=0.26
+    )
 
     # (a) shared x-axis across both regimes (Base-TGD2 only)
-    ax_a1 = fig.add_subplot(gsL[0, 0]); apply_clean_spines(ax_a1)
-    ax_a2 = fig.add_subplot(gsL[1, 0]); apply_clean_spines(ax_a2)
-    ax_a1.set_title("(a) Snow gradients of paired shifts (Base\u2013TGD2)",
-                    weight="bold", loc="left", pad=5, fontsize=9.0)
-    cilo = min(F4.slope_ci_param(df_tgd2, p_, par)[1] for p_ in ["IC", "dPL"] for par in PARAM_ORDER)
-    cihi = max(F4.slope_ci_param(df_tgd2, p_, par)[2] for p_ in ["IC", "dPL"] for par in PARAM_ORDER)
+    ax_a1 = fig.add_subplot(gsL[0, 0])
+    apply_clean_spines(ax_a1)
+    ax_a2 = fig.add_subplot(gsL[1, 0])
+    apply_clean_spines(ax_a2)
+    ax_a1.set_title(
+        "(a) Snow gradients of paired shifts (Base\u2013TGD2)",
+        weight="bold",
+        loc="left",
+        pad=5,
+        fontsize=9.0,
+    )
+    cilo = min(
+        F4.slope_ci_param(df_tgd2, p_, par)[1]
+        for p_ in ["IC", "dPL"]
+        for par in PARAM_ORDER
+    )
+    cihi = max(
+        F4.slope_ci_param(df_tgd2, p_, par)[2]
+        for p_ in ["IC", "dPL"]
+        for par in PARAM_ORDER
+    )
     pad = max(0.05, (cihi - cilo) * 0.08)
     lo_r = np.floor((cilo - pad) / 0.5) * 0.5
     hi_r = np.ceil((cihi + pad) / 0.5) * 0.5
@@ -210,27 +277,63 @@ def build_figure(df_tgd2, df_dz) -> None:
     panel_a_gradients(ax_a1, df_tgd2, "IC", shared_lim=shared_lim)
     panel_a_gradients(ax_a2, df_tgd2, "dPL", shared_lim=shared_lim)
     ax_a1.set_ylabel("Parameter", labelpad=3)
-    ax_a1.text(0.02, 0.97, "IC regime", transform=ax_a1.transAxes, ha="left",
-               va="top", fontsize=7.6, fontweight="bold", color="#333333")
-    ax_a2.text(0.02, 0.97, "dPL regime", transform=ax_a2.transAxes, ha="left",
-               va="top", fontsize=7.6, fontweight="bold", color="#333333")
+    ax_a1.text(
+        0.02,
+        0.97,
+        "IC regime",
+        transform=ax_a1.transAxes,
+        ha="left",
+        va="top",
+        fontsize=7.6,
+        fontweight="bold",
+        color="#333333",
+    )
+    ax_a2.text(
+        0.02,
+        0.97,
+        "dPL regime",
+        transform=ax_a2.transAxes,
+        ha="left",
+        va="top",
+        fontsize=7.6,
+        fontweight="bold",
+        color="#333333",
+    )
 
     # (b)(c)(d) ridgelines
     for row, (param, letter) in enumerate(zip(KEY_PARAMS, ["b", "c", "d"])):
-        ax = fig.add_subplot(gsM[row, 0]); apply_clean_spines(ax)
-        panel_ridge(ax, df_dz, param, letter,
-                    xlabel=(row == 2), snow_cue=(row == 0))
+        ax = fig.add_subplot(gsM[row, 0])
+        apply_clean_spines(ax)
+        panel_ridge(ax, df_dz, param, letter, xlabel=(row == 2), snow_cue=(row == 0))
 
     # shared IC/dPL ridge legend
     handles = [
-        Patch(facecolor=COLOR_CN, alpha=IC_FILL_ALPHA, edgecolor=RIDGE_EDGE,
-              linewidth=0.8, label="IC"),
-        Patch(facecolor=COLOR_BASE, alpha=DPL_FILL_ALPHA, edgecolor=COLOR_BASE,
-              linewidth=0.7, linestyle=DPL_LINESTYLE, label="dPL"),
+        Patch(
+            facecolor=COLOR_CN,
+            alpha=IC_FILL_ALPHA,
+            edgecolor=RIDGE_EDGE,
+            linewidth=0.8,
+            label="IC",
+        ),
+        Patch(
+            facecolor=COLOR_BASE,
+            alpha=DPL_FILL_ALPHA,
+            edgecolor=COLOR_BASE,
+            linewidth=0.7,
+            linestyle=DPL_LINESTYLE,
+            label="dPL",
+        ),
     ]
-    leg = fig.legend(handles=handles, loc="lower center", bbox_to_anchor=(0.5, 0.028),
-                     ncol=2, frameon=False, fontsize=7.0, columnspacing=1.4,
-                     handlelength=1.8)
+    leg = fig.legend(
+        handles=handles,
+        loc="lower center",
+        bbox_to_anchor=(0.5, 0.028),
+        ncol=2,
+        frameon=False,
+        fontsize=7.0,
+        columnspacing=1.4,
+        handlelength=1.8,
+    )
     for t in leg.get_texts():
         t.set_fontsize(7.0)
 
@@ -250,7 +353,12 @@ def main() -> None:
     # sanity: delta bounded in [-1, 1]; 531 basins per (paradigm, parameter)
     dz = df_dz[df_dz["parameter"].isin(KEY_PARAMS)]["delta_base_minus_tgd2"]
     assert float(dz.min()) >= -1.0 - 1e-9 and float(dz.max()) <= 1.0 + 1e-9
-    assert (df_dz[df_dz["parameter"].isin(KEY_PARAMS)].groupby(["paradigm", "parameter"]).size() == 531).all()
+    assert (
+        df_dz[df_dz["parameter"].isin(KEY_PARAMS)]
+        .groupby(["paradigm", "parameter"])
+        .size()
+        == 531
+    ).all()
     build_figure(df_tgd2, df_dz)
     print("Figure S6 (Base-TGD2 parallel to F4) generated.")
 

@@ -2,23 +2,34 @@
 
 import pytest
 import torch
-
 from models import (
-    HBVLite, GR4JLite, SIMHYDLite,
-    GR4JWithCemaNeigeLite, XAJWithCemaNeigeLite, SIMHYDWithCemaNeigeLite,
-    GR4JWithPrecipitationDelayLite, XAJWithPrecipitationDelayLite,
-    SIMHYDWithPrecipitationDelayLite,
+    GR4JLite,
+    GR4JWithCemaNeigeLite,
+    GR4JWithPrecipitationDelayLite,
     GR4JWithTGD2Lite,
+    HBVLite,
+    SIMHYDLite,
+    SIMHYDWithCemaNeigeLite,
+    SIMHYDWithPrecipitationDelayLite,
     SIMHYDWithTGD2Lite,
+    XAJWithCemaNeigeLite,
+    XAJWithPrecipitationDelayLite,
     XAJWithTGD2Lite,
 )
 from models.parameter_specs import (
-    HBV_PARAM_SPECS, GR4J_PARAM_SPECS, SIMHYD_PARAM_SPECS,
-    GR4J_CN_PARAM_SPECS, XAJ_CN_PARAM_SPECS, SIMHYD_CN_PARAM_SPECS,
-    GR4J_PD_PARAM_SPECS, XAJ_PD_PARAM_SPECS, SIMHYD_PD_PARAM_SPECS,
-    GR4J_TGD2_PARAM_SPECS, SIMHYD_TGD2_PARAM_SPECS, XAJ_TGD2_PARAM_SPECS,
+    GR4J_CN_PARAM_SPECS,
+    GR4J_PARAM_SPECS,
+    GR4J_PD_PARAM_SPECS,
+    GR4J_TGD2_PARAM_SPECS,
+    HBV_PARAM_SPECS,
+    SIMHYD_CN_PARAM_SPECS,
+    SIMHYD_PARAM_SPECS,
+    SIMHYD_PD_PARAM_SPECS,
+    SIMHYD_TGD2_PARAM_SPECS,
+    XAJ_CN_PARAM_SPECS,
+    XAJ_PD_PARAM_SPECS,
+    XAJ_TGD2_PARAM_SPECS,
 )
-
 
 CASES = (
     (HBVLite, HBV_PARAM_SPECS, False),
@@ -49,7 +60,9 @@ def _forcing(batch=2, steps=12):
 def _params(specs, batch=2):
     return {
         name: torch.full(
-            (batch,), float(spec["default"]), requires_grad=True,
+            (batch,),
+            float(spec["default"]),
+            requires_grad=True,
         )
         for name, spec in specs.items()
     }
@@ -57,7 +70,9 @@ def _params(specs, batch=2):
 
 @pytest.mark.parametrize("model_cls,specs,_has_tgd_stats", CASES)
 def test_lite_model_returns_only_finite_streamflow_and_gradients(
-    model_cls, specs, _has_tgd_stats,
+    model_cls,
+    specs,
+    _has_tgd_stats,
 ):
     forcing = _forcing()
     params = _params(specs)

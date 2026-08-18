@@ -269,7 +269,12 @@ def _unbatch_space(space: Space) -> Space:
                 f" a shape with at least two dimensions was expected, but the encountered shape is {shape}."
             )
         unbatched_shape = shape[1:]
-        return Box(low=space.low[0], high=space.high[0], dtype=space.dtype, shape=unbatched_shape)
+        return Box(
+            low=space.low[0],
+            high=space.high[0],
+            dtype=space.dtype,
+            shape=unbatched_shape,
+        )
     elif isinstance(space, MultiDiscrete):
         shape, ndim = _space_shape_and_ndim(space)
         if ndim != 1:
@@ -299,7 +304,12 @@ def _batch_space(space: Space, num_envs: int) -> Space:
         broadcast_shape = (num_envs,) + tuple(1 for _ in shape)
         dtype = space.dtype
         broadcaster = np.ones(broadcast_shape, dtype=dtype)
-        return Box(low=(broadcaster * space.low), high=(broadcaster * space.high), shape=batched_shape, dtype=dtype)
+        return Box(
+            low=(broadcaster * space.low),
+            high=(broadcaster * space.high),
+            shape=batched_shape,
+            dtype=dtype,
+        )
     elif isinstance(space, Discrete):
         return MultiDiscrete(np.ones(num_envs) * space.n)
     else:
@@ -338,7 +348,9 @@ else:
         action spaces are either `Box` or `Discrete`.
         """
 
-        def __init__(self, num_envs: int, observation_space: Space, action_space: Space):
+        def __init__(
+            self, num_envs: int, observation_space: Space, action_space: Space
+        ):
             """
             `__init__(...)`: Initialize the vectorized environment.
 
@@ -355,7 +367,9 @@ else:
             self.num_envs = int(num_envs)
             self.single_observation_space = observation_space
             self.single_action_space = action_space
-            self.observation_space = _batch_space(self.single_observation_space, self.num_envs)
+            self.observation_space = _batch_space(
+                self.single_observation_space, self.num_envs
+            )
             self.action_space = _batch_space(self.single_action_space, self.num_envs)
 
 
@@ -442,7 +456,9 @@ class TorchWrapper:
 
             # Take the shape and the dtype of the discrete action space.
             single_action_shape = (act_space.n,)
-            single_action_dtype = torch.from_numpy(np.array([], dtype=act_space.dtype)).dtype
+            single_action_dtype = torch.from_numpy(
+                np.array([], dtype=act_space.dtype)
+            ).dtype
 
             # We store the integer dtype of the environment.
             self.__discrete_dtype = single_action_dtype
@@ -451,11 +467,23 @@ class TorchWrapper:
                 # If the environment is vectorized, we declare the new `action_space` and the `single_action_space`
                 # for the enviornment.
                 action_shape = (env.num_envs,) + single_action_shape
-                self.single_action_space = Box(float("-inf"), float("inf"), shape=single_action_shape, dtype=np.float32)
-                self.action_space = Box(float("-inf"), float("inf"), shape=action_shape, dtype=np.float32)
+                self.single_action_space = Box(
+                    float("-inf"),
+                    float("inf"),
+                    shape=single_action_shape,
+                    dtype=np.float32,
+                )
+                self.action_space = Box(
+                    float("-inf"), float("inf"), shape=action_shape, dtype=np.float32
+                )
             else:
                 # If the environment is not vectorized, we declare the new `action_space` for the environment.
-                self.action_space = Box(float("-inf"), float("inf"), shape=single_action_shape, dtype=np.float32)
+                self.action_space = Box(
+                    float("-inf"),
+                    float("inf"),
+                    shape=single_action_shape,
+                    dtype=np.float32,
+                )
         else:
             # This is the case where we do not transform the action space.
             # The discrete dtype will not be used, so, we set it as None.
@@ -556,7 +584,9 @@ class TorchWrapper:
 
         if not isinstance(result, tuple):
             # If the `step(...)` method returned anything other than tuple, we raise an error.
-            raise TypeError(f"Expected a tuple as the result of the `step()` method, but received a {type(result)}")
+            raise TypeError(
+                f"Expected a tuple as the result of the `step()` method, but received a {type(result)}"
+            )
 
         if len(result) == 5:
             # If the result is a tuple of 5 elements, then we note that we are using the new API.
@@ -573,7 +603,9 @@ class TorchWrapper:
             observation, reward, done, info = result
             done2 = None
         else:
-            raise ValueError(f"Unexpected number of elements were returned from step(): {len(result)}")
+            raise ValueError(
+                f"Unexpected number of elements were returned from step(): {len(result)}"
+            )
 
         # Convert the observation, reward, and done variables to PyTorch tensors.
         observation = convert_to_torch(observation)
@@ -1164,7 +1196,10 @@ class Policy:
                 therefore, it is not possible to pass these keyword arguments.
         """
         from ..net import str_to_net
-        from ..net.functional import ModuleExpectingFlatParameters, make_functional_module
+        from ..net.functional import (
+            ModuleExpectingFlatParameters,
+            make_functional_module,
+        )
 
         if isinstance(net, str):
             self.__module = str_to_net(net, **kwargs)
@@ -1184,11 +1219,19 @@ class Policy:
                 f" (whose type is {type(net)})."
             )
 
-        self.__fmodule: ModuleExpectingFlatParameters = make_functional_module(self.__module)
+        self.__fmodule: ModuleExpectingFlatParameters = make_functional_module(
+            self.__module
+        )
         self.__state: Any = None
         self.__parameters: Optional[torch.Tensor] = None
 
-    def set_parameters(self, parameters: torch.Tensor, indices: Optional[MaskOrIndices] = None, *, reset: bool = True):
+    def set_parameters(
+        self,
+        parameters: torch.Tensor,
+        indices: Optional[MaskOrIndices] = None,
+        *,
+        reset: bool = True,
+    ):
         """
         Set the parameters of the policy.
 
@@ -1249,7 +1292,9 @@ class Policy:
             The output tensor, which represents the action to take.
         """
         if self.__parameters is None:
-            raise ValueError("Please use the method `set_parameters(...)` before calling the policy.")
+            raise ValueError(
+                "Please use the method `set_parameters(...)` before calling the policy."
+            )
 
         if self.__state is None:
             further_args = (x,)
@@ -1276,7 +1321,9 @@ class Policy:
             self.__state = state
             return result
         else:
-            raise TypeError(f"The torch module used by the Policy returned an unexpected object: {result}")
+            raise TypeError(
+                f"The torch module used by the Policy returned an unexpected object: {result}"
+            )
 
     def reset(self, indices: Optional[MaskOrIndices] = None, *, copy: bool = True):
         """
@@ -1410,36 +1457,60 @@ if brax is not None:  # noqa: C901
                     " which is not supported."
                 )
 
-            self.__brax_env = create(env_name, auto_reset=auto_reset, batch_size=num_envs, **filtered_kwargs)
+            self.__brax_env = create(
+                env_name, auto_reset=auto_reset, batch_size=num_envs, **filtered_kwargs
+            )
             self.__jit_reset = jax.jit(self.__brax_env.reset)
             self.__jit_step = jax.jit(self.__brax_env.step)
             self.__jit_convert_to_bool = jax.jit(self.__convert_to_bool)
-            self.__jit_make_terminated_and_truncated = jax.jit(self.__make_terminated_and_truncated)
-            self.__jit_make_terminated_and_truncated2 = jax.jit(self.__make_terminated_and_truncated2)
+            self.__jit_make_terminated_and_truncated = jax.jit(
+                self.__make_terminated_and_truncated
+            )
+            self.__jit_make_terminated_and_truncated2 = jax.jit(
+                self.__make_terminated_and_truncated2
+            )
             self.__given_seed: Optional[int] = None
 
             inf = float("inf")
-            observation_space = Box(low=-inf, high=inf, shape=(self.__brax_env.observation_size,), dtype=np.float32)
+            observation_space = Box(
+                low=-inf,
+                high=inf,
+                shape=(self.__brax_env.observation_size,),
+                dtype=np.float32,
+            )
 
             if hasattr(self.__brax_env.sys, "actuator"):
 
                 def as_float32_array(arr: Iterable) -> np.ndarray:
                     return np.array(arr, dtype=np.float32)
 
-                ctrl_range = jax.tree_map(as_float32_array, self.__brax_env.sys.actuator.ctrl_range)
+                ctrl_range = jax.tree_map(
+                    as_float32_array, self.__brax_env.sys.actuator.ctrl_range
+                )
                 ctrl_lb = ctrl_range[:, 0]
                 ctrl_ub = ctrl_range[:, 1]
                 action_space = Box(low=ctrl_lb, high=ctrl_ub, dtype=np.float32)
             else:
-                action_space = Box(low=-1.0, high=1.0, shape=(self.__brax_env.action_size,), dtype=np.float32)
+                action_space = Box(
+                    low=-1.0,
+                    high=1.0,
+                    shape=(self.__brax_env.action_size,),
+                    dtype=np.float32,
+                )
 
             self.__last_state: Optional[Iterable] = None
-            super().__init__(num_envs=num_envs, observation_space=observation_space, action_space=action_space)
+            super().__init__(
+                num_envs=num_envs,
+                observation_space=observation_space,
+                action_space=action_space,
+            )
 
         def seed(self, seed: Optional[int] = None):
             self.__given_seed = None if seed is None else int(seed)
 
-        def reset(self, *, seed: Optional[int] = None, options: Optional[dict] = None) -> tuple:
+        def reset(
+            self, *, seed: Optional[int] = None, options: Optional[dict] = None
+        ) -> tuple:
             if seed is None:
                 if self.__given_seed is None:
                     seed = random.randint(0, (2**32) - 1)
@@ -1470,7 +1541,9 @@ if brax is not None:  # noqa: C901
             truncated = jnp.zeros_like(terminated)
             return terminated, truncated
 
-        def __make_terminated_and_truncated2(self, done: jnp.ndarray, truncation: jnp.ndarray) -> tuple:
+        def __make_terminated_and_truncated2(
+            self, done: jnp.ndarray, truncation: jnp.ndarray
+        ) -> tuple:
             done = self.__jit_convert_to_bool(done)
             truncated = jnp.zeros_like(done)
             terminated = done & (~truncated)
@@ -1483,7 +1556,9 @@ if brax is not None:  # noqa: C901
             reward = state.reward
             done = state.done
             if "truncation" in state.info:
-                terminated, truncated = self.__jit_make_terminated_and_truncated2(done, state.info["truncation"])
+                terminated, truncated = self.__jit_make_terminated_and_truncated2(
+                    done, state.info["truncation"]
+                )
             else:
                 terminated, truncated = self.__jit_make_terminated_and_truncated(done)
             info = {**(state.metrics), **(state.info)}
@@ -1621,19 +1696,31 @@ class SyncVectorEnv(BaseVectorEnv):
                 _must_be_supported_space(single_action_space)
             else:
                 if env.observation_space.shape != single_observation_space.shape:
-                    raise ValueError("The observation shapes of the sub-environments do not match")
+                    raise ValueError(
+                        "The observation shapes of the sub-environments do not match"
+                    )
                 if isinstance(env.action_space, Discrete):
                     if not isinstance(single_action_space, Discrete):
-                        raise TypeError("The action space types of the sub-environments do not match")
+                        raise TypeError(
+                            "The action space types of the sub-environments do not match"
+                        )
                     if env.action_space.n != single_action_space.n:
-                        raise ValueError("The discrete numbers of actions of the sub-environments do not match")
+                        raise ValueError(
+                            "The discrete numbers of actions of the sub-environments do not match"
+                        )
                 elif isinstance(env.action_space, Box):
                     if not isinstance(single_action_space, Box):
-                        raise TypeError("The action space types of the sub-environments do not match")
+                        raise TypeError(
+                            "The action space types of the sub-environments do not match"
+                        )
                     if env.observation_space.shape != single_observation_space.shape:
-                        raise ValueError("The action space shapes of the sub-environments do not match")
+                        raise ValueError(
+                            "The action space shapes of the sub-environments do not match"
+                        )
                 else:
-                    assert False, "Code execution should not have reached here. This is most probably a bug."
+                    assert False, (
+                        "Code execution should not have reached here. This is most probably a bug."
+                    )
 
         self.__batched_obs_shape = (num_envs,) + single_observation_space.shape
         self.__batched_obs_dtype = single_observation_space.dtype
@@ -1646,8 +1733,12 @@ class SyncVectorEnv(BaseVectorEnv):
         else:
             self.__num_episodes = int(num_episodes)
             if self.__num_episodes <= 0:
-                raise ValueError(f"Expected `num_episodes` as a positive integer, but its value is {num_episodes}")
-            self.__dummy_observation = np.zeros(single_observation_space.shape, dtype=single_observation_space.dtype)
+                raise ValueError(
+                    f"Expected `num_episodes` as a positive integer, but its value is {num_episodes}"
+                )
+            self.__dummy_observation = np.zeros(
+                single_observation_space.shape, dtype=single_observation_space.dtype
+            )
             if "float" in str(self.__dummy_observation.dtype):
                 self.__dummy_observation[:] = float("nan")
             self.__num_episodes_counter = np.ones(num_envs, dtype=int)
@@ -1822,7 +1913,9 @@ class SyncVectorEnv(BaseVectorEnv):
 
         batch_size = action.shape[0]
         if batch_size != self.num_envs:
-            raise ValueError("The leftmost dimension of the action array does not match the number of sub-environments")
+            raise ValueError(
+                "The leftmost dimension of the action array does not match the number of sub-environments"
+            )
 
         batched_obs_shape = self.__batched_obs_shape
         batched_obs_dtype = self.__batched_obs_dtype
@@ -1855,7 +1948,9 @@ class SyncVectorEnv(BaseVectorEnv):
                 return
             self.__num_episodes_counter[env_index] -= 1
 
-        def apply_step(env_index: int, single_action: Union[np.ndarray, np.generic, Number, bool]) -> tuple:
+        def apply_step(
+            env_index: int, single_action: Union[np.ndarray, np.generic, Number, bool]
+        ) -> tuple:
             if not is_active_env(env_index):
                 return self.__dummy_observation, float("nan"), True, True, {}
 
@@ -1878,7 +1973,9 @@ class SyncVectorEnv(BaseVectorEnv):
             # done = terminated | truncated
             # if done:
             #     observation, info = self.__envs[i_env].reset()
-            observation, reward, terminated, truncated, info = apply_step(i_env, action[i_env])
+            observation, reward, terminated, truncated, info = apply_step(
+                i_env, action[i_env]
+            )
 
             per_env.observation[i_env] = observation
             per_env.reward[i_env] = reward

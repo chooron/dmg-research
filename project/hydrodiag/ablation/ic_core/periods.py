@@ -20,7 +20,9 @@ def _resolve_one(name: str, dates: np.ndarray, spec: dict[str, Any]) -> PeriodSl
     matches_start = np.flatnonzero(dates.astype("datetime64[D]") == start)
     matches_end = np.flatnonzero(dates.astype("datetime64[D]") == end)
     if len(matches_start) != 1 or len(matches_end) != 1:
-        raise ValueError(f"{name} dates are not both present in the dataset: {start}..{end}")
+        raise ValueError(
+            f"{name} dates are not both present in the dataset: {start}..{end}"
+        )
     start_index = int(matches_start[0])
     end_index = int(matches_end[0])
     if end_index - start_index + 1 != days:
@@ -57,7 +59,7 @@ def resolve_periods(
         test = None
     if train.start_index != warmup.end_index + 1:
         raise ValueError("warmup and train must be adjacent")
-        
+
     if test is not None:
         if test.start_index != train.end_index + 1:
             raise ValueError("train and test must be adjacent")
@@ -65,7 +67,7 @@ def resolve_periods(
         raise ValueError(f"warmup must have ~{warmup_days} days, got {warmup.days}")
     if train.start_index - warmup.start_index != warmup.days:
         raise ValueError("train start must follow the configured warmup length")
-        
+
     test_forcing_start_index = -1
     test_forcing_end_index = -1
     test_warmup_days = 0
@@ -75,7 +77,7 @@ def resolve_periods(
         test_warmup_days = warmup_days
         if test_forcing_start_index < 0:
             raise ValueError("not enough preceding dates for test warmup")
-            
+
     return PeriodResolution(
         warmup=warmup,
         train=train,

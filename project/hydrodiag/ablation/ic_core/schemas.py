@@ -83,15 +83,25 @@ class ICDataBundle:
     def __post_init__(self) -> None:
         n_basins = len(self.basin_ids)
         if n_basins != 531:
-            raise ValueError(f"IC foundation requires exactly 531 basins, got {n_basins}")
+            raise ValueError(
+                f"IC foundation requires exactly 531 basins, got {n_basins}"
+            )
         if len(set(self.basin_ids)) != n_basins:
             raise ValueError("basin_ids must be unique")
-        if self.source_indices.shape != (n_basins,) or self.metadata_indices.shape != (n_basins,):
-            raise ValueError("source_indices and metadata_indices must have shape [531]")
+        if self.source_indices.shape != (n_basins,) or self.metadata_indices.shape != (
+            n_basins,
+        ):
+            raise ValueError(
+                "source_indices and metadata_indices must have shape [531]"
+            )
         if self.forcing.ndim != 3 or self.forcing.shape[0] != n_basins:
-            raise ValueError(f"forcing must have shape [531,time,features], got {self.forcing.shape}")
+            raise ValueError(
+                f"forcing must have shape [531,time,features], got {self.forcing.shape}"
+            )
         if self.target_cfs.shape[:1] != (n_basins,) or self.target_cfs.ndim != 2:
-            raise ValueError(f"target_cfs must have shape [531,time], got {self.target_cfs.shape}")
+            raise ValueError(
+                f"target_cfs must have shape [531,time], got {self.target_cfs.shape}"
+            )
         if self.target_mm_day.shape != self.target_cfs.shape:
             raise ValueError("target_mm_day must align with target_cfs")
         if self.valid_target_mask.shape != self.target_cfs.shape:
@@ -100,7 +110,9 @@ class ICDataBundle:
             raise ValueError("raw_attributes must align with basin_ids")
         if self.raw_area_km2.shape != (n_basins,):
             raise ValueError("raw_area_km2 must have shape [531]")
-        if self.temp_mean_train.shape != (n_basins,) or self.temp_std_train.shape != (n_basins,):
+        if self.temp_mean_train.shape != (n_basins,) or self.temp_std_train.shape != (
+            n_basins,
+        ):
             raise ValueError("temperature statistics must have shape [531]")
 
 

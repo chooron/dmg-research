@@ -89,16 +89,18 @@ def iter_ic_records(run_root: Path, raw_subdir: str) -> list[ICRecord]:
             continue
         parameters = np.asarray(data["parameters"], dtype=np.float64)
         names = tuple(str(x) for x in data["parameter_names"])
-        records.append(ICRecord(
-            basin_id=basin,
-            start=int(data["start"]),
-            train_kge=float(train_kge),
-            test_kge=float(test_kge if test_kge is not None else np.nan),
-            parameters=parameters,
-            parameter_names=names,
-            source=path,
-            raw=data,
-        ))
+        records.append(
+            ICRecord(
+                basin_id=basin,
+                start=int(data["start"]),
+                train_kge=float(train_kge),
+                test_kge=float(test_kge if test_kge is not None else np.nan),
+                parameters=parameters,
+                parameter_names=names,
+                source=path,
+                raw=data,
+            )
+        )
     if not records:
         raise R4ArtifactError(
             f"IC run {run_root.name}: no complete records found under {raw_dir}"
@@ -175,7 +177,9 @@ def read_ic_canonical(
 # ---------------------------------------------------------------------------
 
 
-def _fused_param_columns(header: list[str], parameter_names: tuple[str, ...]) -> list[str]:
+def _fused_param_columns(
+    header: list[str], parameter_names: tuple[str, ...]
+) -> list[str]:
     """Map canonical parameter names onto p_* columns of a fused per_start.csv.
 
     Physical columns appear as ``p_<name>`` (e.g. ``p_xaj_k``, ``p_cn_ctg``,
@@ -266,7 +270,10 @@ def _valid_checkpoint(path: Path, model_key: str) -> dict[str, Any]:
         )
     if not checkpoint.get("lite_mode", False):
         raise R4ArtifactError(f"dPL checkpoint {path}: lite_mode is not True")
-    if not isinstance(checkpoint.get("state_dict"), dict) or not checkpoint["state_dict"]:
+    if (
+        not isinstance(checkpoint.get("state_dict"), dict)
+        or not checkpoint["state_dict"]
+    ):
         raise R4ArtifactError(f"dPL checkpoint {path}: empty state_dict")
     return checkpoint
 
@@ -289,9 +296,11 @@ def read_dpl_seed(
     or inconsistent (fail loud, no silent fallback to synthetic runs).
     """
     import torch
-
     from training.dpl.run_dpl_model import (
-        LITE_MODEL_REGISTRY, StaticParameterNet, physical_parameters, robust_normalize,
+        LITE_MODEL_REGISTRY,
+        StaticParameterNet,
+        physical_parameters,
+        robust_normalize,
     )
 
     config_path = seed_dir / "config.json"
@@ -316,7 +325,9 @@ def read_dpl_seed(
 
     norm_path = seed_dir / "attribute_normalization.npz"
     if not norm_path.is_file():
-        raise R4ArtifactError(f"dPL seed {seed_dir}: attribute_normalization.npz missing")
+        raise R4ArtifactError(
+            f"dPL seed {seed_dir}: attribute_normalization.npz missing"
+        )
     normalization = np.load(norm_path)
 
     # ---- rebuild the parameter net exactly as training did ----------------
@@ -325,8 +336,15 @@ def read_dpl_seed(
     lower = np.asarray([specs[name]["lower"] for name in names], dtype=np.float64)
     upper = np.asarray([specs[name]["upper"] for name in names], dtype=np.float64)
     net_cfg = config["network"]
-    hidden_sizes = [int(v) for v in net_cfg.get("hidden_sizes", [net_cfg["hidden_size"]] * net_cfg.get("depth", 2))]
-    net = StaticParameterNet(35, specs, hidden_sizes, net_cfg["dropout"], net_cfg["output_epsilon"])
+    hidden_sizes = [
+        int(v)
+        for v in net_cfg.get(
+            "hidden_sizes", [net_cfg["hidden_size"]] * net_cfg.get("depth", 2)
+        )
+    ]
+    net = StaticParameterNet(
+        35, specs, hidden_sizes, net_cfg["dropout"], net_cfg["output_epsilon"]
+    )
     net.load_state_dict(checkpoint["state_dict"])
     net.eval()
 
@@ -343,7 +361,9 @@ def read_dpl_seed(
     # canonical 531 set must reproduce the stored statistics exactly.
     _ = attrs_np
     if stored_median.shape != (35,) or stored_scale.shape != (35,):
-        raise R4ArtifactError(f"dPL seed {seed_dir}: normalization stats shape mismatch")
+        raise R4ArtifactError(
+            f"dPL seed {seed_dir}: normalization stats shape mismatch"
+        )
     if not np.allclose(stored_median, _stats["median"], atol=1e-6):
         raise R4ArtifactError(
             f"dPL seed {seed_dir}: stored normalization median does not match "
@@ -366,11 +386,14 @@ def read_dpl_seed(
         theta = net(attrs)
         parameter_range = upper - lower
         physical = physical_parameters(
-            theta, names,
+            theta,
+            names,
             torch.from_numpy(lower).float(),
             torch.from_numpy(parameter_range).float(),
         )
-    parameters = np.stack([physical[name].detach().cpu().numpy() for name in names], axis=1).astype(np.float64)
+    parameters = np.stack(
+        [physical[name].detach().cpu().numpy() for name in names], axis=1
+    ).astype(np.float64)
 
     meta = {
         "format": "dpl_checkpoint",

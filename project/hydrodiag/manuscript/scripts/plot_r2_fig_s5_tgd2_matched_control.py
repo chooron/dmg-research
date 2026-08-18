@@ -20,17 +20,19 @@ Visual grammar matches F3/F4 (r1_plot_style):
 Output: manuscript/supplement/figures/Fig_S5_R2_tgd2_parameter_matched_control.png
 (+ vector PDF), 600 DPI, manuscript convention.
 """
+
 from __future__ import annotations
 
 import sys
 from pathlib import Path
 
+import matplotlib
 import numpy as np
 import pandas as pd
-import matplotlib
+
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
+import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 
 HERE = Path(__file__).resolve().parent
@@ -40,7 +42,8 @@ if str(PLOTS_DIR) not in sys.path:
 
 from r1_plot_style import (  # noqa: E402
     MODEL_COLORS,
-    setup_publication_style, apply_clean_spines,
+    apply_clean_spines,
+    setup_publication_style,
 )
 
 MANUSCRIPT = HERE.parent
@@ -51,24 +54,47 @@ OUT_NAME = "Fig_S5_R2_tgd2_parameter_matched_control"
 
 # Canonical parameter order and labels, identical to Figure 4 (panel a).
 PARAM_ORDER = [
-    "xaj_k", "xaj_b", "xaj_im", "xaj_um", "xaj_lm", "xaj_dm", "xaj_c",
-    "xaj_sm", "xaj_ex", "xaj_ki", "xaj_kg", "xaj_ci", "xaj_cg", "xaj_a",
+    "xaj_k",
+    "xaj_b",
+    "xaj_im",
+    "xaj_um",
+    "xaj_lm",
+    "xaj_dm",
+    "xaj_c",
+    "xaj_sm",
+    "xaj_ex",
+    "xaj_ki",
+    "xaj_kg",
+    "xaj_ci",
+    "xaj_cg",
+    "xaj_a",
     "xaj_theta",
 ]
 DISPLAY = {
-    "xaj_k": "k", "xaj_b": "b", "xaj_im": "im", "xaj_um": "um",
-    "xaj_lm": "lm", "xaj_dm": "dm", "xaj_c": "c", "xaj_sm": "sm",
-    "xaj_ex": "ex", "xaj_ki": "ki", "xaj_kg": "kg", "xaj_ci": "ci",
-    "xaj_cg": "cg", "xaj_a": "a", "xaj_theta": "\u03b8",
+    "xaj_k": "k",
+    "xaj_b": "b",
+    "xaj_im": "im",
+    "xaj_um": "um",
+    "xaj_lm": "lm",
+    "xaj_dm": "dm",
+    "xaj_c": "c",
+    "xaj_sm": "sm",
+    "xaj_ex": "ex",
+    "xaj_ki": "ki",
+    "xaj_kg": "kg",
+    "xaj_ci": "ci",
+    "xaj_cg": "cg",
+    "xaj_a": "a",
+    "xaj_theta": "\u03b8",
 }
 
 CN_PRIMARY = "Base-CN"
 CN_TGD2 = "Base-TGD2"
 
-COLOR_BETWEEN = MODEL_COLORS["CN"]   # #0077BB  Base-CN
-COLOR_TGD2 = MODEL_COLORS["TGD"]     # #009988  Base-TGD2
+COLOR_BETWEEN = MODEL_COLORS["CN"]  # #0077BB  Base-CN
+COLOR_TGD2 = MODEL_COLORS["TGD"]  # #009988  Base-TGD2
 COLOR_REF = "#999999"
-DY = 0.22                             # sub-row offset between the two contrasts
+DY = 0.22  # sub-row offset between the two contrasts
 
 
 def load_gradients() -> dict:
@@ -96,11 +122,22 @@ def draw_facet(ax, gradients, paradigm):
         ]:
             beta, lo, hi = gradient_map(gradients[contrast], paradigm, p)
             yy = y + sgn * DY
-            ax.errorbar(beta, yy, xerr=[[beta - lo], [hi - beta]],
-                        fmt=style["mk"], color=style["color"], ecolor=style["color"],
-                        elinewidth=1.1, capsize=2.2, capthick=0.9, markersize=4.6,
-                        markerfacecolor=style["color"], markeredgecolor="none",
-                        linestyle="none", zorder=3)
+            ax.errorbar(
+                beta,
+                yy,
+                xerr=[[beta - lo], [hi - beta]],
+                fmt=style["mk"],
+                color=style["color"],
+                ecolor=style["color"],
+                elinewidth=1.1,
+                capsize=2.2,
+                capthick=0.9,
+                markersize=4.6,
+                markerfacecolor=style["color"],
+                markeredgecolor="none",
+                linestyle="none",
+                zorder=3,
+            )
     ax.set_yticks(y_pos)
     ax.set_yticklabels([DISPLAY[p] for p in PARAM_ORDER], fontsize=7.5)
     ax.set_ylim(-0.75, len(PARAM_ORDER) - 0.25)
@@ -111,18 +148,34 @@ def draw_facet(ax, gradients, paradigm):
 def build_figure(gradients) -> None:
     setup_publication_style()
     fig = plt.figure(figsize=(7.2, 5.6))
-    gs = gridspec.GridSpec(2, 1, height_ratios=[1.0, 1.0], hspace=0.32,
-                           left=0.10, right=0.97, top=0.94, bottom=0.10)
+    gs = gridspec.GridSpec(
+        2,
+        1,
+        height_ratios=[1.0, 1.0],
+        hspace=0.32,
+        left=0.10,
+        right=0.97,
+        top=0.94,
+        bottom=0.10,
+    )
     ax_ic = fig.add_subplot(gs[0, 0])
     ax_dpl = fig.add_subplot(gs[1, 0])
     apply_clean_spines(ax_ic)
     apply_clean_spines(ax_dpl)
 
     # Shared x-axis limits across the two facets (union of both contrasts).
-    lo_all = min(gradient_map(gradients[c], par_, p_)[1]
-                 for c in (CN_PRIMARY, CN_TGD2) for par_ in ("IC", "dPL") for p_ in PARAM_ORDER)
-    hi_all = max(gradient_map(gradients[c], par_, p_)[2]
-                 for c in (CN_PRIMARY, CN_TGD2) for par_ in ("IC", "dPL") for p_ in PARAM_ORDER)
+    lo_all = min(
+        gradient_map(gradients[c], par_, p_)[1]
+        for c in (CN_PRIMARY, CN_TGD2)
+        for par_ in ("IC", "dPL")
+        for p_ in PARAM_ORDER
+    )
+    hi_all = max(
+        gradient_map(gradients[c], par_, p_)[2]
+        for c in (CN_PRIMARY, CN_TGD2)
+        for par_ in ("IC", "dPL")
+        for p_ in PARAM_ORDER
+    )
     pad = max(0.05, (hi_all - lo_all) * 0.06)
     xlim = (lo_all - pad, hi_all + pad)
 
@@ -136,13 +189,35 @@ def build_figure(gradients) -> None:
     ax_dpl.set_title("dPL regime", loc="left", fontsize=8.5, fontweight="bold", pad=5)
 
     handles = [
-        Line2D([0], [0], marker="s", color=COLOR_BETWEEN, markerfacecolor=COLOR_BETWEEN,
-               markersize=5.2, linestyle="none", label="Base\u2013CN"),
-        Line2D([0], [0], marker="^", color=COLOR_TGD2, markerfacecolor=COLOR_TGD2,
-               markersize=5.2, linestyle="none", label="Base\u2013TGD2"),
+        Line2D(
+            [0],
+            [0],
+            marker="s",
+            color=COLOR_BETWEEN,
+            markerfacecolor=COLOR_BETWEEN,
+            markersize=5.2,
+            linestyle="none",
+            label="Base\u2013CN",
+        ),
+        Line2D(
+            [0],
+            [0],
+            marker="^",
+            color=COLOR_TGD2,
+            markerfacecolor=COLOR_TGD2,
+            markersize=5.2,
+            linestyle="none",
+            label="Base\u2013TGD2",
+        ),
     ]
-    ax_ic.legend(handles=handles, loc="lower right", frameon=True, framealpha=0.90,
-                 edgecolor="none", fontsize=7.0)
+    ax_ic.legend(
+        handles=handles,
+        loc="lower right",
+        frameon=True,
+        framealpha=0.90,
+        edgecolor="none",
+        fontsize=7.0,
+    )
 
     SUPP_FIG_DIR.mkdir(parents=True, exist_ok=True)
     fig.savefig(SUPP_FIG_DIR / f"{OUT_NAME}.png", dpi=600)

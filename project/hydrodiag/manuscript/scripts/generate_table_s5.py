@@ -23,8 +23,9 @@ One near-boundary threshold (|Delta z| >= 0.95) is used, matching the F4 audit's
 primary near-boundary criterion; no alternative thresholds are stacked.
 """
 
-import pandas as pd
 from pathlib import Path
+
+import pandas as pd
 
 HERE = Path(__file__).resolve().parent
 MANUSCRIPT = HERE.parent
@@ -60,24 +61,53 @@ def rows(raw, bm, kde):
     for p in PARAMS:
         for paradigm in ["IC", "dPL"]:
             for regime in REGIMES:
-                r = raw[(raw["parameter"] == p) & (raw["paradigm"] == paradigm)
-                        & (raw["regime"] == regime)]
-                b = bm[(bm["parameter"] == p) & (bm["paradigm"] == paradigm)
-                       & (bm["regime"] == regime)]
-                k = kde[(kde["parameter"] == p) & (kde["paradigm"] == paradigm)
-                        & (kde["regime"] == regime)]
-                assert len(r) == len(b) == len(k) == 1, f"missing {p} {paradigm} {regime}"
+                r = raw[
+                    (raw["parameter"] == p)
+                    & (raw["paradigm"] == paradigm)
+                    & (raw["regime"] == regime)
+                ]
+                b = bm[
+                    (bm["parameter"] == p)
+                    & (bm["paradigm"] == paradigm)
+                    & (bm["regime"] == regime)
+                ]
+                k = kde[
+                    (kde["parameter"] == p)
+                    & (kde["paradigm"] == paradigm)
+                    & (kde["regime"] == regime)
+                ]
+                assert len(r) == len(b) == len(k) == 1, (
+                    f"missing {p} {paradigm} {regime}"
+                )
                 r, b, k = r.iloc[0], b.iloc[0], k.iloc[0]
                 n = int(b["n"])
                 frac_zero = float(r["pct_zero"]) / 100.0
-                frac_exact1 = (float(b["n_exact_plus1"]) + float(b["n_exact_minus1"])) / n
+                frac_exact1 = (
+                    float(b["n_exact_plus1"]) + float(b["n_exact_minus1"])
+                ) / n
                 frac_near = float(k["frac_absdz_ge_095"])
-                md_rows.append({
-                    "Parameter": DISPLAY[p], "Regime": paradigm, "Snow": REGIME_LABELS[regime],
-                    "n": n, "zero": fmt(frac_zero), "exact1": fmt(frac_exact1),
-                    "near": fmt(frac_near)})
-                tex_rows.append([DISPLAY[p], paradigm, REGIME_LABELS[regime], str(n),
-                                 fmt(frac_zero), fmt(frac_exact1), fmt(frac_near)])
+                md_rows.append(
+                    {
+                        "Parameter": DISPLAY[p],
+                        "Regime": paradigm,
+                        "Snow": REGIME_LABELS[regime],
+                        "n": n,
+                        "zero": fmt(frac_zero),
+                        "exact1": fmt(frac_exact1),
+                        "near": fmt(frac_near),
+                    }
+                )
+                tex_rows.append(
+                    [
+                        DISPLAY[p],
+                        paradigm,
+                        REGIME_LABELS[regime],
+                        str(n),
+                        fmt(frac_zero),
+                        fmt(frac_exact1),
+                        fmt(frac_near),
+                    ]
+                )
     return md_rows, tex_rows
 
 
@@ -91,8 +121,10 @@ def main():
 | :--- | :--- | :--- | :---: | :---: | :---: | :---: |
 """
     for r in md_rows:
-        md += (f"| {r['Parameter']} | {r['Regime']} | {r['Snow']} | {r['n']} | "
-               f"{r['zero']} | {r['exact1']} | {r['near']} |\n")
+        md += (
+            f"| {r['Parameter']} | {r['Regime']} | {r['Snow']} | {r['n']} | "
+            f"{r['zero']} | {r['exact1']} | {r['near']} |\n"
+        )
 
     md += """
 *Note*: The paired shift is $\\Delta z = z_{\\mathrm{Base}} - z_{\\mathrm{CN}}$
@@ -108,7 +140,8 @@ primary threshold.
 
     body = "\n".join(" & ".join(r) + " \\\\" for r in tex_rows)
 
-    tex = r"""\begin{table}[t]
+    tex = (
+        r"""\begin{table}[t]
 \centering
 \caption{Boundary and point-mass characteristics of the parameters highlighted in Figure 4 ($u_m$, $k_i$, $c_i$) by snow regime and parameter-constraint regime, based on the canonical paired shift $\Delta z = z_{\mathrm{Base}} - z_{\mathrm{CN}}$. Snow regimes S1--S5 are the fixed strata by basin snow fraction: S1 $[0, 0.05)$ ($n=165$), S2 $[0.05, 0.15)$ ($n=156$), S3 $[0.15, 0.30)$ ($n=121$), S4 $[0.30, 0.50)$ ($n=34$), S5 $[0.50, 1.00]$ ($n=55$). Fractions are basin counts over the regime sample size $n$: exact $\Delta z = 0$ (point mass), exact $|\Delta z| = 1$ (opposite-bound co-location; IC only, because dPL reconstructed values are strictly interior), and near-boundary $|\Delta z| \ge 0.95$ at the audit's primary threshold.}
 \label{tab:tables5_boundary_point_mass}
@@ -117,7 +150,9 @@ primary threshold.
 \toprule
 Parameter & Regime & Snow regime & $n$ & $\Delta z = 0$ & $|\Delta z| = 1$ & $|\Delta z| \ge 0.95$ \\
 \midrule
-""" + body + r"""
+"""
+        + body
+        + r"""
 \bottomrule
 \end{tabular}
 \begin{tablenotes}[flushleft]
@@ -127,6 +162,7 @@ Parameter & Regime & Snow regime & $n$ & $\Delta z = 0$ & $|\Delta z| = 1$ & $|\
 \end{threeparttable}
 \end{table}
 """
+    )
 
     for d in OUT_DIRS:
         d.mkdir(parents=True, exist_ok=True)

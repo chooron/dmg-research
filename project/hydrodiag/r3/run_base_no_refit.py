@@ -60,7 +60,9 @@ def main() -> None:
     parser.add_argument("--results-root", type=Path, default=DEFAULT_RESULTS_ROOT)
     parser.add_argument("--truth-run-id", default="r3_synthetic_truth_v1")
     parser.add_argument("--run-id", default="r3_base_no_refit_v1")
-    parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
+    parser.add_argument(
+        "--device", default="cuda" if torch.cuda.is_available() else "cpu"
+    )
     parser.add_argument("--batch-basins", type=int, default=64)
     args = parser.parse_args()
 
@@ -115,12 +117,12 @@ def main() -> None:
     for b, basin in enumerate(bundle.basin_ids):
         row = {"basin_id": basin}
         for period, (si, ei) in (("train", pi["train"]), ("test", pi["test"])):
-            sim = q_full[b, si:ei + 1]
-            obs = q_star[b, si:ei + 1]
+            sim = q_full[b, si : ei + 1]
+            obs = q_star[b, si : ei + 1]
             row[f"kge_{period}"] = standard_kge(sim, obs)
             row[f"nse_{period}"] = nse(sim, obs)
             row[f"pbias_{period}"] = pbias(sim, obs)
-            sig = water_year_errors(dates[si:ei + 1], sim, obs)
+            sig = water_year_errors(dates[si : ei + 1], sim, obs)
             row[f"ct_error_abs_{period}"] = sig["ct_error_absolute"]
             row[f"amjj_error_abs_{period}"] = sig["amjj_error_absolute"]
         rows.append(row)
@@ -157,11 +159,15 @@ def main() -> None:
         },
         "snow_relationship": {
             "spearman_kge_train_vs_frac_snow": float(
-                df[["kge_train", "frac_snow"]].dropna().corr(method="spearman")
+                df[["kge_train", "frac_snow"]]
+                .dropna()
+                .corr(method="spearman")
                 .iloc[0, 1]
             ),
             "spearman_ct_error_train_vs_frac_snow": float(
-                df[["ct_error_abs_train", "frac_snow"]].dropna().corr(method="spearman")
+                df[["ct_error_abs_train", "frac_snow"]]
+                .dropna()
+                .corr(method="spearman")
                 .iloc[0, 1]
             ),
             "note": "descriptive only; frac_snow is an environmental diagnostic axis",

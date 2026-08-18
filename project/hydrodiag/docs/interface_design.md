@@ -98,7 +98,9 @@ for iteration in range(max_iter):
 ### dPL (Differentiable Parameter Learning)
 
 ```python
-params = nn.ParameterDict({name: nn.Parameter(val) for name, val in init_params.items()})
+params = nn.ParameterDict(
+    {name: nn.Parameter(val) for name, val in init_params.items()}
+)
 optimizer = torch.optim.Adam(params.parameters())
 
 for epoch in range(epochs):

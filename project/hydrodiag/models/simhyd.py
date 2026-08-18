@@ -19,7 +19,6 @@ from .parameter_specs import SIMHYD_PARAM_SPECS
 from .utils import validate_forcings, validate_params
 from .xaj import _apply_uh_routing, _gamma_uh_ordinates
 
-
 SIMHYD_UH_MAX_LEN = 15
 SIMHYD_MIN_INSC = 1e-6
 SIMHYD_MIN_COEFF = 1e-6
@@ -135,8 +134,20 @@ def _simhyd_step(
 ) -> tuple[torch.Tensor, ...]:
     """Historical SIMHYD step including diagnostic outputs."""
     return _simhyd_step_impl(
-        precip_t, pet_t, soil, groundwater, insc, coeff, sq, smsc,
-        sub, crak, k, etmul, nearzero, True,
+        precip_t,
+        pet_t,
+        soil,
+        groundwater,
+        insc,
+        coeff,
+        sq,
+        smsc,
+        sub,
+        crak,
+        k,
+        etmul,
+        nearzero,
+        True,
     )
 
 
@@ -157,8 +168,20 @@ def _simhyd_step_compact(
 ) -> tuple[torch.Tensor, ...]:
     """Lean SIMHYD step returning only runoff and recursive states."""
     return _simhyd_step_impl(
-        precip_t, pet_t, soil, groundwater, insc, coeff, sq, smsc,
-        sub, crak, k, etmul, nearzero, False,
+        precip_t,
+        pet_t,
+        soil,
+        groundwater,
+        insc,
+        coeff,
+        sq,
+        smsc,
+        sub,
+        crak,
+        k,
+        etmul,
+        nearzero,
+        False,
     )
 
 
@@ -169,9 +192,7 @@ def _routing_pending(
     """Return water still queued in a causal finite gamma UH."""
     # Buffer order is oldest -> newest.  Its pending fractions are therefore
     # [w[-1], w[-2:].sum(), ..., w[1:].sum()].
-    pending_fractions = torch.cumsum(
-        torch.flip(uh_ordinates[:, 1:], dims=[-1]), dim=-1
-    )
+    pending_fractions = torch.cumsum(torch.flip(uh_ordinates[:, 1:], dims=[-1]), dim=-1)
     return (runoff_buffer * pending_fractions).sum(dim=-1)
 
 
@@ -194,8 +215,8 @@ def _route_simhyd_runoff(
     runoff_with_history = torch.cat((runoff_uh_buffer, runoff_instant), dim=1)
     routed_all = _apply_uh_routing(runoff_with_history, uh_ordinates)
     start = SIMHYD_UH_MAX_LEN - 1
-    qsim = routed_all[:, start:start + runoff_instant.shape[1]]
-    next_buffer = runoff_with_history[:, -(SIMHYD_UH_MAX_LEN - 1):]
+    qsim = routed_all[:, start : start + runoff_instant.shape[1]]
+    next_buffer = runoff_with_history[:, -(SIMHYD_UH_MAX_LEN - 1) :]
     routing_storage = _routing_pending(next_buffer, uh_ordinates)
     return qsim, next_buffer, uh_ordinates, routing_storage
 
@@ -239,8 +260,14 @@ class SIMHYD(BaseHydrologicalModel):
 
         if self.compact_output and not return_states:
             return self._forward_lite(
-                precip, pet, params, soil, groundwater,
-                runoff_uh_buffer, device, dtype,
+                precip,
+                pet,
+                params,
+                soil,
+                groundwater,
+                runoff_uh_buffer,
+                device,
+                dtype,
             )
         else:
             runoff_instant = torch.zeros(batch, nsteps, device=device, dtype=dtype)
@@ -258,15 +285,28 @@ class SIMHYD(BaseHydrologicalModel):
             precip_t = precip[:, t].contiguous()
             pet_t = pet[:, t].contiguous()
             (
-                runoff_instant[:, t], evap[:, t], soil, groundwater,
-                interception[:, t], direct_runoff[:, t], interflow[:, t],
-                recharge[:, t], baseflow[:, t],
+                runoff_instant[:, t],
+                evap[:, t],
+                soil,
+                groundwater,
+                interception[:, t],
+                direct_runoff[:, t],
+                interflow[:, t],
+                recharge[:, t],
+                baseflow[:, t],
             ) = self._step(
-                precip_t, pet_t, soil, groundwater,
-                params["simhyd_insc"], params["simhyd_coeff"],
-                params["simhyd_sq"], params["simhyd_smsc"],
-                params["simhyd_sub"], params["simhyd_crak"],
-                params["simhyd_k"], params["simhyd_etmul"],
+                precip_t,
+                pet_t,
+                soil,
+                groundwater,
+                params["simhyd_insc"],
+                params["simhyd_coeff"],
+                params["simhyd_sq"],
+                params["simhyd_smsc"],
+                params["simhyd_sub"],
+                params["simhyd_crak"],
+                params["simhyd_k"],
+                params["simhyd_etmul"],
                 self.nearzero,
             )
 
@@ -319,18 +359,29 @@ class SIMHYD(BaseHydrologicalModel):
             precip_t = precip[:, t].contiguous()
             pet_t = pet[:, t].contiguous()
             runoff_t, soil, groundwater = self._compact_step(
-                precip_t, pet_t, soil, groundwater,
-                params["simhyd_insc"], params["simhyd_coeff"],
-                params["simhyd_sq"], params["simhyd_smsc"],
-                params["simhyd_sub"], params["simhyd_crak"],
-                params["simhyd_k"], params["simhyd_etmul"],
+                precip_t,
+                pet_t,
+                soil,
+                groundwater,
+                params["simhyd_insc"],
+                params["simhyd_coeff"],
+                params["simhyd_sq"],
+                params["simhyd_smsc"],
+                params["simhyd_sub"],
+                params["simhyd_crak"],
+                params["simhyd_k"],
+                params["simhyd_etmul"],
                 self.nearzero,
             )
             runoff_values.append(runoff_t)
         runoff_instant = torch.stack(runoff_values, dim=1)
         qsim, _runoff_uh_buffer, _uh_ordinates, _routing_storage = _route_simhyd_runoff(
-            runoff_instant, runoff_uh_buffer,
-            params["simhyd_a"], params["simhyd_theta"], device, dtype,
+            runoff_instant,
+            runoff_uh_buffer,
+            params["simhyd_a"],
+            params["simhyd_theta"],
+            device,
+            dtype,
         )
         return qsim, {}
 
@@ -354,9 +405,7 @@ class SIMHYD(BaseHydrologicalModel):
             ),
             initial_states.get(
                 "runoff_uh_buffer",
-                torch.zeros(
-                    batch, SIMHYD_UH_MAX_LEN - 1, device=device, dtype=dtype
-                ),
+                torch.zeros(batch, SIMHYD_UH_MAX_LEN - 1, device=device, dtype=dtype),
             ),
         )
 

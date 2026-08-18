@@ -10,7 +10,6 @@ from .base import BaseHydrologicalModel
 from .parameter_specs import PRECIP_DELAY_PARAM_SPECS
 from .utils import validate_forcings, validate_params
 
-
 PRECIP_DELAY_MIN_TAU = 1e-6
 
 

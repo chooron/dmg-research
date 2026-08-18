@@ -8,7 +8,11 @@ import torch
 
 from .base import BaseHydrologicalModel
 from .gr4j import GR4J, GR4JLite
-from .parameter_specs import GR4J_PD_PARAM_SPECS, SIMHYD_PD_PARAM_SPECS, XAJ_PD_PARAM_SPECS
+from .parameter_specs import (
+    GR4J_PD_PARAM_SPECS,
+    SIMHYD_PD_PARAM_SPECS,
+    XAJ_PD_PARAM_SPECS,
+)
 from .precip_delay import PrecipitationDelay
 from .simhyd import SIMHYD, SIMHYDLite
 from .utils import validate_forcings, validate_params
@@ -32,8 +36,9 @@ class _WithPrecipitationDelay(BaseHydrologicalModel):
                 delay_params[key] = value
             elif key.startswith(self.runoff_prefix):
                 runoff_params[
-                    key[len(self.runoff_prefix):]
-                    if self.strip_runoff_param_prefix else key
+                    key[len(self.runoff_prefix) :]
+                    if self.strip_runoff_param_prefix
+                    else key
                 ] = value
         return delay_params, runoff_params
 
@@ -44,12 +49,12 @@ class _WithPrecipitationDelay(BaseHydrologicalModel):
         if initial_states is None:
             return None, None
         delay_initial = {
-            key[len(self.delay_prefix):]: value
+            key[len(self.delay_prefix) :]: value
             for key, value in initial_states.items()
             if key.startswith(self.delay_prefix)
         }
         runoff_initial = {
-            key[len(self.runoff_prefix):]: value
+            key[len(self.runoff_prefix) :]: value
             for key, value in initial_states.items()
             if key.startswith(self.runoff_prefix)
         }
@@ -86,7 +91,9 @@ class _WithPrecipitationDelay(BaseHydrologicalModel):
             return qsim, {}
 
         aux = {key: value for key, value in delay_aux.items() if key != "final_states"}
-        aux.update({key: value for key, value in runoff_aux.items() if key != "final_states"})
+        aux.update(
+            {key: value for key, value in runoff_aux.items() if key != "final_states"}
+        )
         aux["effective_precip"] = effective_precip
         if return_states:
             aux["final_states"] = {

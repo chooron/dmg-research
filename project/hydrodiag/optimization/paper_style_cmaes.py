@@ -19,7 +19,6 @@ from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
 import torch
-
 from evotorch import Problem
 from evotorch.algorithms import CMAES
 
@@ -111,7 +110,9 @@ def extract_cmaes_distribution_state(searcher: CMAES) -> Dict[str, Any]:
 
     max_coordinate_std = None
     if sigma is not None and C_diag is not None:
-        coord_std = sigma * np.sqrt(np.maximum(C_diag.cpu().numpy().astype(np.float64), 0.0))
+        coord_std = sigma * np.sqrt(
+            np.maximum(C_diag.cpu().numpy().astype(np.float64), 0.0)
+        )
         max_coordinate_std = float(np.max(coord_std))
 
     return {
@@ -149,7 +150,9 @@ class CMAESConfig:
         if self.n_dim <= 0:
             raise ValueError(f"n_dim must be positive, got {self.n_dim}")
         if self.min_generations < 0:
-            raise ValueError(f"min_generations must be >= 0, got {self.min_generations}")
+            raise ValueError(
+                f"min_generations must be >= 0, got {self.min_generations}"
+            )
         if self.max_generations < self.min_generations:
             raise ValueError(
                 f"max_generations ({self.max_generations}) < min_generations ({self.min_generations})"
@@ -221,7 +224,9 @@ class PaperStyleCMAESStopper:
         hist_range = float(max(recent) - min(recent))
         return hist_range <= self.config.tol_hist_fun, hist_range
 
-    def check_tol_x(self, max_coordinate_std: Optional[float]) -> Tuple[bool, Optional[float]]:
+    def check_tol_x(
+        self, max_coordinate_std: Optional[float]
+    ) -> Tuple[bool, Optional[float]]:
         """Check if the maximum coordinate-wise standard deviation
         is within tol_x.
         """
@@ -409,7 +414,7 @@ def run_cmaes_with_early_stopping(
             )
 
         # Determine stop
-        invalid_fitness = (n_invalid == len(pop_evals_np))
+        invalid_fitness = n_invalid == len(pop_evals_np)
         evotorch_terminated = bool(searcher.is_terminated)
 
         primary, all_trig = _determine_stop_reasons(
@@ -440,14 +445,18 @@ def run_cmaes_with_early_stopping(
 
     # Fill in best solution if none found (edge case)
     if best_overall_solution_norm is None:
-        best_overall_solution_norm = searcher.population.values.detach().cpu().numpy()[0].copy()
-        best_overall_eval = float(searcher.population.evals.detach().cpu().numpy().flatten()[0])
+        best_overall_solution_norm = (
+            searcher.population.values.detach().cpu().numpy()[0].copy()
+        )
+        best_overall_eval = float(
+            searcher.population.evals.detach().cpu().numpy().flatten()[0]
+        )
 
     # Physical-scale mapping
     best_solution_physical = None
     if lower_bounds is not None and upper_bounds is not None:
-        best_solution_physical = (
-            lower_bounds + best_overall_solution_norm * (upper_bounds - lower_bounds)
+        best_solution_physical = lower_bounds + best_overall_solution_norm * (
+            upper_bounds - lower_bounds
         )
 
     # Compute final diagnostics
@@ -461,8 +470,9 @@ def run_cmaes_with_early_stopping(
         final_hist_range = last_rec.history_eval_range
         final_max_std = last_rec.max_coordinate_std
 
-    total_evals = (config.population_size * len(generation_history)
-                   if generation_history else 0)
+    total_evals = (
+        config.population_size * len(generation_history) if generation_history else 0
+    )
 
     return CMAESRunResult(
         best_solution_normalized=best_overall_solution_norm,

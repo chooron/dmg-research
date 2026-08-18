@@ -64,8 +64,11 @@ def _utcnow() -> str:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--stage", choices=["cn-ic", "cn-dpl", "comp-ic", "comp-dpl", "all"],
-                        default="all")
+    parser.add_argument(
+        "--stage",
+        choices=["cn-ic", "cn-dpl", "comp-ic", "comp-dpl", "all"],
+        default="all",
+    )
     parser.add_argument("--project-root", type=Path, default=DEFAULT_PROJECT_ROOT)
     parser.add_argument("--data-root", type=Path, default=DEFAULT_DATA_ROOT)
     parser.add_argument("--results-root", type=Path, default=DEFAULT_RESULTS_ROOT)
@@ -80,31 +83,47 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.n_basins < 3 or args.n_basins % 3 != 0:
-        parser.error("--n-basins must be a positive multiple of 3 (tercile stratification)")
+        parser.error(
+            "--n-basins must be a positive multiple of 3 (tercile stratification)"
+        )
     per_tercile = args.n_basins // 3
     truth_dir = args.results_root / args.truth_run_id
     if not (truth_dir / "q_star.npz").exists():
-        parser.error(f"truth run not found: {truth_dir}/q_star.npz (run generate_truth.py first)")
+        parser.error(
+            f"truth run not found: {truth_dir}/q_star.npz (run generate_truth.py first)"
+        )
 
     bundle, _config = load_bundle(args.project_root, args.data_root)
     snow = frac_snow_series(bundle)
     frac_map = dict(zip(snow["basin_id"], snow["frac_snow"]))
-    pilot = pilot_basin_subset(bundle.basin_ids,
-                               np.asarray([frac_map[b] for b in bundle.basin_ids]),
-                               per_tercile=per_tercile)
+    pilot = pilot_basin_subset(
+        bundle.basin_ids,
+        np.asarray([frac_map[b] for b in bundle.basin_ids]),
+        per_tercile=per_tercile,
+    )
     if len(pilot) != args.n_basins:
-        raise RuntimeError(f"pilot subset size mismatch: {len(pilot)} != {args.n_basins}")
+        raise RuntimeError(
+            f"pilot subset size mismatch: {len(pilot)} != {args.n_basins}"
+        )
 
     run_dir = args.results_root / args.run_id
     configs_dir = run_dir / "configs"
     configs_dir.mkdir(parents=True, exist_ok=True)
     order_file = configs_dir / "pilot_basin_order_531.json"
-    order_file.write_text(json.dumps(reordered_531_list(bundle.basin_ids, pilot), indent=1) + "\n")
+    order_file.write_text(
+        json.dumps(reordered_531_list(bundle.basin_ids, pilot), indent=1) + "\n"
+    )
     (configs_dir / "pilot_basins.json").write_text(
-        json.dumps({"basin_ids": pilot,
-                    "frac_snow": {b: frac_map[b] for b in pilot},
-                    "selection": "deterministic tercile-stratified spread; engineering gate only"},
-                   indent=2) + "\n")
+        json.dumps(
+            {
+                "basin_ids": pilot,
+                "frac_snow": {b: frac_map[b] for b in pilot},
+                "selection": "deterministic tercile-stratified spread; engineering gate only",
+            },
+            indent=2,
+        )
+        + "\n"
+    )
 
     q_star_path = truth_dir / "q_star.npz"
     manifest = {
@@ -114,13 +133,18 @@ def main() -> None:
         "truth_run_id": args.truth_run_id,
         "pilot_basins": pilot,
         "per_tercile": per_tercile,
-        "ic_defaults": {"starts": args.ic_starts, "generations": args.ic_generations,
-                        "objective": "KGE(Q*), maximize, train only",
-                        "population_rule": "max(12, round(25*dimension/17))"},
-        "dpl_defaults": {"seeds": list(args.dpl_seeds),
-                         "network": "35->256->256->256->n_params",
-                         "epochs": "config default (100)",
-                         "sampling": "balanced_valid_kge_windows"},
+        "ic_defaults": {
+            "starts": args.ic_starts,
+            "generations": args.ic_generations,
+            "objective": "KGE(Q*), maximize, train only",
+            "population_rule": "max(12, round(25*dimension/17))",
+        },
+        "dpl_defaults": {
+            "seeds": list(args.dpl_seeds),
+            "network": "35->256->256->256->n_params",
+            "epochs": "config default (100)",
+            "sampling": "balanced_valid_kge_windows",
+        },
         "stages": {},
         "engineering_only": True,
         "engineering_only_note": (
@@ -143,14 +167,26 @@ def main() -> None:
     for model in ic_models:
         output = args.results_root / f"{args.run_id}_ic_{model.lower()}"
         command = [
-            sys.executable, str(PROJECT / "training/ic/run_tgd2_batched_cmaes_531.py"),
-            "--model", model, "--output", str(output),
-            "--starts", str(args.ic_starts), "--generations", str(args.ic_generations),
-            "--basin-ids", ",".join(pilot), "--target-npz", str(q_star_path),
-            "--device", args.device,
+            sys.executable,
+            str(PROJECT / "training/ic/run_tgd2_batched_cmaes_531.py"),
+            "--model",
+            model,
+            "--output",
+            str(output),
+            "--starts",
+            str(args.ic_starts),
+            "--generations",
+            str(args.ic_generations),
+            "--basin-ids",
+            ",".join(pilot),
+            "--target-npz",
+            str(q_star_path),
+            "--device",
+            args.device,
         ]
         manifest["stages"][f"ic:{model}"] = {
-            "command": " ".join(command), "output": str(output),
+            "command": " ".join(command),
+            "output": str(output),
             "checkpoint": str(output / "checkpoints" / f"{model.lower()}_batched.pt"),
         }
         print("COMMAND:", " ".join(command), flush=True)
@@ -162,7 +198,9 @@ def main() -> None:
             config = json.loads(
                 (PROJECT / "training/dpl/base_config_camels_531.json").read_text()
             )
-            config["output_dir"] = str(args.results_root / f"{args.run_id}_dpl_{model.lower()}_seed_{seed}")
+            config["output_dir"] = str(
+                args.results_root / f"{args.run_id}_dpl_{model.lower()}_seed_{seed}"
+            )
             config["data_basin_ids"] = str(order_file)
             config["target_override_npz"] = str(q_star_path)
             config["_protocol"] = "r3_pilot_v1_dpl_synthetic_target"
@@ -174,12 +212,21 @@ def main() -> None:
             config_path = configs_dir / f"dpl_{model.lower()}_seed_{seed}.json"
             config_path.write_text(json.dumps(config, indent=2) + "\n")
             command = [
-                sys.executable, str(PROJECT / "training/dpl/run_dpl_model.py"),
-                "--config", str(config_path), "--model", model, "--lite",
-                "--max-basins", str(args.n_basins), "--seed", str(seed),
+                sys.executable,
+                str(PROJECT / "training/dpl/run_dpl_model.py"),
+                "--config",
+                str(config_path),
+                "--model",
+                model,
+                "--lite",
+                "--max-basins",
+                str(args.n_basins),
+                "--seed",
+                str(seed),
             ]
             manifest["stages"][f"dpl:{model}:{seed}"] = {
-                "command": " ".join(command), "config": str(config_path),
+                "command": " ".join(command),
+                "config": str(config_path),
                 "output_dir": config["output_dir"],
             }
             print("COMMAND:", " ".join(command), flush=True)

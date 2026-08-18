@@ -2,9 +2,10 @@ import glob
 import json
 import os
 import sys
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
-from pathlib import Path
 from scipy.stats import wilcoxon
 
 # Set paths
@@ -16,8 +17,13 @@ DPL_RESULTS_DIR = PROJECT_ROOT / "results" / "dpl_camels_531_lite_v2"
 
 SEEDS = [101, 202, 303, 404, 505]
 
+
 def load_531_basins():
-    for p in ["/autodl-fs/data/531sub_id.txt", str(PROJECT_ROOT.parent / "data" / "531sub_id.txt"), str(PROJECT_ROOT / "data" / "531sub_id.txt")]:
+    for p in [
+        "/autodl-fs/data/531sub_id.txt",
+        str(PROJECT_ROOT.parent / "data" / "531sub_id.txt"),
+        str(PROJECT_ROOT / "data" / "531sub_id.txt"),
+    ]:
         if os.path.exists(p):
             with open(p) as f:
                 text = f.read().strip()
@@ -27,24 +33,36 @@ def load_531_basins():
                     return [x.strip().zfill(8) for x in text.splitlines() if x.strip()]
     raise FileNotFoundError("Could not find 531sub_id.txt")
 
+
 def get_dpl_data(model_name):
     dfs = []
     for s in [42, 123, 2026]:
         p = DPL_RESULTS_DIR / model_name / f"seed_{s}" / "train_test_kge_by_basin.csv"
         if not p.exists():
-            p = SCRIPT_DIR.parent / "results" / "dpl_camels_531_lite_v2" / model_name / f"seed_{s}" / "train_test_kge_by_basin.csv"
+            p = (
+                SCRIPT_DIR.parent
+                / "results"
+                / "dpl_camels_531_lite_v2"
+                / model_name
+                / f"seed_{s}"
+                / "train_test_kge_by_basin.csv"
+            )
         df = pd.read_csv(p)
         df["basin_id"] = df["basin_id"].astype(str).str.zfill(8)
         dfs.append(df.set_index("basin_id"))
-    
+
     tr_med = pd.concat([d["train_kge"] for d in dfs], axis=1).median(axis=1)
     te_med = pd.concat([d["test_kge"] for d in dfs], axis=1).median(axis=1)
     return pd.DataFrame({"dpl_tr_med": tr_med, "dpl_te_med": te_med})
 
+
 def load_frac_snow(all_531):
     try:
         from ablation.ic_core.data_adapter import load_531_bundle
-        foundation_cfg_path = PROJECT_ROOT / "ablation" / "configs" / "ic_foundation_531_v1.json"
+
+        foundation_cfg_path = (
+            PROJECT_ROOT / "ablation" / "configs" / "ic_foundation_531_v1.json"
+        )
         with open(foundation_cfg_path) as f:
             cfg = json.load(f)
         cfg["device"] = "cpu"
@@ -57,10 +75,15 @@ def load_frac_snow(all_531):
         fs_array = bundle.attributes[:, 3]
         return {b: float(fs) for b, fs in zip(bundle.basin_ids, fs_array)}
     except Exception as e:
-        print(f"Warning: could not load frac_snow from bundle ({e}), attempting fallback...")
+        print(
+            f"Warning: could not load frac_snow from bundle ({e}), attempting fallback..."
+        )
         return {b: 0.0 for b in all_531}
 
-def load_optimizer_results(model_key, opt_name, all_531, seeds=SEEDS, starts_per_seed=3, cap_gen=200):
+
+def load_optimizer_results(
+    model_key, opt_name, all_531, seeds=SEEDS, starts_per_seed=3, cap_gen=200
+):
     model_dir = TASKS_DIR / model_key / opt_name
     records = {b: [] for b in all_531}
     seed101_records = {b: {} for b in all_531}
@@ -70,9 +93,17 @@ def load_optimizer_results(model_key, opt_name, all_531, seeds=SEEDS, starts_per
             for s in range(starts_per_seed):
                 rf = model_dir / b_id / f"seed_{seed}" / f"start_{s}" / "result.json"
                 tf = model_dir / b_id / f"seed_{seed}" / f"start_{s}" / "trace.json"
-                
+
                 if not rf.exists():
-                    alt_files = glob.glob(str(model_dir / b_id / f"seed_{seed}" / f"*start*{s}*" / "result.json"))
+                    alt_files = glob.glob(
+                        str(
+                            model_dir
+                            / b_id
+                            / f"seed_{seed}"
+                            / f"*start*{s}*"
+                            / "result.json"
+                        )
+                    )
                     if alt_files:
                         rf = Path(alt_files[0])
                         tf = rf.parent / "trace.json"
@@ -107,7 +138,7 @@ def load_optimizer_results(model_key, opt_name, all_531, seeds=SEEDS, starts_per
                             "test_kge": te_kge,
                             "theta": theta,
                             "total_gen": tot_gen,
-                            "plateau_gen": plateau_gen
+                            "plateau_gen": plateau_gen,
                         }
                         records[b_id].append(rec)
                         if seed == 101:
@@ -116,14 +147,19 @@ def load_optimizer_results(model_key, opt_name, all_531, seeds=SEEDS, starts_per
                         pass
     return records, seed101_records
 
+
 def analyze_model(model_key, cap_gen=200):
     all_531 = load_531_basins()
     frac_snow_map = load_frac_snow(all_531)
-    
+
     # Load CMA-ES results (5 seeds x 3 starts)
-    cmaes_all, cmaes_s101 = load_optimizer_results(model_key, "CMAES", all_531, seeds=SEEDS, starts_per_seed=3, cap_gen=cap_gen)
+    cmaes_all, cmaes_s101 = load_optimizer_results(
+        model_key, "CMAES", all_531, seeds=SEEDS, starts_per_seed=3, cap_gen=cap_gen
+    )
     # Load XNES results (seed 101, 3 starts)
-    xnes_all, xnes_s101 = load_optimizer_results(model_key, "XNES", all_531, seeds=[101], starts_per_seed=3, cap_gen=300)
+    xnes_all, xnes_s101 = load_optimizer_results(
+        model_key, "XNES", all_531, seeds=[101], starts_per_seed=3, cap_gen=300
+    )
 
     rows = []
     for b_id in all_531:
@@ -134,11 +170,27 @@ def analyze_model(model_key, cap_gen=200):
         c_tr_all = [r["train_kge"] for r in c_recs if r["train_kge"] is not None]
         c_te_all = [r["test_kge"] for r in c_recs if r["test_kge"] is not None]
 
-        c_tr_3 = [c_101[s]["train_kge"] for s in range(3) if s in c_101 and c_101[s]["train_kge"] is not None]
-        c_te_3 = [c_101[s]["test_kge"] for s in range(3) if s in c_101 and c_101[s]["test_kge"] is not None]
+        c_tr_3 = [
+            c_101[s]["train_kge"]
+            for s in range(3)
+            if s in c_101 and c_101[s]["train_kge"] is not None
+        ]
+        c_te_3 = [
+            c_101[s]["test_kge"]
+            for s in range(3)
+            if s in c_101 and c_101[s]["test_kge"] is not None
+        ]
 
-        x_tr_3 = [x_101[s]["train_kge"] for s in range(3) if s in x_101 and x_101[s]["train_kge"] is not None]
-        x_te_3 = [x_101[s]["test_kge"] for s in range(3) if s in x_101 and x_101[s]["test_kge"] is not None]
+        x_tr_3 = [
+            x_101[s]["train_kge"]
+            for s in range(3)
+            if s in x_101 and x_101[s]["train_kge"] is not None
+        ]
+        x_te_3 = [
+            x_101[s]["test_kge"]
+            for s in range(3)
+            if s in x_101 and x_101[s]["test_kge"] is not None
+        ]
 
         # Medians
         cma_tr_med3 = float(np.median(c_tr_3)) if len(c_tr_3) >= 3 else np.nan
@@ -182,16 +234,17 @@ def analyze_model(model_key, cap_gen=200):
             "xnes_spread3": xnes_spread3,
             "avg_plateau_gen": avg_plateau,
             "term_reason": term_reason,
-            "param_dist_mean": param_dist_mean
+            "param_dist_mean": param_dist_mean,
         }
         rows.append(row)
 
     df = pd.DataFrame(rows)
     return df
 
+
 def run_all_audits_and_comparisons():
     all_531 = load_531_basins()
-    
+
     print("=== Analyzing XAJ_base ===")
     df_xaj = analyze_model("XAJ", cap_gen=200)
     df_xaj.to_csv(OUTPUTS_DIR / "IC_XAJ_base_CMAES_531_results.csv", index=False)
@@ -223,25 +276,48 @@ def run_all_audits_and_comparisons():
         te_win = (diff_te > 0.0001).mean()
 
         stuck_basins = df[diff_tr > 0.05]
-        
-        print(f"--- {model_label} ---")
-        print(f"  Train KGE Paired Diff (CMAES - XNES): Median = {diff_tr.median():.4f} [IQR = {diff_tr.quantile(0.75)-diff_tr.quantile(0.25):.4f}]")
-        print(f"    Wilcoxon p = {w_tr_p:.2e} | Frac CMAES > XNES = {tr_win*100:.1f}% ({int(tr_win*len(df))}/{len(df)})")
-        print(f"  Test KGE Paired Diff (CMAES - XNES):  Median = {diff_te.median():.4f} [IQR = {diff_te.quantile(0.75)-diff_te.quantile(0.25):.4f}]")
-        print(f"    Wilcoxon p = {w_te_p:.2e} | Frac CMAES > XNES = {te_win*100:.1f}% ({int(te_win*len(df))}/{len(df)})")
-        print(f"  Stuck Basins under XNES (Train gain > 0.05): Count = {len(stuck_basins)} ({len(stuck_basins)/len(df)*100:.1f}%)")
-        if len(stuck_basins) > 0:
-            print(f"    Stuck basins frac_snow distribution: min={stuck_basins['frac_snow'].min():.3f}, med={stuck_basins['frac_snow'].median():.3f}, max={stuck_basins['frac_snow'].max():.3f}")
 
-        print(f"  Across-Start Spread (3-start): CMAES Med = {df['cma_spread3'].median():.6f} vs XNES Med = {df['xnes_spread3'].median():.6f}")
+        print(f"--- {model_label} ---")
+        print(
+            f"  Train KGE Paired Diff (CMAES - XNES): Median = {diff_tr.median():.4f} [IQR = {diff_tr.quantile(0.75) - diff_tr.quantile(0.25):.4f}]"
+        )
+        print(
+            f"    Wilcoxon p = {w_tr_p:.2e} | Frac CMAES > XNES = {tr_win * 100:.1f}% ({int(tr_win * len(df))}/{len(df)})"
+        )
+        print(
+            f"  Test KGE Paired Diff (CMAES - XNES):  Median = {diff_te.median():.4f} [IQR = {diff_te.quantile(0.75) - diff_te.quantile(0.25):.4f}]"
+        )
+        print(
+            f"    Wilcoxon p = {w_te_p:.2e} | Frac CMAES > XNES = {te_win * 100:.1f}% ({int(te_win * len(df))}/{len(df)})"
+        )
+        print(
+            f"  Stuck Basins under XNES (Train gain > 0.05): Count = {len(stuck_basins)} ({len(stuck_basins) / len(df) * 100:.1f}%)"
+        )
+        if len(stuck_basins) > 0:
+            print(
+                f"    Stuck basins frac_snow distribution: min={stuck_basins['frac_snow'].min():.3f}, med={stuck_basins['frac_snow'].median():.3f}, max={stuck_basins['frac_snow'].max():.3f}"
+            )
+
+        print(
+            f"  Across-Start Spread (3-start): CMAES Med = {df['cma_spread3'].median():.6f} vs XNES Med = {df['xnes_spread3'].median():.6f}"
+        )
         print(f"  Convergence Audit:")
-        print(f"    Spread < 0.01: {(df['cma_spread3'] < 0.01).mean()*100:.1f}% | Spread < 0.001: {(df['cma_spread3'] < 0.001).mean()*100:.1f}%")
-        print(f"    Avg Plateau Generation: Median = {df['avg_plateau_gen'].median():.1f}")
-        print(f"    Termination Reason: {(df['term_reason'] == 'converged').mean()*100:.1f}% converged before cap")
-        print(f"    Across-Start Parameter Distance: Median = {df['param_dist_mean'].median():.4f}\n")
+        print(
+            f"    Spread < 0.01: {(df['cma_spread3'] < 0.01).mean() * 100:.1f}% | Spread < 0.001: {(df['cma_spread3'] < 0.001).mean() * 100:.1f}%"
+        )
+        print(
+            f"    Avg Plateau Generation: Median = {df['avg_plateau_gen'].median():.1f}"
+        )
+        print(
+            f"    Termination Reason: {(df['term_reason'] == 'converged').mean() * 100:.1f}% converged before cap"
+        )
+        print(
+            f"    Across-Start Parameter Distance: Median = {df['param_dist_mean'].median():.4f}\n"
+        )
 
     compute_summary_stats(df_xaj, "XAJ_base")
     compute_summary_stats(df_xaj_cn, "XAJ_CN")
+
 
 if __name__ == "__main__":
     run_all_audits_and_comparisons()

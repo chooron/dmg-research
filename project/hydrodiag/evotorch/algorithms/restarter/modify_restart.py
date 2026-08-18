@@ -15,9 +15,10 @@
 from copy import deepcopy
 from typing import Type
 
-from .restart import Restart
 from evotorch import Problem
 from evotorch.algorithms import SearchAlgorithm
+
+from .restart import Restart
 
 
 class ModifyingRestart(Restart):
@@ -68,5 +69,7 @@ class IPOP(ModifyingRestart):
         if self.num_restarts >= 1:
             new_args = deepcopy(self._algorithm_args)
             # Multiply population size
-            new_args["popsize"] = int(self.popsize_multiplier * len(self.search_algorithm.population))
+            new_args["popsize"] = int(
+                self.popsize_multiplier * len(self.search_algorithm.population)
+            )
             self._algorithm_args = new_args

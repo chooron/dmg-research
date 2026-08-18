@@ -4,14 +4,13 @@ from __future__ import annotations
 
 import pytest
 import torch
-
 from models import (
     GR4J,
+    SIMHYD,
+    XAJ,
     GR4JWithPrecipitationDelay,
     PrecipitationDelay,
-    SIMHYD,
     SIMHYDWithPrecipitationDelay,
-    XAJ,
     XAJWithPrecipitationDelay,
 )
 from models.parameter_specs import (
@@ -24,7 +23,6 @@ from models.parameter_specs import (
     XAJ_PD_PARAM_SPECS,
 )
 from models.xaj import XAJ_UH_MAX_LEN, _gamma_uh_ordinates
-
 
 COMPOSED = (
     (GR4JWithPrecipitationDelay, GR4J, GR4J_PD_PARAM_SPECS, GR4J_PARAM_SPECS),
@@ -74,7 +72,9 @@ def test_alpha_zero_is_exact_no_delay_limit():
     forcings = _forcing(batch=1)
     params = _params(PRECIP_DELAY_PARAM_SPECS, 1)
     params["pd_alpha"][:] = 0.0
-    effective, aux = PrecipitationDelay()(forcings=forcings, params=params, return_states=True)
+    effective, aux = PrecipitationDelay()(
+        forcings=forcings, params=params, return_states=True
+    )
 
     assert torch.allclose(effective, forcings["precip"], atol=0.0, rtol=0.0)
     assert torch.equal(aux["final_states"]["S"], torch.zeros(1, dtype=effective.dtype))
@@ -93,14 +93,22 @@ def test_precipitation_delay_fixed_value_regression():
     }
     effective, aux = PrecipitationDelay()(forcings, params, return_states=True)
     expected_effective = torch.tensor(
-        [[0.0, 7.274197259250083, 0.602945431755700, 2.651833552175690,
-          2.001427971870230]], dtype=torch.float64
+        [
+            [
+                0.0,
+                7.274197259250083,
+                0.602945431755700,
+                2.651833552175690,
+                2.001427971870230,
+            ]
+        ],
+        dtype=torch.float64,
     )
-    expected_storage = torch.tensor(
-        [2.469595784948297], dtype=torch.float64
-    )
+    expected_storage = torch.tensor([2.469595784948297], dtype=torch.float64)
     assert torch.allclose(effective, expected_effective, atol=1e-14, rtol=0.0)
-    assert torch.allclose(aux["final_states"]["S"], expected_storage, atol=1e-14, rtol=0.0)
+    assert torch.allclose(
+        aux["final_states"]["S"], expected_storage, atol=1e-14, rtol=0.0
+    )
 
 
 @pytest.mark.parametrize("delay_cls,base_cls,composed_specs,base_specs", COMPOSED)
@@ -142,7 +150,9 @@ def test_alpha_zero_composition_matches_base_model(
         ]
         for name in base_specs
     }
-    q_delay, aux = delay_cls()(forcings=forcings, params=delay_params, return_states=True)
+    q_delay, aux = delay_cls()(
+        forcings=forcings, params=delay_params, return_states=True
+    )
     q_base, _ = base_cls()(forcings=forcings, params=base_params)
 
     assert torch.allclose(q_delay, q_base, atol=1e-10, rtol=1e-10)
@@ -221,12 +231,16 @@ def test_composed_delay_full_system_water_balance(model_cls, specs):
         ci = params["xaj_ci"]
         cg = params["xaj_cg"]
         uh = _gamma_uh_ordinates(
-            params["xaj_a"], params["xaj_theta"], XAJ_UH_MAX_LEN,
-            qsim.device, qsim.dtype,
+            params["xaj_a"],
+            params["xaj_theta"],
+            XAJ_UH_MAX_LEN,
+            qsim.device,
+            qsim.dtype,
         )
         pending_fraction = torch.cumsum(torch.flip(uh[:, 1:], dims=[-1]), dim=-1)
         initial_storage = (
-            (1.0 - im) * (
+            (1.0 - im)
+            * (
                 0.6 * params["xaj_um"]
                 + 0.6 * params["xaj_lm"]
                 + 0.6 * params["xaj_dm"]
@@ -236,9 +250,7 @@ def test_composed_delay_full_system_water_balance(model_cls, specs):
             + cg * 0.1 / (1.0 - cg)
         )
         final_storage = (
-            (1.0 - im) * (
-                aux["wu"] + aux["wl"] + aux["wd"] + aux["fr"] * aux["s"]
-            )
+            (1.0 - im) * (aux["wu"] + aux["wl"] + aux["wd"] + aux["fr"] * aux["s"])
             + ci * states["xaj_qi"] / (1.0 - ci)
             + cg * states["xaj_qg"] / (1.0 - cg)
             + (states["xaj_rs_uh_buffer"] * pending_fraction).sum(dim=1)
@@ -256,4 +268,6 @@ def test_composed_delay_full_system_water_balance(model_cls, specs):
         - qsim.sum(dim=1)
         - (final_storage - initial_storage)
     )
-    assert torch.allclose(residual, torch.zeros_like(residual), atol=3e-5, rtol=0.0), residual
+    assert torch.allclose(residual, torch.zeros_like(residual), atol=3e-5, rtol=0.0), (
+        residual
+    )

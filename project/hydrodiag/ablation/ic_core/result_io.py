@@ -25,7 +25,9 @@ def json_default(value: Any) -> Any:
 def atomic_write_text(path: str | Path, text: str) -> None:
     destination = Path(path)
     destination.parent.mkdir(parents=True, exist_ok=True)
-    fd, temporary = tempfile.mkstemp(prefix=f".{destination.name}.", dir=destination.parent)
+    fd, temporary = tempfile.mkstemp(
+        prefix=f".{destination.name}.", dir=destination.parent
+    )
     try:
         with os.fdopen(fd, "w") as handle:
             handle.write(text)
@@ -41,16 +43,24 @@ def atomic_write_text(path: str | Path, text: str) -> None:
 
 
 def atomic_write_json(path: str | Path, payload: dict[str, Any]) -> None:
-    atomic_write_text(path, json.dumps(payload, indent=2, sort_keys=True, default=json_default) + "\n")
+    atomic_write_text(
+        path, json.dumps(payload, indent=2, sort_keys=True, default=json_default) + "\n"
+    )
 
 
-def atomic_write_csv(path: str | Path, fieldnames: Iterable[str], rows: Iterable[dict[str, Any]]) -> None:
+def atomic_write_csv(
+    path: str | Path, fieldnames: Iterable[str], rows: Iterable[dict[str, Any]]
+) -> None:
     destination = Path(path)
     destination.parent.mkdir(parents=True, exist_ok=True)
-    fd, temporary = tempfile.mkstemp(prefix=f".{destination.name}.", dir=destination.parent, text=True)
+    fd, temporary = tempfile.mkstemp(
+        prefix=f".{destination.name}.", dir=destination.parent, text=True
+    )
     try:
         with os.fdopen(fd, "w", newline="") as handle:
-            writer = csv.DictWriter(handle, fieldnames=list(fieldnames), extrasaction="raise")
+            writer = csv.DictWriter(
+                handle, fieldnames=list(fieldnames), extrasaction="raise"
+            )
             writer.writeheader()
             writer.writerows(rows)
             handle.flush()
@@ -65,7 +75,9 @@ def atomic_write_csv(path: str | Path, fieldnames: Iterable[str], rows: Iterable
 
 
 def atomic_write_jsonl(path: str | Path, rows: Iterable[dict[str, Any]]) -> None:
-    text = "".join(json.dumps(row, sort_keys=True, default=json_default) + "\n" for row in rows)
+    text = "".join(
+        json.dumps(row, sort_keys=True, default=json_default) + "\n" for row in rows
+    )
     atomic_write_text(path, text)
 
 

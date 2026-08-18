@@ -8,12 +8,10 @@ Verifies:
 - batch independence of UH routing
 """
 
-import torch
 import pytest
-
+import torch
 from models.gr4j import GR4J
-from models.unit_hydro import compute_gr4j_uh_ordinates, apply_unit_hydrograph_routing
-
+from models.unit_hydro import apply_unit_hydrograph_routing, compute_gr4j_uh_ordinates
 
 BATCH = 3
 TIME = 20
@@ -58,7 +56,9 @@ def test_gr4j_x4_has_nonzero_gradient():
 
     assert params["x4"].grad is not None, "x4.grad is None"
     assert torch.isfinite(params["x4"].grad).all(), "x4.grad contains NaN/Inf"
-    assert params["x4"].grad.abs().sum() > 0, "x4.grad is zero (x4 doesn't affect output)"
+    assert params["x4"].grad.abs().sum() > 0, (
+        "x4.grad is zero (x4 doesn't affect output)"
+    )
 
     print(f"x4 grad abs mean: {params['x4'].grad.abs().mean().item():.6f}")
 
@@ -120,12 +120,12 @@ def test_gr4j_unit_hydro_batch_independence():
     routed_batch = apply_unit_hydrograph_routing(flux, uh)
 
     for b in range(BATCH):
-        uh_single = uh[b:b + 1]
-        flux_single = flux[b:b + 1]
+        uh_single = uh[b : b + 1]
+        flux_single = flux[b : b + 1]
         routed_single = apply_unit_hydrograph_routing(flux_single, uh_single)
-        assert torch.allclose(routed_batch[b], routed_single[0], atol=1e-5, rtol=1e-4), (
-            f"Basin {b} output differs between batch and single-basin runs"
-        )
+        assert torch.allclose(
+            routed_batch[b], routed_single[0], atol=1e-5, rtol=1e-4
+        ), f"Basin {b} output differs between batch and single-basin runs"
 
 
 def test_gr4j_x4_affects_timing():
@@ -154,6 +154,4 @@ def test_gr4j_x4_affects_timing():
 
     # Different x4 should produce different outflow (unless no runoff generated)
     diff = torch.abs(qsim_small - qsim_large).sum()
-    assert diff > 1e-6, (
-        f"x4 has no effect on output (diff={diff.item():.6e})"
-    )
+    assert diff > 1e-6, f"x4 has no effect on output (diff={diff.item():.6e})"

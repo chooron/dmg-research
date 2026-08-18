@@ -1,7 +1,8 @@
 """Consistency checks for the canonical model/test registry."""
 
 from models import BaseHydrologicalModel
-from tests.model_registry import MODEL_REGISTRY, MODEL_BY_NAME
+
+from tests.model_registry import MODEL_BY_NAME, MODEL_REGISTRY
 
 
 def test_model_registry_has_unique_complete_entries():

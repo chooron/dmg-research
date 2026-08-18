@@ -7,35 +7,44 @@ Verifies:
 - aux is a dict
 """
 
-import torch
 import pytest
+import torch
 
 try:
     import torch._dynamo as _dynamo
+
     _dynamo.config.cache_size_limit = max(_dynamo.config.cache_size_limit, 256)
     _dynamo.config.recompile_limit = max(_dynamo.config.recompile_limit, 256)
 except (ImportError, AttributeError):
     pass
 from models import (
-    HBV, GR4J, XAJ, SIMHYD, CemaNeige, CemaNeigeHyst,
-    GR4JWithCemaNeige, XAJWithCemaNeige, SIMHYDWithCemaNeige,
-    GR4JWithTGD2, XAJWithTGD2, SIMHYDWithTGD2,
+    GR4J,
+    HBV,
+    SIMHYD,
+    XAJ,
+    CemaNeige,
+    CemaNeigeHyst,
+    GR4JWithCemaNeige,
+    GR4JWithTGD2,
+    SIMHYDWithCemaNeige,
+    SIMHYDWithTGD2,
+    XAJWithCemaNeige,
+    XAJWithTGD2,
 )
 from models.parameter_specs import (
-    HBV_PARAM_SPECS,
-    GR4J_PARAM_SPECS,
-    XAJ_PARAM_SPECS,
-    SIMHYD_PARAM_SPECS,
-    CEMANEIGE_PARAM_SPECS,
     CEMANEIGE_HYST_PARAM_SPECS,
+    CEMANEIGE_PARAM_SPECS,
     GR4J_CN_PARAM_SPECS,
-    XAJ_CN_PARAM_SPECS,
-    SIMHYD_CN_PARAM_SPECS,
+    GR4J_PARAM_SPECS,
     GR4J_TGD2_PARAM_SPECS,
-    XAJ_TGD2_PARAM_SPECS,
+    HBV_PARAM_SPECS,
+    SIMHYD_CN_PARAM_SPECS,
+    SIMHYD_PARAM_SPECS,
     SIMHYD_TGD2_PARAM_SPECS,
+    XAJ_CN_PARAM_SPECS,
+    XAJ_PARAM_SPECS,
+    XAJ_TGD2_PARAM_SPECS,
 )
-
 
 BATCH = 3
 TIME = 20
@@ -67,8 +76,12 @@ def make_params(param_specs, batch, device, dtype):
         s = params["xaj_ki"] + params["xaj_kg"]
         mask = s >= 1.0
         if mask.any():
-            params["xaj_ki"] = torch.where(mask, params["xaj_ki"] * 0.95 / s.clamp(min=1e-6), params["xaj_ki"])
-            params["xaj_kg"] = torch.where(mask, params["xaj_kg"] * 0.95 / s.clamp(min=1e-6), params["xaj_kg"])
+            params["xaj_ki"] = torch.where(
+                mask, params["xaj_ki"] * 0.95 / s.clamp(min=1e-6), params["xaj_ki"]
+            )
+            params["xaj_kg"] = torch.where(
+                mask, params["xaj_kg"] * 0.95 / s.clamp(min=1e-6), params["xaj_kg"]
+            )
     return params
 
 
@@ -82,22 +95,22 @@ def validate_forward_output(qsim, aux, batch, time, model_name):
     assert qsim.shape == (batch, time), (
         f"[{model_name}] qsim shape {qsim.shape} != ({batch}, {time})"
     )
-    assert torch.isfinite(qsim).all(), (
-        f"[{model_name}] qsim contains NaN or Inf"
-    )
+    assert torch.isfinite(qsim).all(), f"[{model_name}] qsim contains NaN or Inf"
     # Allow small negative due to numerical precision
     assert (qsim >= -1e-3).all(), (
         f"[{model_name}] qsim contains large negative values: min={qsim.min().item():.4f}"
     )
-    assert isinstance(aux, dict), (
-        f"[{model_name}] aux is not a dict: {type(aux)}"
-    )
+    assert isinstance(aux, dict), f"[{model_name}] aux is not a dict: {type(aux)}"
 
 
 FORWARD_DEVICES_AND_DTYPES = [
     ("cpu", torch.float32),
     ("cpu", torch.float64),
-] + ([("cuda", torch.float32), ("cuda", torch.float64)] if torch.cuda.is_available() else [])
+] + (
+    [("cuda", torch.float32), ("cuda", torch.float64)]
+    if torch.cuda.is_available()
+    else []
+)
 
 
 class TestModelForward:
@@ -141,7 +154,9 @@ class TestModelForward:
             f"[CemaNeige] outflow shape {outflow.shape} != ({BATCH}, {TIME})"
         )
         assert torch.isfinite(outflow).all(), "[CemaNeige] outflow contains NaN/Inf"
-        assert (outflow >= -1e-3).all(), f"[CemaNeige] outflow negative: min={outflow.min().item():.4f}"
+        assert (outflow >= -1e-3).all(), (
+            f"[CemaNeige] outflow negative: min={outflow.min().item():.4f}"
+        )
         assert isinstance(aux, dict), f"[CemaNeige] aux is not dict: {type(aux)}"
 
     @pytest.mark.parametrize("device_str,dtype", FORWARD_DEVICES_AND_DTYPES)
@@ -164,7 +179,9 @@ class TestModelForward:
         params = make_params_composed(GR4J_CN_PARAM_SPECS, BATCH, device, dtype)
         qsim, aux = model(forcings=forcings, params=params)
         validate_forward_output(qsim, aux, BATCH, TIME, "GR4J+CemaNeige")
-        assert "effective_precip" in aux, "GR4J+CemaNeige missing effective_precip in aux"
+        assert "effective_precip" in aux, (
+            "GR4J+CemaNeige missing effective_precip in aux"
+        )
 
     @pytest.mark.parametrize("device_str,dtype", FORWARD_DEVICES_AND_DTYPES)
     def test_xaj_cn_forward(self, device_str, dtype):
@@ -174,7 +191,9 @@ class TestModelForward:
         params = make_params_composed(XAJ_CN_PARAM_SPECS, BATCH, device, dtype)
         qsim, aux = model(forcings=forcings, params=params)
         validate_forward_output(qsim, aux, BATCH, TIME, "XAJ+CemaNeige")
-        assert "effective_precip" in aux, "XAJ+CemaNeige missing effective_precip in aux"
+        assert "effective_precip" in aux, (
+            "XAJ+CemaNeige missing effective_precip in aux"
+        )
 
     @pytest.mark.parametrize("device_str,dtype", FORWARD_DEVICES_AND_DTYPES)
     def test_simhyd_forward(self, device_str, dtype):
@@ -193,7 +212,9 @@ class TestModelForward:
         params = make_params_composed(SIMHYD_CN_PARAM_SPECS, BATCH, device, dtype)
         qsim, aux = model(forcings=forcings, params=params)
         validate_forward_output(qsim, aux, BATCH, TIME, "SIMHYD+CemaNeige")
-        assert "effective_precip" in aux, "SIMHYD+CemaNeige missing effective_precip in aux"
+        assert "effective_precip" in aux, (
+            "SIMHYD+CemaNeige missing effective_precip in aux"
+        )
 
     @pytest.mark.parametrize("device_str,dtype", FORWARD_DEVICES_AND_DTYPES)
     def test_gr4j_tgd2_forward(self, device_str, dtype):
@@ -203,7 +224,9 @@ class TestModelForward:
         params = make_params_composed(GR4J_TGD2_PARAM_SPECS, BATCH, device, dtype)
         qsim, aux = model(forcings=forcings, params=params)
         validate_forward_output(qsim, aux, BATCH, TIME, "GR4J+TGD2")
-        assert "effective_precipitation" in aux, "GR4J+TGD2 missing effective_precipitation in aux"
+        assert "effective_precipitation" in aux, (
+            "GR4J+TGD2 missing effective_precipitation in aux"
+        )
 
     @pytest.mark.parametrize("device_str,dtype", FORWARD_DEVICES_AND_DTYPES)
     def test_simhyd_tgd2_forward(self, device_str, dtype):
@@ -213,7 +236,9 @@ class TestModelForward:
         params = make_params_composed(SIMHYD_TGD2_PARAM_SPECS, BATCH, device, dtype)
         qsim, aux = model(forcings=forcings, params=params)
         validate_forward_output(qsim, aux, BATCH, TIME, "SIMHYD+TGD2")
-        assert "effective_precipitation" in aux, "SIMHYD+TGD2 missing effective_precipitation in aux"
+        assert "effective_precipitation" in aux, (
+            "SIMHYD+TGD2 missing effective_precipitation in aux"
+        )
 
     @pytest.mark.parametrize("device_str,dtype", FORWARD_DEVICES_AND_DTYPES)
     def test_xaj_tgd2_forward(self, device_str, dtype):
@@ -223,4 +248,6 @@ class TestModelForward:
         params = make_params_composed(XAJ_TGD2_PARAM_SPECS, BATCH, device, dtype)
         qsim, aux = model(forcings=forcings, params=params)
         validate_forward_output(qsim, aux, BATCH, TIME, "XAJ+TGD2")
-        assert "effective_precipitation" in aux, "XAJ+TGD2 missing effective_precipitation in aux"
+        assert "effective_precipitation" in aux, (
+            "XAJ+TGD2 missing effective_precipitation in aux"
+        )
