@@ -1,10 +1,13 @@
+from pathlib import Path
+import json
 import pytest
 import pandas as pd
-import json
 
 def test_96_manifest_subset_of_531():
-    df = pd.read_csv('ablation/manifests/ic_ablation_96_basins_v1.csv')
-    assert len(df) == 96
+    manifest_path = Path('ablation/manifests/ic_ablation_96_basins_v1.json')
+    data = json.loads(manifest_path.read_text())
+    basins = data.get('basins', [])
+    assert len(basins) == 96
 
 def test_96_manifest_counts():
     pass

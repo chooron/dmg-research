@@ -9,18 +9,30 @@ Verifies:
 import torch
 import pytest
 
+try:
+    import torch._dynamo as _dynamo
+    _dynamo.config.cache_size_limit = max(_dynamo.config.cache_size_limit, 256)
+    _dynamo.config.recompile_limit = max(_dynamo.config.recompile_limit, 256)
+except (ImportError, AttributeError):
+    pass
 from models import (
-    HBV, GR4J, XAJ, CemaNeige, CemaNeigeHyst,
-    GR4JWithCemaNeige, XAJWithCemaNeige,
+    HBV, GR4J, XAJ, SIMHYD, CemaNeige, CemaNeigeHyst,
+    GR4JWithCemaNeige, XAJWithCemaNeige, SIMHYDWithCemaNeige,
+    GR4JWithTGD2, XAJWithTGD2, SIMHYDWithTGD2,
 )
 from models.parameter_specs import (
     HBV_PARAM_SPECS,
     GR4J_PARAM_SPECS,
     XAJ_PARAM_SPECS,
+    SIMHYD_PARAM_SPECS,
     CEMANEIGE_PARAM_SPECS,
     CEMANEIGE_HYST_PARAM_SPECS,
     GR4J_CN_PARAM_SPECS,
     XAJ_CN_PARAM_SPECS,
+    SIMHYD_CN_PARAM_SPECS,
+    GR4J_TGD2_PARAM_SPECS,
+    XAJ_TGD2_PARAM_SPECS,
+    SIMHYD_TGD2_PARAM_SPECS,
 )
 
 
@@ -86,36 +98,31 @@ def _check_model_gradient(model_cls, param_specs, model_name, device, dtype):
     return grad_info
 
 
+GRAD_DEVICES_AND_DTYPES = [
+    ("cpu", torch.float32),
+] + ([("cuda", torch.float32)] if torch.cuda.is_available() else [])
+
+
 class TestModelGrad:
     """Gradient tests for all models."""
 
-    @pytest.mark.parametrize("device_str,dtype", [
-        ("cpu", torch.float32),
-    ])
+    @pytest.mark.parametrize("device_str,dtype", GRAD_DEVICES_AND_DTYPES)
     def test_hbv_grad(self, device_str, dtype):
         _check_model_gradient(HBV, HBV_PARAM_SPECS, "HBV", device_str, dtype)
 
-    @pytest.mark.parametrize("device_str,dtype", [
-        ("cpu", torch.float32),
-    ])
+    @pytest.mark.parametrize("device_str,dtype", GRAD_DEVICES_AND_DTYPES)
     def test_gr4j_grad(self, device_str, dtype):
         _check_model_gradient(GR4J, GR4J_PARAM_SPECS, "GR4J", device_str, dtype)
 
-    @pytest.mark.parametrize("device_str,dtype", [
-        ("cpu", torch.float32),
-    ])
+    @pytest.mark.parametrize("device_str,dtype", GRAD_DEVICES_AND_DTYPES)
     def test_xaj_grad(self, device_str, dtype):
         _check_model_gradient(XAJ, XAJ_PARAM_SPECS, "XAJ", device_str, dtype)
 
-    @pytest.mark.parametrize("device_str,dtype", [
-        ("cpu", torch.float32),
-    ])
+    @pytest.mark.parametrize("device_str,dtype", GRAD_DEVICES_AND_DTYPES)
     def test_cemaneige_grad(self, device_str, dtype):
         _check_model_gradient(CemaNeige, CEMANEIGE_PARAM_SPECS, "CemaNeige", device_str, dtype)
 
-    @pytest.mark.parametrize("device_str,dtype", [
-        ("cpu", torch.float32),
-    ])
+    @pytest.mark.parametrize("device_str,dtype", GRAD_DEVICES_AND_DTYPES)
     def test_cemaneige_hyst_grad(self, device_str, dtype):
         _check_model_gradient(
             CemaNeigeHyst,
@@ -125,14 +132,30 @@ class TestModelGrad:
             dtype,
         )
 
-    @pytest.mark.parametrize("device_str,dtype", [
-        ("cpu", torch.float32),
-    ])
+    @pytest.mark.parametrize("device_str,dtype", GRAD_DEVICES_AND_DTYPES)
     def test_gr4j_cn_grad(self, device_str, dtype):
         _check_model_gradient(GR4JWithCemaNeige, GR4J_CN_PARAM_SPECS, "GR4J+CemaNeige", device_str, dtype)
 
-    @pytest.mark.parametrize("device_str,dtype", [
-        ("cpu", torch.float32),
-    ])
+    @pytest.mark.parametrize("device_str,dtype", GRAD_DEVICES_AND_DTYPES)
     def test_xaj_cn_grad(self, device_str, dtype):
         _check_model_gradient(XAJWithCemaNeige, XAJ_CN_PARAM_SPECS, "XAJ+CemaNeige", device_str, dtype)
+
+    @pytest.mark.parametrize("device_str,dtype", GRAD_DEVICES_AND_DTYPES)
+    def test_simhyd_grad(self, device_str, dtype):
+        _check_model_gradient(SIMHYD, SIMHYD_PARAM_SPECS, "SIMHYD", device_str, dtype)
+
+    @pytest.mark.parametrize("device_str,dtype", GRAD_DEVICES_AND_DTYPES)
+    def test_simhyd_cn_grad(self, device_str, dtype):
+        _check_model_gradient(SIMHYDWithCemaNeige, SIMHYD_CN_PARAM_SPECS, "SIMHYD+CemaNeige", device_str, dtype)
+
+    @pytest.mark.parametrize("device_str,dtype", GRAD_DEVICES_AND_DTYPES)
+    def test_gr4j_tgd2_grad(self, device_str, dtype):
+        _check_model_gradient(GR4JWithTGD2, GR4J_TGD2_PARAM_SPECS, "GR4J+TGD2", device_str, dtype)
+
+    @pytest.mark.parametrize("device_str,dtype", GRAD_DEVICES_AND_DTYPES)
+    def test_simhyd_tgd2_grad(self, device_str, dtype):
+        _check_model_gradient(SIMHYDWithTGD2, SIMHYD_TGD2_PARAM_SPECS, "SIMHYD+TGD2", device_str, dtype)
+
+    @pytest.mark.parametrize("device_str,dtype", GRAD_DEVICES_AND_DTYPES)
+    def test_xaj_tgd2_grad(self, device_str, dtype):
+        _check_model_gradient(XAJWithTGD2, XAJ_TGD2_PARAM_SPECS, "XAJ+TGD2", device_str, dtype)

@@ -42,6 +42,9 @@ ADDITIONAL_MODEL_DIMENSIONS = {
     "GR4J_CN": 6,
     "SIMHYD": 10,
     "SIMHYD_CN": 12,
+    "XAJ": 15,
+    "XAJ_CN": 17,
+    "XAJ_TGD2": 17,
 }
 MODEL_STRUCTURE_VERSIONS = {
     "N": "phase0_xaj_controlled_n_cemaneige_v1",
@@ -55,6 +58,8 @@ MODEL_STRUCTURE_VERSIONS = {
     "SIMHYD_CN": "cemaneige_v1",
     "GR4J_TGD2": TGD2_STRUCTURE_VERSION,
     "SIMHYD_TGD2": TGD2_STRUCTURE_VERSION,
+    "XAJ": "xaj_base_v1",
+    "XAJ_CN": "cemaneige_v1",
     "XAJ_TGD2": TGD2_STRUCTURE_VERSION,
 }
 DEFAULT_STARTS = 10
@@ -196,6 +201,18 @@ def main() -> None:
     output = args.output or PROJECT / "results" / f"{args.model.lower()}_cmaes_531_batched_v1"
 
     config = json.loads((PROJECT / "ablation/configs/ic_foundation_531_v1.json").read_text())
+    data_dir = PROJECT.parents[1] / "data"
+    if not Path(config.get("dataset_path", "")).exists():
+        if (data_dir / "camels_dataset").exists():
+            config["dataset_path"] = str(data_dir / "camels_dataset")
+            config["gage_ids_path"] = str(data_dir / "gage_id.npy")
+            config["dates_path"] = str(data_dir / "camels_dates.npy")
+            config["basin_list_path"] = str(data_dir / "531sub_id.txt")
+        elif Path("/autodl-fs/data/camels_dataset").exists():
+            config["dataset_path"] = "/autodl-fs/data/camels_dataset"
+            config["gage_ids_path"] = "/autodl-fs/data/gage_id.npy"
+            config["dates_path"] = "/autodl-fs/data/camels_dates.npy"
+            config["basin_list_path"] = "/autodl-fs/data/531sub_id.txt"
     config.update({"device": str(device), "model_variant": "lite", "tgd_structure_version": TGD2_STRUCTURE_VERSION})
     config.setdefault("batching", {})["cache_device_data"] = True
     bundle = load_531_bundle(config)

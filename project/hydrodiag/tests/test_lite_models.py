@@ -8,13 +8,15 @@ from models import (
     GR4JWithCemaNeigeLite, XAJWithCemaNeigeLite, SIMHYDWithCemaNeigeLite,
     GR4JWithPrecipitationDelayLite, XAJWithPrecipitationDelayLite,
     SIMHYDWithPrecipitationDelayLite,
+    GR4JWithTGD2Lite,
+    SIMHYDWithTGD2Lite,
     XAJWithTGD2Lite,
 )
 from models.parameter_specs import (
     HBV_PARAM_SPECS, GR4J_PARAM_SPECS, SIMHYD_PARAM_SPECS,
     GR4J_CN_PARAM_SPECS, XAJ_CN_PARAM_SPECS, SIMHYD_CN_PARAM_SPECS,
     GR4J_PD_PARAM_SPECS, XAJ_PD_PARAM_SPECS, SIMHYD_PD_PARAM_SPECS,
-    XAJ_TGD2_PARAM_SPECS,
+    GR4J_TGD2_PARAM_SPECS, SIMHYD_TGD2_PARAM_SPECS, XAJ_TGD2_PARAM_SPECS,
 )
 
 
@@ -28,6 +30,8 @@ CASES = (
     (GR4JWithPrecipitationDelayLite, GR4J_PD_PARAM_SPECS, False),
     (XAJWithPrecipitationDelayLite, XAJ_PD_PARAM_SPECS, False),
     (SIMHYDWithPrecipitationDelayLite, SIMHYD_PD_PARAM_SPECS, False),
+    (GR4JWithTGD2Lite, GR4J_TGD2_PARAM_SPECS, False),
+    (SIMHYDWithTGD2Lite, SIMHYD_TGD2_PARAM_SPECS, False),
     (XAJWithTGD2Lite, XAJ_TGD2_PARAM_SPECS, False),
 )
 
