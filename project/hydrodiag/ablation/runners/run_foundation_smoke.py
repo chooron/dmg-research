@@ -98,7 +98,12 @@ def main() -> None:
     atomic_write_json(output_root / "smoke_multi_basin.json", _record_evaluation(bundle, "XAJ", multi_basin, [0, 1, 2, 3], multi_basin_theta.shape, args.device))
 
     cross_model_records = []
-    cross_models = ["GR4J", "SIMHYD", "XAJ", "HBV", "XAJ_TGD2"]
+    cross_models = [
+        "GR4J", "GR4J_CN", "GR4J_TGD2",
+        "SIMHYD", "SIMHYD_CN", "SIMHYD_TGD2",
+        "XAJ", "XAJ_CN", "XAJ_TGD2",
+        "HBV",
+    ]
     for model_key in cross_models:
         started = time.perf_counter()
         try:

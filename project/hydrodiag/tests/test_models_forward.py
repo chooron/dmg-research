@@ -10,18 +10,30 @@ Verifies:
 import torch
 import pytest
 
+try:
+    import torch._dynamo as _dynamo
+    _dynamo.config.cache_size_limit = max(_dynamo.config.cache_size_limit, 256)
+    _dynamo.config.recompile_limit = max(_dynamo.config.recompile_limit, 256)
+except (ImportError, AttributeError):
+    pass
 from models import (
-    HBV, GR4J, XAJ, CemaNeige, CemaNeigeHyst,
-    GR4JWithCemaNeige, XAJWithCemaNeige,
+    HBV, GR4J, XAJ, SIMHYD, CemaNeige, CemaNeigeHyst,
+    GR4JWithCemaNeige, XAJWithCemaNeige, SIMHYDWithCemaNeige,
+    GR4JWithTGD2, XAJWithTGD2, SIMHYDWithTGD2,
 )
 from models.parameter_specs import (
     HBV_PARAM_SPECS,
     GR4J_PARAM_SPECS,
     XAJ_PARAM_SPECS,
+    SIMHYD_PARAM_SPECS,
     CEMANEIGE_PARAM_SPECS,
     CEMANEIGE_HYST_PARAM_SPECS,
     GR4J_CN_PARAM_SPECS,
     XAJ_CN_PARAM_SPECS,
+    SIMHYD_CN_PARAM_SPECS,
+    GR4J_TGD2_PARAM_SPECS,
+    XAJ_TGD2_PARAM_SPECS,
+    SIMHYD_TGD2_PARAM_SPECS,
 )
 
 
@@ -82,13 +94,16 @@ def validate_forward_output(qsim, aux, batch, time, model_name):
     )
 
 
+FORWARD_DEVICES_AND_DTYPES = [
+    ("cpu", torch.float32),
+    ("cpu", torch.float64),
+] + ([("cuda", torch.float32), ("cuda", torch.float64)] if torch.cuda.is_available() else [])
+
+
 class TestModelForward:
     """Forward sanity tests for all models."""
 
-    @pytest.mark.parametrize("device_str,dtype", [
-        ("cpu", torch.float32),
-        ("cpu", torch.float64),
-    ])
+    @pytest.mark.parametrize("device_str,dtype", FORWARD_DEVICES_AND_DTYPES)
     def test_hbv_forward(self, device_str, dtype):
         device = torch.device(device_str)
         model = HBV().to(device=device, dtype=dtype)
@@ -97,10 +112,7 @@ class TestModelForward:
         qsim, aux = model(forcings=forcings, params=params)
         validate_forward_output(qsim, aux, BATCH, TIME, "HBV")
 
-    @pytest.mark.parametrize("device_str,dtype", [
-        ("cpu", torch.float32),
-        ("cpu", torch.float64),
-    ])
+    @pytest.mark.parametrize("device_str,dtype", FORWARD_DEVICES_AND_DTYPES)
     def test_gr4j_forward(self, device_str, dtype):
         device = torch.device(device_str)
         model = GR4J().to(device=device, dtype=dtype)
@@ -109,10 +121,7 @@ class TestModelForward:
         qsim, aux = model(forcings=forcings, params=params)
         validate_forward_output(qsim, aux, BATCH, TIME, "GR4J")
 
-    @pytest.mark.parametrize("device_str,dtype", [
-        ("cpu", torch.float32),
-        ("cpu", torch.float64),
-    ])
+    @pytest.mark.parametrize("device_str,dtype", FORWARD_DEVICES_AND_DTYPES)
     def test_xaj_forward(self, device_str, dtype):
         device = torch.device(device_str)
         model = XAJ().to(device=device, dtype=dtype)
@@ -121,17 +130,13 @@ class TestModelForward:
         qsim, aux = model(forcings=forcings, params=params)
         validate_forward_output(qsim, aux, BATCH, TIME, "XAJ")
 
-    @pytest.mark.parametrize("device_str,dtype", [
-        ("cpu", torch.float32),
-        ("cpu", torch.float64),
-    ])
+    @pytest.mark.parametrize("device_str,dtype", FORWARD_DEVICES_AND_DTYPES)
     def test_cemaneige_forward(self, device_str, dtype):
         device = torch.device(device_str)
         model = CemaNeige().to(device=device, dtype=dtype)
         forcings = make_synthetic_forcings(BATCH, TIME, device, dtype)
         params = make_params(CEMANEIGE_PARAM_SPECS, BATCH, device, dtype)
         outflow, aux = model(forcings=forcings, params=params)
-        # CemaNeige outputs liquid water [batch, time] — same shape as qsim
         assert outflow.shape == (BATCH, TIME), (
             f"[CemaNeige] outflow shape {outflow.shape} != ({BATCH}, {TIME})"
         )
@@ -139,10 +144,7 @@ class TestModelForward:
         assert (outflow >= -1e-3).all(), f"[CemaNeige] outflow negative: min={outflow.min().item():.4f}"
         assert isinstance(aux, dict), f"[CemaNeige] aux is not dict: {type(aux)}"
 
-    @pytest.mark.parametrize("device_str,dtype", [
-        ("cpu", torch.float32),
-        ("cpu", torch.float64),
-    ])
+    @pytest.mark.parametrize("device_str,dtype", FORWARD_DEVICES_AND_DTYPES)
     def test_cemaneige_hyst_forward(self, device_str, dtype):
         device = torch.device(device_str)
         model = CemaNeigeHyst().to(device=device, dtype=dtype)
@@ -154,10 +156,7 @@ class TestModelForward:
         assert (outflow >= -1e-3).all()
         assert isinstance(aux, dict)
 
-    @pytest.mark.parametrize("device_str,dtype", [
-        ("cpu", torch.float32),
-        ("cpu", torch.float64),
-    ])
+    @pytest.mark.parametrize("device_str,dtype", FORWARD_DEVICES_AND_DTYPES)
     def test_gr4j_cn_forward(self, device_str, dtype):
         device = torch.device(device_str)
         model = GR4JWithCemaNeige().to(device=device, dtype=dtype)
@@ -167,10 +166,7 @@ class TestModelForward:
         validate_forward_output(qsim, aux, BATCH, TIME, "GR4J+CemaNeige")
         assert "effective_precip" in aux, "GR4J+CemaNeige missing effective_precip in aux"
 
-    @pytest.mark.parametrize("device_str,dtype", [
-        ("cpu", torch.float32),
-        ("cpu", torch.float64),
-    ])
+    @pytest.mark.parametrize("device_str,dtype", FORWARD_DEVICES_AND_DTYPES)
     def test_xaj_cn_forward(self, device_str, dtype):
         device = torch.device(device_str)
         model = XAJWithCemaNeige().to(device=device, dtype=dtype)
@@ -179,3 +175,52 @@ class TestModelForward:
         qsim, aux = model(forcings=forcings, params=params)
         validate_forward_output(qsim, aux, BATCH, TIME, "XAJ+CemaNeige")
         assert "effective_precip" in aux, "XAJ+CemaNeige missing effective_precip in aux"
+
+    @pytest.mark.parametrize("device_str,dtype", FORWARD_DEVICES_AND_DTYPES)
+    def test_simhyd_forward(self, device_str, dtype):
+        device = torch.device(device_str)
+        model = SIMHYD().to(device=device, dtype=dtype)
+        forcings = make_synthetic_forcings(BATCH, TIME, device, dtype)
+        params = make_params(SIMHYD_PARAM_SPECS, BATCH, device, dtype)
+        qsim, aux = model(forcings=forcings, params=params)
+        validate_forward_output(qsim, aux, BATCH, TIME, "SIMHYD")
+
+    @pytest.mark.parametrize("device_str,dtype", FORWARD_DEVICES_AND_DTYPES)
+    def test_simhyd_cn_forward(self, device_str, dtype):
+        device = torch.device(device_str)
+        model = SIMHYDWithCemaNeige().to(device=device, dtype=dtype)
+        forcings = make_synthetic_forcings(BATCH, TIME, device, dtype)
+        params = make_params_composed(SIMHYD_CN_PARAM_SPECS, BATCH, device, dtype)
+        qsim, aux = model(forcings=forcings, params=params)
+        validate_forward_output(qsim, aux, BATCH, TIME, "SIMHYD+CemaNeige")
+        assert "effective_precip" in aux, "SIMHYD+CemaNeige missing effective_precip in aux"
+
+    @pytest.mark.parametrize("device_str,dtype", FORWARD_DEVICES_AND_DTYPES)
+    def test_gr4j_tgd2_forward(self, device_str, dtype):
+        device = torch.device(device_str)
+        model = GR4JWithTGD2().to(device=device, dtype=dtype)
+        forcings = make_synthetic_forcings(BATCH, TIME, device, dtype)
+        params = make_params_composed(GR4J_TGD2_PARAM_SPECS, BATCH, device, dtype)
+        qsim, aux = model(forcings=forcings, params=params)
+        validate_forward_output(qsim, aux, BATCH, TIME, "GR4J+TGD2")
+        assert "effective_precipitation" in aux, "GR4J+TGD2 missing effective_precipitation in aux"
+
+    @pytest.mark.parametrize("device_str,dtype", FORWARD_DEVICES_AND_DTYPES)
+    def test_simhyd_tgd2_forward(self, device_str, dtype):
+        device = torch.device(device_str)
+        model = SIMHYDWithTGD2().to(device=device, dtype=dtype)
+        forcings = make_synthetic_forcings(BATCH, TIME, device, dtype)
+        params = make_params_composed(SIMHYD_TGD2_PARAM_SPECS, BATCH, device, dtype)
+        qsim, aux = model(forcings=forcings, params=params)
+        validate_forward_output(qsim, aux, BATCH, TIME, "SIMHYD+TGD2")
+        assert "effective_precipitation" in aux, "SIMHYD+TGD2 missing effective_precipitation in aux"
+
+    @pytest.mark.parametrize("device_str,dtype", FORWARD_DEVICES_AND_DTYPES)
+    def test_xaj_tgd2_forward(self, device_str, dtype):
+        device = torch.device(device_str)
+        model = XAJWithTGD2().to(device=device, dtype=dtype)
+        forcings = make_synthetic_forcings(BATCH, TIME, device, dtype)
+        params = make_params_composed(XAJ_TGD2_PARAM_SPECS, BATCH, device, dtype)
+        qsim, aux = model(forcings=forcings, params=params)
+        validate_forward_output(qsim, aux, BATCH, TIME, "XAJ+TGD2")
+        assert "effective_precipitation" in aux, "XAJ+TGD2 missing effective_precipitation in aux"

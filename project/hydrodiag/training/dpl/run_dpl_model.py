@@ -681,6 +681,18 @@ def main() -> None:
                 "Cannot resume with a different Lite mode than the output config"
             )
     (output_dir / "config.json").write_text(json.dumps(config, indent=2) + "\n")
+    data_dir = PROJECT_DIR.parents[1] / "data"
+    if not Path(config.get("data_pkl_dataset", "")).exists():
+        if (data_dir / "camels_dataset").exists():
+            config["data_pkl_dataset"] = str(data_dir / "camels_dataset")
+            config["gage_ids_path"] = str(data_dir / "gage_id.npy")
+            config["dates_path"] = str(data_dir / "camels_dates.npy")
+            config["data_basin_ids"] = str(data_dir / "531sub_id.txt")
+        elif Path("/autodl-fs/data/camels_dataset").exists():
+            config["data_pkl_dataset"] = "/autodl-fs/data/camels_dataset"
+            config["gage_ids_path"] = "/autodl-fs/data/gage_id.npy"
+            config["dates_path"] = "/autodl-fs/data/camels_dates.npy"
+            config["data_basin_ids"] = "/autodl-fs/data/531sub_id.txt"
     set_seed(config["training"]["seed"])
     device = torch.device(config["runtime"]["device"] if torch.cuda.is_available() else "cpu")
     indices = gate_time_index(config)

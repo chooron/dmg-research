@@ -33,6 +33,7 @@ class TemperatureDependentGenericDelay2(BaseHydrologicalModel):
     def __init__(self, compact_output: bool = False):
         super().__init__()
         self.compact_output = compact_output
+        self._step = torch.compile(tgd2_step, fullgraph=True)
 
     @property
     def parameter_specs(self) -> dict[str, dict[str, Any]]:
@@ -54,7 +55,7 @@ class TemperatureDependentGenericDelay2(BaseHydrologicalModel):
         if diagnostics:
             storage_trace, tau_trace, retention_trace = (torch.empty_like(precip) for _ in range(3))
         for t in range(nsteps):
-            effective_t, storage, tau_t, retention_t = tgd2_step(
+            effective_t, storage, tau_t, retention_t = self._step(
                 precip[:, t], temp[:, t], storage, params["tgd_tau_warm"], params["tgd_delta_tau_cold"]
             )
             effective[:, t] = effective_t

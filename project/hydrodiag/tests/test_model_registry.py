@@ -22,6 +22,8 @@ def test_model_registry_has_unique_complete_entries():
         "XAJWithPrecipitationDelay",
         "SIMHYDWithCemaNeige",
         "SIMHYDWithPrecipitationDelay",
+        "GR4JWithTGD2",
+        "SIMHYDWithTGD2",
         "XAJWithTGD2",
     }
     assert set(MODEL_BY_NAME) == set(names)
