@@ -27,8 +27,14 @@ log = logging.getLogger(__name__)
 PROCESSES = ["w_phen", "w_int", "w_snow", "w_sub"]
 GATE_IDX = {"w_phen": 0, "w_int": 1, "w_snow": 2, "w_sub": 3}
 COSTS = {"w_phen": 2.0, "w_int": 2.0, "w_snow": 2.0, "w_sub": 1.0}
-AIC_ALPHA = 0.01
 EPS = 1e-12
+
+
+def _extract_aic_alpha(config: dict[str, Any]) -> float:
+    loss_cfg = config.get("loss_function") or config.get("train", {}).get("loss_function") or {}
+    if isinstance(loss_cfg, dict):
+        return float(loss_cfg.get("aic_alpha", 0.01))
+    return 0.01
 
 
 def per_basin_fit(q: torch.Tensor, obs: torch.Tensor, std: torch.Tensor) -> torch.Tensor:
@@ -43,12 +49,19 @@ def per_basin_fit(q: torch.Tensor, obs: torch.Tensor, std: torch.Tensor) -> torc
 class CounterfactualTargetGenerator:
     """Computes detached counterfactual structural targets q for all training basins."""
 
-    def __init__(self, config: dict[str, Any], device: str | torch.device = "cuda:0") -> None:
+    def __init__(
+        self,
+        config: dict[str, Any],
+        device: str | torch.device = "cuda:0",
+        aic_alpha: float | None = None,
+    ) -> None:
         self.config = config
         self.device = torch.device(device)
-        self.aic_alpha = AIC_ALPHA
+        if aic_alpha is not None:
+            self.aic_alpha = float(aic_alpha)
+        else:
+            self.aic_alpha = _extract_aic_alpha(config)
         self.costs = COSTS
-
     @torch.no_grad()
     def generate_targets(
         self,
@@ -93,13 +106,8 @@ class CounterfactualTargetGenerator:
         routing = phy._descale_routing_params(p_raw["gamma_uh"])
         base_w = w_learn.detach().clone()
 
-        # Vectorized counterfactual evaluation across all 4 processes (S=8)
-        S = 8
-        w_cf = base_w.repeat(S, 1)
-        for p_idx in range(4):
-            w_cf[(2 * p_idx) * B:(2 * p_idx + 1) * B, p_idx] = 0.0      # OFF
-            w_cf[(2 * p_idx + 1) * B:(2 * p_idx + 2) * B, p_idx] = 1.0  # ON
-
+        # Process-wise counterfactual evaluation (S=2 per process for low VRAM footprint)
+        S = 2
         params_rep = {k: v.repeat(S, 1) for k, v in mopex_params.items()}
         routing_rep = {k: v.repeat(S) for k, v in routing.items()}
         sample_rep = {
@@ -108,25 +116,36 @@ class CounterfactualTargetGenerator:
             "c_nn_norm": attrs.repeat(S, 1).to(self.device),
         }
 
-        P, T_forcing, PET, doy, n_steps, _ = phy._prepare_forcings(sample_rep)
-        Q = phy._run_weighted_loop(P, T_forcing, PET, doy, params_rep, w_cf, n_steps, B * S)
-        Qr = phy._apply_routing(Q.mean(-1), routing_rep)  # [n_out, B * S, 1]
-        n_out = Qr.shape[0]
+        L_fit_off_list = []
+        L_fit_on_list = []
+        std_dev = std_t.view(1, 1, B)
 
-        # Reshape to [n_out, 4 (proc), 2 (off/on), B]
-        Qr_arr = Qr[:, :B * S, 0].view(n_out, 4, 2, B)
-        obs_t = y_t_dev[phy.warm_up:phy.warm_up + n_out].view(n_out, 1, 1, B)
-        # Compute per-basin fit loss for OFF and ON
-        # fit = mean((Q - obs)^2 / std^2) over valid timesteps
-        sq_res = (Qr_arr - obs_t) ** 2 / (std_t.view(1, 1, 1, B) ** 2)
-        mask = ~torch.isnan(obs_t)
-        n_valid_rep = mask.sum(dim=0).clamp(min=1)
-        sq_res = torch.where(mask, sq_res, torch.zeros_like(sq_res))
-        fit_arr = sq_res.sum(dim=0) / n_valid_rep  # [4, 2, B]
+        for p_idx in range(4):
+            w_cf = base_w.repeat(S, 1)
+            w_cf[0:B, p_idx] = 0.0      # OFF
+            w_cf[B:2*B, p_idx] = 1.0    # ON
 
-        L_fit_off = fit_arr[:, 0, :]  # [4, B]
-        L_fit_on = fit_arr[:, 1, :]   # [4, B]
+            P, T_forcing, PET, doy, n_steps, _ = phy._prepare_forcings(sample_rep)
+            Q = phy._run_weighted_loop(P, T_forcing, PET, doy, params_rep, w_cf, n_steps, B * S)
+            Qr = phy._apply_routing(Q.mean(-1), routing_rep)  # [n_out, B * S, 1]
+            n_out = Qr.shape[0]
 
+            Qr_arr = Qr[:, :B * S, 0].view(n_out, 2, B)  # [n_out, 2 (off/on), B]
+            obs_t = y_t_dev[phy.warm_up:phy.warm_up + n_out].view(n_out, 1, B)
+
+            sq_res = (Qr_arr - obs_t) ** 2 / (std_dev ** 2)
+            mask = ~torch.isnan(obs_t)
+            n_valid_rep = mask.sum(dim=0).clamp(min=1)
+            sq_res = torch.where(mask, sq_res, torch.zeros_like(sq_res))
+            fit_arr = sq_res.sum(dim=0) / n_valid_rep  # [2, B]
+
+            L_fit_off_list.append(fit_arr[0].unsqueeze(0))
+            L_fit_on_list.append(fit_arr[1].unsqueeze(0))
+
+        L_fit_off = torch.cat(L_fit_off_list, dim=0)  # [4, B]
+        L_fit_on = torch.cat(L_fit_on_list, dim=0)    # [4, B]
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
         # Compute DeltaJ per process
         # aic_penalty = AIC_ALPHA * cost * (N / (B * n_valid_b))
         q_list = []
@@ -204,6 +223,7 @@ class CFTrainer(WarmupTrainer):
             self.config,
             device=self.config.get("device", "cuda:0"),
         )
+        print(f"[CFTrainer] Structural complexity lambda (aic_alpha) = {self.cf_generator.aic_alpha}")
         self.cached_q: Optional[torch.Tensor] = None
         self.epoch_cf_diag: Dict[str, Any] = {}
         self.cf_loss_weight: float = float(self.config.get("cf_loss_weight", 1.0))
@@ -221,7 +241,9 @@ class CFTrainer(WarmupTrainer):
         for model in getattr(self.model, "model_dict", {}).values():
             nn_m = getattr(model, "nn_model", None)
             if nn_m is not None:
-                if hasattr(nn_m, "structure_encoder"):
+                if hasattr(nn_m, "structure_parameters"):
+                    self.weights_head_params.extend(list(nn_m.structure_parameters()))
+                elif hasattr(nn_m, "structure_encoder"):
                     self.weights_head_params.extend(list(nn_m.structure_encoder.parameters()))
                 elif hasattr(nn_m, "heads") and "weights" in nn_m.heads:
                     self.weights_head_params.extend(list(nn_m.heads["weights"].parameters()))
@@ -315,17 +337,17 @@ class CFTrainer(WarmupTrainer):
             # In LearnedStructureNetCF, nn.heads["weights"] already receives shared.detach()
             # If standard LearnedStructureNet is used, we ensure stopgrad explicitly:
             attrs_b = dataset_sample["xc_nn_norm"][0, :, -nn.backbone[0].in_features:].to(self.cached_q.device) if "xc_nn_norm" in dataset_sample else dataset_sample["c_nn_norm"].to(self.cached_q.device)
-            if hasattr(nn, "structure_encoder"):
-                with torch.no_grad():
-                    shared_detached = nn.backbone(attrs_b)
-                struct_input = torch.cat([attrs_b, shared_detached], dim=-1)
-                raw_weights = nn.structure_encoder(struct_input)
-            elif hasattr(nn, "heads") and "weights" in nn.heads and nn.heads["weights"].in_features == attrs_b.shape[-1]:
-                raw_weights = nn.heads["weights"](attrs_b)
-            else:
+            # Model owns structure-logit extraction from static attributes
+            if hasattr(nn, "get_structure_logits"):
+                raw_weights = nn.get_structure_logits(attrs_b)
+            elif hasattr(nn, "structure_encoder"):
+                raw_weights = nn.structure_encoder(attrs_b)
+            elif hasattr(nn, "heads") and "weights" in nn.heads:
                 with torch.no_grad():
                     shared_detached = nn.backbone(attrs_b)
                 raw_weights = nn.heads["weights"](shared_detached)
+            else:
+                raise ValueError(f"NN model {type(nn)} does not support structure logit extraction.")
             raw_weights = torch.clamp(raw_weights, min=-10.0, max=10.0)
             logits = raw_weights.view(raw_weights.shape[0], 4, 2)
             # Contrast z_on - z_off

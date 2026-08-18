@@ -212,12 +212,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--model-type",
         choices=("base", "full", "fixed", "flex", "binary"),
-        default="flex",
+        default=None,
         help=(
             "Model type: 'base' = FixedWeightMopex(all weights=0), "
             "'full' = FixedWeightMopex(all weights=1), "
             "'fixed' = FixedWeightMopex(user-specified fixed weights), "
-            "'flex' = LearnedWeightMopex (default), "
+            "'flex' = LearnedWeightMopex, "
             "'binary' = BinaryWeightMopex (Hard-Concrete L0 gates)."
         ),
     )
@@ -360,45 +360,85 @@ def apply_runtime_overrides(
 
     # Apply --model-type overrides
     model_type = args.model_type
+    if model_type is None:
+        phy_names = (
+            config.get("delta_model", {}).get("phy_model", {}).get("model")
+            or config.get("model", {}).get("phy", {}).get("name")
+            or []
+        )
+        if isinstance(phy_names, str):
+            phy_names = [phy_names]
+        if "FixedWeightMopex" in phy_names:
+            fw = (
+                config.get("delta_model", {}).get("phy_model", {}).get("fixed_weights")
+                or config.get("model", {}).get("phy", {}).get("fixed_weights")
+                or {}
+            )
+            vals = [float(fw.get(k, -1)) for k in FIXED_WEIGHT_NAMES]
+            if vals == [0.0, 0.0, 0.0, 0.0]:
+                model_type = "base"
+            elif vals == [1.0, 1.0, 1.0, 1.0]:
+                model_type = "full"
+            else:
+                model_type = "fixed"
+        elif "BinaryWeightMopex" in phy_names:
+            model_type = "binary"
+        else:
+            model_type = "flex"
+
     if model_type in {"base", "full", "fixed"}:
         config.setdefault("delta_model", {}).setdefault("phy_model", {})["model"] = ["FixedWeightMopex"]
+        config["delta_model"]["phy_model"].setdefault("interception_semantics", "S0")
         if model_type == "base":
             fixed_weights = _fixed_weight_dict([0.0, 0.0, 0.0, 0.0])
         elif model_type == "full":
             fixed_weights = _fixed_weight_dict([1.0, 1.0, 1.0, 1.0])
         else:
-            if args.fixed_weights is None:
-                raise ValueError("--model-type fixed requires --fixed-weights.")
-            fixed_weights = _fixed_weight_dict(list(args.fixed_weights))
+            if args.fixed_weights is not None:
+                fixed_weights = _fixed_weight_dict(list(args.fixed_weights))
+            else:
+                existing_fw = (
+                    config.get("delta_model", {}).get("phy_model", {}).get("fixed_weights")
+                    or config.get("model", {}).get("phy", {}).get("fixed_weights")
+                    or {}
+                )
+                fixed_weights = _fixed_weight_dict([float(existing_fw[k]) for k in FIXED_WEIGHT_NAMES])
         config["delta_model"]["phy_model"]["fixed_weights"] = fixed_weights
-    else:  # flex / binary
-        # Default 'flex' selects LearnedWeightMopex unless the config already
-        # names a different (experimental) phy model, e.g. the interception
-        # 2x2 variants. Production configs name LearnedWeightMopex themselves,
-        # so default behavior is unchanged.
-        _phy_model_cfg = config.setdefault("delta_model", {}).setdefault("phy_model", {})
-        _configured_names = list(_phy_model_cfg.get("model") or [])
-        _STANDARD_FLEX_NAMES = {"LearnedWeightMopex", "BinaryWeightMopex", "FixedWeightMopex"}
-        if not _configured_names or set(_configured_names) <= _STANDARD_FLEX_NAMES:
-            _phy_model_cfg["model"] = ["LearnedWeightMopex"]
 
-    if model_type == "binary":
+        # Fixed-weight endpoints do not train a structure encoder
+        config.setdefault("delta_model", {}).setdefault("nn_model", {})["model"] = "ParamRoutingNet"
+        config.setdefault("model", {}).setdefault("nn", {})["name"] = "ParamRoutingNet"
+        config["counterfactual_supervision"] = False
+        config["confidence_weighted_cf_loss"] = False
+        config.setdefault("delta_model", {}).setdefault("phy_model", {})["counterfactual_supervision"] = False
+        config["trainer"] = "MyTrainer"
+    elif model_type == "binary":
         config.setdefault("delta_model", {}).setdefault("phy_model", {})["model"] = ["BinaryWeightMopex"]
         config.setdefault("delta_model", {}).setdefault("nn_model", {})["model"] = "BinaryStructureNet"
         _set_loss_name(config, "NseL0BatchLoss")
-
+    else:  # flex
+        _phy_model_cfg = config.setdefault("delta_model", {}).setdefault("phy_model", {})
+        _configured_names = list(_phy_model_cfg.get("model") or [])
+        _STANDARD_FLEX_NAMES = {"LearnedWeightMopex", "LearnedWeightMopexE"}
+        if not _configured_names or set(_configured_names) <= _STANDARD_FLEX_NAMES:
+            _phy_model_cfg["model"] = ["LearnedWeightMopexE"]
+            _phy_model_cfg.setdefault("interception_semantics", "S0")
     # Keep config["model"]["phy"] in sync so model_builder.get_phy_model_names()
     # returns the correct name (it reads config["model"]["phy"]["name"], not
     # config["delta_model"]["phy_model"]["model"]).
-    # Also sync fixed_weights so build_phy_config() passes them to FixedWeightMopex.
+    # Also sync fixed_weights and interception_semantics so build_phy_config() passes them.
     _phy_cfg = config["delta_model"]["phy_model"]
     _phy_names = _phy_cfg["model"]
     config.setdefault("model", {}).setdefault("phy", {})["name"] = list(_phy_names)
     config["model"]["phy"]["model"] = list(_phy_names)
     if "fixed_weights" in _phy_cfg:
         config["model"]["phy"]["fixed_weights"] = dict(_phy_cfg["fixed_weights"])
+    if "interception_semantics" in _phy_cfg:
+        config["model"]["phy"]["interception_semantics"] = _phy_cfg["interception_semantics"]
+    if "counterfactual_supervision" in _phy_cfg:
+        config["model"]["phy"]["counterfactual_supervision"] = _phy_cfg["counterfactual_supervision"]
 
-    # Sync nn_model name override (used by binary model type)
+    # Sync nn_model name override (used by binary model type / ParamRoutingNet)
     _nn_cfg = config.get("delta_model", {}).get("nn_model", {})
     if "model" in _nn_cfg:
         config.setdefault("model", {}).setdefault("nn", {})["name"] = _nn_cfg["model"]
@@ -418,10 +458,11 @@ def apply_runtime_overrides(
         run_name = args.run_name
     elif region_id is not None:
         run_name = f"{config_stem}/{model_type}_region{region_id}/seed_{config['seed']}"
+    elif model_type in {"base", "full"}:
+        run_name = f"{config_stem}/{model_type}/seed_{config['seed']}"
     else:
         run_name = f"{config_stem}/{model_type}_{_alpha_label(alpha)}/seed_{config['seed']}"
     _refresh_runtime_paths(config, Path(args.output_root) / run_name)
-
 
 def _build_data_loader(config: dict[str, Any]):
     loader_config = copy.deepcopy(config)

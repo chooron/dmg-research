@@ -958,3 +958,55 @@ results/intercept_r19/E_S0_r19_unified_adadelta/
   FINAL_DECISION.json              # 机器可读最终决定
 ```
 
+---
+
+## 18. R20 — 纯属性结构编码器冻结（Pure-X35 Architecture Freeze）
+
+### 18.1 动机与架构演进
+- **动机**：$h_{128}$ 本身完全由 35 维流域静态物理属性 $x_{35}$ 确定，在结构编码器输入中拼接 $\text{stopgrad}(h_{128})$ 存在方法学冗余。
+- **架构**：彻底实现任务解耦：
+  - 水文参数/汇流分支：$x_{35} \to \text{Hydrologic Backbone}(128\text{-D}) \to \text{params\_head}(192) / \text{gamma\_head}(2)$
+  - 结构门控分支：$x_{35} \to \text{Linear}(35, 128) \to \text{Tanh} \to \text{Linear}(128, 64) \to \text{Tanh} \to \text{Linear}(64, 8)$
+- **参数精简**：结构编码器参数从 29,768 降至 13,384（减少 16,384 参数，全 NN 减少 21.3%）。
+- **接口解耦**：模型内聚实现 `get_structure_logits(attrs)` 与 `structure_parameters()`，彻底移除 `CFTrainer` 中的层维度反射判断。
+
+### 18.2 三种子（Seeds 42, 43, 44）对比验证结果
+
+| 指标 | R19 Hybrid (参考基准) | Pure-X35 (新冻结基准) | 变化 |
+|:---|:---:|:---:|:---:|
+| **3-Seed Median NSE** | 0.6502 ± 0.0012 | **0.6550 ± 0.0026** (Peak 0.6584) | **+0.0048** |
+| **3-Seed Mean NSE** | 0.5737 ± 0.0023 | **0.5769 ± 0.0017** | **+0.0032** |
+| **w_int 分离度 $\Delta$** | +0.1345 ± 0.0036 | **+0.1630 ± 0.0136** | **+0.0285** |
+| **w_int Spearman $\rho$** | +0.3277 ± 0.0165 | **+0.3796 ± 0.0116** | **+0.0519** |
+| **w_int 标准差 (std)** | 0.1433 | **0.1513** (无塌陷/无平台) | +0.0080 |
+| **w_phen 分离度 $\Delta$** | +0.2893 ± 0.0082 | **+0.3093 ± 0.0044** | **+0.0200** |
+| **w_snow 分离度 $\Delta$** | +0.4721 ± 0.0148 | **+0.4676 ± 0.0149** | -0.0045 |
+| **w_sub 分离度 $\Delta$** | +0.2204 ± 0.0148 | **+0.2015 ± 0.0102** | -0.0189 |
+
+*全部四个过程在所有三种子下均保持 100% 正分离度（$\Delta > 0$）与正秩相关（$\rho > 0$）。*
+
+### 18.3 最终决定与规范冻结
+
+**`ADOPT_PURE_X35` / `FREEZE_CANONICAL_PURE_X35`**
+
+- 规范生产模型：`LearnedStructureNetPureAttrEncoder`
+- 规范配置文件：`conf/config_flexmopex_canonical.yaml`
+- 向后兼容性：`LearnedStructureNetHybridEncoder` 完整保留供历史检查点/消融复现
+- 优化器：统一单一 `Adadelta` (lr=1.0)
+- 损失函数与物理机制：Candidate E-S0 + 动态 AIC ($\lambda=0.01$) + 逆事实监督 + 置信度加权 $c = 2|q - 0.5|$
+
+### 18.4 新增产物清单
+```
+project/flexmopex/models/learned_weight_mopex_candidates.py  # LearnedStructureNetPureAttrEncoder
+project/flexmopex/models/parameter_nets.py                   # get_structure_logits / structure_parameters
+project/flexmopex/models/cf_trainer.py                       # 解耦模型拥有结构逻辑抽取
+project/flexmopex/conf/config_flexmopex_canonical.yaml       # 规范配置文件（Pure-X35）
+project/flexmopex/conf/config_dmopex_interceptE_S0_r19_pure_x35_seed42.yaml
+project/flexmopex/conf/config_dmopex_interceptE_S0_r19_pure_x35_seed43.yaml
+project/flexmopex/conf/config_dmopex_interceptE_S0_r19_pure_x35_seed44.yaml
+project/flexmopex/test/test_pure_x35_structure_encoder.py    # 纯属性结构编码器单元测试
+project/flexmopex/scripts/diagnose_pure_x35_preflight.py     # 前置校验脚本
+project/flexmopex/scripts/evaluate_pure_x35_seed.py          # 评测脚本
+project/flexmopex/scripts/synthesize_pure_x35_results.py     # 三种子合成汇总脚本
+project/flexmopex/scripts/verify_canonical_freeze.py         # 10项冻结不变量及数值回归校验脚本
+```

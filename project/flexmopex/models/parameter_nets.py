@@ -102,3 +102,15 @@ class LearnedStructureNet(_BaseParameterNet):
             output_sizes={"params": 12 * nmul, "weights": 8, "gamma_uh": 2},
             device=device,
         )
+
+    def get_structure_logits(self, attrs: torch.Tensor) -> torch.Tensor:
+        """Compute 8 structure gate logits from static basin attributes."""
+        with torch.no_grad():
+            shared_detached = self.backbone(attrs)
+        return self.heads["weights"](shared_detached)
+
+    def structure_parameters(self):
+        """Iterator over parameters belonging to the structure prediction branch."""
+        if "weights" in self.heads:
+            return self.heads["weights"].parameters()
+        return iter(())

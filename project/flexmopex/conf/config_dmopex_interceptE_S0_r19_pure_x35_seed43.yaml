@@ -1,15 +1,3 @@
-# =============================================================================
-# Flex-MOPEX Canonical Configuration (Pure-Attribute Final Freeze)
-# 
-# Method: Counterfactual Structural Learning with Pure-Attribute Nonlinear Structure Encoder
-# - Architecture: LearnedStructureNetPureAttrEncoder x35 -> 35->128->64->8
-# - Supervision: Basin-specific Counterfactual Supervision (DeltaJ = J_OFF - J_ON)
-# - Soft-target: q = sigmoid(DeltaJ / T) with process-wise robust median scale T
-# - Confidence-weighting: c = 2 * |q - 0.5| (normalized per process)
-# - Optimization: Single Unified Adadelta (lr=1.0) over all 16 parameter tensors
-# - Gradient isolation: Fit/AIC -> structure-gate blocked; L_CF -> backbone blocked
-# =============================================================================
-
 defaults:
   - _self_
   - hydra: settings
@@ -17,7 +5,7 @@ defaults:
 
 ## General -------------------------------#
 mode: train # train, test, train_test, simulation
-random_seed: 42
+random_seed: 43
 device: cuda
 gpu_id: 0
 
@@ -25,8 +13,8 @@ data_loader: HydroLoader
 data_sampler: HydroSampler
 trainer: CFTrainer
 save_output: true
-save_path: project/flexmopex/results/canonical_freeze/seed_42/
-trained_model: project/flexmopex/results/canonical_freeze/seed_42/model/
+save_path: project/flexmopex/results/pure_x35_r19/seed_43/
+trained_model: project/flexmopex/results/pure_x35_r19/seed_43/model/
 
 ## Training ------------------------------#
 train:
@@ -63,11 +51,11 @@ loss_function:
   model: NseDynAicBatchLoss
   aic_alpha: 0.01
 
-## Counterfactual Supervision ----------------#
+## Counterfactual Supervision (R19 Pure x35 Unified Adadelta) #
 counterfactual_supervision: true
 confidence_weighted_cf_loss: true
 cf_loss_weight: 1.0
-structure_optimizer: none # Single Unified Adadelta optimizer across all parameters
+structure_optimizer: none
 
 ## Differentiable Model -----------------------------#
 delta_model:

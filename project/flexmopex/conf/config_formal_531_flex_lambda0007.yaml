@@ -1,19 +1,20 @@
 # =============================================================================
-# Flex-MOPEX Canonical Configuration (Pure-Attribute Final Freeze)
-# 
+# Flex-MOPEX Formal 531 Benchmark: Flex (lambda = 0.007)
+#
 # Method: Counterfactual Structural Learning with Pure-Attribute Nonlinear Structure Encoder
+# - Interception: Candidate E-S0
 # - Architecture: LearnedStructureNetPureAttrEncoder x35 -> 35->128->64->8
 # - Supervision: Basin-specific Counterfactual Supervision (DeltaJ = J_OFF - J_ON)
 # - Soft-target: q = sigmoid(DeltaJ / T) with process-wise robust median scale T
-# - Confidence-weighting: c = 2 * |q - 0.5| (normalized per process)
+# - Complexity penalty: lambda = 0.007
 # - Optimization: Single Unified Adadelta (lr=1.0) over all 16 parameter tensors
-# - Gradient isolation: Fit/AIC -> structure-gate blocked; L_CF -> backbone blocked
+# - Dataset: CAMELS-531 (531 basins)
 # =============================================================================
 
 defaults:
   - _self_
   - hydra: settings
-  - observations: camels_671 # camels_531, camels_671
+  - observations: camels_531
 
 ## General -------------------------------#
 mode: train # train, test, train_test, simulation
@@ -25,8 +26,8 @@ data_loader: HydroLoader
 data_sampler: HydroSampler
 trainer: CFTrainer
 save_output: true
-save_path: project/flexmopex/results/canonical_freeze/seed_42/
-trained_model: project/flexmopex/results/canonical_freeze/seed_42/model/
+save_path: project/flexmopex/results/formal_531/flex_lambda0007_seed42/
+trained_model: project/flexmopex/results/formal_531/flex_lambda0007_seed42/model/
 
 ## Training ------------------------------#
 train:
@@ -35,7 +36,7 @@ train:
   target: [streamflow]
   optimizer: Adadelta
   batch_size: 100
-  epochs: 10
+  epochs: 100
   start_epoch: 0
   save_epoch: 1
   learning_rate: 1.0
@@ -49,7 +50,7 @@ test:
   start_time: 1995/10/01
   end_time: 2010/09/30
   batch_size: 100
-  test_epoch: 10
+  test_epoch: 100
   split_dataset: True
 
 ## Inference -------------------------------#
@@ -61,13 +62,13 @@ simulation:
 ## Loss Function -------------------------#
 loss_function:
   model: NseDynAicBatchLoss
-  aic_alpha: 0.01
+  aic_alpha: 0.007
 
 ## Counterfactual Supervision ----------------#
 counterfactual_supervision: true
 confidence_weighted_cf_loss: true
 cf_loss_weight: 1.0
-structure_optimizer: none # Single Unified Adadelta optimizer across all parameters
+structure_optimizer: none
 
 ## Differentiable Model -----------------------------#
 delta_model:
