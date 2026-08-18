@@ -74,6 +74,8 @@ from models import (  # noqa: E402
     XAJDRWithCemaNeigeLite,
     XAJGRWithCemaNeige,
     XAJGRWithCemaNeigeLite,
+XAJControlledNWithCemaNeige,
+XAJControlledNWithCemaNeigeLite,
 )
 from models.parameter_specs import (  # noqa: E402
     GR4J_CN_PARAM_SPECS,
@@ -98,6 +100,7 @@ from models.parameter_specs import (  # noqa: E402
     XAJ_GE_PARAM_SPECS,
     XAJ_DR_PARAM_SPECS,
     XAJ_GR_PARAM_SPECS,
+XAJ_CONTROLLED_N_PARAM_SPECS,
 )
 from training.data_contract import FORCING_NAMES, load_dates, load_gage_ids  # noqa: E402
 
@@ -114,6 +117,7 @@ MODEL_REGISTRY: dict[str, tuple[type[nn.Module], dict[str, dict[str, Any]]]] = {
     "XAJ_G_E_CN": (XAJGEWithCemaNeige, {**CEMANEIGE_PARAM_SPECS, **XAJ_GE_PARAM_SPECS}),
     "XAJ_D_R_CN": (XAJDRWithCemaNeige, {**CEMANEIGE_PARAM_SPECS, **XAJ_DR_PARAM_SPECS}),
     "XAJ_G_R_CN": (XAJGRWithCemaNeige, {**CEMANEIGE_PARAM_SPECS, **XAJ_GR_PARAM_SPECS}),
+"XAJ_CONTROLLED_N_CN": (XAJControlledNWithCemaNeige, {**CEMANEIGE_PARAM_SPECS, **XAJ_CONTROLLED_N_PARAM_SPECS}),
     "XAJ_2S": (XAJ2SWithCemaNeige, XAJ_2S_PARAM_SPECS),
     "XAJ_RWPE": (XAJRWPEWithCemaNeige, XAJ_RWPE_PARAM_SPECS),
     "XAJ_PD": (XAJWithPrecipitationDelay, XAJ_PD_PARAM_SPECS),
@@ -136,6 +140,7 @@ LITE_MODEL_REGISTRY: dict[str, tuple[type[nn.Module], dict[str, dict[str, Any]]]
     "XAJ_G_E_CN": (XAJGEWithCemaNeigeLite, {**CEMANEIGE_PARAM_SPECS, **XAJ_GE_PARAM_SPECS}),
     "XAJ_D_R_CN": (XAJDRWithCemaNeigeLite, {**CEMANEIGE_PARAM_SPECS, **XAJ_DR_PARAM_SPECS}),
     "XAJ_G_R_CN": (XAJGRWithCemaNeigeLite, {**CEMANEIGE_PARAM_SPECS, **XAJ_GR_PARAM_SPECS}),
+"XAJ_CONTROLLED_N_CN": (XAJControlledNWithCemaNeigeLite, {**CEMANEIGE_PARAM_SPECS, **XAJ_CONTROLLED_N_PARAM_SPECS}),
     "XAJ_2S": (XAJ2SWithCemaNeigeLite, XAJ_2S_PARAM_SPECS),
     "XAJ_RWPE": (XAJRWPEWithCemaNeigeLite, XAJ_RWPE_PARAM_SPECS),
     "XAJ_PD": (XAJWithPrecipitationDelayLite, XAJ_PD_PARAM_SPECS),

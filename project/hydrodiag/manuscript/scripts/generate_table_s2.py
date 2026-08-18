@@ -14,7 +14,7 @@ def format_val(val, decs=3):
 
 
 def main():
-    project_root = "/home/jingxin/code/dmg-research/project/hydrodiag"
+    project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     r1_dir = os.path.join(project_root, "manuscript/results/R1")
 
     out_stats_dir = os.path.join(project_root, "manuscript/stats/tables")
@@ -29,11 +29,11 @@ def main():
     periods = ["train", "test"]
     scopes = [
         ("All basins", "full_sample", None),
-        ("0–0.05", "snow_stratum", "S1"),
-        ("0.05–0.15", "snow_stratum", "S2"),
-        ("0.15–0.30", "snow_stratum", "S3"),
-        ("0.30–0.50", "snow_stratum", "S4"),
-        ("0.50–1.00", "snow_stratum", "S5"),
+        ("S1 (0\u20130.05)", "snow_stratum", "S1"),
+        ("S2 (0.05\u20130.15)", "snow_stratum", "S2"),
+        ("S3 (0.15\u20130.30)", "snow_stratum", "S3"),
+        ("S4 (0.30\u20130.50)", "snow_stratum", "S4"),
+        ("S5 (0.50\u20131.00)", "snow_stratum", "S5"),
     ]
     contrasts = [
         ("TGD - Base", "TGD-Base"),
@@ -82,7 +82,7 @@ def main():
     # 1. Markdown Table
     md_header = (
         "# Table S2: Basin-wise Paired KGE Differences Among Controlled XAJ Structures\n\n"
-        "| Paradigm | Period | Scope | Contrast | n | Median Paired ΔKGE | Bootstrap 95% CI | Positive-Effect Fraction |\n"
+        "| Paradigm | Period | Snow regime | Contrast | n | Median Paired ΔKGE | Bootstrap 95% CI | Positive-Effect Fraction |\n"
         "| :--- | :--- | :--- | :--- | :---: | :---: | :---: | :---: |\n"
     )
     md_rows_str = ""
@@ -122,7 +122,7 @@ def main():
 \begin{threeparttable}
 \begin{tabular}{lllccccccc}
 \toprule
-Paradigm & Period & Scope & Contrast & n & Median $\Delta\text{KGE}$ & Bootstrap 95\% CI & Positive Fraction \\
+Paradigm & Period & Snow regime & Contrast & n & Median $\Delta\text{KGE}$ & Bootstrap 95\% CI & Positive Fraction \\
 \midrule
 """ + tex_rows_str + r"""\bottomrule
 \end{tabular}

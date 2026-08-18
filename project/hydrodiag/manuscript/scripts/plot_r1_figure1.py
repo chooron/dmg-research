@@ -35,14 +35,12 @@ def main():
     setup_publication_style()
 
     # Paths
-    project_root = "/home/jingxin/code/dmg-research/project/hydrodiag"
+    project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     r1_dir = os.path.join(project_root, "manuscript/results/R1")
 
-    # Output directories
+    # Output directory (canonical main-figure location)
     out_plots_fig_dir = os.path.join(project_root, "manuscript/plots/figures")
-    out_script_fig_dir = os.path.join(project_root, "manuscript/figures")
     os.makedirs(out_plots_fig_dir, exist_ok=True)
-    os.makedirs(out_script_fig_dir, exist_ok=True)
 
     # 1. Load authoritative data
     df_basin = pd.read_csv(os.path.join(r1_dir, "r1_basin_level_performance.csv"))
@@ -79,7 +77,7 @@ def main():
         2,
         height_ratios=[1.0, 1.25],
         wspace=0.18,
-        hspace=0.34,
+        hspace=0.18,
         top=0.93,
         bottom=0.07,
         left=0.10,
@@ -242,13 +240,7 @@ def main():
 
     # --- Panels (c) & (d): Snow-stratum ladders (train=filled, test=hollow) ---
     strata_order = ["S1", "S2", "S3", "S4", "S5"]
-    strata_labels = [
-        "0–0.05",
-        "0.05–0.15",
-        "0.15–0.30",
-        "0.30–0.50",
-        "0.50–1.00",
-    ]
+    strata_labels = ["S1", "S2", "S3", "S4", "S5"]
     y_positions = np.arange(len(strata_order))
     ladder_xlim = [0.0, 0.95]
     offset_y = 0.16  # Vertical offset between train and test rows within each stratum
@@ -506,21 +498,9 @@ def main():
     fig_path_plots = os.path.join(
         out_plots_fig_dir, "Figure1_R1_compensation_overview.png"
     )
-    fig_path_script = os.path.join(
-        out_script_fig_dir, "Figure1_R1_compensation_overview.png"
-    )
 
     plt.savefig(fig_path_plots, dpi=600, bbox_inches="tight", facecolor="#FFFFFF")
-    plt.savefig(fig_path_script, dpi=600, bbox_inches="tight", facecolor="#FFFFFF")
     plt.close()
-
-    # Copy script to manuscript/scripts/ as well
-    cp_script_target = os.path.join(
-        project_root, "manuscript/scripts/plot_r1_figure1.py"
-    )
-    if os.path.abspath(__file__) != os.path.abspath(cp_script_target):
-        with open(__file__, "r") as sf, open(cp_script_target, "w") as df:
-            df.write(sf.read())
 
     # 2. Build Source Data CSV
     source_records = []
@@ -589,9 +569,7 @@ def main():
                     )
 
     df_source = pd.DataFrame(source_records)
-    src_path_script = os.path.join(out_script_fig_dir, "Figure1_R1_source_data.csv")
     src_path_plots = os.path.join(out_plots_fig_dir, "Figure1_R1_source_data.csv")
-    df_source.to_csv(src_path_script, index=False)
     df_source.to_csv(src_path_plots, index=False)
 
     # 3. Create Notes MD File
@@ -601,7 +579,7 @@ def main():
     notes_content = f"""# Figure 1 (R1) Technical Notes & Caption Specification
 
 ## Figure Caption Notes
-Snow-fraction strata were defined as 0–0.05 (n=165), 0.05–0.15 (n=156), 0.15–0.30 (n=121), 0.30–0.50 (n=34), and 0.50–1.00 (n=55). Panels (c) and (d) show medians and 95% bootstrap confidence intervals for both training (solid lines, filled markers) and testing (dashed lines, hollow markers with white faces) periods within each stratum.
+Snow regimes S1\u2013S5 are the fixed R1 strata by basin snow fraction: S1 [0, 0.05) (n=165), S2 [0.05, 0.15) (n=156), S3 [0.15, 0.30) (n=121), S4 [0.30, 0.50) (n=34), and S5 [0.50, 1.00] (n=55). Panels (c) and (d) show medians and 95% bootstrap confidence intervals for both training (solid lines, filled markers) and testing (dashed lines, hollow markers with white faces) periods within each snow regime.
 
 ## Technical Implementation Details
 - **Authoritative Input Files**:
@@ -632,10 +610,7 @@ Snow-fraction strata were defined as 0–0.05 (n=165), 0.05–0.15 (n=156), 0.15
 - **CVD & Greyscale QA**:
   - Redundant encoding: shape markers (`o`, `^`, `s`, `D`), line styles (solid vs dashed), and marker fill states (filled vs hollow) preserve identity in greyscale and for readers with color-vision deficiencies.
 """
-    notes_path_script = os.path.join(out_script_fig_dir, "Figure1_R1_notes.md")
     notes_path_plots = os.path.join(out_plots_fig_dir, "Figure1_R1_notes.md")
-    with open(notes_path_script, "w") as f:
-        f.write(notes_content)
     with open(notes_path_plots, "w") as f:
         f.write(notes_content)
 

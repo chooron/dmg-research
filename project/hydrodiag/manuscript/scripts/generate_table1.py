@@ -15,7 +15,7 @@ def format_stat(med, ci_low, ci_high, decimals):
 
 
 def main():
-    project_root = "/home/jingxin/code/dmg-research/project/hydrodiag"
+    project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     r1_dir = os.path.join(project_root, "manuscript/results/R1")
 
     out_stats_dir = os.path.join(project_root, "manuscript/stats/tables")
