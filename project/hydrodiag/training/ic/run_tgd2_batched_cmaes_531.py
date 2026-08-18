@@ -38,6 +38,7 @@ MODEL_DIMENSIONS = {"GR4J_TGD2": 6, "SIMHYD_TGD2": 12, "XAJ_TGD2": 17}
 # Kept separate so the original TGD2 protocol contract remains explicit.
 ADDITIONAL_MODEL_DIMENSIONS = {
     "N": 17, "D_E": 16, "G_E": 17, "D_R": 15, "G_R": 16,
+    "XAJ": 15, "XAJ_CN": 17,
     "GR4J": 4,
     "GR4J_CN": 6,
     "SIMHYD": 10,
@@ -52,11 +53,14 @@ MODEL_STRUCTURE_VERSIONS = {
     "G_E": "phase0_xaj_g_e_cemaneige_v1",
     "D_R": "phase0_xaj_d_r_cemaneige_v1",
     "G_R": "phase0_xaj_g_r_cemaneige_v1",
+    "XAJ": "xaj_base_v1",
+    "XAJ_CN": "cemaneige_v1",
     "GR4J": "gr4j_base_v1",
     "GR4J_CN": "cemaneige_v1",
     "SIMHYD": "simhyd_base_v1",
     "SIMHYD_CN": "cemaneige_v1",
     "GR4J_TGD2": TGD2_STRUCTURE_VERSION,
+    "XAJ_TGD2": TGD2_STRUCTURE_VERSION,
     "SIMHYD_TGD2": TGD2_STRUCTURE_VERSION,
     "XAJ": "xaj_base_v1",
     "XAJ_CN": "cemaneige_v1",
@@ -182,6 +186,9 @@ def main() -> None:
     parser.add_argument("--chunk-basins", type=int, default=100)
     parser.add_argument("--checkpoint-interval", type=int, default=5)
     parser.add_argument("--basin-ids", help="Comma-separated canonical basin IDs for smoke runs.")
+    parser.add_argument("--target-npz", type=Path,
+                        help="Optional NPZ (key 'target_mm_day', [531, full-time]) replacing the observed "
+                             "calibration target with a synthetic series (R3).")
     parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
     args = parser.parse_args()
     if min(args.starts, args.generations, args.chunk_basins, args.checkpoint_interval) < 1:
@@ -216,6 +223,36 @@ def main() -> None:
     config.update({"device": str(device), "model_variant": "lite", "tgd_structure_version": TGD2_STRUCTURE_VERSION})
     config.setdefault("batching", {})["cache_device_data"] = True
     bundle = load_531_bundle(config)
+    target_override = None
+    if args.target_npz is not None:
+        from dataclasses import replace as _replace
+
+        saved = np.load(args.target_npz)
+        if "target_mm_day" not in saved:
+            raise ValueError("--target-npz must contain key 'target_mm_day'")
+        synthetic = np.asarray(saved["target_mm_day"], dtype=np.float64)
+        if synthetic.shape != bundle.target_mm_day.shape:
+            raise ValueError(
+                f"--target-npz shape {synthetic.shape} != bundle target {bundle.target_mm_day.shape}"
+            )
+        if not np.isfinite(synthetic).all() or (synthetic < 0).any():
+            raise ValueError("--target-npz must be finite and non-negative")
+        bundle = _replace(
+            bundle,
+            target_mm_day=synthetic,
+            valid_target_mask=np.ones(synthetic.shape, dtype=bool),
+            target_unit_ic="mm/day (synthetic Q*)",
+        )
+        target_override = {
+            "path": str(args.target_npz),
+            "shape": list(synthetic.shape),
+            "unit": "mm/day (synthetic Q*)",
+            "notes": "R3 synthetic-truth target; observed discharge untouched",
+        }
+        # Synthetic-truth protocol: fix CN forcing-derived quantities to the
+        # canonical full-record values so the objective path reproduces the
+        # generating truth (no split/window redefinition of g_thresh).
+        config["canonical_cn_psol_annual"] = True
     basin_indices = list(range(len(bundle.basin_ids)))
     basin_ids = bundle.basin_ids
     if args.basin_ids:
@@ -242,6 +279,8 @@ def main() -> None:
             "max_generations": args.generations,
             "seed": "sha256(TGD2-CMAES-v1:model:basin_id:start) for TGD2; sha256(ABLAT-CMAES-v1:model:basin_id:start) otherwise",
             "objective": "KGE(Q), maximize, train only",
+            "target_override": target_override,
+            "canonical_cn_psol_annual": bool(config.get("canonical_cn_psol_annual", False)),
             "warmup": "1980-10-01..1981-09-30",
             "train": "1981-10-01..1995-09-30",
             "validation": "1995-10-01..2010-09-30",

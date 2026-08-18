@@ -65,9 +65,13 @@ def norm_seed(series: pd.Series) -> pd.Series:
     return series.apply(lambda v: "" if pd.isna(v) else str(int(v)))
 
 
-def boot_ci_median(values: np.ndarray, n_boot: int = BOOT_N, seed: int = BOOT_SEED,
+def boot_ci_median(values: np.ndarray, n_boot=None, seed=None,
                    alpha: float = 0.05):
     """Paired basin-level bootstrap CI of the median (R3 convention)."""
+    if n_boot is None:
+        n_boot = BOOT_N
+    if seed is None:
+        seed = BOOT_SEED
     rng = np.random.default_rng(seed)
     n = len(values)
     draws = np.empty(n_boot)
@@ -220,12 +224,25 @@ def block2_rows(bt, red, resv, proc):
 # main
 # ---------------------------------------------------------------------------
 def main() -> None:
+    global PROJECT, CANON, GATE, PREP, OUT_DIRS, BOOT_N, BOOT_SEED
+
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--project-root", type=Path, default=PROJECT)
     parser.add_argument("--results-root", type=Path, default=DEFAULT_RESULTS_ROOT)
     parser.add_argument("--n-boot", type=int, default=BOOT_N)
     parser.add_argument("--seed", type=int, default=BOOT_SEED)
     args = parser.parse_args()
+    if args.n_boot <= 0:
+        parser.error("--n-boot must be positive")
+
+    PROJECT = args.project_root.resolve()
+    results_root = args.results_root.resolve()
+    BOOT_N = args.n_boot
+    BOOT_SEED = args.seed
+    CANON = results_root / "r3_misspec_analysis_v1"
+    GATE = results_root / "r3_gate_v1"
+    PREP = PROJECT / "manuscript" / "results" / "R3"
+    OUT_DIRS = (PROJECT / "manuscript" / "tables", PROJECT / "manuscript" / "stats" / "tables")
 
     f5, f6, ps, pv, gate, gss, proto, bt, red, resv, proc, vp = load()
 
@@ -423,10 +440,11 @@ def main() -> None:
     for r in b5:
         md_parts.append(f"| {r['estimand']} | {r['regime']} | {r['note']} |\n")
 
+    bootstrap_meta = f"{BOOT_N} replicates, seed {BOOT_SEED}"
     md_note = ("\n*Note*: Values report basin-level medians; dPL rows aggregate the three "
                "seeds (42/123/2026) to per-basin seed medians before summarising, exactly "
-               "as in Figures 5–6. 95% CIs are paired-basin bootstrap (2000 replicates, "
-               "seed 20260730). Block 2 medians and Block 3 seed medians are asserted equal "
+               f"as in Figures 5–6. 95% CIs are paired-basin bootstrap ({bootstrap_meta}). "
+               "Block 2 medians and Block 3 seed medians are asserted equal "
                "to the frozen post-hoc summaries (1e-6 / 1e-9). In Block 4, the raw "
                "output-recovery/internal-cost association largely disappears after "
                "controlling for frac_snow (partial ρ ≈ 0), i.e. the relationship is "
@@ -462,6 +480,10 @@ Estimand & Regime & $N$ & Median [95\% CI] \\
 \end{tablenotes}
 \end{threeparttable}
 \end{table*}""")
+    tex_lines[-1] = tex_lines[-1].replace(
+        "2000 replicates, seed 20260730",
+        bootstrap_meta,
+    )
     full_tex = "\n".join(tex_lines)
     for d in OUT_DIRS:
         with open(d / "TableS5_R3_statistics.tex", "w") as f:
