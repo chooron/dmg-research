@@ -30,7 +30,6 @@ Outputs saved to results/r4_phase1_soil_official/:
     robustness_timing_sensitivity.csv
     r4_robustness_report.json
 """
-
 from __future__ import annotations
 
 import json
@@ -47,12 +46,7 @@ PROJECT = Path(__file__).resolve().parents[1]
 if str(PROJECT) not in sys.path:
     sys.path.insert(0, str(PROJECT))
 
-from r4.common import (  # noqa: E402
-    default_data_root,
-    default_results_root,
-    load_bundle,
-    zfill8,
-)
+from r4.common import default_data_root, default_results_root, load_bundle, zfill8  # noqa: E402
 from r4.soil_analysis import (  # noqa: E402
     BOOTSTRAP_ROUNDS,
     BOOTSTRAP_SEED,
@@ -66,11 +60,8 @@ SWE_REF_DIR = default_results_root() / "r4_swe_reference_v1"
 CARAVAN_REF_DIR = default_results_root() / "r4_caravan_soil_reference_v1"
 MIN_ANNUAL_SWE_PEAK_MM = 5.0
 
-
 def bootstrap_median_ci(
-    values: np.ndarray,
-    n_boot: int = BOOTSTRAP_ROUNDS,
-    seed: int = BOOTSTRAP_SEED,
+    values: np.ndarray, n_boot: int = BOOTSTRAP_ROUNDS, seed: int = BOOTSTRAP_SEED,
 ) -> Tuple[float, float, float]:
     """Return (median, 2.5% CI, 97.5% CI) via nonparametric bootstrap."""
     v = values[np.isfinite(values)]
@@ -107,63 +98,46 @@ def run_performance_controls(
 
     subset_rows = []
 
-    for thr_label, thr_val in [
-        ("all_basins", np.inf),
-        ("abs_delta_kge_le_005", 0.05),
-        ("abs_delta_kge_le_002", 0.02),
-    ]:
+    for thr_label, thr_val in [("all_basins", np.inf), ("abs_delta_kge_le_005", 0.05), ("abs_delta_kge_le_002", 0.02)]:
         sub = merged[merged["abs_delta_kge"] <= thr_val].copy()
         n_all = len(sub)
         n_snow_act = int((sub["snow_burden_swe_mm"] >= 20.0).sum())
         n_high_snow = int((sub["snow_burden_swe_mm"] >= 212.0).sum())
 
         # All matching basins in subset
-        med_danom, danom_lo, danom_hi = bootstrap_median_ci(
-            sub["delta_anomaly_corr"].to_numpy()
-        )
+        med_danom, danom_lo, danom_hi = bootstrap_median_ci(sub["delta_anomaly_corr"].to_numpy())
         med_d7d, d7d_lo, d7d_hi = bootstrap_median_ci(sub["delta_7d_corr"].to_numpy())
 
         # High-snow matching basins in subset
         sub_high = sub[sub["snow_burden_swe_mm"] >= 212.0]
-        med_danom_hs, danom_hs_lo, danom_hs_hi = bootstrap_median_ci(
-            sub_high["delta_anomaly_corr"].to_numpy()
-        )
-        med_d7d_hs, d7d_hs_lo, d7d_hs_hi = bootstrap_median_ci(
-            sub_high["delta_7d_corr"].to_numpy()
-        )
+        med_danom_hs, danom_hs_lo, danom_hs_hi = bootstrap_median_ci(sub_high["delta_anomaly_corr"].to_numpy())
+        med_d7d_hs, d7d_hs_lo, d7d_hs_hi = bootstrap_median_ci(sub_high["delta_7d_corr"].to_numpy())
 
-        subset_rows.append(
-            {
-                "regime": regime,
-                "threshold": thr_label,
-                "max_abs_delta_kge": float(thr_val) if np.isfinite(thr_val) else -1.0,
-                "n_basins_all": n_all,
-                "n_snow_active": n_snow_act,
-                "n_high_snow": n_high_snow,
-                "delta_anomaly_corr_median": med_danom,
-                "delta_anomaly_corr_ci_lower": danom_lo,
-                "delta_anomaly_corr_ci_upper": danom_hi,
-                "delta_7d_corr_median": med_d7d,
-                "delta_7d_corr_ci_lower": d7d_lo,
-                "delta_7d_corr_ci_upper": d7d_hi,
-                "high_snow_delta_anomaly_median": med_danom_hs,
-                "high_snow_delta_anomaly_ci_lower": danom_hs_lo,
-                "high_snow_delta_anomaly_ci_upper": danom_hs_hi,
-                "high_snow_delta_7d_median": med_d7d_hs,
-                "high_snow_delta_7d_ci_lower": d7d_hs_lo,
-                "high_snow_delta_7d_ci_upper": d7d_hs_hi,
-            }
-        )
+        subset_rows.append({
+            "regime": regime,
+            "threshold": thr_label,
+            "max_abs_delta_kge": float(thr_val) if np.isfinite(thr_val) else -1.0,
+            "n_basins_all": n_all,
+            "n_snow_active": n_snow_act,
+            "n_high_snow": n_high_snow,
+            "delta_anomaly_corr_median": med_danom,
+            "delta_anomaly_corr_ci_lower": danom_lo,
+            "delta_anomaly_corr_ci_upper": danom_hi,
+            "delta_7d_corr_median": med_d7d,
+            "delta_7d_corr_ci_lower": d7d_lo,
+            "delta_7d_corr_ci_upper": d7d_hi,
+            "high_snow_delta_anomaly_median": med_danom_hs,
+            "high_snow_delta_anomaly_ci_lower": danom_hs_lo,
+            "high_snow_delta_anomaly_ci_upper": danom_hs_hi,
+            "high_snow_delta_7d_median": med_d7d_hs,
+            "high_snow_delta_7d_ci_lower": d7d_hs_lo,
+            "high_snow_delta_7d_ci_upper": d7d_hs_hi,
+        })
 
     # 1.2 Controlled regression
     # DeltaC = beta0 + beta1 * std(SWE) + beta2 * std(DeltaKGE) + error
     reg_rows = []
-    for metric_col in [
-        "delta_anomaly_corr",
-        "delta_7d_corr",
-        "delta_raw_daily_corr",
-        "delta_monthly_corr",
-    ]:
+    for metric_col in ["delta_anomaly_corr", "delta_7d_corr", "delta_raw_daily_corr", "delta_monthly_corr"]:
         y = merged[metric_col].to_numpy(dtype=np.float64)
         x_swe = merged["snow_burden_swe_mm"].to_numpy(dtype=np.float64)
         x_dkge = merged["delta_kge"].to_numpy(dtype=np.float64)
@@ -192,21 +166,19 @@ def run_performance_controls(
         ci_b1 = np.nanquantile(boot_b1, [0.025, 0.975])
         ci_b2 = np.nanquantile(boot_b2, [0.025, 0.975])
 
-        reg_rows.append(
-            {
-                "regime": regime,
-                "target_metric": metric_col,
-                "n_basins": n,
-                "beta0_intercept": b0,
-                "beta1_swe_burden_std": b1,
-                "beta1_ci_lower": float(ci_b1[0]),
-                "beta1_ci_upper": float(ci_b1[1]),
-                "beta2_delta_kge_std": b2,
-                "beta2_ci_lower": float(ci_b2[0]),
-                "beta2_ci_upper": float(ci_b2[1]),
-                "swe_effect_remains_positive": bool(ci_b1[0] > 0.0),
-            }
-        )
+        reg_rows.append({
+            "regime": regime,
+            "target_metric": metric_col,
+            "n_basins": n,
+            "beta0_intercept": b0,
+            "beta1_swe_burden_std": b1,
+            "beta1_ci_lower": float(ci_b1[0]),
+            "beta1_ci_upper": float(ci_b1[1]),
+            "beta2_delta_kge_std": b2,
+            "beta2_ci_lower": float(ci_b2[0]),
+            "beta2_ci_upper": float(ci_b2[1]),
+            "swe_effect_remains_positive": bool(ci_b1[0] > 0.0),
+        })
 
     return pd.DataFrame(subset_rows), pd.DataFrame(reg_rows)
 
@@ -226,114 +198,68 @@ def run_regional_and_extreme_robustness(
     all_regions = sorted(sub["huc2"].unique())
 
     # Full sample baseline
-    full_rho_anom = stats.spearmanr(
-        sub["snow_burden_swe_mm"], sub["delta_anomaly_corr"]
-    )[0]
+    full_rho_anom = stats.spearmanr(sub["snow_burden_swe_mm"], sub["delta_anomaly_corr"])[0]
     full_rho_7d = stats.spearmanr(sub["snow_burden_swe_mm"], sub["delta_7d_corr"])[0]
-    full_hs_anom = float(
-        sub[sub["snow_burden_swe_mm"] >= 212.0]["delta_anomaly_corr"].median()
-    )
-    full_hs_7d = float(
-        sub[sub["snow_burden_swe_mm"] >= 212.0]["delta_7d_corr"].median()
-    )
+    full_hs_anom = float(sub[sub["snow_burden_swe_mm"] >= 212.0]["delta_anomaly_corr"].median())
+    full_hs_7d = float(sub[sub["snow_burden_swe_mm"] >= 212.0]["delta_7d_corr"].median())
 
     loro_rows = []
-    loro_rows.append(
-        {
-            "regime": regime,
-            "dropped_region": "NONE (Full Sample)",
-            "n_basins_retained": len(sub),
-            "rho_delta_anomaly_swe": float(full_rho_anom),
-            "rho_delta_7d_swe": float(full_rho_7d),
-            "high_snow_median_delta_anomaly": full_hs_anom,
-            "high_snow_median_delta_7d": full_hs_7d,
-        }
-    )
+    loro_rows.append({
+        "regime": regime,
+        "dropped_region": "NONE (Full Sample)",
+        "n_basins_retained": len(sub),
+        "rho_delta_anomaly_swe": float(full_rho_anom),
+        "rho_delta_7d_swe": float(full_rho_7d),
+        "high_snow_median_delta_anomaly": full_hs_anom,
+        "high_snow_median_delta_7d": full_hs_7d,
+    })
 
     for r in all_regions:
         sub_loro = sub[sub["huc2"] != r]
         n_ret = len(sub_loro)
-        rho_a = float(
-            stats.spearmanr(
-                sub_loro["snow_burden_swe_mm"], sub_loro["delta_anomaly_corr"]
-            )[0]
-        )
-        rho_7 = float(
-            stats.spearmanr(sub_loro["snow_burden_swe_mm"], sub_loro["delta_7d_corr"])[
-                0
-            ]
-        )
-        hs_a = float(
-            sub_loro[sub_loro["snow_burden_swe_mm"] >= 212.0][
-                "delta_anomaly_corr"
-            ].median()
-        )
-        hs_7 = float(
-            sub_loro[sub_loro["snow_burden_swe_mm"] >= 212.0]["delta_7d_corr"].median()
-        )
-        loro_rows.append(
-            {
-                "regime": regime,
-                "dropped_region": f"HUC_{r}",
-                "n_basins_retained": n_ret,
-                "rho_delta_anomaly_swe": rho_a,
-                "rho_delta_7d_swe": rho_7,
-                "high_snow_median_delta_anomaly": hs_a,
-                "high_snow_median_delta_7d": hs_7,
-            }
-        )
+        rho_a = float(stats.spearmanr(sub_loro["snow_burden_swe_mm"], sub_loro["delta_anomaly_corr"])[0])
+        rho_7 = float(stats.spearmanr(sub_loro["snow_burden_swe_mm"], sub_loro["delta_7d_corr"])[0])
+        hs_a = float(sub_loro[sub_loro["snow_burden_swe_mm"] >= 212.0]["delta_anomaly_corr"].median())
+        hs_7 = float(sub_loro[sub_loro["snow_burden_swe_mm"] >= 212.0]["delta_7d_corr"].median())
+        loro_rows.append({
+            "regime": regime,
+            "dropped_region": f"HUC_{r}",
+            "n_basins_retained": n_ret,
+            "rho_delta_anomaly_swe": rho_a,
+            "rho_delta_7d_swe": rho_7,
+            "high_snow_median_delta_anomaly": hs_a,
+            "high_snow_median_delta_7d": hs_7,
+        })
 
     # 2.2 Extreme SWE Trimming
     trim_rows = []
-    for trim_label, trim_pct in [
-        ("full_sample", 0.0),
-        ("trim_top_1pct", 0.01),
-        ("trim_top_5pct", 0.05),
-    ]:
+    for trim_label, trim_pct in [("full_sample", 0.0), ("trim_top_1pct", 0.01), ("trim_top_5pct", 0.05)]:
         n_drop = int(np.ceil(len(sub) * trim_pct))
         if n_drop > 0:
-            threshold_val = float(
-                np.partition(sub["snow_burden_swe_mm"], -n_drop)[-n_drop]
-            )
+            threshold_val = float(np.partition(sub["snow_burden_swe_mm"], -n_drop)[-n_drop])
             sub_trim = sub[sub["snow_burden_swe_mm"] < threshold_val].copy()
         else:
             sub_trim = sub.copy()
             threshold_val = float(sub["snow_burden_swe_mm"].max())
 
         n_ret = len(sub_trim)
-        rho_a = float(
-            stats.spearmanr(
-                sub_trim["snow_burden_swe_mm"], sub_trim["delta_anomaly_corr"]
-            )[0]
-        )
-        rho_7 = float(
-            stats.spearmanr(sub_trim["snow_burden_swe_mm"], sub_trim["delta_7d_corr"])[
-                0
-            ]
-        )
+        rho_a = float(stats.spearmanr(sub_trim["snow_burden_swe_mm"], sub_trim["delta_anomaly_corr"])[0])
+        rho_7 = float(stats.spearmanr(sub_trim["snow_burden_swe_mm"], sub_trim["delta_7d_corr"])[0])
         hs_sub = sub_trim[sub_trim["snow_burden_swe_mm"] >= 212.0]
         hs_a = float(hs_sub["delta_anomaly_corr"].median()) if len(hs_sub) else np.nan
-        hs_7 = (
-            float(hs_sub["delta_7d"].median())
-            if len(hs_sub) and "delta_7d" in hs_sub
-            else float(hs_sub["delta_7d_corr"].median())
-            if len(hs_sub)
-            else np.nan
-        )
+        hs_7 = float(hs_sub["delta_7d"].median()) if len(hs_sub) and "delta_7d" in hs_sub else float(hs_sub["delta_7d_corr"].median()) if len(hs_sub) else np.nan
 
-        trim_rows.append(
-            {
-                "regime": regime,
-                "trimming_scheme": trim_label,
-                "n_basins_dropped": n_drop,
-                "n_basins_retained": n_ret,
-                "max_retained_swe_mm": float(sub_trim["snow_burden_swe_mm"].max()),
-                "rho_delta_anomaly_swe": rho_a,
-                "rho_delta_7d_swe": rho_7,
-                "high_snow_median_delta_anomaly": hs_a,
-                "high_snow_median_delta_7d": hs_7,
-            }
-        )
+        trim_rows.append({
+            "regime": regime,
+            "trimming_scheme": trim_label,
+            "n_basins_dropped": n_drop,
+            "n_basins_retained": n_ret,
+            "max_retained_swe_mm": float(sub_trim["snow_burden_swe_mm"].max()),
+            "rho_delta_anomaly_swe": rho_a,
+            "rho_delta_7d_swe": rho_7,
+            "high_snow_median_delta_anomaly": hs_a,
+            "high_snow_median_delta_7d": hs_7,
+        })
 
     # 2.3 Response-shape audit across SWE deciles
     decile_labels = [f"D{d:02d}" for d in range(1, 11)]
@@ -344,28 +270,22 @@ def run_regional_and_extreme_robustness(
         d_sub = sub[sub["swe_decile"] == d_lab]
         if len(d_sub) == 0:
             continue
-        d_anom_med, d_anom_lo, d_anom_hi = bootstrap_median_ci(
-            d_sub["delta_anomaly_corr"].to_numpy()
-        )
-        d_7d_med, d_7d_lo, d_7d_hi = bootstrap_median_ci(
-            d_sub["delta_7d_corr"].to_numpy()
-        )
-        decile_rows.append(
-            {
-                "regime": regime,
-                "decile": d_lab,
-                "n_basins": len(d_sub),
-                "swe_burden_median_mm": float(d_sub["snow_burden_swe_mm"].median()),
-                "swe_burden_min_mm": float(d_sub["snow_burden_swe_mm"].min()),
-                "swe_burden_max_mm": float(d_sub["snow_burden_swe_mm"].max()),
-                "delta_anomaly_corr_median": d_anom_med,
-                "delta_anomaly_corr_ci_lower": d_anom_lo,
-                "delta_anomaly_corr_ci_upper": d_anom_hi,
-                "delta_7d_corr_median": d_7d_med,
-                "delta_7d_corr_ci_lower": d_7d_lo,
-                "delta_7d_corr_ci_upper": d_7d_hi,
-            }
-        )
+        d_anom_med, d_anom_lo, d_anom_hi = bootstrap_median_ci(d_sub["delta_anomaly_corr"].to_numpy())
+        d_7d_med, d_7d_lo, d_7d_hi = bootstrap_median_ci(d_sub["delta_7d_corr"].to_numpy())
+        decile_rows.append({
+            "regime": regime,
+            "decile": d_lab,
+            "n_basins": len(d_sub),
+            "swe_burden_median_mm": float(d_sub["snow_burden_swe_mm"].median()),
+            "swe_burden_min_mm": float(d_sub["snow_burden_swe_mm"].min()),
+            "swe_burden_max_mm": float(d_sub["snow_burden_swe_mm"].max()),
+            "delta_anomaly_corr_median": d_anom_med,
+            "delta_anomaly_corr_ci_lower": d_anom_lo,
+            "delta_anomaly_corr_ci_upper": d_anom_hi,
+            "delta_7d_corr_median": d_7d_med,
+            "delta_7d_corr_ci_lower": d_7d_lo,
+            "delta_7d_corr_ci_upper": d_7d_hi,
+        })
 
     return pd.DataFrame(loro_rows), pd.DataFrame(trim_rows), pd.DataFrame(decile_rows)
 
@@ -398,9 +318,7 @@ def run_process_phase_analysis(
     months = d.month.values
 
     # Only evaluate for snow-active catchments (SWE >= 20 mm, 352 basins)
-    snow_active_basins = [
-        b for b in basin_ids if burden_df.loc[b, "median_annual_max_swe_mm"] >= 20.0
-    ]
+    snow_active_basins = [b for b in basin_ids if burden_df.loc[b, "median_annual_max_swe_mm"] >= 20.0]
 
     phase_rows = []
 
@@ -461,51 +379,31 @@ def run_process_phase_analysis(
             mo_p = months[p_mask]
 
             # Daily raw correlation
-            r_d_b = (
-                float(stats.pearsonr(wb_p, ref_p)[0])
-                if wb_p.std() > 0 and ref_p.std() > 0
-                else np.nan
-            )
-            r_d_c = (
-                float(stats.pearsonr(wc_p, ref_p)[0])
-                if wc_p.std() > 0 and ref_p.std() > 0
-                else np.nan
-            )
+            r_d_b = float(stats.pearsonr(wb_p, ref_p)[0]) if wb_p.std() > 0 and ref_p.std() > 0 else np.nan
+            r_d_c = float(stats.pearsonr(wc_p, ref_p)[0]) if wc_p.std() > 0 and ref_p.std() > 0 else np.nan
 
             # Deseasonalized anomaly correlation within phase
             wb_an = calendar_month_anomaly(wb_p, mo_p)
             wc_an = calendar_month_anomaly(wc_p, mo_p)
             ref_an = calendar_month_anomaly(ref_p, mo_p)
 
-            r_a_b = (
-                float(stats.pearsonr(wb_an, ref_an)[0])
-                if np.nanstd(wb_an) > 0 and np.nanstd(ref_an) > 0
-                else np.nan
-            )
-            r_a_c = (
-                float(stats.pearsonr(wc_an, ref_an)[0])
-                if np.nanstd(wc_an) > 0 and np.nanstd(ref_an) > 0
-                else np.nan
-            )
+            r_a_b = float(stats.pearsonr(wb_an, ref_an)[0]) if np.nanstd(wb_an) > 0 and np.nanstd(ref_an) > 0 else np.nan
+            r_a_c = float(stats.pearsonr(wc_an, ref_an)[0]) if np.nanstd(wc_an) > 0 and np.nanstd(ref_an) > 0 else np.nan
 
-            phase_rows.append(
-                {
-                    "regime": regime,
-                    "basin_id": b,
-                    "phase_code": p_code,
-                    "phase_name": p_name,
-                    "n_days": n_p_days,
-                    "base_daily_corr": r_d_b,
-                    "cn_daily_corr": r_d_c,
-                    "delta_daily_corr": r_d_c - r_d_b,
-                    "base_anomaly_corr": r_a_b,
-                    "cn_anomaly_corr": r_a_c,
-                    "delta_anomaly_corr": r_a_c - r_a_b,
-                    "snow_burden_swe_mm": float(
-                        burden_df.loc[b, "median_annual_max_swe_mm"]
-                    ),
-                }
-            )
+            phase_rows.append({
+                "regime": regime,
+                "basin_id": b,
+                "phase_code": p_code,
+                "phase_name": p_name,
+                "n_days": n_p_days,
+                "base_daily_corr": r_d_b,
+                "cn_daily_corr": r_d_c,
+                "delta_daily_corr": r_d_c - r_d_b,
+                "base_anomaly_corr": r_a_b,
+                "cn_anomaly_corr": r_a_c,
+                "delta_anomaly_corr": r_a_c - r_a_b,
+                "snow_burden_swe_mm": float(burden_df.loc[b, "median_annual_max_swe_mm"]),
+            })
 
     return pd.DataFrame(phase_rows)
 
@@ -613,32 +511,26 @@ def run_timing_definition_sensitivity(
         wb_arr = np.array(w_errs_base_all)
         wc_arr = np.array(w_errs_cn_all)
 
-        summary_rows.append(
-            {
-                "regime": regime,
-                "peak_definition": peak_name,
-                "wetup_definition": wetup_name,
-                "n_valid_basin_years": len(pb),
-                "base_signed_peak_error_median": float(np.nanmedian(pb)),
-                "base_signed_peak_error_mean": float(np.nanmean(pb)),
-                "base_abs_peak_error_median": float(np.nanmedian(np.abs(pb))),
-                "base_abs_peak_error_mean": float(np.nanmean(np.abs(pb))),
-                "cn_signed_peak_error_median": float(np.nanmedian(pc)),
-                "cn_signed_peak_error_mean": float(np.nanmean(pc)),
-                "cn_abs_peak_error_median": float(np.nanmedian(np.abs(pc))),
-                "cn_abs_peak_error_mean": float(np.nanmean(np.abs(pc))),
-                "peak_abs_error_improvement_days": float(
-                    np.nanmedian(np.abs(pb)) - np.nanmedian(np.abs(pc))
-                ),
-                "base_signed_wetup_error_median": float(np.nanmedian(wb_arr)),
-                "base_abs_wetup_error_median": float(np.nanmedian(np.abs(wb_arr))),
-                "cn_signed_wetup_error_median": float(np.nanmedian(wc_arr)),
-                "cn_abs_wetup_error_median": float(np.nanmedian(np.abs(wc_arr))),
-                "wetup_abs_error_improvement_days": float(
-                    np.nanmedian(np.abs(wb_arr)) - np.nanmedian(np.abs(wc_arr))
-                ),
-            }
-        )
+        summary_rows.append({
+            "regime": regime,
+            "peak_definition": peak_name,
+            "wetup_definition": wetup_name,
+            "n_valid_basin_years": len(pb),
+            "base_signed_peak_error_median": float(np.nanmedian(pb)),
+            "base_signed_peak_error_mean": float(np.nanmean(pb)),
+            "base_abs_peak_error_median": float(np.nanmedian(np.abs(pb))),
+            "base_abs_peak_error_mean": float(np.nanmean(np.abs(pb))),
+            "cn_signed_peak_error_median": float(np.nanmedian(pc)),
+            "cn_signed_peak_error_mean": float(np.nanmean(pc)),
+            "cn_abs_peak_error_median": float(np.nanmedian(np.abs(pc))),
+            "cn_abs_peak_error_mean": float(np.nanmean(np.abs(pc))),
+            "peak_abs_error_improvement_days": float(np.nanmedian(np.abs(pb)) - np.nanmedian(np.abs(pc))),
+            "base_signed_wetup_error_median": float(np.nanmedian(wb_arr)),
+            "base_abs_wetup_error_median": float(np.nanmedian(np.abs(wb_arr))),
+            "cn_signed_wetup_error_median": float(np.nanmedian(wc_arr)),
+            "cn_abs_wetup_error_median": float(np.nanmedian(np.abs(wc_arr))),
+            "wetup_abs_error_improvement_days": float(np.nanmedian(np.abs(wb_arr)) - np.nanmedian(np.abs(wc_arr))),
+        })
 
     return pd.DataFrame(summary_rows)
 
@@ -654,15 +546,9 @@ def run_all_robustness_checks() -> Dict[str, Any]:
     print("=" * 80)
 
     # 1. Load paired effects, consistency, Caravan cache, and SWE burden
-    df_paired = pd.read_csv(
-        OUT_DIR / "paired_structural_effects.csv", dtype={"basin_id": str}
-    )
-    df_consistency = pd.read_csv(
-        OUT_DIR / "basin_state_consistency.csv", dtype={"basin_id": str}
-    )
-    burden_df = pd.read_csv(
-        SWE_REF_DIR / "swe_basin_burden_test.csv", dtype={"basin_id": str}
-    ).set_index("basin_id")
+    df_paired = pd.read_csv(OUT_DIR / "paired_structural_effects.csv", dtype={"basin_id": str})
+    df_consistency = pd.read_csv(OUT_DIR / "basin_state_consistency.csv", dtype={"basin_id": str})
+    burden_df = pd.read_csv(SWE_REF_DIR / "swe_basin_burden_test.csv", dtype={"basin_id": str}).set_index("basin_id")
 
     caravan = np.load(CARAVAN_REF_DIR / "caravan_soil_ensemble.npz")
     basin_ids = [str(b).zfill(8) for b in caravan["basin_ids"]]
@@ -686,30 +572,14 @@ def run_all_robustness_checks() -> Dict[str, Any]:
         ("IC_fused", "ic_fused", None, ""),
     ]:
         if seed is not None:
-            qb = np.load(
-                res_root
-                / f"r4_{prefix}_XAJ_seed{seed}"
-                / f"{prefix}_XAJ_seed{seed}_full_arrays.npz"
-            )["q_full"][:, test_sl]
-            qc = np.load(
-                res_root
-                / f"r4_{prefix}_XAJ_CN_seed{seed}"
-                / f"{prefix}_XAJ_CN_seed{seed}_full_arrays.npz"
-            )["q_full"][:, test_sl]
+            qb = np.load(res_root / f"r4_{prefix}_XAJ_seed{seed}" / f"{prefix}_XAJ_seed{seed}_full_arrays.npz")["q_full"][:, test_sl]
+            qc = np.load(res_root / f"r4_{prefix}_XAJ_CN_seed{seed}" / f"{prefix}_XAJ_CN_seed{seed}_full_arrays.npz")["q_full"][:, test_sl]
         else:
-            qb = np.load(
-                res_root / f"r4_{prefix}_XAJ" / f"{prefix}_XAJ_full_arrays.npz"
-            )["q_full"][:, test_sl]
-            qc = np.load(
-                res_root / f"r4_{prefix}_XAJ_CN" / f"{prefix}_XAJ_CN_full_arrays.npz"
-            )["q_full"][:, test_sl]
+            qb = np.load(res_root / f"r4_{prefix}_XAJ" / f"{prefix}_XAJ_full_arrays.npz")["q_full"][:, test_sl]
+            qc = np.load(res_root / f"r4_{prefix}_XAJ_CN" / f"{prefix}_XAJ_CN_full_arrays.npz")["q_full"][:, test_sl]
 
-        kb = np.array(
-            [compute_kge_fp64(qb[i], obs_test[i]) for i in range(len(basin_ids))]
-        )
-        kc = np.array(
-            [compute_kge_fp64(qc[i], obs_test[i]) for i in range(len(basin_ids))]
-        )
+        kb = np.array([compute_kge_fp64(qb[i], obs_test[i]) for i in range(len(basin_ids))])
+        kc = np.array([compute_kge_fp64(qc[i], obs_test[i]) for i in range(len(basin_ids))])
         kge_maps[regime] = pd.DataFrame({"kge_base": kb, "kge_cn": kc}, index=basin_ids)
 
     # Accumulate results across modules
@@ -728,61 +598,33 @@ def run_all_robustness_checks() -> Dict[str, Any]:
     ]:
         print(f"\n[Robustness] Executing checks for {regime}...")
         # 1. Performance controls
-        sub_df, reg_df = run_performance_controls(
-            df_paired, df_consistency, kge_maps[regime], regime
-        )
+        sub_df, reg_df = run_performance_controls(df_paired, df_consistency, kge_maps[regime], regime)
         perf_subset_dfs.append(sub_df)
         perf_reg_dfs.append(reg_df)
 
         # 2. Regional & Extreme SWE
-        loro_df, trim_df, dec_df = run_regional_and_extreme_robustness(
-            df_paired, regime
-        )
+        loro_df, trim_df, dec_df = run_regional_and_extreme_robustness(df_paired, regime)
         loro_dfs.append(loro_df)
         trim_dfs.append(trim_df)
         decile_dfs.append(dec_df)
 
         # Load W_base and W_cn
         if seed is not None:
-            base_npz = np.load(
-                res_root
-                / f"r4_{prefix}_XAJ_seed{seed}"
-                / f"{prefix}_XAJ_seed{seed}_full_arrays.npz"
-            )
-            cn_npz = np.load(
-                res_root
-                / f"r4_{prefix}_XAJ_CN_seed{seed}"
-                / f"{prefix}_XAJ_CN_seed{seed}_full_arrays.npz"
-            )
+            base_npz = np.load(res_root / f"r4_{prefix}_XAJ_seed{seed}" / f"{prefix}_XAJ_seed{seed}_full_arrays.npz")
+            cn_npz = np.load(res_root / f"r4_{prefix}_XAJ_CN_seed{seed}" / f"{prefix}_XAJ_CN_seed{seed}_full_arrays.npz")
         else:
-            base_npz = np.load(
-                res_root / f"r4_{prefix}_XAJ" / f"{prefix}_XAJ_full_arrays.npz"
-            )
-            cn_npz = np.load(
-                res_root / f"r4_{prefix}_XAJ_CN" / f"{prefix}_XAJ_CN_full_arrays.npz"
-            )
+            base_npz = np.load(res_root / f"r4_{prefix}_XAJ" / f"{prefix}_XAJ_full_arrays.npz")
+            cn_npz = np.load(res_root / f"r4_{prefix}_XAJ_CN" / f"{prefix}_XAJ_CN_full_arrays.npz")
 
-        wb = (
-            base_npz["wu"][:, test_sl]
-            + base_npz["wl"][:, test_sl]
-            + base_npz["wd"][:, test_sl]
-        ).astype(np.float64)
-        wc = (
-            cn_npz["wu"][:, test_sl]
-            + cn_npz["wl"][:, test_sl]
-            + cn_npz["wd"][:, test_sl]
-        ).astype(np.float64)
+        wb = (base_npz["wu"][:, test_sl] + base_npz["wl"][:, test_sl] + base_npz["wd"][:, test_sl]).astype(np.float64)
+        wc = (cn_npz["wu"][:, test_sl] + cn_npz["wl"][:, test_sl] + cn_npz["wd"][:, test_sl]).astype(np.float64)
 
         # 3. Process Phase conditioned consistency
-        ph_df = run_process_phase_analysis(
-            basin_ids, test_dates, wb, wc, sm100_test, swe_ref_test, burden_df, regime
-        )
+        ph_df = run_process_phase_analysis(basin_ids, test_dates, wb, wc, sm100_test, swe_ref_test, burden_df, regime)
         phase_dfs.append(ph_df)
 
         # 4. Timing Sensitivity
-        ts_df = run_timing_definition_sensitivity(
-            basin_ids, test_dates, wb, wc, sm100_test, swe_ref_test, regime
-        )
+        ts_df = run_timing_definition_sensitivity(basin_ids, test_dates, wb, wc, sm100_test, swe_ref_test, regime)
         timing_sens_dfs.append(ts_df)
 
     # Concatenate and save all tables
@@ -817,18 +659,12 @@ def run_all_robustness_checks() -> Dict[str, Any]:
             p_dict[p_name] = {
                 "n_basins_evaluated": len(p_sub),
                 "total_valid_days": int(p_sub["n_days"].sum()),
-                "base_median_anomaly_corr": float(
-                    np.nanmedian(p_sub["base_anomaly_corr"])
-                ),
+                "base_median_anomaly_corr": float(np.nanmedian(p_sub["base_anomaly_corr"])),
                 "cn_median_anomaly_corr": float(np.nanmedian(p_sub["cn_anomaly_corr"])),
-                "delta_anomaly_corr_median": float(
-                    np.nanmedian(p_sub["delta_anomaly_corr"])
-                ),
+                "delta_anomaly_corr_median": float(np.nanmedian(p_sub["delta_anomaly_corr"])),
                 "base_median_daily_corr": float(np.nanmedian(p_sub["base_daily_corr"])),
                 "cn_median_daily_corr": float(np.nanmedian(p_sub["cn_daily_corr"])),
-                "delta_daily_corr_median": float(
-                    np.nanmedian(p_sub["delta_daily_corr"])
-                ),
+                "delta_daily_corr_median": float(np.nanmedian(p_sub["delta_daily_corr"])),
             }
         phase_summary[regime] = p_dict
 
@@ -848,9 +684,7 @@ def run_all_robustness_checks() -> Dict[str, Any]:
         "phase_conditioned_summary": phase_summary,
     }
 
-    (OUT_DIR / "r4_robustness_report.json").write_text(
-        json.dumps(master_report, indent=2, sort_keys=True), encoding="utf-8"
-    )
+    (OUT_DIR / "r4_robustness_report.json").write_text(json.dumps(master_report, indent=2, sort_keys=True), encoding="utf-8")
     print(f"\nAll robustness tables and master report written to {OUT_DIR}/")
     return master_report
 

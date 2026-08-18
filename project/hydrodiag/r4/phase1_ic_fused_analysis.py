@@ -22,24 +22,14 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-PROJECT = Path(
-    "/home/jingxin/orca/workspaces/dmg-research/hydrodiag-R4-exp/project/hydrodiag"
-)
+PROJECT = Path("/home/jingxin/orca/workspaces/dmg-research/hydrodiag-R4-exp/project/hydrodiag")
 sys.path.insert(0, str(PROJECT))
 
-from r4.common import (  # noqa: E402
-    default_data_root,
-    default_results_root,
-    load_bundle,
-    zfill8,
-)
+from r4.common import default_data_root, default_results_root, load_bundle, zfill8  # noqa: E402
 from r4.forward_export import export_run  # noqa: E402
 from r4.input_adapters import read_ic_fused  # noqa: E402
 from r4.phase1_dpl_analysis import (  # noqa: E402
-    MIN_ACTIVE_DAYS,
-    consistency_for_basin,
-    theil_sen,
-    timing_metrics_for_basin,
+    MIN_ACTIVE_DAYS, consistency_for_basin, timing_metrics_for_basin, theil_sen,
 )
 
 IC_FUSED_TAG = "IC_FUSED_5x200_SENSITIVITY"
@@ -63,23 +53,13 @@ def export_fused_models(results_root: Path, data_root: Path, device: str) -> Non
         names = tuple(get_parameter_spec(model))
         params, meta = read_ic_fused(csv, model, names, basin_ids)
         manifest = export_run(
-            structure=model,
-            parameters=params,
-            parameter_meta=meta,
-            basin_ids=basin_ids,
-            data_root=data_root,
-            results_root=results_root,
-            run_id=run_id,
-            tag=IC_FUSED_TAG,
-            provenance={
-                "source_run": f"{IC_FUSED_RUN}/{model}",
-                "protocol": "fused IC CMA-ES, 5 starts x 200 generations, observed discharge",
-                "note": "NOT canonical IC (10x300 paired_v2); sensitivity only",
-            },
-            device=device,
-            batch=64,
-            validate_subset=8,
-            save_npz=True,
+            structure=model, parameters=params, parameter_meta=meta,
+            basin_ids=basin_ids, data_root=data_root, results_root=results_root,
+            run_id=run_id, tag=IC_FUSED_TAG,
+            provenance={"source_run": f"{IC_FUSED_RUN}/{model}",
+                        "protocol": "fused IC CMA-ES, 5 starts x 200 generations, observed discharge",
+                        "note": "NOT canonical IC (10x300 paired_v2); sensitivity only"},
+            device=device, batch=64, validate_subset=8, save_npz=True,
         )
         print(f"exported {run_id}: q_finite={manifest['q_finite']}")
 
@@ -88,12 +68,11 @@ def main() -> None:
     import argparse
 
     import torch
+
     from training.dpl.run_dpl_model import compute_kge_fp64
 
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
-        "--device", default="cuda" if torch.cuda.is_available() else "cpu"
-    )
+    parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
     parser.add_argument("--skip-export", action="store_true")
     parser.add_argument("--results-root", type=Path, default=None)
     parser.add_argument("--data-root", type=Path, default=None)
@@ -113,9 +92,7 @@ def main() -> None:
     if list(ref["basin_ids"]) != basin_ids:
         raise ValueError("SWE reference basin order differs from bundle order")
     swe_test = ref["swe_median"][:, test_sl]
-    burden = pd.read_csv(
-        SWE_REF_DIR / "swe_basin_burden_test.csv", dtype={"basin_id": str}
-    ).set_index("basin_id")
+    burden = pd.read_csv(SWE_REF_DIR / "swe_basin_burden_test.csv", dtype={"basin_id": str}).set_index("basin_id")
     obs_test = bundle.target_mm_day[:, test_sl]
 
     def arrays(model: str) -> np.ndarray:
@@ -125,12 +102,8 @@ def main() -> None:
     q = {model: arrays(model)["q_full"][:, test_sl] for model in ("XAJ", "XAJ_CN")}
     g_cn = arrays("XAJ_CN")["G"][:, test_sl]
 
-    kge = {
-        model: np.array(
-            [compute_kge_fp64(q[model][i], obs_test[i]) for i in range(len(basin_ids))]
-        )
-        for model in ("XAJ", "XAJ_CN")
-    }
+    kge = {model: np.array([compute_kge_fp64(q[model][i], obs_test[i])
+                            for i in range(len(basin_ids))]) for model in ("XAJ", "XAJ_CN")}
 
     # ---- analysis A --------------------------------------------------------
     rows_a = []
@@ -144,17 +117,14 @@ def main() -> None:
     delta = kge["XAJ_CN"] - kge["XAJ"]
     rows_b = []
     for i, b in enumerate(basin_ids):
-        rows_b.append(
-            {
-                "basin_id": b,
-                "kge_cn_test": kge["XAJ_CN"][i],
-                "kge_base_test": kge["XAJ"][i],
-                "delta_cn_minus_base": delta[i],
-                "median_annual_max_swe_mm": burden.loc[b, "median_annual_max_swe_mm"],
-                "median_swe_positive_days": burden.loc[b, "median_swe_positive_days"],
-                "frac_snow": bundle.raw_attributes[i, 3],
-            }
-        )
+        rows_b.append({
+            "basin_id": b,
+            "kge_cn_test": kge["XAJ_CN"][i], "kge_base_test": kge["XAJ"][i],
+            "delta_cn_minus_base": delta[i],
+            "median_annual_max_swe_mm": burden.loc[b, "median_annual_max_swe_mm"],
+            "median_swe_positive_days": burden.loc[b, "median_swe_positive_days"],
+            "frac_snow": bundle.raw_attributes[i, 3],
+        })
     df_b = pd.DataFrame(rows_b)
 
     summary_a = {
@@ -164,9 +134,7 @@ def main() -> None:
         "median_anomaly_corr": float(df_a["anomaly_corr"].median()),
         "median_nrmse": float(df_a["nrmse"].median()),
         "median_peak_timing_error_days": float(df_a["peak_timing_error_days"].median()),
-        "median_depletion_timing_error_days": float(
-            df_a["depletion_timing_error_days"].median()
-        ),
+        "median_depletion_timing_error_days": float(df_a["depletion_timing_error_days"].median()),
     }
     active_b = burden[burden["median_annual_max_swe_mm"] >= 20].index
     sub = df_a[df_a["basin_id"].isin(active_b)]
@@ -179,32 +147,25 @@ def main() -> None:
 
     summary_b = {"n_basins": int(len(df_b))}
     for axis in ("median_annual_max_swe_mm", "median_swe_positive_days", "frac_snow"):
-        summary_b[axis] = theil_sen(
-            df_b[axis].to_numpy(), df_b["delta_cn_minus_base"].to_numpy()
-        )
+        summary_b[axis] = theil_sen(df_b[axis].to_numpy(), df_b["delta_cn_minus_base"].to_numpy())
     suba = df_b[df_b["median_annual_max_swe_mm"] >= 20]
     summary_b["median_annual_max_swe_mm_snow_active_only"] = theil_sen(
-        suba["median_annual_max_swe_mm"].to_numpy(),
-        suba["delta_cn_minus_base"].to_numpy(),
-    )
+        suba["median_annual_max_swe_mm"].to_numpy(), suba["delta_cn_minus_base"].to_numpy())
 
     report = {
         "tag": IC_FUSED_TAG,
         "created_at": datetime.now(timezone.utc).isoformat(),
         "scope": "fused IC Base/CN (5 starts x 200 gen, observed discharge) — SENSITIVITY ONLY, not canonical IC",
         "test_period": "1995-10-01..2010-09-30",
-        "kge_test_levels": {
-            "base_median": float(np.nanmedian(kge["XAJ"])),
-            "cn_median": float(np.nanmedian(kge["XAJ_CN"])),
-        },
+        "kge_test_levels": {"base_median": float(np.nanmedian(kge["XAJ"])),
+                            "cn_median": float(np.nanmedian(kge["XAJ_CN"]))},
         "analysis_A_consistency": summary_a,
         "analysis_B_burden_gradient": summary_b,
         "direction_consistency_with_dpl": "compare with r4_phase1_dpl_official report",
     }
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     (OUT_DIR / "r4_phase1_ic_fused_sensitivity_report.json").write_text(
-        json.dumps(report, indent=2, sort_keys=True), encoding="utf-8"
-    )
+        json.dumps(report, indent=2, sort_keys=True), encoding="utf-8")
     df_a.to_csv(OUT_DIR / "snow_consistency_basin.csv", index=False)
     df_b.to_csv(OUT_DIR / "burden_gradient_basin.csv", index=False)
     print(json.dumps(report, indent=2, sort_keys=True))

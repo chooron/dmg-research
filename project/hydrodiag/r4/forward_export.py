@@ -27,10 +27,10 @@ import numpy as np
 from . import (
     DEV_ONLY,
     DEV_ONLY_SYNTHETIC_TRAINED,
+    IC_FUSED_5x200_SENSITIVITY,
     OFFICIAL_DPL_OBSERVATION_TRAINED,
     OFFICIAL_OBSERVATION_TRAINED,
     SYNTHETIC_TRAINED,
-    IC_FUSED_5x200_SENSITIVITY,
 )
 from .common import MODEL_KEYS, PERIOD_INDEX, bundle_config, load_bundle, zfill8
 from .state_export import (
@@ -43,37 +43,10 @@ from .state_export import (
 # Columns written to the daily export tables, per structure.
 EXPORT_COLUMNS = {
     "XAJ": ("discharge", "wu", "wl", "wd", "s", "fr", "qi", "qg"),
-    "XAJ_CN": (
-        "discharge",
-        "snow_pack",
-        "thermal_state",
-        "sca",
-        "rain",
-        "melt",
-        "effective_precip",
-        "wu",
-        "wl",
-        "wd",
-        "s",
-        "fr",
-        "qi",
-        "qg",
-        "evap",
-    ),
-    "XAJ_TGD2": (
-        "discharge",
-        "effective_precip",
-        "tgd_storage",
-        "tgd_tau",
-        "tgd_retention",
-        "wu",
-        "wl",
-        "wd",
-        "s",
-        "fr",
-        "qi",
-        "qg",
-    ),
+    "XAJ_CN": ("discharge", "snow_pack", "thermal_state", "sca", "rain", "melt",
+               "effective_precip", "wu", "wl", "wd", "s", "fr", "qi", "qg", "evap"),
+    "XAJ_TGD2": ("discharge", "effective_precip", "tgd_storage", "tgd_tau", "tgd_retention",
+                 "wu", "wl", "wd", "s", "fr", "qi", "qg"),
 }
 
 STATE_TO_COLUMN = {
@@ -88,13 +61,7 @@ STATE_TO_COLUMN = {
     "rain": "rain",
     "melt": "melt",
     "sca": "sca",
-    "wu": "wu",
-    "wl": "wl",
-    "wd": "wd",
-    "s": "s",
-    "fr": "fr",
-    "qi": "qi",
-    "qg": "qg",
+    "wu": "wu", "wl": "wl", "wd": "wd", "s": "s", "fr": "fr", "qi": "qi", "qg": "qg",
 }
 
 
@@ -136,9 +103,7 @@ def build_daily_tables(
     return tables
 
 
-def write_daily_csv(
-    tables: dict[str, list[dict[str, Any]]], out_dir: Path, run_id: str
-) -> list[Path]:
+def write_daily_csv(tables: dict[str, list[dict[str, Any]]], out_dir: Path, run_id: str) -> list[Path]:
     import csv
 
     paths: list[Path] = []
@@ -157,17 +122,16 @@ def write_daily_csv(
     return paths
 
 
-def psol_gthresh_manifest(
-    bundle: Any, basin_ids: list[str], device: Any, dtype: Any
-) -> dict[str, dict[str, Any]]:
+def psol_gthresh_manifest(bundle: Any, basin_ids: list[str], device: Any, dtype: Any) -> dict[str, dict[str, Any]]:
     """Per-basin psol_annual / g_thresh for the relevant windows (CN only).
 
     - ``full``: the window used by the continuous R4 export forward;
     - ``train_forcing`` / ``test_forcing``: the windows the R1-era per-period
       inference forwards used (informational; R1/R2 historical semantics).
     """
-    import torch
     from models.cemaneige import _estimate_psol_annual
+
+    import torch
 
     forcing = bundle.forcing.astype(np.float32)
     slices = period_slices_full(forcing.shape[1])
@@ -262,14 +226,8 @@ def export_run(
 
     models = model_instances(device, dtype)
     q_full, states = continuous_forward(
-        structure,
-        models[structure],
-        parameters,
-        bundle.forcing.astype(np.float32),
-        device,
-        dtype,
-        batch=batch,
-        validate_subset=validate_subset,
+        structure, models[structure], parameters, bundle.forcing.astype(np.float32),
+        device, dtype, batch=batch, validate_subset=validate_subset,
     )
 
     dates = bundle.dates
@@ -280,12 +238,8 @@ def export_run(
     if csv_basin_subset:
         csv_basins = [zfill8(b) for b in csv_basin_subset]
         if set(csv_basins) - set(expected):
-            raise ValueError(
-                "csv_basin_subset contains basins outside the exported set"
-            )
-        tables = build_daily_tables(
-            structure, csv_basins, dates, q_full, states, periods
-        )
+            raise ValueError("csv_basin_subset contains basins outside the exported set")
+        tables = build_daily_tables(structure, csv_basins, dates, q_full, states, periods)
         csv_paths = write_daily_csv(tables, out_dir, run_id)
 
     npz_path = None
@@ -319,7 +273,7 @@ def export_run(
         },
         "psol_gthresh_semantics": {
             "note": "window-based psol_annual (R1/R2 historical semantics); "
-            "the R3 canonical_cn_psol_annual path is NOT used",
+                    "the R3 canonical_cn_psol_annual path is NOT used",
             "export_used_window": "full",
             "r1_inference_windows": ["train_forcing", "test_forcing"],
         },
@@ -337,17 +291,11 @@ def export_run(
         "extra_notes": extra_notes or {},
     }
     manifest_path = out_dir / f"{run_id}_manifest.json"
-    manifest_path.write_text(
-        json.dumps(manifest, indent=2, sort_keys=True), encoding="utf-8"
-    )
+    manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True), encoding="utf-8")
     return manifest
 
 
-def kge_vs_reference(
-    q_full: np.ndarray,
-    reference: np.ndarray,
-    periods: tuple[str, ...] = ("train", "test"),
-) -> dict[str, np.ndarray]:
+def kge_vs_reference(q_full: np.ndarray, reference: np.ndarray, periods: tuple[str, ...] = ("train", "test")) -> dict[str, np.ndarray]:
     """Standard repository KGE of the exported discharge vs a reference.
 
     ``reference`` must be [n, time] on the full axis (e.g. q* for R3 dev
@@ -359,10 +307,8 @@ def kge_vs_reference(
     result: dict[str, np.ndarray] = {}
     for period in periods:
         sl = slices[period]
-        result[period] = np.array(
-            [
-                compute_kge_fp64(q_full[i, sl], reference[i, sl])
-                for i in range(q_full.shape[0])
-            ]
-        )
+        result[period] = np.array([
+            compute_kge_fp64(q_full[i, sl], reference[i, sl])
+            for i in range(q_full.shape[0])
+        ])
     return result

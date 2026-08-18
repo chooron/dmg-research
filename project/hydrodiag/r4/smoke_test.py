@@ -36,19 +36,11 @@ import numpy as np
 
 from . import DEV_ONLY, SYNTHETIC_TRAINED
 from .common import (
-    R3_DPL_RUNS,
-    R3_IC_RUNS,
-    default_data_root,
-    default_results_root,
-    load_bundle,
-    zfill8,
+    R3_DPL_RUNS, R3_IC_RUNS, default_data_root, default_results_root, load_bundle, zfill8,
 )
 from .forward_export import export_run
 from .input_adapters import (
-    R4ArtifactError,
-    read_dpl_seed,
-    read_ic_canonical,
-    read_ic_fused,
+    R4ArtifactError, read_dpl_seed, read_ic_canonical, read_ic_fused,
 )
 from .state_export import continuous_forward, model_instances
 
@@ -57,13 +49,8 @@ DPL_Q_ABS_TOL = 0.05  # float32 MLP re-derivation noise over the 12418-day loop
 KGE_TOL = 1e-4
 
 
-def _reproduce_stored_kge(
-    q_full: np.ndarray,
-    q_star: np.ndarray,
-    records_kge_train: np.ndarray,
-    records_kge_test: np.ndarray,
-    basin_ids: list[str],
-) -> dict[str, Any]:
+def _reproduce_stored_kge(q_full: np.ndarray, q_star: np.ndarray, records_kge_train: np.ndarray,
+                          records_kge_test: np.ndarray, basin_ids: list[str]) -> dict[str, Any]:
     """Compare recomputed KGE (vs q*) with the KGE stored in the run records.
 
     Train: the runner's train split (train_forcing [0,5478) with a 365-day
@@ -83,19 +70,15 @@ def _reproduce_stored_kge(
     """
     from training.dpl.run_dpl_model import compute_kge_fp64
 
-    recomputed_train = np.array(
-        [
-            compute_kge_fp64(q_full[i, 365:5478], q_star[i, 365:5478])
-            for i in range(len(basin_ids))
-        ]
-    )
+    recomputed_train = np.array([
+        compute_kge_fp64(q_full[i, 365:5478], q_star[i, 365:5478])
+        for i in range(len(basin_ids))
+    ])
     diff_train = np.abs(recomputed_train - records_kge_train)
-    cont_test = np.array(
-        [
-            compute_kge_fp64(q_full[i, 5478:10957], q_star[i, 5478:10957])
-            for i in range(len(basin_ids))
-        ]
-    )
+    cont_test = np.array([
+        compute_kge_fp64(q_full[i, 5478:10957], q_star[i, 5478:10957])
+        for i in range(len(basin_ids))
+    ])
     diff_test = np.abs(cont_test - records_kge_test)
     return {
         "train": {
@@ -109,12 +92,11 @@ def _reproduce_stored_kge(
             "median_abs_diff": float(np.nanmedian(diff_test)),
             "pass": None,
             "note": "stored test KGE uses the R3 runner's windowed-warmup + "
-            "canonical full-record-psol convention; the R4 continuous "
-            "full-axis forward (window-based psol) differs for "
-            "long-memory basins — documented convention gap, not a bug",
+                    "canonical full-record-psol convention; the R4 continuous "
+                    "full-axis forward (window-based psol) differs for "
+                    "long-memory basins — documented convention gap, not a bug",
         },
     }
-
 
 def smoke_ic_cn(results_root: Path, data_root: Path, device: str) -> dict[str, Any]:
     """S1 + S3 + S4 for the R3 CN IC gate run."""
@@ -140,14 +122,8 @@ def smoke_ic_cn(results_root: Path, data_root: Path, device: str) -> dict[str, A
 
     models = model_instances(torch.device(device), torch.float32)
     q_full, states = continuous_forward(
-        "XAJ_CN",
-        models["XAJ_CN"],
-        parameters,
-        bundle.forcing.astype(np.float32),
-        torch.device(device),
-        torch.float32,
-        batch=64,
-        validate_subset=8,
+        "XAJ_CN", models["XAJ_CN"], parameters, bundle.forcing.astype(np.float32),
+        torch.device(device), torch.float32, batch=64, validate_subset=8,
     )
 
     posthoc = np.load(results_root / "r3_misspec_analysis_v1" / "posthoc_q_CN_IC.npy")
@@ -155,12 +131,8 @@ def smoke_ic_cn(results_root: Path, data_root: Path, device: str) -> dict[str, A
         raise AssertionError(f"posthoc shape {posthoc.shape} != q_full {q_full.shape}")
     q_diff = np.abs(posthoc - q_full)
 
-    q_star = np.load(results_root / "r3_synthetic_truth_v1" / "q_star.npz")[
-        "target_mm_day"
-    ]
-    kge_check = _reproduce_stored_kge(
-        q_full, q_star, stored_train, stored_test, basin_ids
-    )
+    q_star = np.load(results_root / "r3_synthetic_truth_v1" / "q_star.npz")["target_mm_day"]
+    kge_check = _reproduce_stored_kge(q_full, q_star, stored_train, stored_test, basin_ids)
     return {
         "adapter_meta": {k: meta[k] for k in ("format", "n_basins", "restart_rule")},
         "q_vs_posthoc": {
@@ -170,8 +142,7 @@ def smoke_ic_cn(results_root: Path, data_root: Path, device: str) -> dict[str, A
             "pass": bool(q_diff.max() <= Q_ABS_TOL),
         },
         "kge_vs_qstar_reproduced": kge_check,
-        "basin_order_matches_bundle": basin_ids
-        == [zfill8(b) for b in bundle.basin_ids],
+        "basin_order_matches_bundle": basin_ids == [zfill8(b) for b in bundle.basin_ids],
         "states_exported": sorted(states.keys()),
         "n_days": q_full.shape[1],
     }
@@ -188,18 +159,10 @@ def smoke_dpl_cn(results_root: Path, data_root: Path, device: str) -> dict[str, 
 
     models = model_instances(torch.device(device), torch.float32)
     q_full, _states = continuous_forward(
-        "XAJ_CN",
-        models["XAJ_CN"],
-        parameters,
-        bundle.forcing.astype(np.float32),
-        torch.device(device),
-        torch.float32,
-        batch=64,
-        validate_subset=8,
+        "XAJ_CN", models["XAJ_CN"], parameters, bundle.forcing.astype(np.float32),
+        torch.device(device), torch.float32, batch=64, validate_subset=8,
     )
-    posthoc = np.load(
-        results_root / "r3_misspec_analysis_v1" / "posthoc_q_CN_dPL_s42.npy"
-    )
+    posthoc = np.load(results_root / "r3_misspec_analysis_v1" / "posthoc_q_CN_dPL_s42.npy")
     q_diff = np.abs(posthoc - q_full)
     # Parameter-level cross-check against the training-time physical dump.
     # The R3 posthoc q files were generated from `best_parameters_physical.npz`;
@@ -210,11 +173,7 @@ def smoke_dpl_cn(results_root: Path, data_root: Path, device: str) -> dict[str, 
     param_diff = np.inf
     npz_path = run_root / "best_parameters_physical.npz"
     if npz_path.is_file():
-        param_diff = float(
-            np.abs(
-                parameters - np.asarray(np.load(npz_path)["params"], dtype=np.float64)
-            ).max()
-        )
+        param_diff = float(np.abs(parameters - np.asarray(np.load(npz_path)["params"], dtype=np.float64)).max())
     return {
         "adapter_meta": {k: meta[k] for k in ("format", "n_basins", "epoch_label")},
         "params_vs_best_parameters_physical_npz": {
@@ -227,14 +186,11 @@ def smoke_dpl_cn(results_root: Path, data_root: Path, device: str) -> dict[str, 
             "tolerance_note": "float32 MLP re-derivation noise; S1-style 1e-5 identity applies to IC (JSON params, deterministic)",
             "pass": bool(q_diff.max() <= DPL_Q_ABS_TOL),
         },
-        "basin_order_matches_bundle": basin_ids
-        == [zfill8(b) for b in bundle.basin_ids],
+        "basin_order_matches_bundle": basin_ids == [zfill8(b) for b in bundle.basin_ids],
     }
 
 
-def smoke_export_pipeline(
-    results_root: Path, data_root: Path, device: str, out_tag: str = "r4_smoke"
-) -> dict[str, Any]:
+def smoke_export_pipeline(results_root: Path, data_root: Path, device: str, out_tag: str = "r4_smoke") -> dict[str, Any]:
     """Full export pipeline on the R3 CN dPL seed-42 parameters (DEV_ONLY)."""
     import torch
 
@@ -269,9 +225,8 @@ def smoke_export_pipeline(
         "q_finite": manifest["q_finite"],
         "q_nonnegative": manifest["q_nonnegative"],
         "psol_semantics": manifest["psol_gthresh_semantics"],
-        "cn_psol_gthresh_sample": {
-            b: manifest["cn_psol_gthresh"][b]["full"] for b in basin_ids[:3]
-        },
+        "cn_psol_gthresh_sample": {b: manifest["cn_psol_gthresh"][b]["full"]
+                                   for b in basin_ids[:3]},
         "outputs": manifest["outputs"],
         "state_columns": manifest["state_columns"],
     }
@@ -287,70 +242,32 @@ def smoke_fail_loud(results_root: Path, data_root: Path) -> list[dict[str, Any]]
         try:
             fn()
         except R4ArtifactError as exc:
-            checks.append(
-                {
-                    "check": label,
-                    "raised": "R4ArtifactError",
-                    "ok": True,
-                    "message_head": str(exc)[:160],
-                }
-            )
+            checks.append({"check": label, "raised": "R4ArtifactError", "ok": True,
+                           "message_head": str(exc)[:160]})
         except Exception as exc:  # noqa: BLE001
-            checks.append(
-                {
-                    "check": label,
-                    "raised": type(exc).__name__,
-                    "ok": False,
-                    "message_head": str(exc)[:160],
-                }
-            )
+            checks.append({"check": label, "raised": type(exc).__name__,
+                           "ok": False, "message_head": str(exc)[:160]})
         else:
-            checks.append(
-                {
-                    "check": label,
-                    "raised": None,
-                    "ok": False,
-                    "message_head": "no exception raised",
-                }
-            )
+            checks.append({"check": label, "raised": None, "ok": False,
+                           "message_head": "no exception raised"})
 
     # (1) nonexistent IC run root
-    expect_raise(
-        "ic_missing_run_root",
-        lambda: read_ic_canonical(
-            Path("/nonexistent/results/run"), "XAJ_CN", "xaj_cn", basin_ids
-        ),
-    )
+    expect_raise("ic_missing_run_root", lambda: read_ic_canonical(
+        Path("/nonexistent/results/run"), "XAJ_CN", "xaj_cn", basin_ids))
     # (2) IC run exists but raw subdir mismatched
     run_root = results_root / R3_IC_RUNS["XAJ_CN"]
-    expect_raise(
-        "ic_wrong_raw_subdir",
-        lambda: read_ic_canonical(run_root, "XAJ_CN", "xaj_wrong", basin_ids),
-    )
+    expect_raise("ic_wrong_raw_subdir", lambda: read_ic_canonical(
+        run_root, "XAJ_CN", "xaj_wrong", basin_ids))
     # (3) dPL missing seed directory
-    expect_raise(
-        "dpl_missing_seed_dir",
-        lambda: read_dpl_seed(
-            results_root / (R3_DPL_RUNS["XAJ_CN"] + "999"),
-            "XAJ_CN",
-            data_root,
-            basin_ids,
-        ),
-    )
+    expect_raise("dpl_missing_seed_dir", lambda: read_dpl_seed(
+        results_root / (R3_DPL_RUNS["XAJ_CN"] + "999"), "XAJ_CN", data_root, basin_ids))
     # (4) dPL wrong model key vs checkpoint content
-    expect_raise(
-        "dpl_wrong_model_key",
-        lambda: read_dpl_seed(
-            results_root / (R3_DPL_RUNS["XAJ_CN"] + "42"), "XAJ", data_root, basin_ids
-        ),
-    )
+    expect_raise("dpl_wrong_model_key", lambda: read_dpl_seed(
+        results_root / (R3_DPL_RUNS["XAJ_CN"] + "42"), "XAJ", data_root, basin_ids))
     # (5) fused csv missing file
-    expect_raise(
-        "ic_fused_missing_csv",
-        lambda: read_ic_fused(
-            Path("/nonexistent/per_start.csv"), "XAJ_CN", ("cn_ctg", "cn_kf"), basin_ids
-        ),
-    )
+    expect_raise("ic_fused_missing_csv", lambda: read_ic_fused(
+        Path("/nonexistent/per_start.csv"), "XAJ_CN",
+        ("cn_ctg", "cn_kf"), basin_ids))
     return checks
 
 
@@ -367,16 +284,12 @@ def smoke_snow_reader() -> dict[str, Any]:
             lines = ["date snow17_swe sac_sma_swe"]
             for month in range(1, 13):
                 for day in (1, 15):
-                    lines.append(
-                        f"1985-{month:02d}-{day:02d} {10.0 * month} {5.0 * month}"
-                    )
+                    lines.append(f"1985-{month:02d}-{day:02d} {10.0 * month} {5.0 * month}")
             (out_dir / f"usgs_{gauge}_model_output.txt").write_text("\n".join(lines))
         reader = SnowReferenceReader(root)
         basins = reader.available_basins()
         snow = reader.load_basin("01013500")
-        aligned = snow.align_to(
-            np.array(["1985-01-01", "1985-01-02", "1985-01-15"], dtype="datetime64[D]")
-        )
+        aligned = snow.align_to(np.array(["1985-01-01", "1985-01-02", "1985-01-15"], dtype="datetime64[D]"))
         metrics = snow.annual_metrics()
         return {
             "layout": reader.layout,
@@ -395,20 +308,13 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--results-root", type=Path, default=None)
     parser.add_argument("--data-root", type=Path, default=None)
-    parser.add_argument(
-        "--device", default="cuda" if __import__("torch").cuda.is_available() else "cpu"
-    )
+    parser.add_argument("--device", default="cuda" if __import__("torch").cuda.is_available() else "cpu")
     parser.add_argument("--out-tag", default="r4_smoke")
-    parser.add_argument(
-        "--skip-export",
-        action="store_true",
-        help="Skip the CSV export step (forward checks only).",
-    )
+    parser.add_argument("--skip-export", action="store_true",
+                        help="Skip the CSV export step (forward checks only).")
     args = parser.parse_args()
 
-    results_root = (
-        Path(args.results_root) if args.results_root else default_results_root()
-    )
+    results_root = Path(args.results_root) if args.results_root else default_results_root()
     data_root = Path(args.data_root) if args.data_root else default_data_root()
 
     report: dict[str, Any] = {
@@ -420,16 +326,11 @@ def main() -> None:
         "checks": {},
     }
 
-    report["checks"]["S1_ic_cn_forward_vs_posthoc"] = smoke_ic_cn(
-        results_root, data_root, args.device
-    )
-    report["checks"]["S2_dpl_cn_forward_vs_posthoc"] = smoke_dpl_cn(
-        results_root, data_root, args.device
-    )
+    report["checks"]["S1_ic_cn_forward_vs_posthoc"] = smoke_ic_cn(results_root, data_root, args.device)
+    report["checks"]["S2_dpl_cn_forward_vs_posthoc"] = smoke_dpl_cn(results_root, data_root, args.device)
     if not args.skip_export:
         report["checks"]["S3_export_pipeline"] = smoke_export_pipeline(
-            results_root, data_root, args.device, args.out_tag
-        )
+            results_root, data_root, args.device, args.out_tag)
     report["checks"]["S4_fail_loud"] = smoke_fail_loud(results_root, data_root)
     report["checks"]["S5_snow_reader"] = smoke_snow_reader()
 

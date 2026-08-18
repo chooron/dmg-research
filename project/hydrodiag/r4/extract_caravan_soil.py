@@ -12,7 +12,6 @@ Outputs:
         caravan_soil_ensemble.npz
         manifest.json
 """
-
 from __future__ import annotations
 
 import json
@@ -28,12 +27,7 @@ PROJECT = Path(__file__).resolve().parents[1]
 if str(PROJECT) not in sys.path:
     sys.path.insert(0, str(PROJECT))
 
-from r4.common import (  # noqa: E402
-    default_data_root,
-    default_results_root,
-    load_bundle,
-    zfill8,
-)
+from r4.common import default_data_root, default_results_root, load_bundle, zfill8  # noqa: E402
 
 STAGE_ROOT = Path("/mnt/c/r4caravan_staging")
 OUT_ROOT = default_results_root() / "r4_caravan_soil_reference_v1"
@@ -69,33 +63,19 @@ def extract_all(stage_dir: Path, data_root: Path, out_dir: Path) -> dict:
         # Find overlapping slice
         idx = np.searchsorted(project_dates, file_dates)
         in_range = idx < len(project_dates)
-        valid = in_range & (
-            project_dates[np.minimum(idx, len(project_dates) - 1)] == file_dates
-        )
+        valid = in_range & (project_dates[np.minimum(idx, len(project_dates) - 1)] == file_dates)
 
         proj_indices = idx[valid]
 
-        L1[i, proj_indices] = (
-            ds["volumetric_soil_water_layer_1_mean"].values[valid].astype(np.float32)
-        )
-        L2[i, proj_indices] = (
-            ds["volumetric_soil_water_layer_2_mean"].values[valid].astype(np.float32)
-        )
-        L3[i, proj_indices] = (
-            ds["volumetric_soil_water_layer_3_mean"].values[valid].astype(np.float32)
-        )
-        L4[i, proj_indices] = (
-            ds["volumetric_soil_water_layer_4_mean"].values[valid].astype(np.float32)
-        )
-        SWE[i, proj_indices] = (
-            ds["snow_depth_water_equivalent_mean"].values[valid].astype(np.float32)
-        )
+        L1[i, proj_indices] = ds["volumetric_soil_water_layer_1_mean"].values[valid].astype(np.float32)
+        L2[i, proj_indices] = ds["volumetric_soil_water_layer_2_mean"].values[valid].astype(np.float32)
+        L3[i, proj_indices] = ds["volumetric_soil_water_layer_3_mean"].values[valid].astype(np.float32)
+        L4[i, proj_indices] = ds["volumetric_soil_water_layer_4_mean"].values[valid].astype(np.float32)
+        SWE[i, proj_indices] = ds["snow_depth_water_equivalent_mean"].values[valid].astype(np.float32)
         ds.close()
 
     if missing_basins:
-        raise RuntimeError(
-            f"Missing {len(missing_basins)} Caravan basin files in {stage_dir}: {missing_basins[:5]}"
-        )
+        raise RuntimeError(f"Missing {len(missing_basins)} Caravan basin files in {stage_dir}: {missing_basins[:5]}")
 
     # Compute depth-weighted composites
     SM100 = 0.07 * L1 + 0.21 * L2 + 0.72 * L3
@@ -109,15 +89,9 @@ def extract_all(stage_dir: Path, data_root: Path, out_dir: Path) -> dict:
     nan_l4_test = int(np.isnan(L4[:, test_sl]).sum())
 
     print(f"Validation on test period ({test_days} days):")
-    print(
-        f"  L1 NaNs: {nan_l1_test}, L2 NaNs: {nan_l2_test}, L3 NaNs: {nan_l3_test}, L4 NaNs: {nan_l4_test}"
-    )
-    print(
-        f"  SM100 range: [{np.nanmin(SM100[:, test_sl]):.4f}, {np.nanmax(SM100[:, test_sl]):.4f}] m3/m3"
-    )
-    print(
-        f"  SM289 range: [{np.nanmin(SM289[:, test_sl]):.4f}, {np.nanmax(SM289[:, test_sl]):.4f}] m3/m3"
-    )
+    print(f"  L1 NaNs: {nan_l1_test}, L2 NaNs: {nan_l2_test}, L3 NaNs: {nan_l3_test}, L4 NaNs: {nan_l4_test}")
+    print(f"  SM100 range: [{np.nanmin(SM100[:, test_sl]):.4f}, {np.nanmax(SM100[:, test_sl]):.4f}] m3/m3")
+    print(f"  SM289 range: [{np.nanmin(SM289[:, test_sl]):.4f}, {np.nanmax(SM289[:, test_sl]):.4f}] m3/m3")
 
     out_dir.mkdir(parents=True, exist_ok=True)
     npz_path = out_dir / "caravan_soil_ensemble.npz"
@@ -148,12 +122,7 @@ def extract_all(stage_dir: Path, data_root: Path, out_dir: Path) -> dict:
             "end": "2010-09-30",
             "days": test_days,
             "test_slice": [test_sl.start, test_sl.stop],
-            "nan_count_test": {
-                "L1": nan_l1_test,
-                "L2": nan_l2_test,
-                "L3": nan_l3_test,
-                "L4": nan_l4_test,
-            },
+            "nan_count_test": {"L1": nan_l1_test, "L2": nan_l2_test, "L3": nan_l3_test, "L4": nan_l4_test},
         },
         "variables": {
             "L1_mean": "volumetric_soil_water_layer_1_mean (0-7 cm) [m3/m3]",
@@ -167,10 +136,8 @@ def extract_all(stage_dir: Path, data_root: Path, out_dir: Path) -> dict:
         "reference_semantics": "external process-state consistency reference; NOT ground-truth soil moisture",
         "file_size_bytes": npz_path.stat().st_size,
     }
-    (out_dir / "manifest.json").write_text(
-        json.dumps(manifest, indent=2, sort_keys=True), encoding="utf-8"
-    )
-    print(f"Saved: {npz_path} ({manifest['file_size_bytes'] / (1024 * 1024):.2f} MB)")
+    (out_dir / "manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True), encoding="utf-8")
+    print(f"Saved: {npz_path} ({manifest['file_size_bytes'] / (1024*1024):.2f} MB)")
     return manifest
 
 

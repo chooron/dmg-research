@@ -39,7 +39,7 @@ def default_data_root() -> Path:
     if env:
         return Path(env).resolve()
     candidates = [
-        WORKSPACE_ROOT / "data",  # orca worktree shared data symlink
+        WORKSPACE_ROOT / "data",          # orca worktree shared data symlink
         PROJECT_ROOT / "data",
     ]
     for candidate in candidates:
@@ -64,9 +64,9 @@ PERIODS = {
 #   test_forcing  = [5113, 10957)  (365 d preceding warmup + test)
 PERIOD_INDEX = {
     "train_start": 365,
-    "train_end": 5477,  # inclusive
+    "train_end": 5477,          # inclusive
     "test_start": 5478,
-    "test_end": 10956,  # inclusive
+    "test_end": 10956,          # inclusive
     "train_forcing_start": 0,
     "train_forcing_end": 5478,  # exclusive
     "test_forcing_start": 5113,
@@ -85,15 +85,7 @@ MODEL_KEYS = {
 }
 
 # Legacy/other keys seen on the remote training node (never canonical for R4).
-LEGACY_MODEL_KEYS = (
-    "XAJ_TGD",
-    "XAJ_PD",
-    "GR4J",
-    "GR4J_CN",
-    "SIMHYD",
-    "SIMHYD_CN",
-    "HBV",
-)
+LEGACY_MODEL_KEYS = ("XAJ_TGD", "XAJ_PD", "GR4J", "GR4J_CN", "SIMHYD", "SIMHYD_CN", "HBV")
 
 # ---------------------------------------------------------------------------
 # R1/R2 canonical result run identities (recovery clues, not assumptions)
