@@ -67,6 +67,8 @@ manuscriptv2/
 !project/hydrodiag/manuscript/
 project/hydrodiag/manuscript/*
 !project/hydrodiag/manuscript/scripts/
+!project/hydrodiag/manuscript/README.md
+!project/hydrodiag/manuscript/FIGURE_OPTIMIZATION_HANDOFF.md
 !project/hydrodiag/manuscript/scripts/shared/
 !project/hydrodiag/manuscript/scripts/r1/
 !project/hydrodiag/manuscript/scripts/r2/
