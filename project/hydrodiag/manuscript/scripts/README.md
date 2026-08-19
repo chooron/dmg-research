@@ -1,30 +1,25 @@
-# Manuscript Statistical and Plotting Scripts Catalog
+# Manuscript scripts
 
-This directory contains the production-grade, read-only statistical evaluation,
-figure generation, and table compilation pipelines for Results R1, R2, and R4.
+All manuscript-facing code lives below this directory and is grouped by result family.
 
-## Pipeline Map
-
-| Result | Main Build Entry Point | Figure Generators | Table Generators | Primary Outputs |
-|---|---|---|---|---|
-| **R1** | `build_r1_statistics.py` | `plot_r1_figure1.py` | `generate_table1.py`, `generate_table_s1..s3.py` | `manuscript/tables/Table1*`, `manuscript/figures/figure1*` |
-| **R2** | `run_r2_parameter_statistics.py` | `plot_r2_figure3_final.py`, `plot_r2_figure4.py` | `run_r2_robustness_checks.py`, `run_r2_tgd2_specificity.py` | `manuscript/tables/Table2*`, `manuscript/figures/figure3*` |
-| **R4** | `build_r4_soil_statistics.py` | `plot_r4_figure4.py` | `generate_table_r4.py` | `manuscript/tables/Table4*`, `manuscript/tables/TableS4*`, `manuscript/figures/figure4_r4*`, `results/r4_phase1_soil_official/` |
-
-## R4 Reproduction Commands
-
-```bash
-# 1. End-to-end R4 state consistency & robustness build
-python manuscript/scripts/build_r4_soil_statistics.py --device cuda
-
-# 2. Compile Figure 4 (4-panel publication figure, PNG & PDF)
-python manuscript/scripts/plot_r4_figure4.py
-
-# 3. Compile Table 4 (Main text) and Table S4 (Supplement) in Markdown & LaTeX
-python manuscript/scripts/generate_table_r4.py
+```text
+manuscript/scripts/shared/  shared style and path helpers
+manuscript/scripts/r1/      R1 statistics, Figure 1/2, Tables 1/S1–S3
+manuscript/scripts/r2/      R2 statistics, Figure 3/4, Tables S4/S5
+manuscript/scripts/r3/      R3 figures, tables, and process-data exports
+manuscript/scripts/r4/      R4 figures, tables, and provenance-guarded generators
 ```
 
-## Detailed Handoff
+R3/R4 computational and manuscript-facing modules are colocated in
+`manuscript/scripts/r3/` and `manuscript/scripts/r4/` so imports and path
+resolution use one canonical package location.
 
-See `HANDOFF_R4.md` in this directory for the full statistical methods,
-provenance logs, metric formulas, and paper writing guidance.
+Generated assets must use these locations:
+
+- figures, including supplementary figure panels: `manuscript/figures/`
+- tables: `manuscript/tables/`
+- intermediate data, logs, audits, and temporary exports: `manuscript/cache/`
+
+Run commands from the repository worktree root or from `project/hydrodiag` with
+an explicit `--project-root`/`--results-root` when a script supports those flags.
+No script may use an absolute parent-checkout path as a default output location.

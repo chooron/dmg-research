@@ -19,8 +19,8 @@ PROJECT = Path(__file__).resolve().parents[1]
 if str(PROJECT) not in sys.path:
     sys.path.insert(0, str(PROJECT))
 
-from r3.common import COMMON_XAJ, pilot_basin_subset, reordered_531_list  # noqa: E402
-from r3.truth_generator import (  # noqa: E402
+from manuscript.scripts.r3.common import COMMON_XAJ, pilot_basin_subset, reordered_531_list  # noqa: E402
+from manuscript.scripts.r3.truth_generator import (  # noqa: E402
     EXPLAINED_VARIANCE_FRACTION,
     fit_g_star,
     g_star_apply,
@@ -78,7 +78,7 @@ def test_physical_z_roundtrip_with_specs():
 
 def test_recorded_cn_matches_production_forward():
     from models import XAJWithCemaNeigeLite
-    from r3.recorded_forward import recorded_cn_forward, validate_recorded_forward
+    from manuscript.scripts.r3.recorded_forward import recorded_cn_forward, validate_recorded_forward
 
     torch.manual_seed(11)
     model = XAJWithCemaNeigeLite()
@@ -114,7 +114,7 @@ def test_recorded_cn_matches_production_forward():
 
 def test_recorded_base_matches_production_forward():
     from models import XAJLite
-    from r3.recorded_forward import recorded_base_forward, validate_recorded_forward
+    from manuscript.scripts.r3.recorded_forward import recorded_base_forward, validate_recorded_forward
 
     torch.manual_seed(12)
     model = XAJLite()
@@ -148,7 +148,7 @@ def test_recorded_base_matches_production_forward():
 
 def test_recorded_tgd2_matches_production_forward():
     from models import XAJWithTGD2Lite
-    from r3.recorded_forward import recorded_tgd2_forward, validate_recorded_forward
+    from manuscript.scripts.r3.recorded_forward import recorded_tgd2_forward, validate_recorded_forward
 
     torch.manual_seed(13)
     model = XAJWithTGD2Lite()

@@ -1,0 +1,32 @@
+{
+  "baseline_commit": "cd0b000",
+  "gate_A_ct": {
+    "status": "pass",
+    "definition": "Per complete water year, CT is the day cumulative runoff reaches 50%; basin statistic is the median of yearly CT errors; DeltaCT = CT_sim - CT_obs.",
+    "evidence": ["manuscript/scripts/r1/r1_statistics.py", "manuscript/scripts/r1/r1_daily_inference.py"],
+    "boundary": "The available R1 source package is not present in the formal checkout, so regenerated F2 output remains blocked until the source CSVs are restored."
+  },
+  "gate_B_tgd2_provenance": {
+    "status": "blocked",
+    "evidence": ["results/README.md", "results/dpl_camels_531_lite_v3_tgd2_dpl_audited/XAJ_TGD2/"],
+    "reason": "Canonical TGD2 seed 42 lacks COMPLETE, final summary, normalized parameters, and report. Legacy XAJ-TGD is never relabelled as TGD2."
+  },
+  "gate_C_f6_common_core_input": {
+    "status": "pass_implementation_blocked_evidence",
+    "definition": "Effective liquid-water input entering the shared XAJ core; Base raw precipitation, TGD2 delayed effective precipitation, CN rain plus snowmelt.",
+    "state_export": "wt = wu + wl + wd",
+    "evidence": ["manuscript/scripts/r3/export_figure6_process_data.py", "manuscript/scripts/r3/plot_figure6.py"]
+  },
+  "gate_D_shared_soil_state": {
+    "status": "pass",
+    "state": "W_total = wu + wl + wd",
+    "evidence": ["manuscript/r3/misspec_states.py", "manuscript/r3/protocol_misspec_v1.json", "manuscript/r4/soil_analysis.py"],
+    "boundary": "Synthetic correct-CN recoverability does not itself establish completed R4 TGD2 provenance."
+  },
+  "gate_E_r4_comparability": {
+    "status": "blocked",
+    "evidence": ["manuscript/FIGURE_OPTIMIZATION_HANDOFF.md", "manuscript/r4/HANDOFF.md", "results/r4_phase1_soil_official/r4_phase1_soil_official_report.json"],
+    "reasons": ["TGD2 seed 42 incomplete", "dPL seed 2026 Base/CN arrays are currently mapped to seed 42 arrays", "R4 report retains TGD2_PENDING"],
+    "allowed_output": "Explicit *_interim assets only; final filenames are protected by the three-structure generator."
+  }
+}
