@@ -4,7 +4,7 @@ Baseline ID: `model-test-baseline-2026-07-20`
 
 This is the frozen quality gate for the models in `models/`.  The registry is
 in [`tests/model_registry.py`](../tests/model_registry.py); the runner is
-[`scripts/run_model_test_suite.py`](../scripts/run_model_test_suite.py).
+[`manuscript/scripts/shared/run_model_test_suite.py`](../manuscript/scripts/shared/run_model_test_suite.py).
 
 ## Registered models
 
@@ -29,8 +29,8 @@ in [`tests/model_registry.py`](../tests/model_registry.py); the runner is
 From `project/hydrodiag`:
 
 ```bash
-python scripts/run_model_test_suite.py
-python scripts/run_model_test_suite.py --full
+python manuscript/scripts/shared/run_model_test_suite.py
+python manuscript/scripts/shared/run_model_test_suite.py --full
 ```
 
 The runner automatically includes CUDA cases when CUDA is available.  The
