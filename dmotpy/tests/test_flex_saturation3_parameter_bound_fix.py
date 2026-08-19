@@ -2,12 +2,12 @@ from __future__ import annotations
 
 from functools import lru_cache
 import math
-
 import pytest
+import torch
 
 from models import core
+from models.flux.saturation import saturation_3
 from scripts.validate_flex_saturation3_bound_fix import TARGET_MODELS, TARGET_PARAM, main
-
 
 @lru_cache(maxsize=1)
 def _validation_rows():
@@ -51,3 +51,19 @@ def test_flex_saturation3_validation_rows_are_finite_from_beta_zero_through_midp
     beta1e6_row = next(row for row in rows if math.isclose(float(row["tested_beta"]), 1.0e-6, rel_tol=0.0, abs_tol=1.0e-15))
     assert float(beta0_row["output_diff_vs_beta0_if_available"]) == pytest.approx(0.0)
     assert float(beta1e6_row["output_diff_vs_beta0_if_available"]) == pytest.approx(0.0)
+
+
+def test_saturation3_float32_backward_is_finite_at_beta_near_zero_and_high_storage():
+    storage = torch.tensor([1.0e-6, 1.0, 100.0, 1000.0, 2000.0], dtype=torch.float32, requires_grad=True)
+    storage_max = torch.full_like(storage, 2000.0)
+    beta = torch.tensor([0.0, 1.0e-12, 1.0e-6, 1.0e-4, 5.0], dtype=torch.float32, requires_grad=True)
+    incoming = torch.full_like(storage, 10.0)
+
+    output = saturation_3(storage, storage_max, beta, incoming)
+    output.sum().backward()
+
+    assert torch.isfinite(output).all()
+    assert torch.isfinite(storage.grad).all()
+    assert torch.isfinite(beta.grad).all()
+    assert (output >= 0.0).all()
+    assert (output <= incoming).all()
