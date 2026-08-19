@@ -74,6 +74,8 @@ project/hydrodiag/manuscript/*
 !project/hydrodiag/manuscript/scripts/r2/
 !project/hydrodiag/manuscript/scripts/r3/
 !project/hydrodiag/manuscript/scripts/r4/
+!project/hydrodiag/manuscript/scripts/r5/
+!project/hydrodiag/manuscript/cache/*.csv
 !project/hydrodiag/manuscript/figures/
 !project/hydrodiag/manuscript/tables/
 !project/hydrodiag/manuscript/cache/
