@@ -45,7 +45,10 @@ def saturation_3(
     Saturation excess from a store with different degrees of saturation (exponential variant).
     """
     ratio = S / (Smax + nearzero)
-    out_frac = 1.0 - (1.0 / (1.0 + torch.exp((ratio + 0.5) / (p1 + nearzero))))
+    # Use the numerically stable sigmoid form of 1 - 1/(1 + exp(x)).
+    # The expanded expression overflows for large x and its backward pass can
+    # produce NaN even when the forward output is physically finite.
+    out_frac = torch.sigmoid((ratio + 0.5) / (p1 + nearzero))
     return out_frac * incoming_flux
 
 

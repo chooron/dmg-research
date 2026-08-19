@@ -195,6 +195,32 @@ class HydrologyModel(nn.Module):
             return torch.exp(log_lower + param * (log_upper - log_lower))
         return param * (bounds[1] - bounds[0]) + bounds[0]
 
+    def normalized_parameter_mapping_jacobian(self, normalized: torch.Tensor) -> torch.Tensor:
+        """Return d(physical)/(d(normalized)) divided by bound span.
+
+        This is diagnostic-only metadata for dPL saturation telemetry.  It
+        mirrors ``_change_param_range`` without changing the physical mapping.
+        Linear mappings therefore return one; ``auto_log`` uses its analytic
+        derivative in physical units normalized by the linear bound span.
+        """
+        if normalized.dim() not in {2, 3}:
+            raise ValueError(f"normalized parameters must be rank 2 or 3, got {normalized.dim()}")
+        result = torch.ones_like(normalized)
+        for index, name in enumerate(self.phy_param_names):
+            bounds = self.parameter_bounds[name]
+            if not self._should_use_log_mapping(bounds, self.parameter_mapping, self.log_mapping_span_threshold):
+                continue
+            lower = torch.as_tensor(bounds[0], dtype=normalized.dtype, device=normalized.device)
+            upper = torch.as_tensor(bounds[1], dtype=normalized.dtype, device=normalized.device)
+            log_span = torch.log(upper) - torch.log(lower)
+            if normalized.dim() == 3:
+                physical = torch.exp(torch.log(lower) + normalized[:, index, :] * log_span)
+                result[:, index, :] = physical * log_span / (upper - lower)
+            else:
+                physical = torch.exp(torch.log(lower) + normalized[:, index] * log_span)
+                result[:, index] = physical * log_span / (upper - lower)
+        return result
+
     def _descale_params(self, raw: torch.Tensor) -> Dict[str, torch.Tensor]:
         if raw.dim() == 2:
             return {

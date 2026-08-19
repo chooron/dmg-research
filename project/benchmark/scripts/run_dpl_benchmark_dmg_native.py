@@ -9,6 +9,7 @@ Strictly inherits and uses DMG's native architecture:
 - dmg.trainers.base.BaseTrainer / Trainer structure
 """
 import argparse
+from contextlib import nullcontext
 import os
 import random
 import sys
@@ -37,8 +38,11 @@ from dmg.trainers.base import BaseTrainer
 from dmotpy.data_contract import CALENDAR_MODELS, add_calendar_forcing, calendar_features
 from dpl.attributes import CatchmentAttributeBuilder
 from dpl.nn_parameterizer import CatchmentParameterizer
+from dpl.optimizer_transaction import FiniteOptimizerTransaction, validate_finite_training_state
 from src.data_selection import load_ids
 from src.model_registry import NPARAM_INFO_36, build_model, get_spec
+from src.checkpointing import atomic_torch_save
+from src.objective import streaming_kge
 
 DATA_DIR = BENCHMARK_ROOT.parents[1] / "data"
 RESULTS_DIR = BENCHMARK_ROOT / "results" / "dpl_results"
@@ -176,47 +180,45 @@ def build_informative_kge_catalog(
     return catalog
 
 
-def compute_differentiable_kge(q_sim: torch.Tensor, q_obs: torch.Tensor, warmup_days: int = 365, eps: float = 1e-6):
-    """Compute differentiable 1 - KGE loss with eps_sq inside sqrt (matching hydrodiag)."""
+def compute_differentiable_kge(
+    q_sim: torch.Tensor,
+    q_obs: torch.Tensor,
+    warmup_days: int = 365,
+    eps: float = 0.1,
+):
+    """Compute the IC-compatible differentiable 1 - KGE loss.
+
+    The canonical IC evaluator uses ``streaming_kge``: float64 moment
+    accumulation, sample standard deviation, and ``eps=0.1`` in the
+    correlation and bias denominators.  Keeping the dPL trainer on that same
+    convention makes reported validation KGE directly comparable to IC while
+    retaining autograd through the simulated discharge.
+    """
     if q_obs.shape[0] == q_sim.shape[0] + warmup_days:
         q_obs = q_obs[warmup_days:]
     elif q_sim.shape[0] == q_obs.shape[0] + warmup_days:
         q_sim = q_sim[warmup_days:]
 
-    eps_sq = eps * eps
-    mask = torch.isfinite(q_obs) & torch.isfinite(q_sim) & (q_obs >= 0.0) & (q_sim >= 0.0)
-    mask_f = mask.to(dtype=q_sim.dtype)
-    n_valid = mask_f.sum(dim=0).clamp_min(1.0)
+    if q_obs.ndim == 3 and q_obs.shape[-1] == 1:
+        q_obs = q_obs.squeeze(-1)
+    if q_obs.ndim != 2:
+        raise ValueError(f"q_obs must have shape [time, basin], got {tuple(q_obs.shape)}")
 
-    obs_safe = torch.where(mask, q_obs, torch.zeros_like(q_obs))
-    sim_safe = torch.where(mask, q_sim, torch.zeros_like(q_sim))
+    if q_sim.ndim == 2:
+        prediction = q_sim.unsqueeze(-1).unsqueeze(-1)
+    elif q_sim.ndim == 3 and q_sim.shape[-1] == 1:
+        prediction = q_sim.unsqueeze(-1)
+    elif q_sim.ndim == 4:
+        prediction = q_sim
+    else:
+        raise ValueError(f"q_sim must have shape [time, basin] or singleton-group variants, got {tuple(q_sim.shape)}")
 
-    mean_obs = obs_safe.sum(dim=0) / n_valid
-    mean_sim = sim_safe.sum(dim=0) / n_valid
-
-    obs_diff = (obs_safe - mean_obs[None, :]) * mask_f
-    sim_diff = (sim_safe - mean_sim[None, :]) * mask_f
-
-    var_obs = (obs_diff ** 2).sum(dim=0) / n_valid
-    var_sim = (sim_diff ** 2).sum(dim=0) / n_valid
-
-    std_obs = torch.sqrt(var_obs + eps_sq)
-    std_sim = torch.sqrt(var_sim + eps_sq)
-
-    cov = (obs_diff * sim_diff).sum(dim=0) / n_valid
-    r = cov / (std_obs * std_sim)
-
-    alpha = std_sim / std_obs
-    beta = mean_sim / (mean_obs + eps)
-
-    distance_sq = (r - 1.0) ** 2 + (alpha - 1.0) ** 2 + (beta - 1.0) ** 2 + eps_sq
-    kge = 1.0 - torch.sqrt(distance_sq)
-
-    valid_basin_mask = (n_valid > 30) & torch.isfinite(kge)
+    kge, invalid = streaming_kge(prediction, q_obs, eps=eps)
+    kge = kge.squeeze(-1).squeeze(-1)
+    invalid = invalid.squeeze(-1).squeeze(-1)
+    valid_basin_mask = ~invalid & torch.isfinite(kge)
     kge_valid = torch.where(valid_basin_mask, kge, torch.zeros_like(kge))
-
-    mean_kge = kge_valid.sum() / valid_basin_mask.sum().clamp_min(1.0)
-    loss = 1.0 - mean_kge
+    loss = 1.0 - kge_valid.sum() / valid_basin_mask.sum().clamp_min(1.0)
     return loss, kge
 
 
@@ -227,10 +229,33 @@ class DmgNativeBenchmarkTrainer(BaseTrainer):
         super().__init__(config=config, model=None)
         self.model_name = model_name
         self.device = device
-        self.epochs = config["train"]["epochs"]
-        self.batch_size = config["train"]["batch_size"]
-        self.lr = config["train"]["lr"]
-
+        train_config = config["train"]
+        self.epochs = train_config["epochs"]
+        self.min_epochs = train_config.get("min_epochs", 50)
+        self.early_stopping_patience = train_config.get("early_stopping_patience", 10)
+        self.early_stopping_min_delta = train_config.get("early_stopping_min_delta", 1.0e-4)
+        self.detect_anomaly = train_config.get("detect_anomaly", False)
+        self.resume_checkpoint = train_config.get("resume_checkpoint")
+        self.batch_size = train_config["batch_size"]
+        self.lr = train_config["lr"]
+        # Preserve the historical production clip threshold unless explicitly
+        # configured; unlike the old inline code this is transaction-gated.
+        self.grad_clip_norm = train_config.get("grad_clip_norm", 1.0)
+        self.failure_policy = train_config.get("finite_failure_policy", "raise")
+        self.parameterizer_architecture = train_config.get("parameterizer_architecture", "legacy")
+        self.parameterizer_output_transform = train_config.get("parameterizer_output_transform", "sigmoid")
+        self.parameterizer_head_hidden_dims = train_config.get("parameterizer_head_hidden_dims")
+        self.saturation_floor = float(train_config.get("saturation_floor", 0.01))
+        self.saturation_regularizer_weight = float(train_config.get("saturation_regularizer_weight", 0.0))
+        self.saturation_diagnostics = bool(train_config.get("saturation_diagnostics", False))
+        self.mapping_telemetry: list[dict] = []
+        self.checkpoint_root = Path(train_config.get("checkpoint_root", CHECKPOINTS_DIR))
+        self.results_root = Path(train_config.get("results_root", RESULTS_DIR))
+        if not self.checkpoint_root.is_absolute():
+            self.checkpoint_root = BENCHMARK_ROOT / self.checkpoint_root
+        if not self.results_root.is_absolute():
+            self.results_root = BENCHMARK_ROOT / self.results_root
+        self.results_root.mkdir(parents=True, exist_ok=True)
         # Set DMG random seed for reproducibility
         set_randomseed(config.get("random_seed", 42))
 
@@ -284,13 +309,26 @@ class DmgNativeBenchmarkTrainer(BaseTrainer):
             hidden_dims=[256, 256, 256],
             # DMG HydrologyModel owns normalized-to-physical parameter
             # mapping in _descale_params.  Passing bounds here would map the
-            # parameters twice and collapse HBV runoff near zero.
+            # parameters twice and collapse runoff near zero.
             param_bounds=None,
             dropout=0.05,
+            architecture=self.parameterizer_architecture,
+            output_transform=self.parameterizer_output_transform,
+            parameter_names=list(self.spec.parameter_names),
+            parameter_groups=self.spec.parameter_groups,
+            head_hidden_dims=self.parameterizer_head_hidden_dims,
+            saturation_floor=self.saturation_floor,
+            saturation_regularizer_weight=self.saturation_regularizer_weight,
         ).to(device)
 
         self.optimizer = self.init_optimizer()
-
+        self.transaction = FiniteOptimizerTransaction(
+            self.optimizer,
+            self.parameterizer.parameters(),
+            clip_norm=self.grad_clip_norm,
+            failure_policy=self.failure_policy,
+            named_parameters=self.parameterizer.named_parameters(),
+        )
         # Build dummy tensor for DMG create_training_grid calculation
         n_forcing_features = 4 if self.is_calendar_model else 3
         dummy_xc = np.zeros(
@@ -325,45 +363,152 @@ class DmgNativeBenchmarkTrainer(BaseTrainer):
     def train_benchmark(self) -> dict:
         print(f"\n========================================================")
         print(f"   DMG Native dPL Training for [{self.model_name.upper()}]")
-        print(f"   Epochs: {self.epochs} | Batch Size: {self.batch_size} Basins | Steps/Epoch: {self.n_minibatch}")
-        print(f"   Variance Filter: min_observation_std = {self.config['model'].get('min_observation_std', 0.01)} mm/day")
+        print(
+            f"   Max Epochs: {self.epochs} | Min Epochs: {self.min_epochs} | "
+            f"Patience: {self.early_stopping_patience} | Batch Size: {self.batch_size} | "
+            f"Steps/Epoch: {self.n_minibatch}"
+        )
+        print(
+            f"   Backend: {self.config['model'].get('backend', 'compile')} | "
+            f"Anomaly Detection: {self.detect_anomaly}"
+        )
         print(f"========================================================", flush=True)
 
-        model_ckpt_dir = CHECKPOINTS_DIR / self.model_name
+        if self.min_epochs > self.epochs:
+            raise ValueError("min_epochs cannot exceed epochs")
+
+        model_ckpt_dir = self.checkpoint_root / self.model_name
         model_ckpt_dir.mkdir(parents=True, exist_ok=True)
+        resume_epoch = 0
+        resume_loss = float("inf")
+        if self.resume_checkpoint:
+            resume_path = Path(self.resume_checkpoint)
+            if not resume_path.exists():
+                raise FileNotFoundError(f"Resume checkpoint not found: {resume_path}")
+            checkpoint = torch.load(resume_path, map_location="cpu", weights_only=False)
+            checkpoint_model = checkpoint.get("model_name")
+            if checkpoint_model is not None and str(checkpoint_model).lower() != self.model_name:
+                raise ValueError(f"checkpoint model mismatch: checkpoint={checkpoint_model!r}, requested={self.model_name!r}")
+            checkpoint_names = checkpoint.get("parameter_names")
+            if checkpoint_names is not None and tuple(checkpoint_names) != tuple(self.spec.parameter_names):
+                raise ValueError("checkpoint canonical parameter names/order mismatch")
+            checkpoint_groups = checkpoint.get("parameter_groups")
+            current_groups = self.spec.parameter_groups
+            if checkpoint_groups is not None:
+                normalized_checkpoint_groups = {
+                    str(group): tuple(names) for group, names in checkpoint_groups.items()
+                }
+                if normalized_checkpoint_groups != current_groups:
+                    raise ValueError("checkpoint process-group metadata mismatch")
+            checkpoint_mapping = checkpoint.get("parameter_mapping")
+            if checkpoint_mapping is not None and str(checkpoint_mapping).lower() != self.hydro_model.parameter_mapping:
+                raise ValueError("checkpoint parameter mapping mismatch")
+            checkpoint_span = checkpoint.get("log_mapping_span_threshold")
+            if checkpoint_span is not None and not np.isclose(float(checkpoint_span), self.hydro_model.log_mapping_span_threshold):
+                raise ValueError("checkpoint log-mapping threshold mismatch")
+            checkpoint_architecture = checkpoint.get("parameterizer_architecture")
+            if checkpoint_architecture is not None and checkpoint_architecture != self.parameterizer_architecture:
+                raise ValueError(
+                    f"checkpoint architecture mismatch: checkpoint={checkpoint_architecture!r}, "
+                    f"requested={self.parameterizer_architecture!r}"
+                )
+            checkpoint_transform = checkpoint.get("parameterizer_output_transform")
+            if checkpoint_transform is not None and checkpoint_transform != self.parameterizer_output_transform:
+                raise ValueError(
+                    f"checkpoint output transform mismatch: checkpoint={checkpoint_transform!r}, "
+                    f"requested={self.parameterizer_output_transform!r}"
+                )
+            # Strict loading preserves legacy key semantics and refuses silent
+            # partial loads for the process-head architecture.
+            self.parameterizer.load_state_dict(checkpoint["parameterizer_state"], strict=True)
+            if "optimizer_state" in checkpoint:
+                self.optimizer.load_state_dict(checkpoint["optimizer_state"])
+                for state in self.optimizer.state.values():
+                    for key, value in state.items():
+                        if torch.is_tensor(value):
+                            state[key] = value.to(self.device)
+            validate_finite_training_state(self.parameterizer.parameters(), self.optimizer)
+            resume_epoch = int(checkpoint.get("epoch", 0))
+            resume_loss = float(checkpoint.get("loss", float("inf")))
+            if not np.isfinite(resume_loss):
+                raise FloatingPointError(f"refusing non-finite resume loss from {resume_path}")
+            print(
+                f"Resuming from {resume_path} at epoch {resume_epoch} "
+                f"with train loss {resume_loss:.6f}",
+                flush=True,
+            )
+        def assert_finite(label: str, tensor: torch.Tensor) -> None:
+            if not torch.isfinite(tensor).all():
+                raise FloatingPointError(f"{self.model_name}: non-finite {label}")
+
+        def assert_parameter_bounds(raw_params: torch.Tensor) -> None:
+            assert_finite("normalized parameters", raw_params)
+            if bool((raw_params < 0.0).any() or (raw_params > 1.0).any()):
+                raise FloatingPointError(f"{self.model_name}: normalized parameter outside [0, 1]")
+            physical = self.hydro_model._descale_params(raw_params)
+            for name, values in physical.items():
+                assert_finite(f"physical parameter {name}", values)
+                lower, upper = self.hydro_model.parameter_bounds[name]
+                tolerance = 1.0e-5 * max(abs(float(upper) - float(lower)), 1.0)
+                if bool((values < lower - tolerance).any() or (values > upper + tolerance).any()):
+                    raise FloatingPointError(f"{self.model_name}: physical parameter {name} outside bounds")
+
+        def save_checkpoint(path: Path, epoch: int, loss_value: float, stop_reason: str = "") -> None:
+            # Only successful finite transactions reach this function.  Keep
+            # the check here as the serialization boundary as well.
+            validate_finite_training_state(self.parameterizer.parameters(), self.optimizer, loss=loss_value)
+            payload = {
+                "epoch": epoch,
+                "model_name": self.model_name,
+                "parameterizer_architecture": self.parameterizer_architecture,
+                "parameterizer_output_transform": self.parameterizer_output_transform,
+                "parameter_names": list(self.spec.parameter_names),
+                "parameter_groups": self.spec.parameter_groups,
+                "parameter_mapping": self.hydro_model.parameter_mapping,
+                "log_mapping_span_threshold": self.hydro_model.log_mapping_span_threshold,
+                "parameterizer_state": self.parameterizer.state_dict(),
+                "optimizer_state": self.optimizer.state_dict(),
+                "loss": loss_value,
+                "stop_reason": stop_reason,
+                "finite_optimizer_steps": self.transaction.successful_steps,
+            }
+            atomic_torch_save(payload, path)
+            print(f"  --> Checkpoint Saved -> {path.name}", flush=True)
 
         history = []
-        window_length = self.config["model"]["rho"]  # 730
+        window_length = self.config["model"]["rho"]
         warmup_days = self.config["model"].get("warmup", 365)
-
+        best_loss = resume_loss
+        best_epoch = resume_epoch
+        stale_epochs = 0
+        best_parameterizer_state = {
+            name: value.detach().cpu().clone()
+            for name, value in self.parameterizer.state_dict().items()
+        } if self.resume_checkpoint else None
+        stop_reason = "max_epochs"
         t0 = time.time()
 
-        for epoch in range(1, self.epochs + 1):
+        for epoch in range(resume_epoch + 1, self.epochs + 1):
+
             self.parameterizer.train()
             epoch_loss_sum = 0.0
+            epoch_successes = 0
 
             for mb in range(self.n_minibatch):
                 self.optimizer.zero_grad()
-
-                # Mini-batch sampling: Randomly select batch_size (100) basins
                 b_indices = np.random.choice(self.n_basins, size=self.batch_size, replace=False)
-                norm_attr_batch = self.norm_attr[b_indices]  # (100, 35)
-
-                pred_params = self.parameterizer(norm_attr_batch)
-                raw_params = pred_params.unsqueeze(-1)  # (100, N_params, 1)
-
-                # Direct GPU Tensor Slicing & Stacking (100% In-VRAM, 0 CPU Bottleneck)
+                norm_attr_batch = self.norm_attr[b_indices]
+                window_starts = []
                 sub_x_list = []
                 sub_y_list = []
-                window_starts = []
                 for b_idx in b_indices:
                     t_start = int(np.random.choice(self.catalog[b_idx]))
                     window_starts.append(t_start)
                     sub_x_list.append(self.train_x_t[t_start : t_start + window_length, b_idx, :])
                     sub_y_list.append(self.train_y_t[t_start : t_start + window_length, b_idx])
 
-                sub_x = torch.stack(sub_x_list, dim=1)  # (730, 100, 3) on GPU
-                sub_y = torch.stack(sub_y_list, dim=1)  # (730, 100) on GPU
+                sub_x = torch.stack(sub_x_list, dim=1)
+                sub_y = torch.stack(sub_y_list, dim=1)
                 if self.is_calendar_model:
                     sub_doy = torch.stack(
                         [self.train_doy_t[start : start + window_length] for start in window_starts],
@@ -371,48 +516,86 @@ class DmgNativeBenchmarkTrainer(BaseTrainer):
                     ).unsqueeze(-1)
                     sub_x = torch.cat((sub_x, sub_doy), dim=-1)
 
-                q_sim = self.hydro_model({"x_phy": sub_x}, (None, raw_params))["streamflow"].squeeze(-1).squeeze(-1)
+                anomaly_context = torch.autograd.detect_anomaly() if self.detect_anomaly else nullcontext()
+                with anomaly_context:
+                    pred_params, mapping_diagnostics = self.parameterizer(
+                        norm_attr_batch, return_diagnostics=True
+                    )
+                    total_mapping_jacobian = mapping_diagnostics["transform_jacobian"] * self.hydro_model.normalized_parameter_mapping_jacobian(pred_params)
+                    mapping_diagnostics["total_mapping_jacobian"] = total_mapping_jacobian
+                    mapping_diagnostics["normalized_jacobian"] = total_mapping_jacobian
+                    raw_params = pred_params.unsqueeze(-1)
+                    assert_parameter_bounds(raw_params)
+                    q_sim = self.hydro_model(
+                        {"x_phy": sub_x}, (None, raw_params)
+                    )["streamflow"].squeeze(-1).squeeze(-1)
+                    assert_finite("simulated streamflow", q_sim)
+                    loss, _ = compute_differentiable_kge(
+                        q_sim,
+                        sub_y[warmup_days:],
+                        warmup_days=0,
+                    )
+                    if self.saturation_regularizer_weight:
+                        loss = loss + self.saturation_regularizer_weight * self.parameterizer.saturation_regularizer_from_diagnostics(
+                            mapping_diagnostics
+                        )
+                    assert_finite("loss", loss)
+                    result = self.transaction.step(
+                        loss,
+                        epoch=epoch,
+                        batch_index=mb,
+                        basin_ids=b_indices,
+                    )
+                if not result.success:
+                    continue
+                if self.saturation_diagnostics:
+                    self.mapping_telemetry.append(
+                        self.parameterizer.summarize_mapping_diagnostics(mapping_diagnostics)
+                    )
+                epoch_successes += 1
+                epoch_loss_sum += float(loss.detach().item())
 
-                # The first 365 days initialize the physical states only;
-                # compare simulated and observed runoff on the prediction
-                # interval that follows the warm-up.
-                loss, _ = compute_differentiable_kge(
-                    q_sim,
-                    sub_y[warmup_days:],
-                    warmup_days=0,
-                )
-                loss.backward()
-
-                nn.utils.clip_grad_norm_(self.parameterizer.parameters(), max_norm=1.0)
-                self.optimizer.step()
-
-                epoch_loss_sum += loss.item()
-
-            avg_epoch_loss = epoch_loss_sum / self.n_minibatch
+            if epoch_successes == 0:
+                raise RuntimeError(f"{self.model_name}: no finite optimizer transactions completed in epoch {epoch}")
+            avg_epoch_loss = epoch_loss_sum / epoch_successes
             history.append({"epoch": epoch, "loss_1_minus_kge": avg_epoch_loss})
+            improved = avg_epoch_loss < best_loss - self.early_stopping_min_delta
+            if improved:
+                best_loss = avg_epoch_loss
+                best_epoch = epoch
+                stale_epochs = 0
+                best_parameterizer_state = {
+                    name: value.detach().cpu().clone()
+                    for name, value in self.parameterizer.state_dict().items()
+                }
+                save_checkpoint(model_ckpt_dir / "best.pt", epoch, avg_epoch_loss)
+            else:
+                stale_epochs += 1
 
-            print(f"Epoch [{epoch:02d}/{self.epochs:02d}] Train Loss (1-KGE): {avg_epoch_loss:.4f}", flush=True)
-            # Save Checkpoints Every 5 Epochs
+            print(
+                f"Epoch [{epoch:02d}/{self.epochs:02d}] Train Loss (1-KGE): {avg_epoch_loss:.4f} "
+                f"(best={best_loss:.4f}, stale={stale_epochs})",
+                flush=True,
+            )
             if epoch % 5 == 0 or epoch == self.epochs:
-                ckpt_path = model_ckpt_dir / f"epoch_{epoch:02d}.pt"
-                torch.save({
-                    "epoch": epoch,
-                    "model_name": self.model_name,
-                    "parameterizer_state": self.parameterizer.state_dict(),
-                    "optimizer_state": self.optimizer.state_dict(),
-                    "loss": avg_epoch_loss,
-                }, ckpt_path)
-                print(f"  --> Checkpoint Saved -> {ckpt_path.name}", flush=True)
+                save_checkpoint(model_ckpt_dir / f"epoch_{epoch:02d}.pt", epoch, avg_epoch_loss)
+            if epoch >= self.min_epochs and stale_epochs >= self.early_stopping_patience:
+                stop_reason = "early_stopping"
+                save_checkpoint(model_ckpt_dir / "early_stop.pt", epoch, avg_epoch_loss, stop_reason)
+                break
 
+        if best_parameterizer_state is None:
+            raise RuntimeError(f"{self.model_name}: no finite training checkpoint was produced")
+        self.parameterizer.load_state_dict(best_parameterizer_state)
+        actual_epochs = history[-1]["epoch"] if history else resume_epoch
         elapsed_time = time.time() - t0
 
-        # Full 15-year Validation Evaluation using DMG Metrics
         print(f"\nEvaluating Model [{self.model_name}] on 1995-2010 Validation Set...", flush=True)
         self.parameterizer.eval()
         with torch.no_grad():
             val_pred_params = self.parameterizer(self.norm_attr)
             val_raw_params = val_pred_params.unsqueeze(-1)
-
+            assert_parameter_bounds(val_raw_params)
             val_x_t = torch.as_tensor(self.val_x, dtype=torch.float32, device=self.device)
             val_x_t, _ = add_calendar_forcing(
                 val_x_t,
@@ -420,40 +603,71 @@ class DmgNativeBenchmarkTrainer(BaseTrainer):
                 model_name=self.model_name,
             )
             val_y_t = torch.as_tensor(self.val_y, dtype=torch.float32, device=self.device)
+            val_q_sim = self.hydro_model(
+                {"x_phy": val_x_t}, (None, val_raw_params)
+            )["streamflow"].squeeze(-1).squeeze(-1)
+            assert_finite("validation streamflow", val_q_sim)
+            val_loss, per_basin_kge = compute_differentiable_kge(
+                val_q_sim, val_y_t, warmup_days=warmup_days
+            )
+            assert_finite("validation loss", val_loss)
 
-            val_q_sim = self.hydro_model({"x_phy": val_x_t}, (None, val_raw_params))["streamflow"].squeeze(-1).squeeze(-1)
-            val_loss, per_basin_kge = compute_differentiable_kge(val_q_sim, val_y_t, warmup_days=warmup_days)
-
-            val_kge_np = per_basin_kge.cpu().numpy()
-            val_kge_median = float(np.nanmedian(val_kge_np))
-            val_kge_mean = float(np.nanmean(val_kge_np))
-
+        val_kge_np = per_basin_kge.cpu().numpy()
+        val_kge_median = float(np.nanmedian(val_kge_np))
+        val_kge_mean = float(np.nanmean(val_kge_np))
         print(f"=== DMG Validation Complete for [{self.model_name}] in {elapsed_time:.1f}s ===", flush=True)
         print(f"Validation KGE Median: {val_kge_median:.4f} | Validation KGE Mean: {val_kge_mean:.4f}", flush=True)
 
         summary_data = {
             "model_name": self.model_name,
-            "epochs": self.epochs,
+            "configured_epochs": self.epochs,
+            "actual_epochs": actual_epochs,
+            "best_epoch": best_epoch,
+            "stop_reason": stop_reason,
             "train_loss_final": history[-1]["loss_1_minus_kge"],
+            "train_loss_best": best_loss,
             "val_kge_median": val_kge_median,
             "val_kge_mean": val_kge_mean,
             "elapsed_seconds": elapsed_time,
+            "saturation_telemetry": self.mapping_telemetry[-1] if self.mapping_telemetry else None,
         }
 
-        # Save per-basin validation KGE CSV
         by_basin_df = pd.DataFrame({"basin_id": [f"{b:08d}" for b in self.ids], "val_kge": val_kge_np})
-        by_basin_csv = RESULTS_DIR / f"dpl_{self.epochs}ep_{self.model_name}_by_basin.csv"
+        by_basin_csv = self.results_root / f"dpl_{actual_epochs}ep_{self.model_name}_by_basin.csv"
         by_basin_df.to_csv(by_basin_csv, index=False, float_format="%.4f")
-
         return summary_data
 
 
 def main():
     parser = argparse.ArgumentParser(description="Run DMG Native Production dPL Benchmark for 36 Models")
     parser.add_argument("--model", default="simhyd", help="Target model name or 'all'")
-    parser.add_argument("--epochs", type=int, default=20)
+    parser.add_argument("--epochs", type=int, default=100, help="Maximum epochs")
+    parser.add_argument("--min_epochs", type=int, default=50, help="Minimum epochs before early stopping")
+    parser.add_argument("--patience", type=int, default=10, help="Early-stopping patience in epochs")
+    parser.add_argument("--min_delta", type=float, default=1.0e-4, help="Minimum train-loss improvement")
     parser.add_argument("--batch_size", type=int, default=100)
     parser.add_argument("--lr", type=float, default=1e-3)
+    parser.add_argument("--rho", type=int, default=730, help="Training window length")
+    parser.add_argument("--warmup", type=int, default=365)
+    parser.add_argument("--backend", choices=("compile", "eager"), default="compile")
+    parser.add_argument("--detect_anomaly", action="store_true")
+    parser.add_argument("--grad_clip_norm", type=float, default=1.0)
+    parser.add_argument(
+        "--parameterizer_architecture",
+        choices=("legacy", "process_heads", "residual_process", "residual_selective"),
+        default="legacy",
+    )
+    parser.add_argument(
+        "--parameterizer_output_transform",
+        choices=("sigmoid", "softsign", "arctan", "identity", "linear"),
+        default="sigmoid",
+    )
+    parser.add_argument("--saturation_floor", type=float, default=0.01)
+    parser.add_argument("--saturation_regularizer_weight", type=float, default=0.0)
+    parser.add_argument("--saturation_diagnostics", action="store_true")
+    parser.add_argument("--resume_checkpoint", default=None, help="Checkpoint path to resume from")
+    parser.add_argument("--checkpoint_root", default=None, help="Optional isolated checkpoint root")
+    parser.add_argument("--results_root", default=None, help="Optional isolated results root")
     parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
     args = parser.parse_args()
 
@@ -463,13 +677,26 @@ def main():
         "train_time": ["1980/10/01", "1995/09/30"],
         "train": {
             "epochs": args.epochs,
+            "min_epochs": args.min_epochs,
+            "early_stopping_patience": args.patience,
+            "early_stopping_min_delta": args.min_delta,
+            "detect_anomaly": args.detect_anomaly,
+            "resume_checkpoint": args.resume_checkpoint,
             "batch_size": args.batch_size,
             "lr": args.lr,
+            "grad_clip_norm": args.grad_clip_norm,
+            "parameterizer_architecture": args.parameterizer_architecture,
+            "parameterizer_output_transform": args.parameterizer_output_transform,
+            "saturation_floor": args.saturation_floor,
+            "saturation_regularizer_weight": args.saturation_regularizer_weight,
+            "saturation_diagnostics": args.saturation_diagnostics,
+            "checkpoint_root": args.checkpoint_root,
+            "results_root": args.results_root,
         },
         "model": {
-            "rho": 730,
-            "warmup": 365,
-            "backend": "compile",
+            "rho": args.rho,
+            "warmup": args.warmup,
+            "backend": args.backend,
         },
     }
 
@@ -486,7 +713,11 @@ def main():
 
     if all_summaries:
         summary_df = pd.DataFrame(all_summaries)
-        summary_csv = RESULTS_DIR / f"dpl_{args.epochs}ep_model_summary.csv"
+        summary_root = Path(config["train"].get("results_root") or RESULTS_DIR)
+        if not summary_root.is_absolute():
+            summary_root = BENCHMARK_ROOT / summary_root
+        summary_root.mkdir(parents=True, exist_ok=True)
+        summary_csv = summary_root / f"dpl_{args.epochs}ep_model_summary.csv"
         summary_df.to_csv(summary_csv, index=False, float_format="%.4f")
 
 

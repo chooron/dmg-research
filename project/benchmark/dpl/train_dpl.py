@@ -16,6 +16,7 @@ sys.path[:0] = [str(BENCHMARK_ROOT), str(BENCHMARK_ROOT / "src")]
 
 from dpl.attributes import CatchmentAttributeBuilder
 from dpl.nn_parameterizer import CatchmentParameterizer
+from dpl.optimizer_transaction import FiniteOptimizerTransaction
 from src.data_selection import load_ids, load_repeated_warmup_and_train
 from src.model_registry import NPARAM_INFO_36, build_model, get_spec
 from src.production_config import load_resolved_config
@@ -73,8 +74,9 @@ def train_dpl_model(
     epochs: int = 50,
     lr: float = 1e-3,
     device: str = "cuda",
+    grad_clip_norm: float | None = None,
 ) -> None:
-    """Train dPL neural network mapping catchment attributes to model parameters."""
+    """Train dPL with the finite transaction guard (CPU smoke-friendly)."""
     resolved = load_resolved_config(config_path)
     ids = load_ids(resolved["data"]["basin_ids"])
 
@@ -87,19 +89,30 @@ def train_dpl_model(
     norm_attr = attr_builder.build_normalized_attributes(ids, device=device)
     n_basins, n_attr = norm_attr.shape
 
-    # 3. Instantiate Hydrological Model & Parameterizer with physical bounds
+    # 3. Instantiate model and parameterizer.  HydrologyModel owns the
+    # normalized-to-physical mapping, so the dPL output stays normalized.
     spec = get_spec(model_name, device=device)
-    min_b = spec.bounds[:, 0].to(dtype=torch.float32)
-    max_b = spec.bounds[:, 1].to(dtype=torch.float32)
-
     n_params = NPARAM_INFO_36[model_name]
     hydro_model = build_model(model_name, device, warm_up=warmup_days, backend="eager")
+    dpl_config = resolved.get("dpl", {})
     parameterizer = CatchmentParameterizer(
-        in_features=n_attr, out_features=n_params, param_bounds=(min_b, max_b)
+        in_features=n_attr,
+        out_features=n_params,
+        param_bounds=None,
+        architecture=dpl_config.get("parameterizer_architecture", "legacy"),
+        parameter_names=list(spec.parameter_names),
+        parameter_groups=spec.parameter_groups,
+        saturation_floor=float(dpl_config.get("saturation_floor", 0.01)),
+        saturation_regularizer_weight=float(dpl_config.get("saturation_regularizer_weight", 0.0)),
     ).to(device)
 
     optimizer = optim.Adam(parameterizer.parameters(), lr=lr)
-
+    transaction = FiniteOptimizerTransaction(
+        optimizer,
+        parameterizer.parameters(),
+        clip_norm=grad_clip_norm,
+        named_parameters=parameterizer.named_parameters(),
+    )
     print(f"=== Starting dPL Training for [{model_name}] across {n_basins} basins ===")
     print(f"Attributes Shape: {norm_attr.shape} | Parameters Dim: {n_params}")
 
@@ -107,18 +120,20 @@ def train_dpl_model(
         optimizer.zero_grad()
 
         # Predict parameters theta from catchment attributes: (n_basins, n_params)
-        predicted_params = parameterizer(norm_attr)
-
-        # Reshape for hydro model: (n_basins, n_params, 1) -> 1 start / 1 sample per basin
+        predicted_params, mapping_diagnostics = parameterizer(norm_attr, return_diagnostics=True)
+        total_mapping_jacobian = mapping_diagnostics["transform_jacobian"] * hydro_model.normalized_parameter_mapping_jacobian(predicted_params)
+        mapping_diagnostics["total_mapping_jacobian"] = total_mapping_jacobian
+        mapping_diagnostics["normalized_jacobian"] = total_mapping_jacobian
         raw_params = predicted_params.unsqueeze(-1)
 
         # Run differentiable forward pass through hydrological model
         q_sim = hydro_model({"x_phy": x}, (None, raw_params))["streamflow"].squeeze(-1).squeeze(-1)
-
-        # Compute loss excluding warmup period and handling NaNs
         loss = compute_differentiable_kge(q_sim, y, warmup_days=warmup_days)
-        loss.backward()
-        optimizer.step()
+        if parameterizer.saturation_regularizer_weight:
+            loss = loss + parameterizer.saturation_regularizer_weight * parameterizer.saturation_regularizer_from_diagnostics(
+                mapping_diagnostics
+            )
+        transaction.step(loss, epoch=epoch, batch_index=0, basin_ids=ids)
 
         if epoch % 5 == 0 or epoch == 1:
             print(f"Epoch [{epoch:03d}/{epochs:03d}] Loss (1 - Mean KGE): {loss.item():.4f}")
@@ -132,11 +147,19 @@ def main() -> None:
     parser.add_argument("--config", default="configs/full_run_10starts_300gen_warm1980_1981x5.yaml")
     parser.add_argument("--epochs", type=int, default=50)
     parser.add_argument("--lr", type=float, default=1e-3)
+    parser.add_argument("--grad_clip_norm", type=float, default=None)
     parser.add_argument("--device", default="cuda")
     args = parser.parse_args()
 
     config_path = Path(args.config) if Path(args.config).is_absolute() else BENCHMARK_ROOT / args.config
-    train_dpl_model(args.model, config_path, epochs=args.epochs, lr=args.lr, device=args.device)
+    train_dpl_model(
+        args.model,
+        config_path,
+        epochs=args.epochs,
+        lr=args.lr,
+        device=args.device,
+        grad_clip_norm=args.grad_clip_norm,
+    )
 
 
 if __name__ == "__main__":

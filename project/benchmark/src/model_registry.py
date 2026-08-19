@@ -52,6 +52,31 @@ class ModelSpec:
     dimension: int
     bounds: torch.Tensor
     routed_kind: str
+    parameter_names: tuple[str, ...] = ()
+    parameter_groups: dict[str, tuple[str, ...]] | None = None
+
+
+# Optional metadata is centralized in the benchmark registry rather than
+# scattered through the parameterizer.  Names are taken from PARAM_INFO below
+# and are therefore checked against the canonical model order at construction.
+FLEX_PROCESS_GROUPS = {
+    "production": ("s1max", "smax", "beta", "d_split", "percmax", "lp"),
+    "routing": ("nlagf", "nlags", "kf", "ks"),
+    "interception": ("imax",),
+    "snow": ("tt", "ddf"),
+}
+
+
+def parameter_groups_for_model(name: str, parameter_names: Iterable[str]) -> dict[str, tuple[str, ...]] | None:
+    """Return only valid process groups for Flex models."""
+    if name.lower() not in {"flexb", "flexi", "flexis"}:
+        return None
+    available = set(parameter_names)
+    groups = {
+        group: tuple(parameter for parameter in members if parameter in available)
+        for group, members in FLEX_PROCESS_GROUPS.items()
+    }
+    return {group: members for group, members in groups.items() if members}
 
 
 def model_config(
@@ -91,11 +116,19 @@ def get_spec(name: str, device: torch.device | str = "cpu") -> ModelSpec:
     entries = PARAM_INFO.get(key)
     if entries is None or len(entries) != expected:
         raise RuntimeError(f"bound count mismatch for {key}: {0 if entries is None else len(entries)} != {expected}")
+    parameter_names = tuple(entries.keys())
     flat = [[float(lo), float(hi)] for lo, hi in entries.values()]
     if not all(math.isfinite(x) and lo < hi for (lo, hi) in flat for x in (lo, hi)):
         raise RuntimeError(f"non-finite or unordered bounds for {key}")
     kind = "endpoint" if key in ENDPOINT_UH_SCHEMES else "intermediate" if key in INTERMEDIATE_UH_CONFIG else "base"
-    return ModelSpec(key, expected, torch.tensor(flat, dtype=torch.float64, device=device), kind)
+    return ModelSpec(
+        key,
+        expected,
+        torch.tensor(flat, dtype=torch.float64, device=device),
+        kind,
+        parameter_names=parameter_names,
+        parameter_groups=parameter_groups_for_model(key, parameter_names),
+    )
 
 
 def build_model(
