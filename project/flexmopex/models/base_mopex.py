@@ -71,11 +71,19 @@ class BaseMopex(nn.Module):
         self.pet_idx = self.variables.index("pet")
 
     def _compile_step(self, step_fn):
+        """Compile the physics step, optionally failing closed for formal runs."""
+        require_compile = bool(self.config.get("require_torch_compile", False))
         if hasattr(torch, "compile") and not bool(self.config.get("disable_compile", False)):
             try:
-                return torch.compile(step_fn)
-            except Exception:
-                pass  # e.g. Dynamo not supported on Python 3.12+
+                compiled = torch.compile(step_fn)
+                self._torch_compile_enabled = True
+                return compiled
+            except Exception as exc:
+                if require_compile:
+                    raise RuntimeError("torch.compile was required but could not be enabled") from exc
+        elif require_compile:
+            raise RuntimeError("torch.compile was required but is unavailable or disabled")
+        self._torch_compile_enabled = False
         return step_fn
 
     def _descale_mopex_params(

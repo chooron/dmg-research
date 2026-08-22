@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Optional, Tuple, Union
 
 import numpy as np
@@ -47,7 +48,9 @@ class PubSampler(BaseSampler):
         """
         # 1. Get file paths from environment variables loaded from .env.
         groups_dir = get_env_path("BASIN_GROUPS_DIR")
-        all_basins_file = get_env_path("GAGE_INFO")
+        subset_path = self.config.get("observations", {}).get("subset_path")
+        default_gage_info = Path(__file__).resolve().parents[3] / "data" / "gage_id.npy"
+        all_basins_file = None if subset_path else get_env_path("GAGE_INFO", default=default_gage_info)
 
         # 2. Get the test group ID from the config
         try:
@@ -55,9 +58,15 @@ class PubSampler(BaseSampler):
         except KeyError:
             raise KeyError("Config must contain ['test']['test_group_id']")
 
-        # 3. Load all basin IDs to create a complete ID-to-index mapping
-        all_basin_ids = np.load(all_basins_file)
-        id_to_index_map = {basin_id: i for i, basin_id in enumerate(all_basin_ids)}
+        # The formal 671 manifest uses the complete gage_id storage index; a
+        # subset_path, when present, remains authoritative for legacy subsets.
+        if subset_path:
+            import ast
+            subset_text = Path(subset_path).read_text()
+            all_basin_ids = np.asarray(ast.literal_eval(subset_text), dtype=np.int64)
+        else:
+            all_basin_ids = np.load(all_basins_file)
+        id_to_index_map = {int(basin_id): i for i, basin_id in enumerate(all_basin_ids)}
 
         # 4. Load the basin IDs for the designated test group
         test_group_file = groups_dir / f"group_{test_group_id}.npy"

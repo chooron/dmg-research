@@ -1,0 +1,108 @@
+# Flex-MOPEX formal CAMELS-671 execution manifest (prepared, not committed)
+# Execution contract only; no scientific interpretation.
+manifest_version: 2
+basin_manifest: data/gage_id.npy
+basin_count: 671
+model_contract:
+  flex_model: LearnedWeightMopexE
+  structure_encoder: LearnedStructureNetPureAttrEncoder
+  structure_input_width: 35
+  structure_head: 35-128-128-8
+  interception_semantics: S0
+  counterfactual_supervision: true
+  soft_target: sigmoid(delta_J_over_process_median_T)
+  confidence_weighted_bce: true
+  gradient_isolation: bidirectional
+  optimizer: Adadelta
+  learning_rate: 1.0
+  nmul_default: 1
+  nmul_sensitivity_grid: [1, 8, 16, 32]
+  nmul_sensitivity_last: true
+training_protocol:
+  max_epochs: 100
+  min_epochs: 50
+  monitor: train_loss
+  monitor_source: current_training_objective_only
+  mode: min
+  patience: 10
+  min_delta: 0.0001
+  save_epoch: 1
+  final_checkpoint_rule: best_epoch_at_or_after_min_epochs
+  outputs: [best_checkpoint, last_checkpoint, final_checkpoint, train_loss_history, early_stopping_metadata]
+legacy_results:
+  531_basin_results: not_reusable_for_671_formal_results
+  reason: basin universe differs; no cross-universe checkpoint reuse
+experiment_families:
+  - family: core_endpoints_and_lambda_path
+    variants: [base, full, flex_lambda0003, flex_lambda0005, flex_lambda0007, flex_lambda0010, flex_lambda0015, flex_lambda0020, flex_lambda0030, flex_lambda0050, flex_lambda0100]
+    seeds: [42]
+    basin_count: 671
+    new_runs: 11
+    output: results/formal_671_core/{variant}/seed_42
+  - family: reference_cflex_multiseed
+    lambda: 0.007
+    seeds: [42, 43, 44]
+    basin_count: 671
+    total_runs: 3
+    new_runs: 2
+    core_overlap: lambda0007 seed42
+    output: results/formal_671_reference/flex_lambda0007/seed_{seed}
+  - family: LOPO
+    variants: [remove_snow, remove_subsurface_fast_flow, remove_phenology, remove_interception]
+    removed_processes: [w_snow, w_sub, w_phen, w_int]
+    lambda: 0.007
+    nmul: 1
+    seeds: [42, 43, 44]
+    basin_count: 671
+    new_runs: 12
+    model: Pure-X35 with a fixed-off process mask and CF/BCE retained
+    output: results/formal_671_lopo/{removed_process}/seed_{seed}
+  - family: DFlex_comparison
+    legacy_source: scripts/run_binary_full_pilot.sh
+    legacy_grid: [0.001, 0.003, 0.005, 0.010, 0.030]
+    seeds: [42, 43, 44]
+    basin_count: 671
+    planned_runs: 15
+    status: blocked_pending_objective_and_config_confirmation
+    reason: BinaryWeightMopex/NseL0BatchLoss is a legacy L0 objective; no accepted formal DFlex protocol/provenance yet
+    output: results/formal_671_dflex/{lambda}/seed_{seed}
+  - family: n_mul_sensitivity
+    n_mul_grid: [1, 8, 16, 32]
+    lambda: 0.007
+    seeds: [42, 43, 44]
+    basin_count: 671
+    new_runs: 12
+    output: results/formal_671_nmul/lambda0007/nmul{n_mul}/seed_{seed}
+  - family: LORO
+    regions: [0, 1, 2, 3, 4, 5, 6]
+    models: [base, full, flex]
+    lambda_flex: 0.007
+    seeds: [42, 43, 44]
+    basin_count: 671
+    region_counts: [102, 109, 109, 79, 87, 94, 91]
+    new_runs: 63
+    output: results/formal_671_loro/{model}/region{region}/seed_{seed}
+execution:
+  runnable_new_runs: 100
+  unified_queue: true
+  gpu_policy: six_processes_per_gpu
+  gpu_count: 2
+  processes_per_gpu: 6
+  total_concurrency: 12
+  scheduler: unified_queue_with_nmul_tail
+  non_sensitivity_nmul: 1
+  main_processes_per_gpu: 6
+  nmul_processes_per_gpu: 3
+  results_root: results/formal_671_unified_nmul1_tail3
+  order: non_sensitivity_then_nmul_tail_with_completion_replenishment
+  nmul_tail_phases:
+    small_first: [1, 4, 8]
+    delayed: [16, 32]
+    barrier: wait_for_small_first_phase_completion
+  continuation_policy: single_visible_gpu
+  continuation_gpu: 0
+  continuation_main_processes: 5
+  continuation_nmul_small_processes: 5
+  continuation_nmul16_processes: 3
+  continuation_nmul32_processes: 2
+  smoke_gate: one representative one-epoch run per family

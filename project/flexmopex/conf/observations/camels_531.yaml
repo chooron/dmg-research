@@ -1,4 +1,4 @@
-# CAMELS 671-basin data extraction (with 531-basin indexing)
+# CAMELS-US formal 531-basin subset; data archive may retain a 671-basin storage index
 # Download: https://mhpi-spatial.s3.us-east-2.amazonaws.com/mhpi-release/camels/camels_data.zip
 
 name: camels_531

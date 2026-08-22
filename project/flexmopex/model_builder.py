@@ -18,6 +18,8 @@ PHY_MODEL_MODULES: dict[str, str] = {
     # --- Interception candidates E/F (formula screening; semantics via config) ---
     "LearnedWeightMopexE": "project.flexmopex.models.learned_weight_mopex_candidates",
     "LearnedWeightMopexF": "project.flexmopex.models.learned_weight_mopex_candidates",
+    # --- Formal DFlex-CF/BCE: Candidate E/S0 with deterministic hard gates ---
+    "DFlexWeightMopexCF": "project.flexmopex.models.dflex_weight_mopex",
 }
 
 NN_MODEL_MODULES: dict[str, str] = {

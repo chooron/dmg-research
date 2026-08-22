@@ -13,7 +13,7 @@
 defaults:
   - _self_
   - hydra: settings
-  - observations: camels_671 # camels_531, camels_671
+  - observations: camels_531 # formal canonical manifest: data/531sub_id.txt
 
 ## General -------------------------------#
 mode: train # train, test, train_test, simulation
@@ -43,7 +43,13 @@ train:
   lr_scheduler_params:
     step_size: 10
     gamma: 0.5
-
+  early_stopping:
+    enabled: true
+    monitor: train_loss
+    mode: min
+    min_epochs: 50
+    patience: 20
+    min_delta: 0.0001
 ## Evaluation -------------------------------#
 test:
   start_time: 1995/10/01

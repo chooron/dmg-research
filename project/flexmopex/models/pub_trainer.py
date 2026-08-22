@@ -6,10 +6,13 @@ the minimal training loop needed for FlexMOPEX LORO runs.
 """
 from __future__ import annotations
 
+import json
 import logging
 import os
 import re
+import shutil
 import time
+from pathlib import Path
 from typing import Any, Optional
 
 import numpy as np
@@ -17,6 +20,7 @@ import torch
 import tqdm
 from numpy.typing import NDArray
 
+from project.flexmopex.models.early_stopping import EarlyStoppingController
 log = logging.getLogger(__name__)
 
 
@@ -52,7 +56,10 @@ class PubTrainer:
         self.sampler = None  # Set externally after construction
         self.start_epoch = 0
         self.predictions = None
-
+        self.early_stopping = EarlyStoppingController.from_config(config)
+        self.training_history: list[dict[str, Any]] = []
+        self.stop_epoch = 0
+        self.best_epoch = None
         if "train" in config.get("mode", "train"):
             if not self.train_dataset:
                 raise ValueError("'train_dataset' required for training mode.")
@@ -149,8 +156,68 @@ class PubTrainer:
             self.train_dataset["xc_nn_norm"], self.config
         )
         log.info(f"LORO training: epochs {self.start_epoch}–{self.epochs}")
+        self.stop_epoch = max(self.start_epoch - 1, 0)
         for epoch in range(self.start_epoch, self.epochs + 1):
             self._train_one_epoch(epoch, n_minibatch, n_timesteps)
+            self.stop_epoch = epoch
+            if self._record_training_epoch(epoch):
+                break
+        self._finalize_training_metadata(self.stop_epoch)
+    def _model_checkpoint_path(self, epoch: int) -> str:
+        model_name = next(iter(self.model.model_dict)).lower()
+        return os.path.join(self.config["model_path"], f"{model_name}_ep{int(epoch)}.pt")
+
+    def _checkpoint_alias(self, epoch: int, alias: str) -> None:
+        source = self._model_checkpoint_path(epoch)
+        if not os.path.exists(source):
+            self.model.save_model(epoch)
+        shutil.copy2(source, os.path.join(self.config["model_path"], f"{alias}_checkpoint.pt"))
+
+    def _record_training_epoch(self, epoch: int) -> bool:
+        value = float(self.total_loss / max(1, self.config["train"].get("n_minibatch", 1)))
+        # _train_one_epoch stores the true average in _final_loss when available.
+        value = float(getattr(self, "_final_loss", value))
+        should_stop = self.early_stopping.update(epoch, value)
+        row = self.early_stopping.history[-1]
+        self.training_history.append(row)
+        self._checkpoint_alias(epoch, "last")
+        if row["improved"]:
+            self.best_epoch = int(epoch)
+            self._checkpoint_alias(epoch, "best")
+            self._checkpoint_alias(epoch, "final")
+        if should_stop:
+            print(
+                f"[Early stopping] epoch={epoch} best_epoch={self.best_epoch} "
+                f"monitor={value:.6f} patience={self.early_stopping.patience}",
+                flush=True,
+            )
+        return should_stop
+
+    def _finalize_training_metadata(self, stop_epoch: int) -> None:
+        self.early_stopping.finalize(stop_epoch, int(self.epochs))
+        self.stop_epoch = int(self.early_stopping.stop_epoch or stop_epoch)
+        self.best_epoch = self.early_stopping.best_epoch
+        if self.early_stopping.enabled and self.best_epoch is None:
+            raise RuntimeError("No eligible LORO best epoch was recorded.")
+        selected_epoch = self.best_epoch if self.early_stopping.enabled else self.stop_epoch
+        if selected_epoch and self.early_stopping.enabled:
+            self.model.load_model(epoch=int(selected_epoch))
+            self._checkpoint_alias(int(selected_epoch), "final")
+        if selected_epoch:
+            self.config.setdefault("test", {})["test_epoch"] = int(selected_epoch)
+        payload = {
+            "protocol": "training_side_early_stopping",
+            "selected_checkpoint": "best_checkpoint.pt" if self.early_stopping.enabled else "last_checkpoint.pt",
+            "best_epoch": self.best_epoch,
+            "stop_epoch": self.stop_epoch,
+            "early_stop_reason": self.early_stopping.reason,
+            "monitor": self.early_stopping.monitor,
+            "monitor_values": self.training_history,
+            "early_stopping": self.early_stopping.as_dict(),
+        }
+        output_dir = Path(self.config["model_path"]).parent
+        (output_dir / "early_stopping.json").write_text(json.dumps(payload, indent=2, allow_nan=False) + "\n")
+        (output_dir / "train_loss_history.json").write_text(json.dumps(self.training_history, indent=2, allow_nan=False) + "\n")
 
     def _train_one_epoch(self, epoch: int, n_minibatch: int, n_timesteps: int) -> None:
         start_time = time.perf_counter()
@@ -178,6 +245,7 @@ class PubTrainer:
         if self.use_scheduler:
             self.scheduler.step()
 
+        self._final_loss = self.total_loss / max(n_minibatch, 1)
         self._log_epoch_stats(epoch, getattr(self.model, "loss_dict", {}), n_minibatch, start_time)
 
         save_epoch = self.config["train"].get("save_epoch", 10)

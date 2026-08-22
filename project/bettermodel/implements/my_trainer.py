@@ -1,6 +1,8 @@
+import json
 import logging
 import os
 import re
+import shutil
 import sys
 import time
 from pathlib import Path
@@ -17,6 +19,7 @@ from dmg.core.utils.factory import import_data_sampler, load_criterion
 from dmg.core.utils.utils import save_outputs, save_train_state
 from dmg.models.model_handler import ModelHandler
 from dmg.trainers.base import BaseTrainer
+from project.flexmopex.models.early_stopping import EarlyStoppingController
 
 log = logging.getLogger(__name__)
 
@@ -77,7 +80,12 @@ class MyTrainer(BaseTrainer):
         self.verbose = verbose
         self.sampler = import_data_sampler(config['data_sampler'])(config)
         self.is_in_train = False
-
+        self.early_stopping = EarlyStoppingController.from_config(config)
+        self.training_history: list[dict[str, Any]] = []
+        self.stop_epoch = 0
+        self.best_epoch = None
+        self.best_checkpoint_path: str | None = None
+        self.last_checkpoint_path: str | None = None
         if 'train' in config['mode']:
             if not self.train_dataset:
                 raise ValueError("'train_dataset' required for training mode.")
@@ -300,6 +308,9 @@ class MyTrainer(BaseTrainer):
         print(f"Loaded checkpoint from epoch {latest_model_epoch}")
 
     def _save_final_checkpoint_if_needed(self) -> None:
+        """Preserve legacy final-epoch behavior when early stopping is disabled."""
+        if self.early_stopping.enabled:
+            return
         final_epoch = int(self.epochs)
         model_path = self._model_checkpoint_path(final_epoch)
         latest_state_epoch, _ = self._find_latest_train_state(self._model_dir())
@@ -318,6 +329,67 @@ class MyTrainer(BaseTrainer):
                 clear_prior=False,
             )
 
+    def _checkpoint_alias(self, epoch: int, alias: str) -> str:
+        """Copy an epoch checkpoint to a stable best/last/final alias."""
+        source = self._model_checkpoint_path(epoch)
+        if not os.path.exists(source):
+            self.model.save_model(epoch)
+        destination = os.path.join(self._model_dir(), f"{alias}_checkpoint.pt")
+        shutil.copy2(source, destination)
+        return destination
+
+    def _record_training_epoch(self, epoch: int) -> bool:
+        """Record train loss, create aliases, and return the stop decision."""
+        value = float(getattr(self, "_final_loss", float("nan")))
+        should_stop = self.early_stopping.update(epoch, value)
+        row = self.early_stopping.history[-1]
+        self.training_history.append(row)
+        self.last_checkpoint_path = self._checkpoint_alias(epoch, "last")
+        if row["improved"]:
+            self.best_epoch = int(epoch)
+            self.best_checkpoint_path = self._checkpoint_alias(epoch, "best")
+            self._checkpoint_alias(epoch, "final")
+        if should_stop:
+            self.stop_epoch = int(epoch)
+            print(
+                f"[Early stopping] epoch={epoch} best_epoch={self.best_epoch} "
+                f"monitor={value:.6f} patience={self.early_stopping.patience}",
+                flush=True,
+            )
+        return should_stop
+
+    def _finalize_training_metadata(self, stop_epoch: int) -> None:
+        """Restore the selected checkpoint and persist machine-readable metadata."""
+        self.early_stopping.finalize(stop_epoch, int(self.epochs))
+        self.stop_epoch = int(self.early_stopping.stop_epoch or stop_epoch)
+        self.best_epoch = self.early_stopping.best_epoch
+        if self.early_stopping.enabled and self.best_epoch is None:
+            raise RuntimeError(
+                "Early stopping was enabled but no eligible best epoch was recorded; "
+                "check min_epochs/max_epochs."
+            )
+        selected_epoch = self.best_epoch if self.early_stopping.enabled else self.stop_epoch
+        if selected_epoch is not None and selected_epoch > 0:
+            if self.early_stopping.enabled:
+                self.model.load_model(epoch=int(selected_epoch))
+                self._checkpoint_alias(int(selected_epoch), "final")
+            self.config.setdefault("test", {})["test_epoch"] = int(selected_epoch)
+
+        payload = {
+            "protocol": "training_side_early_stopping",
+            "selected_checkpoint": "best_checkpoint.pt" if self.early_stopping.enabled else "last_checkpoint.pt",
+            "best_epoch": self.best_epoch,
+            "stop_epoch": self.stop_epoch,
+            "early_stop_reason": self.early_stopping.reason,
+            "monitor": self.early_stopping.monitor,
+            "monitor_values": self.training_history,
+            "early_stopping": self.early_stopping.as_dict(),
+        }
+        output_path = Path(self._model_dir()).parent / "early_stopping.json"
+        output_path.write_text(json.dumps(payload, indent=2, allow_nan=False) + "\n")
+        history_path = Path(self._model_dir()).parent / "train_loss_history.json"
+        history_path.write_text(json.dumps(self.training_history, indent=2, allow_nan=False) + "\n")
+
     def load_test_states(self) -> None:
         """Load model states for testing using the configured test epoch."""
         path = self._model_dir()
@@ -329,7 +401,6 @@ class MyTrainer(BaseTrainer):
         model_name = self.config['delta_model']['phy_model']['model']
         if isinstance(model_name, list):
             model_name = model_name[0]
-
         checkpoint_file = f"{str(model_name).lower()}_ep{int(test_epoch)}.pt"
         checkpoint_path = os.path.join(path, checkpoint_file)
         if not os.path.exists(checkpoint_path):
@@ -381,7 +452,9 @@ class MyTrainer(BaseTrainer):
         self._train_start_time = time.perf_counter()
         self._final_loss = 0.0
 
-        # Training loop
+        # Training loop. The monitor is always the actual optimization loss;
+        # validation/test data is never touched by the stopping decision.
+        self.stop_epoch = max(self.start_epoch - 1, 0)
         for epoch in range(self.start_epoch, self.epochs + 1):
             self.train_one_epoch(
                 epoch,
@@ -389,7 +462,11 @@ class MyTrainer(BaseTrainer):
                 n_minibatch,
                 n_timesteps,
             )
+            self.stop_epoch = epoch
+            if self._record_training_epoch(epoch):
+                break
 
+        self._finalize_training_metadata(self.stop_epoch)
         self._save_final_checkpoint_if_needed()
         total_time = time.perf_counter() - self._train_start_time
         self._emit_progress(
