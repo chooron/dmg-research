@@ -1,0 +1,61 @@
+{
+  "manifest": "/mnt/f/python/generic_deltamodel/data/gage_id.npy",
+  "manifest_basin_count": 671,
+  "source_dir": "/mnt/f/python/generic_deltamodel/data/basin_groups",
+  "output_dir": "/home/jingxin/orca/workspaces/dmg-research/flex-mopex/project/flexmopex/manifests/loro_671",
+  "regions": [
+    {
+      "region": 0,
+      "source_group_id": 11,
+      "source_count": 102,
+      "held_out_count": 102,
+      "output": "/home/jingxin/orca/workspaces/dmg-research/flex-mopex/project/flexmopex/manifests/loro_671/group_11.npy"
+    },
+    {
+      "region": 1,
+      "source_group_id": 12,
+      "source_count": 109,
+      "held_out_count": 109,
+      "output": "/home/jingxin/orca/workspaces/dmg-research/flex-mopex/project/flexmopex/manifests/loro_671/group_12.npy"
+    },
+    {
+      "region": 2,
+      "source_group_id": 13,
+      "source_count": 109,
+      "held_out_count": 109,
+      "output": "/home/jingxin/orca/workspaces/dmg-research/flex-mopex/project/flexmopex/manifests/loro_671/group_13.npy"
+    },
+    {
+      "region": 3,
+      "source_group_id": 14,
+      "source_count": 79,
+      "held_out_count": 79,
+      "output": "/home/jingxin/orca/workspaces/dmg-research/flex-mopex/project/flexmopex/manifests/loro_671/group_14.npy"
+    },
+    {
+      "region": 4,
+      "source_group_id": 15,
+      "source_count": 87,
+      "held_out_count": 87,
+      "output": "/home/jingxin/orca/workspaces/dmg-research/flex-mopex/project/flexmopex/manifests/loro_671/group_15.npy"
+    },
+    {
+      "region": 5,
+      "source_group_id": 16,
+      "source_count": 94,
+      "held_out_count": 94,
+      "output": "/home/jingxin/orca/workspaces/dmg-research/flex-mopex/project/flexmopex/manifests/loro_671/group_16.npy"
+    },
+    {
+      "region": 6,
+      "source_group_id": 17,
+      "source_count": 91,
+      "held_out_count": 91,
+      "output": "/home/jingxin/orca/workspaces/dmg-research/flex-mopex/project/flexmopex/manifests/loro_671/group_17.npy"
+    }
+  ],
+  "overlap_count": 0,
+  "covered_basin_count": 671,
+  "uncovered_basin_count": 0,
+  "uncovered_basin_ids": []
+}

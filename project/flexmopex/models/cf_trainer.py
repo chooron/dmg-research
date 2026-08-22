@@ -8,6 +8,7 @@ Provides:
 """
 from __future__ import annotations
 
+import json
 import logging
 import math
 import sys
@@ -104,7 +105,13 @@ class CounterfactualTargetGenerator:
         w_learn = F.softmax(p_raw["weights"].view(B, 4, 2).clamp(-10, 10), dim=-1)[..., 1]
         mopex_params = phy._descale_mopex_params(p_raw["params"])
         routing = phy._descale_routing_params(p_raw["gamma_uh"])
-        base_w = w_learn.detach().clone()
+        # DFlex counterfactuals must use the same hard-gated simulator as its
+        # training forward; CFlex retains the continuous baseline weights.
+        if bool(getattr(phy, "is_dflex", False)):
+            base_w = (w_learn > 0.5).to(w_learn.dtype)
+        else:
+            base_w = w_learn.detach().clone()
+        removed_processes = set(getattr(phy, "removed_processes", set()))
 
         # Process-wise counterfactual evaluation (S=2 per process for low VRAM footprint)
         S = 2
@@ -119,8 +126,27 @@ class CounterfactualTargetGenerator:
         L_fit_off_list = []
         L_fit_on_list = []
         std_dev = std_t.view(1, 1, B)
+        q_list = [None] * len(PROCESSES)
+        diag = {}
 
         for p_idx in range(4):
+            proc = PROCESSES[p_idx]
+            if proc in removed_processes:
+                q_p = torch.zeros(B, device=self.device)
+                zero_fit = torch.zeros(B, device=self.device)
+                L_fit_off_list.append(zero_fit.unsqueeze(0))
+                L_fit_on_list.append(zero_fit.unsqueeze(0))
+                q_list[p_idx] = q_p.unsqueeze(-1)
+                diag[proc] = {
+                    "removed": True,
+                    "T_scale": 0.0,
+                    "q_mean": 0.0,
+                    "q_median": 0.0,
+                    "q_std": 0.0,
+                    "c_mean": 1.0,
+                    "effective_n_samples": float(B),
+                }
+                continue
             w_cf = base_w.repeat(S, 1)
             w_cf[0:B, p_idx] = 0.0      # OFF
             w_cf[B:2*B, p_idx] = 1.0    # ON
@@ -148,9 +174,9 @@ class CounterfactualTargetGenerator:
             torch.cuda.empty_cache()
         # Compute DeltaJ per process
         # aic_penalty = AIC_ALPHA * cost * (N / (B * n_valid_b))
-        q_list = []
-        diag = {}
         for p_idx, proc in enumerate(PROCESSES):
+            if proc in removed_processes:
+                continue
             cost = self.costs[proc]
             aic_pen = self.aic_alpha * cost * (N / (B * torch.clamp(n_valid_b, min=1.0)))  # [B]
             fit_diff = L_fit_off[p_idx] - L_fit_on[p_idx]  # [B]
@@ -166,7 +192,7 @@ class CounterfactualTargetGenerator:
 
             # Soft target q = sigmoid(DeltaJ / T_p)
             q_p = torch.sigmoid(delta_J / T_p)
-            q_list.append(q_p.unsqueeze(-1))
+            q_list[p_idx] = q_p.unsqueeze(-1)
 
             q_p_np = q_p.cpu().numpy()
             entropy = float(-np.nanmean(q_p_np * np.log(np.maximum(q_p_np, 1e-12)) + (1 - q_p_np) * np.log(np.maximum(1 - q_p_np, 1e-12))))
@@ -201,6 +227,7 @@ class CounterfactualTargetGenerator:
                 "top10_loss_weight_fraction": top10_frac,
                 "top20_loss_weight_fraction": top20_frac,
                 "frac_q_gt05": float(np.nanmean(q_p_np > 0.5)),
+                "delta_positive_fraction": float(np.nanmean(dJ_np > 0.0)),
                 "frac_q_gt08": float(np.nanmean(q_p_np > 0.8)),
                 "entropy": entropy,
             }
@@ -294,6 +321,89 @@ class CFTrainer(WarmupTrainer):
               f"w_phen: frac_ON={phen_diag.get('frac_q_gt05', 0)*100:.1f}% | "
               f"w_snow: frac_ON={snow_diag.get('frac_q_gt05', 0)*100:.1f}% | "
               f"w_sub: frac_ON={sub_diag.get('frac_q_gt05', 0)*100:.1f}%", flush=True)
+
+    @torch.no_grad()
+    def _write_structural_diagnostics(
+        self,
+        epoch: int,
+        *,
+        total_loss: float,
+        fit_loss: float,
+        cf_loss: float,
+    ) -> None:
+        """Persist per-epoch structural scores and hard gates for CF/DFlex audits."""
+        if self.cached_q is None:
+            return
+
+        dpl_model = next(iter(self.model.model_dict.values()))
+        nn = dpl_model.nn_model
+        n_attr = int(nn.backbone[0].in_features)
+        attrs = self.train_dataset["xc_nn_norm"][0, :, -n_attr:].to(self.cached_q.device)
+        was_training = nn.training
+        nn.eval()
+        try:
+            raw_weights = nn.get_structure_logits(attrs)
+            logits = raw_weights.view(raw_weights.shape[0], 4, 2).clamp(-10.0, 10.0)
+            p_struct = torch.sigmoid(logits[..., 1] - logits[..., 0])
+        finally:
+            if was_training:
+                nn.train()
+
+        q = self.cached_q.detach()
+        hard = (p_struct > 0.5).to(p_struct.dtype)
+        c = 2.0 * torch.abs(q - 0.5)
+        bce_elem = F.binary_cross_entropy(p_struct, q, reduction="none")
+        rows: dict[str, Any] = {}
+        for index, proc in enumerate(PROCESSES):
+            p = p_struct[:, index]
+            target = q[:, index] > 0.5  # equivalent to DeltaJ > 0
+            pred = hard[:, index] > 0.5
+            tp = float((pred & target).sum().item())
+            fp = float((pred & ~target).sum().item())
+            fn = float((~pred & target).sum().item())
+            precision = tp / (tp + fp) if tp + fp else 0.0
+            recall = tp / (tp + fn) if tp + fn else 0.0
+            f1 = 2.0 * precision * recall / (precision + recall) if precision + recall else 0.0
+            weight_sum = float(c[:, index].sum().item())
+            rows[proc] = {
+                "p_struct_mean": float(p.mean().item()),
+                "p_struct_median": float(p.median().item()),
+                "p_struct_std": float(p.std(unbiased=False).item()),
+                "p_struct_min": float(p.min().item()),
+                "p_struct_max": float(p.max().item()),
+                "hard_on_fraction": float(hard[:, index].mean().item()),
+                "delta_positive_fraction": float(target.float().mean().item()),
+                "bce": float((c[:, index] * bce_elem[:, index]).sum().item() / (weight_sum + EPS)),
+                "precision": precision,
+                "recall": recall,
+                "f1": f1,
+            }
+
+        output_dir = Path(self.config.get("output_dir", self.config.get("save_path", ".")))
+        diag_dir = output_dir / "diagnostics"
+        diag_dir.mkdir(parents=True, exist_ok=True)
+        np.save(diag_dir / f"p_struct_epoch_{epoch:03d}.npy", p_struct.cpu().numpy())
+        np.save(diag_dir / f"hard_gates_epoch_{epoch:03d}.npy", hard.cpu().numpy())
+        np.save(diag_dir / f"q_epoch_{epoch:03d}.npy", q.cpu().numpy())
+        record = {
+            "epoch": int(epoch),
+            "variant": "DFlex-CF/BCE" if bool(getattr(dpl_model.phy_model, "is_dflex", False)) else "CFlex-CF/BCE",
+            "total_loss": float(total_loss),
+            "fit_loss": float(fit_loss),
+            "bce_loss": float(cf_loss),
+            "processes": rows,
+        }
+        with (output_dir / "structural_diagnostics.jsonl").open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps(record, allow_nan=False) + "\n")
+        print(
+            "[CF structural Ep %d] " % epoch
+            + " | ".join(
+                f"{proc}: p={rows[proc]['p_struct_mean']:.3f}, hard={rows[proc]['hard_on_fraction']:.3f}, "
+                f"delta+={rows[proc]['delta_positive_fraction']:.3f}, F1={rows[proc]['f1']:.3f}"
+                for proc in PROCESSES
+            ),
+            flush=True,
+        )
 
     def train_one_epoch(self, epoch, n_samples, n_minibatch, n_timesteps) -> None:
         self.refresh_targets_if_needed(epoch)
@@ -408,6 +518,12 @@ class CFTrainer(WarmupTrainer):
         self._final_loss = self.total_loss / max(n_minibatch, 1)
         mean_fit_aic = total_fit_aic_loss / max(n_minibatch, 1)
         mean_cf = total_cf_loss / max(n_minibatch, 1)
+        self._write_structural_diagnostics(
+            epoch,
+            total_loss=self._final_loss,
+            fit_loss=mean_fit_aic,
+            cf_loss=mean_cf,
+        )
 
         # Log epoch stats
         t_epoch = time.perf_counter() - start_time

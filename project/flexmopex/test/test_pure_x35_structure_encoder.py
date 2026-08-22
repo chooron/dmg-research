@@ -2,12 +2,12 @@
 
 Validates:
   1. Pure attribute input shape: struct_input is [B, 35], output is [B, 8]
-  2. Structure encoder architecture: Linear(35, 128) -> Tanh -> Linear(128, 64) -> Tanh -> Linear(64, 8)
+  2. Structure encoder architecture: Linear(35, 128) -> Tanh -> Linear(128, 128) -> Tanh -> Linear(128, 8)
   3. Forward behavior & two-logit semantics:
      - Neutral initialization near p = 0.5
      - params and gamma_uh match when backbone is identical
   4. Gradient isolation invariants:
-     - L_CF gives non-zero gradient to all layers of structure_encoder (35 -> 128 -> 64 -> 8)
+     - L_CF gives non-zero gradient to all layers of structure_encoder (35 -> 128 -> 128 -> 8)
      - L_CF gives strictly zero gradient to shared hydrologic backbone (0.0 grad by construction)
      - L_CF gives strictly zero gradient to params_head and gamma_head
      - Direct fit loss and direct AIC loss give strictly zero gradient to structure_encoder
@@ -60,7 +60,7 @@ def dummy_batch():
 
 
 def test_pure_attribute_architecture_and_forward(dummy_batch):
-    """Test that LearnedStructureNetPureAttrEncoder has structure_encoder(35 -> 128 -> 64 -> 8)."""
+    """Test that LearnedStructureNetPureAttrEncoder has structure_encoder(35 -> 128 -> 128 -> 8)."""
     nn = LearnedStructureNetPureAttrEncoder(input_dim=35, hidden_dim=128, nmul=16, device="cpu")
     nn.eval()
 
@@ -68,8 +68,8 @@ def test_pure_attribute_architecture_and_forward(dummy_batch):
     assert nn.structure_encoder[0].in_features == 35  # Pure 35-D static attributes
     assert nn.structure_encoder[0].out_features == 128
     assert nn.structure_encoder[2].in_features == 128
-    assert nn.structure_encoder[2].out_features == 64
-    assert nn.structure_encoder[4].in_features == 64
+    assert nn.structure_encoder[2].out_features == 128
+    assert nn.structure_encoder[4].in_features == 128
     assert nn.structure_encoder[4].out_features == 8
 
     out = nn({"c_nn_norm": dummy_batch["c_nn_norm"]})
@@ -185,8 +185,12 @@ def test_unified_adadelta_optimizer_pure(dummy_batch):
     assert all_param_ids == opt_param_ids, "Mismatch in unified optimizer parameter registration!"
     assert len(trainer.weights_head_params) == 6
     assert trainer.weights_head_params[0].shape == (128, 35)
-    assert trainer.weights_head_params[2].shape == (64, 128)
-    assert trainer.weights_head_params[4].shape == (8, 64)
+    assert trainer.weights_head_params[2].shape == (128, 128)
+    assert trainer.weights_head_params[4].shape == (8, 128)
+
+def test_formal_671_default_nmul_is_one():
+    config = load_config(str(PROJECT_DIR / "conf/config_formal_671_flex_lambda0007.yaml"))
+    assert config["delta_model"]["phy_model"]["nmul"] == 1
 
 
 if __name__ == "__main__":

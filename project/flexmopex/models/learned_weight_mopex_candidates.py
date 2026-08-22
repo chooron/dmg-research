@@ -254,6 +254,13 @@ class _CandidateBase(LearnedWeightMopex):
         step = cand._make_step(self._season_mode, **kwargs)
         self.step_fn = self._compile_step(step)
         self.freeze_wint = bool(self.config.get("freeze_wint", False))
+        removed = self.config.get("removed_processes", self.config.get("removed_process", []))
+        if isinstance(removed, str):
+            removed = [removed]
+        self.removed_processes = {str(name) for name in (removed or [])}
+        unknown_removed = self.removed_processes - set(self.weight_names)
+        if unknown_removed:
+            raise ValueError(f"Unknown removed process names: {sorted(unknown_removed)}")
         # Full-process parameter warm-up (formal method):
         #   structure_warmup_epochs=N (default 0 = off): during training epochs
         #   1..N the effective structural gates are forced to exactly 1 (a
@@ -400,6 +407,12 @@ class _CandidateBase(LearnedWeightMopex):
         elif self.freeze_wint:
             frozen = torch.full_like(probs[:, 1:2, :], 0.5)
             probs = torch.cat([probs[:, 0:1, :], frozen, probs[:, 2:, :]], dim=1)
+        if self.removed_processes:
+            process_mask = torch.ones_like(probs)
+            for index, name in enumerate(self.weight_names):
+                if name in self.removed_processes:
+                    process_mask[:, index, :] = torch.tensor((1.0, 0.0), device=probs.device, dtype=probs.dtype)
+            probs = probs * process_mask
         return probs[..., 1]
 
 
@@ -574,7 +587,7 @@ class LearnedStructureNetPureAttrEncoder(LearnedStructureNet):
 
     Architecture:
       Hydrologic branch: x35_norm -> shared backbone (128-D) -> params_head (192) / gamma_head (2)
-      Structure branch : x35_norm -> dedicated MLP (35 -> 128 -> 64 -> 8) -> 8 logits
+      Structure branch : x35_norm -> dedicated MLP (35 -> 128 -> 128 -> 8) -> 8 logits
 
     Zero Shared-Backbone Leakage:
       The structure encoder directly ingests normalized basin attributes x35_norm without
@@ -597,13 +610,13 @@ class LearnedStructureNetPureAttrEncoder(LearnedStructureNet):
             nmul=nmul,
             device=device,
         )
-        # Dedicated pure-attribute nonlinear structure encoder: input_dim (35) -> 128 -> 64 -> 8
+        # Dedicated pure-attribute nonlinear structure encoder: input_dim (35) -> 128 -> 128 -> 8
         self.structure_encoder = torch.nn.Sequential(
             torch.nn.Linear(input_dim, 128),
             torch.nn.Tanh(),
-            torch.nn.Linear(128, 64),
+            torch.nn.Linear(128, 128),
             torch.nn.Tanh(),
-            torch.nn.Linear(64, 8),
+            torch.nn.Linear(128, 8),
         )
         # Initialize hidden layers with xavier_uniform, final output layer with normal(0, 0.001)
         torch.nn.init.xavier_uniform_(self.structure_encoder[0].weight)

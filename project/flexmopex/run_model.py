@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
+import json
 import copy
 from datetime import datetime, timedelta
 import os
+import subprocess
 import sys
 from pathlib import Path
 from typing import Any
@@ -104,9 +107,15 @@ class FlexMopexPubSampler(FlexMopexSampler):
         self.val_indices = val_indices
         # Build train indices = all basins except val_indices
         val_set = set(val_indices)
+        configured_count = int(
+            config.get(
+                "basin_count",
+                531 if config.get("observations", {}).get("name") == "camels_531" else TOTAL_BASINS,
+            )
+        )
         self._train_basin_indices: list[int] = config.get(
             "train_basin_indices",
-            [i for i in range(TOTAL_BASINS) if i not in val_set],
+            [i for i in range(configured_count) if i not in val_set],
         )
 
     def get_training_sample(
@@ -175,8 +184,19 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--test-epoch", type=int, default=None, help="Override test.test_epoch.")
     parser.add_argument("--start-epoch", type=int, default=None, help="Override train.start_epoch.")
     parser.add_argument("--epochs", type=int, default=None, help="Override train.epochs.")
+    parser.add_argument("--min-epochs", type=int, default=None, help="Override early-stopping train.min_epochs.")
+    parser.add_argument("--early-stop-patience", type=int, default=None, help="Override early-stopping patience.")
+    parser.add_argument("--early-stop-min-delta", type=float, default=None, help="Override early-stopping min_delta.")
+    parser.add_argument("--disable-early-stopping", action="store_true", help="Disable configured early stopping.")
     parser.add_argument("--batch-size", type=int, default=None, help="Override train/test batch_size.")
     parser.add_argument("--nmul", type=int, default=None, help="Override model.phy.nmul.")
+    parser.add_argument(
+        "--removed-process",
+        nargs="+",
+        choices=("w_phen", "w_int", "w_snow", "w_sub"),
+        default=None,
+        help="Canonical LOPO mask: force these process gates off while retaining the Pure-X35 head.",
+    )
     parser.add_argument(
         "--fixed-weights",
         type=float,
@@ -211,13 +231,13 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     )
     parser.add_argument(
         "--model-type",
-        choices=("base", "full", "fixed", "flex", "binary"),
+        choices=("base", "full", "fixed", "flex", "dflex", "binary"),
         default=None,
         help=(
             "Model type: 'base' = FixedWeightMopex(all weights=0), "
             "'full' = FixedWeightMopex(all weights=1), "
             "'fixed' = FixedWeightMopex(user-specified fixed weights), "
-            "'flex' = LearnedWeightMopex, "
+            "'flex' = LearnedWeightMopex, 'dflex' = DFlexWeightMopexCF (hard gates), "
             "'binary' = BinaryWeightMopex (Hard-Concrete L0 gates)."
         ),
     )
@@ -279,6 +299,55 @@ def _refresh_runtime_paths(config: dict[str, Any], output_dir: Path) -> None:
         config[key] = str(value)
     for key in RUNTIME_PATH_KEYS:
         Path(config[key]).mkdir(parents=True, exist_ok=True)
+
+def _write_run_provenance(config: dict[str, Any], config_path: str) -> None:
+    """Persist config/provenance before training mutates any model state."""
+    output_dir = Path(config["output_dir"])
+    output_dir.mkdir(parents=True, exist_ok=True)
+    source_config = Path(config_path)
+    (output_dir / "source_config.yaml").write_text(source_config.read_text())
+    (output_dir / "config_snapshot.json").write_text(
+        json.dumps(config, indent=2, default=str, sort_keys=True) + "\n"
+    )
+    manifest = config.get("basin_manifest") or config.get("observations", {}).get("subset_path")
+    manifest_path = Path(manifest) if manifest else None
+    if manifest_path and not manifest_path.is_absolute():
+        manifest_path = REPO_ROOT / manifest_path
+    manifest_hash = None
+    basin_count = config.get("basin_count")
+    if manifest_path and manifest_path.exists():
+        raw = manifest_path.read_bytes()
+        manifest_hash = hashlib.sha256(raw).hexdigest()
+        try:
+            if manifest_path.suffix == ".npy":
+                basin_count = int(np.load(manifest_path, allow_pickle=True).shape[0])
+            else:
+                import ast
+                basin_count = len(ast.literal_eval(raw.decode()))
+        except (ValueError, SyntaxError, UnicodeDecodeError):
+            basin_count = config.get("basin_count")
+    try:
+        commit = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=REPO_ROOT, text=True
+        ).strip()
+        dirty = bool(subprocess.check_output(["git", "status", "--porcelain"], cwd=REPO_ROOT, text=True).strip())
+    except (OSError, subprocess.CalledProcessError):
+        commit, dirty = "unknown", None
+    provenance = {
+        "git_commit": commit,
+        "git_worktree_dirty": dirty,
+        "seed": config.get("random_seed", config.get("seed")),
+        "basin_manifest": str(manifest_path) if manifest_path else None,
+        "basin_manifest_sha256": manifest_hash,
+        "basin_count": basin_count,
+        "observations_name": config.get("observations", {}).get("name"),
+        "variant": config.get("variant"),
+        "model_variant": config.get("model", {}).get("phy", {}).get("name"),
+        "nn_variant": config.get("model", {}).get("nn", {}).get("name"),
+        "removed_processes": config.get("removed_processes", []),
+        "output_dir": str(output_dir),
+    }
+    (output_dir / "provenance.json").write_text(json.dumps(provenance, indent=2) + "\n")
 
 
 def _fixed_weight_dict(values: list[float] | tuple[float, ...]) -> dict[str, float]:
@@ -344,6 +413,21 @@ def apply_runtime_overrides(
         config.setdefault("train", {})["start_epoch"] = args.start_epoch
     if args.epochs is not None:
         config.setdefault("train", {})["epochs"] = args.epochs
+    early_cfg = config.setdefault("train", {}).setdefault("early_stopping", {})
+    min_epochs = getattr(args, "min_epochs", None)
+    patience = getattr(args, "early_stop_patience", None)
+    min_delta = getattr(args, "early_stop_min_delta", None)
+    if min_epochs is not None:
+        early_cfg["min_epochs"] = min_epochs
+        early_cfg["enabled"] = True
+    if patience is not None:
+        early_cfg["patience"] = patience
+        early_cfg["enabled"] = True
+    if min_delta is not None:
+        early_cfg["min_delta"] = min_delta
+        early_cfg["enabled"] = True
+    if getattr(args, "disable_early_stopping", False):
+        early_cfg["enabled"] = False
     if args.batch_size is not None:
         config.setdefault("train", {})["batch_size"] = args.batch_size
         config.setdefault("test", {})["batch_size"] = args.batch_size
@@ -351,6 +435,11 @@ def apply_runtime_overrides(
         config.setdefault("delta_model", {}).setdefault("phy_model", {})["nmul"] = args.nmul
         config.setdefault("model", {}).setdefault("phy", {})["nmul"] = args.nmul
         config.setdefault("model", {}).setdefault("nn", {})["nmul"] = args.nmul
+    removed_processes = getattr(args, "removed_process", None)
+    if removed_processes is not None:
+        config.setdefault("delta_model", {}).setdefault("phy_model", {})["removed_processes"] = list(removed_processes)
+        config["removed_processes"] = list(removed_processes)
+
 
     loss_name = _loss_name(config)
     if loss_name:
@@ -381,6 +470,8 @@ def apply_runtime_overrides(
                 model_type = "full"
             else:
                 model_type = "fixed"
+        elif "DFlexWeightMopexCF" in phy_names:
+            model_type = "dflex"
         elif "BinaryWeightMopex" in phy_names:
             model_type = "binary"
         else:
@@ -412,6 +503,14 @@ def apply_runtime_overrides(
         config["confidence_weighted_cf_loss"] = False
         config.setdefault("delta_model", {}).setdefault("phy_model", {})["counterfactual_supervision"] = False
         config["trainer"] = "MyTrainer"
+    elif model_type == "dflex":
+        config.setdefault("delta_model", {}).setdefault("phy_model", {})["model"] = ["DFlexWeightMopexCF"]
+        config.setdefault("delta_model", {}).setdefault("phy_model", {})["interception_semantics"] = "S0"
+        config.setdefault("delta_model", {}).setdefault("nn_model", {})["model"] = "LearnedStructureNetPureAttrEncoder"
+        config["counterfactual_supervision"] = True
+        config["confidence_weighted_cf_loss"] = True
+        config["trainer"] = "CFTrainer"
+        config.setdefault("delta_model", {}).setdefault("phy_model", {})["counterfactual_supervision"] = True
     elif model_type == "binary":
         config.setdefault("delta_model", {}).setdefault("phy_model", {})["model"] = ["BinaryWeightMopex"]
         config.setdefault("delta_model", {}).setdefault("nn_model", {})["model"] = "BinaryStructureNet"
@@ -420,7 +519,11 @@ def apply_runtime_overrides(
         _phy_model_cfg = config.setdefault("delta_model", {}).setdefault("phy_model", {})
         _configured_names = list(_phy_model_cfg.get("model") or [])
         _STANDARD_FLEX_NAMES = {"LearnedWeightMopex", "LearnedWeightMopexE"}
-        if not _configured_names or set(_configured_names) <= _STANDARD_FLEX_NAMES:
+        # Preserve an explicitly selected standard physics implementation for
+        # dedicated factorial provenance runs.  The canonical/default path still
+        # upgrades an unspecified standard flex model to Candidate E/S0.
+        preserve_phy_model = bool(config.get("preserve_phy_model", False))
+        if (not preserve_phy_model) and (not _configured_names or set(_configured_names) <= _STANDARD_FLEX_NAMES):
             _phy_model_cfg["model"] = ["LearnedWeightMopexE"]
             _phy_model_cfg.setdefault("interception_semantics", "S0")
     # Keep config["model"]["phy"] in sync so model_builder.get_phy_model_names()
@@ -437,6 +540,8 @@ def apply_runtime_overrides(
         config["model"]["phy"]["interception_semantics"] = _phy_cfg["interception_semantics"]
     if "counterfactual_supervision" in _phy_cfg:
         config["model"]["phy"]["counterfactual_supervision"] = _phy_cfg["counterfactual_supervision"]
+    if "removed_processes" in _phy_cfg:
+        config["model"]["phy"]["removed_processes"] = list(_phy_cfg["removed_processes"])
 
     # Sync nn_model name override (used by binary model type / ParamRoutingNet)
     _nn_cfg = config.get("delta_model", {}).get("nn_model", {})
@@ -450,8 +555,13 @@ def apply_runtime_overrides(
         config["loro_holdout_region"] = region_id
         config.setdefault("test", {})["test_group_id"] = group_id
         _align_loro_eval_time(config)
+        group_dir = config.get("loro_basin_groups_dir")
+        if group_dir:
+            group_dir_path = Path(group_dir)
+            if not group_dir_path.is_absolute():
+                group_dir_path = REPO_ROOT / group_dir_path
+            os.environ["BASIN_GROUPS_DIR"] = str(group_dir_path.resolve())
         os.environ.setdefault("DATA_PATH", str(BASIN_GROUPS_DIR.parent))
-
     # Build run_name
     config_stem = Path(config_path).stem
     if args.run_name:
@@ -463,6 +573,7 @@ def apply_runtime_overrides(
     else:
         run_name = f"{config_stem}/{model_type}_{_alpha_label(alpha)}/seed_{config['seed']}"
     _refresh_runtime_paths(config, Path(args.output_root) / run_name)
+    _write_run_provenance(config, config_path)
 
 def _build_data_loader(config: dict[str, Any]):
     loader_config = copy.deepcopy(config)
