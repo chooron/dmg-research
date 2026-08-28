@@ -142,6 +142,7 @@ def build_model(
     warmup_grad_mode: str = "detach",
     state_init_fractions: dict | None = None,
     state_init_capacity_specs: dict | None = None,
+    dtype: torch.dtype | None = None,
 ) -> HydrologyModel:
     config = model_config(
         name,
@@ -153,7 +154,11 @@ def build_model(
         state_init_fractions=state_init_fractions,
         state_init_capacity_specs=state_init_capacity_specs,
     )
-    return HydrologyModel(config, device=torch.device(device), backend=backend).to(device)
+    model = HydrologyModel(config, device=torch.device(device), backend=backend).to(
+        device=device, dtype=dtype
+    )
+    model.compute_dtype = dtype
+    return model
 
 
 def audit_registry(names: Iterable[str] = NPARAM_INFO_36) -> list[dict]:

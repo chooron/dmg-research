@@ -95,7 +95,7 @@ def vic_step(
     smmax = fsm * stot
     gwmax = (1.0 - fsm) * stot
     tmax = torch.tensor(
-        365.25, device=P.device
+        365.25, device=P.device, dtype=P.dtype
     )  # Length of one growing cycle [d]
 
     # --- 1. Interception Store (S1) ---

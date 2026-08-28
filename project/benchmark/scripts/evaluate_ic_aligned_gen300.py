@@ -35,7 +35,7 @@ sys.path[:0] = [str(REPO_ROOT), str(BENCHMARK_ROOT), str(BENCHMARK_ROOT / "src")
 
 from src.checkpoint_guard import validate_canonical_checkpoint
 from dmotpy.data_contract import CALENDAR_MODELS, add_calendar_forcing
-from src.data_selection import frozen_parameters
+from src.data_selection import frozen_parameters, load_ids
 from src.model_registry import build_model
 from src.objective import streaming_kge
 
@@ -62,8 +62,8 @@ def load_window(ids: list[int], device: torch.device):
     fy = target[idx, ys:wr, 0].copy()
     area = attrs[idx, 11].astype(float)
     fy *= (0.0283168 * 86400.0 * 1e3 / (area * 1e6))[:, None]
-    x = torch.as_tensor(np.transpose(fx, (1, 0, 2)), dtype=torch.float32, device=device)
-    y = torch.as_tensor(fy.T, dtype=torch.float32, device=device)
+    x = torch.as_tensor(np.transpose(fx, (1, 0, 2)), dtype=torch.float64, device=device)
+    y = torch.as_tensor(fy.T, dtype=torch.float64, device=device)
     return x, y
 
 
@@ -72,7 +72,9 @@ def evaluate_model(model: str, ckpt_dir: Path, generation: int, starts: int,
     # Canonical provenance guard: gen-300, 531-basin, DONE-marked final set only.
     validate_canonical_checkpoint(
         ckpt_dir, model_name=model,
-        required_generation=generation, required_basins=531,
+        required_generation=generation,
+        required_basins=531,
+        required_basin_ids=load_ids(REPO_ROOT / "data/531sub_id.txt"),
     )
     basin_ids, latent, ckpt_train = frozen_parameters(ckpt_dir, generation, starts)
 
@@ -81,8 +83,8 @@ def evaluate_model(model: str, ckpt_dir: Path, generation: int, starts: int,
         x, _ = add_calendar_forcing(
             x, pd.date_range(WARM_START, EVAL_END, freq="D"), model_name=model
         )
-    model_inst = build_model(model, device, warm_up=WARMUP_DAYS, backend="compile")
-    raw = torch.sigmoid(latent.to(device=device, dtype=torch.float64)).unsqueeze(-1).float()
+    model_inst = build_model(model, device, warm_up=WARMUP_DAYS, backend="compile", dtype=torch.float64)
+    raw = torch.sigmoid(latent.to(device=device, dtype=torch.float64)).unsqueeze(-1)
     with torch.inference_mode():
         q = model_inst({"x_phy": x}, (None, raw))["streamflow"].reshape(-1, len(basin_ids), 1, 1)
         score, invalid = streaming_kge(q, y)

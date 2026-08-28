@@ -1,0 +1,24 @@
+{
+  "status": "PASS",
+  "sample_and_pairing_verification": "PASS (531 Full / 476 ExcludeS5, paired on exact basin IDs, frac_snow aligned)",
+  "paired_delta_beta_verification": "PASS (simultaneous re-fit on same resample within each bootstrap draw)",
+  "trajectory_rows": 20,
+  "leverage_diagnostics_rows": 20,
+  "wording_verdicts": {
+    "IC": {
+      "verdict": "MONOTONIC / NEAR-MONOTONIC ORGANIZATION",
+      "justification": "IC Base-CN excess increases strictly monotonically across all strata: S1 (-0.002) -> S2 (+0.002) -> S3 (+0.012) -> S4 (+0.043) -> S5 (+0.083), and prevalence increases from 46.7% to 98.2%.",
+      "recommended_wording": "parameter-space reorganization became progressively stronger with snow activity"
+    },
+    "dPL": {
+      "verdict": "ORDERED BUT NONLINEAR",
+      "justification": "dPL Base-CN excess rises steeply from S1 (+0.019) -> S2 (+0.056) -> S3 (+0.127) -> S4 (+0.132), then plateaus in S5 (+0.125). S5 exerts high leverage that pulls down the linear slope across [0, 0.91].",
+      "recommended_wording": "parameter-space reorganization was increasingly organized across the snow-activity gradient, steep across moderate snow regimes (S2-S4) and plateauing in high-snow basins (S5)"
+    }
+  },
+  "delta_beta_explanation": {
+    "dPL_Full531": "+0.041 [+0.008, +0.077]",
+    "dPL_ExcludeS5": "+0.086 [+0.017, +0.157]",
+    "reason": "In dPL, Base-CN excess saturates in S5, exerting downward leverage on the global slope (pulling beta_CN from +0.427 in S1-S4 down to +0.197 in Full). TGD also plateaus (pulling beta_TGD from +0.341 down to +0.156). In the active transition zone S1-S4 (ExcludeS5), CN separates from Base at rate +0.427 vs TGD rate +0.341, yielding Delta_beta = +0.086. Structural differentiation persists below S5 and is not an S5 artifact."
+  }
+}

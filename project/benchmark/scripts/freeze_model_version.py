@@ -43,11 +43,18 @@ def main() -> None:
     config = load_resolved_config(args.config)
     validate_full_run_config(config)
 
-    paths = sorted((BENCHMARK_ROOT / "dmotpy/models").rglob("*.py"))
+    paths = sorted((BENCHMARK_ROOT.parents[1] / "dmotpy/models").rglob("*.py"))
     paths += sorted((BENCHMARK_ROOT / "src").glob("*.py"))
     paths += [BENCHMARK_ROOT / "scripts/run_36model_benchmark.py", Path(config["_resolved_from"])]
     unique = sorted({path.resolve() for path in paths if "__pycache__" not in path.parts})
-    source_hashes = {str(path.relative_to(BENCHMARK_ROOT)): digest(path) for path in unique}
+    source_hashes = {
+        (
+            str(path.relative_to(BENCHMARK_ROOT))
+            if path.is_relative_to(BENCHMARK_ROOT)
+            else str(Path("..", "..") / path.relative_to(BENCHMARK_ROOT.parents[1]))
+        ): digest(path)
+        for path in unique
+    }
     bounds = {name: get_spec(name).bounds.cpu().tolist() for name in NPARAM_INFO_36}
     try:
         git_head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=BENCHMARK_ROOT, text=True).strip()

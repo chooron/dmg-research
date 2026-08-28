@@ -1,0 +1,20 @@
+Parameter,Identifier,Hydrological role,Unit,Lower bound,Upper bound,Applies to
+$k$,xaj_k,Ratio of potential ET to reference crop evaporation,-,0.5,2.0,Shared host
+$b$,xaj_b,Exponent of tension water storage capacity distribution curve,-,0.1,2.0,Shared host
+$i_m$,xaj_im,Fraction of impervious and saturated direct runoff area,-,0.0,0.3,Shared host
+$u_m$,xaj_um,Upper-layer soil tension water capacity,mm,5.0,50.0,Shared host
+$l_m$,xaj_lm,Lower-layer soil tension water capacity,mm,20.0,200.0,Shared host
+$d_m$,xaj_dm,Deep-layer soil tension water capacity,mm,20.0,200.0,Shared host
+$c$,xaj_c,Deep-layer evapotranspiration coefficient,-,0.05,0.3,Shared host
+$s_m$,xaj_sm,Areal mean free water capacity of surface/shallow layer,mm,5.0,100.0,Shared host
+$ex$,xaj_ex,Exponent of free water capacity distribution curve,-,0.1,2.0,Shared host
+$k_i$,xaj_ki,Outflow coefficient from free water storage to interflow,d⁻¹,0.0,0.7,Shared host
+$k_g$,xaj_kg,Outflow coefficient from free water storage to groundwater,d⁻¹,0.0,0.7,Shared host
+$c_i$,xaj_ci,Recession constant of the linear interflow reservoir,-,0.1,1.0,Shared host
+$c_g$,xaj_cg,Recession constant of the linear groundwater reservoir,-,0.9,1.0,Shared host
+$a$,xaj_a,Shape parameter of the Gamma unit hydrograph (Gamma-UH),-,0.0,2.9,Shared host
+$\theta$,xaj_theta,Scale parameter of the Gamma unit hydrograph (Gamma-UH),d,0.0,6.5,Shared host
+$\tau_{\mathrm{warm}}$,tgd_tau_warm,Warm-condition linear reservoir residence time / baseline smoothing,d,0.0001,3.0,TGD only
+$\Delta\tau_{\mathrm{cold}}$,tgd_delta_tau_cold,Additional cold-condition linear reservoir residence time increment,d,0.1,180.0,TGD only
+$C_{\mathrm{TG}}$,cn_ctg,Snowpack thermal inertia and temperature weighting coefficient,-,0.0,1.0,CN only
+$K_f$,cn_kf,Degree-day snowmelt factor ($D_f$),mm °C⁻¹ d⁻¹,0.0,10.0,CN only

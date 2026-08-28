@@ -1,0 +1,81 @@
+{
+  "status": "PASS",
+  "path": "compact_tables_only",
+  "rows": {
+    "basin_level": 6372,
+    "complete_basin_distributions": 1062,
+    "stratified_summaries": 36,
+    "bootstrap_cis": 6,
+    "spearman_bootstrap": 6,
+    "endpoint_S1_vs_S5": 6,
+    "threshold_denominator_audit": 1476,
+    "loro_region_robustness": 98
+  },
+  "snow_counts": {
+    "S1": 165,
+    "S2": 156,
+    "S3": 121,
+    "S4": 34,
+    "S5": 55
+  },
+  "daily_fallback": false,
+  "raw_rebuild": "separate explicit path; not implemented by canonical CLI",
+  "schemas": {
+    "r1_basin_level_performance_rebuilt.csv": [
+      "basin_id",
+      "paradigm",
+      "structure",
+      "model",
+      "period",
+      "seed_or_restart",
+      "selected_run",
+      "KGE",
+      "NSE",
+      "PBIAS",
+      "RMSE",
+      "valid_observation_count",
+      "valid_simulation_count",
+      "valid_days",
+      "valid_metric",
+      "basin_median_Delta_CT"
+    ],
+    "r1_basin_level_ct.csv": [
+      "basin_id",
+      "paradigm",
+      "structure",
+      "period",
+      "seed_or_restart",
+      "valid_year_count",
+      "basin_median_Delta_CT",
+      "basin_CT_q25_years",
+      "basin_CT_q75_years",
+      "CT_obs_median_years",
+      "CT_sim_median_years",
+      "frac_snow",
+      "snow_stratum",
+      "KGE_pass_0p60",
+      "KGE",
+      "basin_test_KGE"
+    ],
+    "r1_basin_year_ct.csv": [
+      "basin_id",
+      "paradigm",
+      "structure",
+      "model",
+      "period",
+      "seed_or_restart",
+      "water_year",
+      "complete_year",
+      "valid_year",
+      "invalid_reason",
+      "n_valid_days",
+      "CT_obs",
+      "CT_sim",
+      "Delta_CT",
+      "seed_count",
+      "frac_snow",
+      "snow_stratum"
+    ]
+  },
+  "region_metadata": "available"
+}

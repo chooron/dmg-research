@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "total_paired_basins_per_paradigm": {
+    "IC-CMA-ES": 531,
+    "dPL-MLP": 531
+  },
+  "total_contrast_rows": 1062,
+  "silent_drop_check": "PASS (0 basins dropped, 0 duplicate keys)",
+  "sign_convention": {
+    "delta_KGE_Base_CN": "KGE_CN - KGE_Base (positive = CN improves)",
+    "delta_absCT_Base_CN": "abs(signed_e_Base) - abs(signed_e_CN) (positive = CN improves)",
+    "delta_absCT_TGD_CN": "abs(signed_e_TGD) - abs(signed_e_CN) (positive = CN improves)"
+  },
+  "output_path": "/home/jingxin/code/dmg-research/project/hydrodiag/manuscript/analysis/R1/results/canonical_paired_contrasts.csv"
+}

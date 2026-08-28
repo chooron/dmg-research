@@ -1,96 +1,69 @@
 #!/usr/bin/env python3
-"""Final R3 Figure 6 (F6): 6-panel composite on TGD2 matched-surrogate
-mitigation and residual CN explicit-process advantage.
+"""Figure 6: Internal parameter and state recovery under structural omission and generic control.
 
-Scientific line (frozen):
-    Generic temperature-conditioned storage/memory (TGD2) provides
-    substantial (~50 %) but incomplete output mitigation, and partially
-    relieves internal parameter and state distortion; the residual advantage
-    of the explicit snow-process structure (CN) strengthens with snow
-    activity and is heavily concentrated during snow-active periods.
+Hierarchical 4-panel layout matching Results 3.3 revised evidence architecture:
+  Row 1 (Parameter Evidence):
+    (a) Parameter distance to generating truth (Base, TGD, CN across S1-S5)
+    (b) Parameter excess beyond CN refit (Base, TGD across S1-S5; CN baseline = 0)
+    Both panels share S1-S5 sequential blue background bands.
+  Row 2 (State Excess & Association Audit):
+    (c) Shared-state and flux excess (~60% width, Scatter + Boxplot style)
+        Wt (total), Wu (upper), Wl (lower) states and Qi, Qg fluxes; Base & TGD (IC vs dPL).
+    (d) Recovery–excess-error association (~40% width, Horizontal Dumbbell)
+        Raw vs Partial Spearman rho on frac_snow across 8 parameter and state associations.
 
-Layout (three-level asymmetric composite)
------------------------------------------------------------------
-  Row 1 (output structural ladder & mitigation):
-      (a) Base -> TGD2 -> CN structural ladder (approx. 70 % width, IC & dPL facets)
-      (b) TGD2 gap-mitigation fraction F_tgd2 (approx. 30 % width)
-  Row 2 (deterministic process trajectories, matched pair):
-      (c) Seasonal liquid-water input timing (approx. 50 % width)
-      (d) Seasonal shared total tension storage response (approx. 50 % width)
-  Row 3 (process-specific adjudication, hero row, approx. 44 % height):
-      (e) Residual CN advantage vs. frac_snow (approx. 68 % width, IC+dPL on single axis)
-      (f) Process-conditioned residual: snow-active vs. non-snow (approx. 32 % width)
-
-The process panels use compact water-year-month summaries from a deterministic
-recorded-forward replay of frozen R3 fits; they do not retrain or recalibrate.
-
-Visual grammar (inherited from r1_plot_style.py / F1-F5):
-  * Base fitted  -> Base orange #EE7733
-  * TGD2         -> TGD teal   #009988 (#007766 for darker IC tone)
-  * CN           -> CN blue    #0077BB (#005588 for darker IC tone)
-  * Base no-refit-> neutral grey #A0A0A0 (raw knockout reference)
-  * Regime encoding in (e):
-      - IC:  darker blue #005588, circle marker 'o', solid line '-'
-      - dPL: CN blue    #0077BB, triangle marker '^', dashed line '--'
-  * PNG only, 600 DPI, saved to manuscript/figures/
-
-Statistics: all headline numbers are read from the frozen post-hoc summaries
-via manuscript/results/R3/figure6_summary.json (prepared by
-prepare_figure6_data.py, which asserts equality with the frozen values).
+Visual grammar (matching Figure 1 Okabe-Ito frozen standards):
+  - Base refit:       #D55E00 (Okabe-Ito vermillion / deep orange)
+  - TGD refit:        #009E73 (Okabe-Ito bluish green / teal)
+  - CN refit:         #0072B2 (Okabe-Ito blue)
+  - Truth / Neutral:  #303438
+  - S1-S5 Background: Light sequential blues
 """
 
 from __future__ import annotations
 
+import argparse
 import json
+import os
 import sys
 from pathlib import Path
 
 import matplotlib
-import numpy as np
-import pandas as pd
-
 matplotlib.use("Agg")
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
+import numpy as np
+import pandas as pd
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "shared"))
-from r1_plot_style import (  # noqa: E402
-    MODEL_COLORS,
+# Path setup
+HERE = Path(__file__).resolve().parent
+PROJECT = HERE.parents[2]
+MANUSCRIPT = PROJECT / "manuscript"
+RESULTS_R3 = MANUSCRIPT / "results" / "R3"
+FIG_DIR = MANUSCRIPT / "figures"
+FIG_DIR.mkdir(parents=True, exist_ok=True)
+
+# Add shared styles
+sys.path.insert(0, str(MANUSCRIPT / "scripts" / "shared"))
+from r1_plot_style import (
+    COLOR_BASE,
+    COLOR_TGD,
+    COLOR_CN,
+    COLOR_DARK_NEUTRAL,
+    COLOR_LIGHT_REF,
+    COLOR_ZERO_LINE,
     apply_clean_spines,
     setup_publication_style,
 )
 
-PROJECT = Path(__file__).resolve().parents[3]
-MANUSCRIPT = PROJECT / "manuscript"
-RESULTS_R3 = MANUSCRIPT / "results" / "R3"
-FIG_DIR = MANUSCRIPT / "figures"
-SEASONAL_DIR = RESULTS_R3 / "fig6_seasonal"
-PLOTS_FIG_DIR = MANUSCRIPT / "figures"
-FIG_DIR.mkdir(parents=True, exist_ok=True)
-PLOTS_FIG_DIR.mkdir(parents=True, exist_ok=True)
-
 OUT_NAME = "Figure6_R3_final"
 
-# ---------------------------------------------------------------------------
-# Frozen visual grammar (r1_plot_style.py / F1-F5 system)
-# ---------------------------------------------------------------------------
-C_BASE = MODEL_COLORS["Base"]  # #EE7733  omitted-process baseline (fitted)
-C_TGD = MODEL_COLORS["TGD"]  # #009988  generic temperature-memory control
-C_TGD_IC = "#007766"  # darker teal tone for IC
-C_CN = MODEL_COLORS["CN"]  # #0077BB  correct snow-process structure
-C_CN_IC = "#005588"  # darker blue tone for IC
-C_NOREFIT = "#A0A0A0"  # neutral grey: Base without recalibration
-C_REF = "#999999"  # reference lines
-C_TEXT = "#333333"  # annotation text
-TEXT_BG = dict(
-    boxstyle="round,pad=0.2", facecolor="white", edgecolor="none", alpha=0.88
-)
+# Sequential blue background palette for snow activity strata (S1 -> S5)
+BLUE_BANDS = ["#F4F8FA", "#EBF3F8", "#DFEDF5", "#D2E5F0", "#C4DDEB"]
+STRATA_LABELS = ["S1\n(low)", "S2", "S3", "S4", "S5\n(high)"]
 
 
-# ---------------------------------------------------------------------------
-# Data loading (frozen Figure 6 package, read-only)
-# ---------------------------------------------------------------------------
 def load_data():
     summary = json.loads((RESULTS_R3 / "figure6_summary.json").read_text())
     tidy = pd.read_csv(RESULTS_R3 / "figure6_basin_table.csv")
@@ -101,655 +74,298 @@ def load_data():
     return tidy, seedmed, summary
 
 
-def ecdf(vals: np.ndarray):
-    v = np.sort(np.asarray(vals, dtype=np.float64))
-    v = v[np.isfinite(v)]
-    return v, np.arange(1, len(v) + 1) / len(v)
-
-
-# ---------------------------------------------------------------------------
-# Panel (a): Base -> TGD2 -> CN structural ladder (test) — wide overview
-# ---------------------------------------------------------------------------
-def _facet_ladder_ecdf(ax, seedmed, reg):
-    te = seedmed[seedmed["paradigm"] == reg]
-    series = [
-        (
-            "Base no-refit",
-            te["kge_base_no_refit"].to_numpy(),
-            C_NOREFIT,
-            (0, (1.5, 2.0)),
-            1.2,
-        ),
-        ("Base fitted", te["kge_base"].to_numpy(), C_BASE, (0, (4.0, 2.0)), 1.5),
-        ("TGD2", te["kge_tgd2"].to_numpy(), C_TGD, "-", 1.6),
-        ("CN", te["kge_cn"].to_numpy(), C_CN, "-", 1.7),
-    ]
-    for label, vals, color, ls, lw in series:
-        x, y = ecdf(vals)
-        ax.step(x, y, where="post", color=color, linestyle=ls, linewidth=lw, zorder=4)
-        med = float(np.median(vals))
-        ax.axvline(med, color=color, linestyle=":", linewidth=0.7, alpha=0.6, zorder=2)
-    ax.set_xlim(-0.30, 1.0)
-    ax.set_ylim(0.0, 1.0)
-    ax.set_xticks([-0.25, 0.0, 0.25, 0.5, 0.75, 1.0])
-    ax.grid(True, axis="y", linestyle=":", alpha=0.25)
-    ax.text(
-        0.02,
-        0.94,
-        f"{reg} regime",
-        transform=ax.transAxes,
-        ha="left",
-        va="top",
-        fontsize=9.0,
-        fontweight="bold",
-        color=C_TEXT,
-    )
-    ax.text(
-        0.98,
-        0.97,
-        "median 0.899 | 0.934 | 0.993"
-        if reg == "IC"
-        else "median 0.908 | 0.944 | 0.995",
-        transform=ax.transAxes,
-        ha="right",
-        va="top",
-        fontsize=7.4,
-        color=C_TEXT,
-        bbox=TEXT_BG,
-    )
-
-
-def panel_a(ax_ic, ax_dpl, seedmed):
-    ax_ic.set_title("(a) Base–TGD2–CN ladder", weight="bold", loc="left", pad=5)
-    _facet_ladder_ecdf(ax_ic, seedmed, "IC")
-    _facet_ladder_ecdf(ax_dpl, seedmed, "dPL")
-    ax_ic.set_ylabel("Cumulative probability", labelpad=2)
-    ax_ic.set_xlabel(r"Test KGE vs. $Q^*$", labelpad=2)
-    ax_dpl.set_xlabel(r"Test KGE vs. $Q^*$", labelpad=2)
-    handles = [
-        Line2D(
-            [0],
-            [0],
-            color=C_NOREFIT,
-            linestyle=(0, (1.5, 2.0)),
-            linewidth=1.2,
-            label="Base no-refit",
-        ),
-        Line2D(
-            [0],
-            [0],
-            color=C_BASE,
-            linestyle=(0, (4.0, 2.0)),
-            linewidth=1.5,
-            label="Base fitted",
-        ),
-        Line2D([0], [0], color=C_TGD, linestyle="-", linewidth=1.6, label="TGD2"),
-        Line2D([0], [0], color=C_CN, linestyle="-", linewidth=1.7, label="CN"),
-    ]
-    ax_ic.legend(
-        handles=handles,
-        loc="lower left",
-        bbox_to_anchor=(0.02, 0.04),
-        frameon=True,
-        framealpha=0.95,
-        edgecolor="none",
-        fontsize=7.6,
-        ncol=2,
-        columnspacing=0.8,
-        handlelength=1.4,
-    )
-
-
-# ---------------------------------------------------------------------------
-# Panel (b): TGD2 gap-mitigation fraction F_tgd2
-# ---------------------------------------------------------------------------
-def panel_b(ax, seedmed, summary):
-    pb = summary["panel_b_f_tgd2"]
-    ax.set_title("(b) Mitigation", weight="bold", loc="left", pad=5)
-    rng = np.random.default_rng(20260730)
-    for xi, reg in enumerate(["IC", "dPL"]):
-        entry = pb[reg]
-        sub = seedmed[seedmed["paradigm"] == reg]
-        vals = sub["F_tgd2"].dropna().to_numpy()
-        win = vals[(vals >= -0.4) & (vals <= 1.4)]
-        jx = xi + rng.uniform(-0.16, 0.16, len(win))
-        marker = "o" if reg == "IC" else "^"
-        col = C_TGD_IC if reg == "IC" else C_TGD
-        ax.scatter(
-            jx,
-            win,
-            s=7,
-            alpha=0.28,
-            marker=marker,
-            color=col,
-            facecolors="white",
-            edgecolors=col,
-            linewidths=0.4,
-            zorder=2,
-        )
-        med, q25, q75 = entry["median"], entry["q25"], entry["q75"]
-        lo, hi = entry["boot_ci_median_display"]
-        bw = 0.26
-        ax.add_patch(
-            plt.Rectangle(
-                (xi - bw / 2, q25),
-                bw,
-                q75 - q25,
-                facecolor=col,
-                edgecolor=col,
-                alpha=0.35,
-                linewidth=0.8,
-                zorder=3,
-            )
-        )
-        ax.plot(
-            [xi - bw / 2, xi + bw / 2], [med, med], color=col, linewidth=1.6, zorder=4
-        )
-        ax.errorbar(
-            [xi],
-            [med],
-            yerr=[[med - lo], [hi - med]],
-            fmt="none",
-            ecolor=C_TEXT,
-            elinewidth=1.2,
-            capsize=2.6,
-            capthick=1.1,
-            zorder=5,
-        )
-        if reg == "dPL":
-            for s, smed in enumerate(entry["seed_medians"]):
-                ax.plot(
-                    xi + 0.24 + 0.03 * s,
-                    smed,
-                    marker="D",
-                    markersize=2.6,
-                    color=C_TGD_IC,
-                    markerfacecolor="none",
-                    markeredgewidth=0.7,
-                    zorder=5,
-                )
-        ax.text(
-            xi,
-            1.15,
-            f"{med:.3f}",
-            ha="center",
-            va="bottom",
-            fontsize=8.0,
-            color=C_TEXT,
-            fontweight="bold",
-        )
-    ax.axhline(0.0, color=C_REF, linestyle="-", linewidth=0.8, alpha=0.6, zorder=1)
-    ax.axhline(0.5, color=C_REF, linestyle="--", linewidth=0.8, alpha=0.8, zorder=1)
-    ax.text(
-        1.48, 0.51, "half closure", ha="right", va="bottom", fontsize=7.0, color=C_REF
-    )
-    ax.axhline(1.0, color=C_REF, linestyle=":", linewidth=0.8, alpha=0.8, zorder=1)
-    ax.text(
-        1.48, 1.01, "full closure", ha="right", va="bottom", fontsize=7.0, color=C_REF
-    )
-    ax.set_xlim(-0.55, 1.6)
-    ax.set_ylim(-0.55, 1.45)
-    ax.set_xticks([0, 1])
-    n_ic = pb["IC"]["n_valid"]
-    n_dpl = pb["dPL"]["n_valid"]
-    ax.set_xticklabels([f"IC\nn = {n_ic}", f"dPL\nn = {n_dpl}"], fontsize=8.4)
-    ax.set_ylabel("Mitigation fraction", labelpad=2)
-    ax.grid(True, axis="y", linestyle=":", alpha=0.25)
-    ax.text(
-        0.99,
-        0.02,
-        r"unclipped; $\approx$4–8 % beyond window",
-        transform=ax.transAxes,
-        ha="right",
-        va="bottom",
-        fontsize=6.8,
-        color="#666666",
-    )
-
-
-# ---------------------------------------------------------------------------
-# Panels (c)/(d): deterministic seasonal process summaries
-# ---------------------------------------------------------------------------
-def _load_seasonal(quantity: str) -> dict[str, np.ndarray]:
-    path = SEASONAL_DIR / f"fig6_seasonal_{quantity}.npz"
-    if not path.exists():
-        raise FileNotFoundError(
-            f"missing Figure 6 process export: {path}; run export_figure6_process_data.py"
-        )
-    with np.load(path) as data:
-        return {key: np.asarray(data[key], dtype=float) for key in data.files}
-
-
-def _plot_seasonal(ax, quantity: str, ylabel: str, title: str) -> None:
-    data = _load_seasonal(quantity)
-    styles = {
-        "Base": (C_BASE, "o"),
-        "TGD2": (C_TGD, "^"),
-        "CN": (C_CN, "s"),
-    }
-    x = np.arange(12)
-    for reg, ls, alpha in (("IC", "-", 1.0), ("dPL", "--", 0.72)):
-        for structure, (color, marker) in styles.items():
-            values = data[f"{structure}_{reg}"]
-            median = np.nanmedian(values, axis=0)
-            q25, q75 = np.nanpercentile(values, [25, 75], axis=0)
-            ax.fill_between(
-                x,
-                q25,
-                q75,
-                color=color,
-                alpha=0.06 if reg == "IC" else 0.035,
-                linewidth=0,
-                zorder=1,
-            )
-            ax.plot(
-                x,
-                median,
-                color=color,
-                linestyle=ls,
-                linewidth=1.6,
-                marker=marker,
-                markersize=3.4,
-                markevery=1,
-                alpha=alpha,
-                zorder=3,
-            )
-    ax.set_title(title, weight="bold", loc="left", pad=5)
-    ax.set_xticks(x)
-    ax.set_xticklabels(
-        [
-            "Oct",
-            "Nov",
-            "Dec",
-            "Jan",
-            "Feb",
-            "Mar",
-            "Apr",
-            "May",
-            "Jun",
-            "Jul",
-            "Aug",
-            "Sep",
-        ],
-        fontsize=8.0,
-    )
-    ax.set_xlabel("Water-year month", labelpad=2)
-    ax.set_ylabel(ylabel, labelpad=2)
-    ax.grid(True, axis="y", linestyle=":", alpha=0.25)
-    ax.legend(
-        [
-            Line2D(
-                [0],
-                [0],
-                color=C_BASE,
-                marker="o",
-                linestyle="-",
-                linewidth=1.5,
-                markersize=3.5,
-            ),
-            Line2D(
-                [0],
-                [0],
-                color=C_TGD,
-                marker="^",
-                linestyle="-",
-                linewidth=1.5,
-                markersize=3.5,
-            ),
-            Line2D(
-                [0],
-                [0],
-                color=C_CN,
-                marker="s",
-                linestyle="-",
-                linewidth=1.5,
-                markersize=3.5,
-            ),
-            Line2D([0], [0], color=C_TEXT, linestyle="-", linewidth=1.3),
-            Line2D([0], [0], color=C_TEXT, linestyle="--", linewidth=1.3),
-        ],
-        ["Base", "TGD2", "CN", "IC", "dPL"],
-        loc="best",
-        fontsize=7.0,
-        frameon=True,
-        framealpha=0.92,
-        edgecolor="none",
-        ncol=2,
-    )
-
-
-def panel_c(ax):
-    _plot_seasonal(
-        ax,
-        "input",
-        r"Effective core input (mm d$^{-1}$)",
-        "(c) Seasonal release timing",
-    )
-
-
-def panel_d(ax):
-    _plot_seasonal(
-        ax, "state", r"Total tension storage $w_t$ (mm)", "(d) Shared-state response"
-    )
-
-
-# ---------------------------------------------------------------------------
-# Panel (e): Residual CN-over-TGD2 advantage vs. frac_snow (Hero Panel, merged)
-# ---------------------------------------------------------------------------
-def panel_e(ax, seedmed, summary):
-    pe = summary["panel_e_residual_vs_frac_snow"]
-    ax.set_title("(e) Residual CN advantage", weight="bold", loc="left", pad=5)
-
-    regimes = [
-        ("IC", pe["IC"], "o", C_CN_IC, "-", -0.008, "IC (CMA-ES)"),
-        ("dPL", pe["dPL"], "^", C_CN, "--", +0.008, "dPL (neural)"),
-    ]
-
-    for reg_name, entry, marker, color, ls, x_off, label in regimes:
-        sub = seedmed[seedmed["paradigm"] == reg_name]
-        x = sub["frac_snow"].to_numpy()
-        y = sub["G_CN_over_TGD2"].to_numpy()
-        ok = np.isfinite(x) & np.isfinite(y)
-        x, y = x[ok], y[ok]
-
-        # Raw points
-        ax.scatter(
-            x,
-            y,
-            s=7,
-            alpha=0.18,
-            marker=marker,
-            color=color,
-            edgecolors="none",
-            zorder=2,
-        )
-
-        # Quartile medians + bootstrap 95 % CI
-        bins = entry["quartile_bins"]
-        bx = np.asarray([b["frac_snow_median"] for b in bins]) + x_off
-        bm = np.asarray([b["median"] for b in bins])
-        blo = np.asarray([b["boot_ci_median_display"][0] for b in bins])
-        bhi = np.asarray([b["boot_ci_median_display"][1] for b in bins])
-
-        ax.plot(bx, bm, color=color, linestyle=ls, linewidth=1.6, alpha=0.95, zorder=4)
-        ax.errorbar(
-            bx,
-            bm,
-            yerr=[bm - blo, bhi - bm],
-            fmt=marker,
-            color=color,
-            ecolor=color,
-            elinewidth=1.3,
-            capsize=2.6,
-            capthick=1.1,
-            markersize=5.5 if marker == "o" else 6.0,
-            markerfacecolor=color,
-            markeredgecolor="white",
-            markeredgewidth=0.7,
-            zorder=5,
-        )
-
-    ax.axhline(0.0, color=C_REF, linestyle="--", linewidth=0.9, zorder=1)
-    ax.set_xlim(0.0, 1.0)
-    ax.set_ylim(-0.05, 0.35)
-    ax.set_xticks([0.0, 0.25, 0.5, 0.75, 1.0])
-    ax.set_xlabel(r"Basin snow fraction, $f_{\mathrm{snow}}$", labelpad=2)
-    ax.set_ylabel(r"$\Delta\mathrm{KGE}_{\mathrm{CN}-\mathrm{TGD2}}$", labelpad=2)
-    ax.grid(True, axis="y", linestyle=":", alpha=0.25)
-
-    # Spearman rho text box
-    rho_ic = pe["IC"]["spearman_frozen"][0]
-    rho_dpl = pe["dPL"]["spearman_frozen"]
-    rho_txt = (
-        f"IC:  $\\rho$ = +{rho_ic:.2f}\n"
-        f"dPL: $\\rho$ = +{min(rho_dpl):.2f} .. +{max(rho_dpl):.2f}"
-    )
-    ax.text(
-        0.98,
-        0.04,
-        rho_txt,
-        transform=ax.transAxes,
-        ha="right",
-        va="bottom",
-        fontsize=8.0,
-        color=C_TEXT,
-        linespacing=1.3,
-        bbox=TEXT_BG,
-    )
-
-    # Shared legend
-    handles = [
-        Line2D(
-            [0],
-            [0],
-            marker="o",
-            color=C_CN_IC,
-            linestyle="-",
-            linewidth=1.5,
-            markersize=5.0,
-            markerfacecolor=C_CN_IC,
-            markeredgecolor="white",
-            markeredgewidth=0.5,
-            label="IC (CMA-ES)",
-        ),
-        Line2D(
-            [0],
-            [0],
-            marker="^",
-            color=C_CN,
-            linestyle="--",
-            linewidth=1.5,
-            markersize=5.5,
-            markerfacecolor=C_CN,
-            markeredgecolor="white",
-            markeredgewidth=0.5,
-            label="dPL (neural)",
-        ),
-    ]
-    ax.legend(
-        handles=handles,
-        loc="upper left",
-        bbox_to_anchor=(0.02, 0.97),
-        frameon=True,
-        framealpha=0.92,
-        edgecolor="none",
-        fontsize=7.8,
-    )
-
-
-# ---------------------------------------------------------------------------
-# Panel (f): Process-conditioned residual (snow_active vs. non-snow)
-# ---------------------------------------------------------------------------
-def panel_f(ax, seedmed, summary):
-    pf = summary["panel_f_process_errors"]
-    ax.set_title(r"(f) Process-conditioned residual", weight="bold", loc="left", pad=5)
-    rng = np.random.default_rng(20260730)
-
-    groups = [
-        ("IC", "snow_active", 0, "IC\nsnow", C_CN_IC, "o"),
-        ("IC", "no_snow_active", 1, "IC\nno snow", C_CN_IC, "o"),
-        ("dPL", "snow_active", 2, "dPL\nsnow", C_CN, "^"),
-        ("dPL", "no_snow_active", 3, "dPL\nno snow", C_CN, "^"),
-    ]
-
-    for reg, cond, xi, lbl, col, marker in groups:
-        entry = pf[reg][cond]
-        sub = seedmed[seedmed["paradigm"] == reg]
-        vals = sub[f"delta_rmse_{cond}"].dropna().to_numpy()
-        win = vals[(vals >= -0.3) & (vals <= 2.2)]
-        jx = xi + rng.uniform(-0.16, 0.16, len(win))
-        face = col if "snow_active" == cond else "white"
-        ax.scatter(
-            jx,
-            win,
-            s=7,
-            alpha=0.28,
-            marker=marker,
-            color=col,
-            facecolors=face,
-            edgecolors=col,
-            linewidths=0.4,
-            zorder=2,
-        )
-        med, q25, q75 = entry["median"], entry["q25"], entry["q75"]
-        lo, hi = entry["boot_ci_median_display"]
-        bw = 0.26
-        ax.add_patch(
-            plt.Rectangle(
-                (xi - bw / 2, q25),
-                bw,
-                q75 - q25,
-                facecolor=col,
-                edgecolor=col,
-                alpha=0.35,
-                linewidth=0.8,
-                zorder=3,
-            )
-        )
-        ax.plot(
-            [xi - bw / 2, xi + bw / 2], [med, med], color=col, linewidth=1.6, zorder=4
-        )
-        ax.errorbar(
-            [xi],
-            [med],
-            yerr=[[med - lo], [hi - med]],
-            fmt="none",
-            ecolor=C_TEXT,
-            elinewidth=1.2,
-            capsize=2.6,
-            capthick=1.1,
-            zorder=5,
-        )
-        ax.text(
-            xi,
-            1.85 if "snow_active" == cond else 0.40,
-            f"+{med:.3f}",
-            ha="center",
-            va="bottom",
-            fontsize=7.8,
-            color=C_TEXT,
-            fontweight="bold",
-        )
-
-    ax.axhline(0.0, color=C_REF, linestyle="--", linewidth=0.9, zorder=1)
-    ax.set_xlim(-0.55, 3.65)
-    ax.set_ylim(-0.45, 2.35)
-    ax.set_xticks([0, 1, 2, 3])
-    ax.set_xticklabels([g[3] for g in groups], fontsize=8.2)
-    ax.set_ylabel(r"Residual RMSE gap (mm d$^{-1}$)", labelpad=2)
-    ax.grid(True, axis="y", linestyle=":", alpha=0.25)
-    # compact legend: fill convention (x tick labels already identify IC/dPL groups)
-    handles = [
-        Line2D(
-            [0],
-            [0],
-            marker="o",
-            color=C_CN_IC,
-            linestyle="none",
-            markerfacecolor=C_CN_IC,
-            markersize=4.5,
-            label="snow active",
-        ),
-        Line2D(
-            [0],
-            [0],
-            marker="o",
-            color=C_CN_IC,
-            linestyle="none",
-            markerfacecolor="white",
-            markeredgecolor=C_CN_IC,
-            markersize=4.5,
-            label="no snow",
-        ),
-    ]
-    ax.legend(
-        handles=handles,
-        loc="upper right",
-        bbox_to_anchor=(0.98, 0.97),
-        frameon=True,
-        framealpha=0.92,
-        edgecolor="none",
-        fontsize=6.8,
-    )
-
-
-# ---------------------------------------------------------------------------
-# Figure assembly
-# ---------------------------------------------------------------------------
-def build_figure(tidy, seedmed, summary) -> None:
-    # Three rows: (a)|(b), process (c)|(d), then (e)|(f).
-    fig = plt.figure(figsize=(13.4, 10.4))
-    gs = gridspec.GridSpec(
-        3,
-        1,
-        height_ratios=[1, 1, 1],
-        hspace=0.30,
-        left=0.055,
-        right=0.99,
-        top=0.965,
-        bottom=0.05,
-    )
-
-    # Row 1: (a) wide structural ladder | (b) compact mitigation.
-    gs1 = gridspec.GridSpecFromSubplotSpec(
-        1, 2, subplot_spec=gs[0], width_ratios=[0.70, 0.30], wspace=0.16
-    )
-    gsa = gridspec.GridSpecFromSubplotSpec(
-        1, 2, subplot_spec=gs1[0], width_ratios=[0.50, 0.50], wspace=0.10
-    )
-    ax_a1 = fig.add_subplot(gsa[0, 0])
-    apply_clean_spines(ax_a1)
-    ax_a2 = fig.add_subplot(gsa[0, 1])
-    apply_clean_spines(ax_a2)
-    ax_b = fig.add_subplot(gs1[1])
-    apply_clean_spines(ax_b)
-    panel_a(ax_a1, ax_a2, seedmed)
-    panel_b(ax_b, seedmed, summary)
-
-    # Row 2: equal-width seasonal process panels.
-    gs2 = gridspec.GridSpecFromSubplotSpec(
-        1, 2, subplot_spec=gs[1], width_ratios=[0.50, 0.50], wspace=0.14
-    )
-    ax_c = fig.add_subplot(gs2[0])
-    apply_clean_spines(ax_c)
-    ax_d = fig.add_subplot(gs2[1])
-    apply_clean_spines(ax_d)
-    panel_c(ax_c)
-    panel_d(ax_d)
-
-    # Row 3: (e) wide residual advantage | (f) compact process concentration.
-    gs3 = gridspec.GridSpecFromSubplotSpec(
-        1, 2, subplot_spec=gs[2], width_ratios=[0.68, 0.32], wspace=0.14
-    )
-    ax_e = fig.add_subplot(gs3[0])
-    apply_clean_spines(ax_e)
-    ax_f = fig.add_subplot(gs3[1])
-    apply_clean_spines(ax_f)
-    panel_e(ax_e, seedmed, summary)
-    panel_f(ax_f, seedmed, summary)
-
-    for out_dir in (FIG_DIR, PLOTS_FIG_DIR):
-        plt.savefig(out_dir / f"{OUT_NAME}.png", dpi=600)
-        print("saved:", out_dir / f"{OUT_NAME}.png")
-    plt.close()
-
-
-def main() -> None:
+def build_figure(tidy, seedmed, summary, out_dir: Path | None = None) -> Path:
     setup_publication_style()
-    # Moderate font up-scaling local to Figure 6 (manuscript readability).
-    plt.rcParams.update(
-        {
-            "font.size": 9.5,
-            "axes.labelsize": 10.5,
-            "axes.titlesize": 10.5,
-            "xtick.labelsize": 9.5,
-            "ytick.labelsize": 9.5,
-            "legend.fontsize": 9.0,
-        }
+
+    target_dir = out_dir or FIG_DIR
+    target_dir.mkdir(parents=True, exist_ok=True)
+
+    fig_w_in = 11.5
+    fig_h_in = 8.6
+    fig = plt.figure(figsize=(fig_w_in, fig_h_in))
+
+    # Outer layout: 2 rows with reduced vertical spacing (hspace=0.25)
+    gs_main = fig.add_gridspec(
+        2,
+        1,
+        height_ratios=[1.0, 1.15],
+        hspace=0.25,
+        top=0.925,
+        bottom=0.08,
+        left=0.075,
+        right=0.985,
     )
+
+    # Row 1: Panels (a) and (b)
+    gs_top = gs_main[0].subgridspec(1, 2, width_ratios=[1.08, 0.92], wspace=0.18)
+    ax_a1 = fig.add_subplot(gs_top[0, 0])
+    ax_a2 = fig.add_subplot(gs_top[0, 1])
+
+    # Row 2: Panels (c) and (d)
+    gs_bot = gs_main[1].subgridspec(1, 2, width_ratios=[1.50, 1.0], wspace=0.22)
+    ax_b = fig.add_subplot(gs_bot[0, 0])
+    ax_c = fig.add_subplot(gs_bot[0, 1])
+
+    xs = np.arange(5)
+
+    # ═════════════════════════════════════════════════════════════════════════
+    # PANEL (a) & PANEL (b): Parameter Evidence
+    # ═════════════════════════════════════════════════════════════════════════
+    apply_clean_spines(ax_a1)
+    apply_clean_spines(ax_a2)
+
+    # Distinct panel titles with (a) and (b)
+    ax_a1.set_title("(a) Parameter distance to generating truth", loc="left", fontsize=11.2, fontweight="bold", pad=6)
+    ax_a2.set_title("(b) Parameter excess beyond CN refit", loc="left", fontsize=11.2, fontweight="bold", pad=6)
+
+    # Background sequential blue strata bands
+    for ax in [ax_a1, ax_a2]:
+        for i in range(5):
+            ax.axvspan(i - 0.5, i + 0.5, color=BLUE_BANDS[i], alpha=0.55, zorder=0)
+        for i in range(4):
+            ax.axvline(i + 0.5, color="#CBD5E1", lw=0.6, ls=":", zorder=1)
+
+    # ── Panel (a): Parameter Distance to Generating Truth ──
+    pa = summary["panel_a_param_distance"]
+    for reg, ls, marker in [("IC", "-", "o"), ("dPL", "--", "^")]:
+        sub_strata = pa[reg]["strata"]
+        b_vals = [sub_strata[st]["Base"]["median"] for st in ("S1", "S2", "S3", "S4", "S5")]
+        t_vals = [sub_strata[st]["TGD"]["median"] for st in ("S1", "S2", "S3", "S4", "S5")]
+        c_vals = [sub_strata[st]["CN"]["median"] for st in ("S1", "S2", "S3", "S4", "S5")]
+
+        b_ci = [sub_strata[st]["Base"]["ci"] for st in ("S1", "S2", "S3", "S4", "S5")]
+        t_ci = [sub_strata[st]["TGD"]["ci"] for st in ("S1", "S2", "S3", "S4", "S5")]
+        c_ci = [sub_strata[st]["CN"]["ci"] for st in ("S1", "S2", "S3", "S4", "S5")]
+
+        off = -0.06 if reg == "IC" else +0.06
+
+        # Base
+        yerr_b = [[b_vals[i] - b_ci[i][0] for i in range(5)], [b_ci[i][1] - b_vals[i] for i in range(5)]]
+        if reg == "IC":
+            ax_a1.errorbar(xs + off, b_vals, yerr=yerr_b, fmt=marker, color=COLOR_BASE, linestyle=ls, linewidth=1.5,
+                           markersize=5.2, markerfacecolor=COLOR_BASE, markeredgecolor="white", markeredgewidth=1.0, capsize=2.5, elinewidth=1.2, zorder=3)
+        else:
+            ax_a1.errorbar(xs + off, b_vals, yerr=yerr_b, fmt=marker, color=COLOR_BASE, linestyle=ls, linewidth=1.5,
+                           markersize=5.2, markerfacecolor="white", markeredgecolor=COLOR_BASE, markeredgewidth=1.3, capsize=2.5, elinewidth=1.2, zorder=3)
+
+        # TGD
+        yerr_t = [[t_vals[i] - t_ci[i][0] for i in range(5)], [t_ci[i][1] - t_vals[i] for i in range(5)]]
+        if reg == "IC":
+            ax_a1.errorbar(xs + off, t_vals, yerr=yerr_t, fmt=marker, color=COLOR_TGD, linestyle=ls, linewidth=1.5,
+                           markersize=5.2, markerfacecolor=COLOR_TGD, markeredgecolor="white", markeredgewidth=1.0, capsize=2.5, elinewidth=1.2, zorder=4)
+        else:
+            ax_a1.errorbar(xs + off, t_vals, yerr=yerr_t, fmt=marker, color=COLOR_TGD, linestyle=ls, linewidth=1.5,
+                           markersize=5.2, markerfacecolor="white", markeredgecolor=COLOR_TGD, markeredgewidth=1.3, capsize=2.5, elinewidth=1.2, zorder=4)
+
+        # CN
+        yerr_c = [[c_vals[i] - c_ci[i][0] for i in range(5)], [c_ci[i][1] - c_vals[i] for i in range(5)]]
+        if reg == "IC":
+            ax_a1.errorbar(xs + off, c_vals, yerr=yerr_c, fmt=marker, color=COLOR_CN, linestyle=ls, linewidth=1.5,
+                           markersize=5.2, markerfacecolor=COLOR_CN, markeredgecolor="white", markeredgewidth=1.0, capsize=2.5, elinewidth=1.2, zorder=5)
+        else:
+            ax_a1.errorbar(xs + off, c_vals, yerr=yerr_c, fmt=marker, color=COLOR_CN, linestyle=ls, linewidth=1.5,
+                           markersize=5.2, markerfacecolor="white", markeredgecolor=COLOR_CN, markeredgewidth=1.3, capsize=2.5, elinewidth=1.2, zorder=5)
+
+    ax_a1.set_xlim(-0.5, 4.5)
+    ax_a1.set_xticks(xs)
+    ax_a1.set_xticklabels(STRATA_LABELS, fontsize=9.2)
+    ax_a1.set_ylim(-0.02, 0.48)
+    ax_a1.tick_params(axis="y", labelsize=9.2)
+    ax_a1.set_xlabel("Snow activity stratum ($f_{\\mathrm{snow}}$)", labelpad=2, fontsize=10.2)
+    ax_a1.set_ylabel("Truth distance $E^{\\mathrm{param}} = \\mathrm{med}_p |e_p|$", labelpad=2, fontsize=10.2)
+    ax_a1.text(0.04, 0.92, "15 shared parameters", transform=ax_a1.transAxes, va="top", ha="left", fontsize=8.6, color="#555555", style="italic", zorder=6)
+    ax_a1.grid(True, axis="y", linestyle=":", alpha=0.35, color=COLOR_LIGHT_REF)
+
+    # ── Panel (b): Parameter Excess Beyond CN Refit ──
+    ax_a2.axhline(0.0, color=COLOR_ZERO_LINE, linestyle="--", linewidth=0.8, zorder=1)
+    ax_a2.text(0.98, 0.02, "CN-refit baseline = 0", transform=ax_a2.get_yaxis_transform(), va="bottom", ha="right", fontsize=8.6, color="#555555", style="italic", zorder=6)
+
+    pb = summary["panel_b_param_excess"]
+    for reg, ls, marker in [("IC", "-", "o"), ("dPL", "--", "^")]:
+        sub_strata = pb[reg]["strata"]
+        b_vals = [sub_strata[st]["Base"]["median"] for st in ("S1", "S2", "S3", "S4", "S5")]
+        t_vals = [sub_strata[st]["TGD"]["median"] for st in ("S1", "S2", "S3", "S4", "S5")]
+
+        b_ci = [sub_strata[st]["Base"]["ci"] for st in ("S1", "S2", "S3", "S4", "S5")]
+        t_ci = [sub_strata[st]["TGD"]["ci"] for st in ("S1", "S2", "S3", "S4", "S5")]
+
+        off = -0.06 if reg == "IC" else +0.06
+
+        # Base
+        yerr_b = [[b_vals[i] - b_ci[i][0] for i in range(5)], [b_ci[i][1] - b_vals[i] for i in range(5)]]
+        if reg == "IC":
+            ax_a2.errorbar(xs + off, b_vals, yerr=yerr_b, fmt=marker, color=COLOR_BASE, linestyle=ls, linewidth=1.5,
+                           markersize=5.2, markerfacecolor=COLOR_BASE, markeredgecolor="white", markeredgewidth=1.0, capsize=2.5, elinewidth=1.2, zorder=3)
+        else:
+            ax_a2.errorbar(xs + off, b_vals, yerr=yerr_b, fmt=marker, color=COLOR_BASE, linestyle=ls, linewidth=1.5,
+                           markersize=5.2, markerfacecolor="white", markeredgecolor=COLOR_BASE, markeredgewidth=1.3, capsize=2.5, elinewidth=1.2, zorder=3)
+
+        # TGD
+        yerr_t = [[t_vals[i] - t_ci[i][0] for i in range(5)], [t_ci[i][1] - t_vals[i] for i in range(5)]]
+        if reg == "IC":
+            ax_a2.errorbar(xs + off, t_vals, yerr=yerr_t, fmt=marker, color=COLOR_TGD, linestyle=ls, linewidth=1.5,
+                           markersize=5.2, markerfacecolor=COLOR_TGD, markeredgecolor="white", markeredgewidth=1.0, capsize=2.5, elinewidth=1.2, zorder=4)
+        else:
+            ax_a2.errorbar(xs + off, t_vals, yerr=yerr_t, fmt=marker, color=COLOR_TGD, linestyle=ls, linewidth=1.5,
+                           markersize=5.2, markerfacecolor="white", markeredgecolor=COLOR_TGD, markeredgewidth=1.3, capsize=2.5, elinewidth=1.2, zorder=4)
+
+    ax_a2.set_xlim(-0.5, 4.5)
+    ax_a2.set_xticks(xs)
+    ax_a2.set_xticklabels(STRATA_LABELS, fontsize=9.2)
+    ax_a2.set_ylim(-0.06, 0.38)
+    ax_a2.tick_params(axis="y", labelsize=9.2)
+    ax_a2.set_xlabel("Snow activity stratum ($f_{\\mathrm{snow}}$)", labelpad=2, fontsize=10.2)
+    ax_a2.set_ylabel("Excess $E_M^{\\mathrm{param}} - E_{\\mathrm{CN}}^{\\mathrm{param}}$", labelpad=2, fontsize=10.2)
+    ax_a2.grid(True, axis="y", linestyle=":", alpha=0.35, color=COLOR_LIGHT_REF)
+
+    # ═════════════════════════════════════════════════════════════════════════
+    # PANEL (c): Shared-state and flux excess (Scatter + Boxplot)
+    # ═════════════════════════════════════════════════════════════════════════
+    apply_clean_spines(ax_b)
+    ax_b.set_title("(c) Shared-state and flux excess", loc="left", fontsize=11.2, fontweight="bold", pad=6)
+    ax_b.axhline(0.0, color=COLOR_ZERO_LINE, linestyle="--", linewidth=0.8, zorder=1)
+    ax_b.text(0.98, 0.02, "CN-refit baseline = 0", transform=ax_b.get_yaxis_transform(), va="bottom", ha="right", fontsize=8.6, color="#555555", style="italic", zorder=6)
+
+    vars_order = [
+        ("delta_E_wt_base", "delta_E_wt_tgd", "$W_t$\n(total)"),
+        ("delta_E_wu_base", "delta_E_wu_tgd", "$W_u$\n(upper)"),
+        ("delta_E_wl_base", "delta_E_wl_tgd", "$W_l$\n(lower)"),
+        ("delta_E_qi_base", "delta_E_qi_tgd", "$Q_i$\n(flux)"),
+        ("delta_E_qg_base", "delta_E_qg_tgd", "$Q_g$\n(flux)"),
+    ]
+
+    x_vars = np.arange(len(vars_order))
+    sub_ic = seedmed[seedmed["paradigm"] == "IC"]
+    sub_dpl = seedmed[seedmed["paradigm"] == "dPL"]
+
+    offsets_cfg = [
+        ("Base", "IC", sub_ic, -0.27, COLOR_BASE, True),
+        ("Base", "dPL", sub_dpl, -0.09, COLOR_BASE, False),
+        ("TGD", "IC", sub_ic, +0.09, COLOR_TGD, True),
+        ("TGD", "dPL", sub_dpl, +0.27, COLOR_TGD, False),
+    ]
+
+    for vi, (col_b, col_t, vlabel) in enumerate(vars_order):
+        if vi > 0:
+            ax_b.axvline(vi - 0.5, color="#E2E8F0", lw=0.6, ls=":", zorder=1)
+
+        for struct, reg, df_sub, dx, col, is_ic in offsets_cfg:
+            col_name = col_b if struct == "Base" else col_t
+            vals = df_sub[col_name].dropna().values
+
+            # Jittered background scatter
+            np.random.seed(42 + vi * 10 + (0 if is_ic else 1))
+            jit = np.random.uniform(-0.035, 0.035, len(vals))
+            ax_b.scatter(vi + dx + jit, vals, s=6, color=col, alpha=0.15, edgecolors="none", rasterized=True, zorder=2)
+
+            # Boxplot showing quartile distributions
+            ax_b.boxplot(
+                vals,
+                positions=[vi + dx],
+                widths=0.13,
+                patch_artist=True,
+                showfliers=False,
+                whis=[5, 95],
+                zorder=4,
+                boxprops=dict(
+                    facecolor=col if is_ic else "white",
+                    edgecolor=col,
+                    linewidth=1.2,
+                    linestyle="-" if is_ic else "--",
+                    alpha=0.45 if is_ic else 0.95,
+                ),
+                whiskerprops=dict(color=col, linewidth=1.1, linestyle="-" if is_ic else "--"),
+                capprops=dict(color=col, linewidth=1.1),
+                medianprops=dict(color=COLOR_DARK_NEUTRAL if not is_ic else "#1E293B", linewidth=1.6),
+            )
+
+    ax_b.set_xlim(-0.55, len(vars_order) - 0.45)
+    ax_b.set_xticks(x_vars)
+    ax_b.set_xticklabels([v[2] for v in vars_order], fontsize=9.2)
+    ax_b.set_ylim(-0.25, 1.85)
+    ax_b.tick_params(axis="y", labelsize=9.2)
+    ax_b.set_ylabel("NRMSE excess vs. CN refit ($\\Delta E^{\\mathrm{state}}$)", labelpad=2, fontsize=10.2)
+    ax_b.text(0.03, 0.92, "$W_t = W_u + W_l + W_d$ headline storage\nBoxes = [q25, q75], whiskers = [5%, 95%]", transform=ax_b.transAxes, va="top", ha="left", fontsize=8.6, color="#555555", style="italic", zorder=6)
+    ax_b.grid(True, axis="y", linestyle=":", alpha=0.35, color=COLOR_LIGHT_REF)
+
+    # ═════════════════════════════════════════════════════════════════════════
+    # PANEL (d): Recovery–excess-error association (Horizontal Dumbbell)
+    # ═════════════════════════════════════════════════════════════════════════
+    apply_clean_spines(ax_c)
+    ax_c.set_title("(d) Recovery–excess-error association", loc="left", fontsize=11.2, fontweight="bold", pad=6)
+    ax_c.axvline(0.0, color=COLOR_ZERO_LINE, linestyle="--", linewidth=0.8, zorder=1)
+
+    pd_assoc = summary["panel_d_associations"]
+    rows = [
+        ("IC",  "G_Base <-> E_param_excess_Base", 7.0, "Base param (IC)",  COLOR_BASE),
+        ("dPL", "G_Base <-> E_param_excess_Base", 6.0, "Base param (dPL)", COLOR_BASE),
+        ("IC",  "G_TGD <-> E_param_excess_TGD",   5.0, "TGD param (IC)",   COLOR_TGD),
+        ("dPL", "G_TGD <-> E_param_excess_TGD",   4.0, "TGD param (dPL)",  COLOR_TGD),
+        ("IC",  "G_Base <-> Delta E_state(Wt)",   3.0, "Base $W_t$ (IC)",  COLOR_BASE),
+        ("dPL", "G_Base <-> Delta E_state(Wt)",   2.0, "Base $W_t$ (dPL)", COLOR_BASE),
+        ("IC",  "G_TGD <-> Delta E_state(Wt)",    1.0, "TGD $W_t$ (IC)",   COLOR_TGD),
+        ("dPL", "G_TGD <-> Delta E_state(Wt)",    0.0, "TGD $W_t$ (dPL)",  COLOR_TGD),
+    ]
+
+    for reg, pname, ypos, lbl, col in rows:
+        entry = pd_assoc[reg][pname]
+        raw_r = entry["raw_spearman"]
+        part_r = entry["partial_spearman"]
+
+        # Dumbbell connecting line
+        ax_c.plot([raw_r, part_r], [ypos, ypos], color="#888888", linestyle="-", linewidth=1.2, zorder=2)
+        # Raw Spearman
+        ax_c.scatter(raw_r, ypos, color=col, s=36, zorder=4, edgecolors="#333333", linewidths=0.7)
+        # Partial Spearman
+        ax_c.scatter(part_r, ypos, color="white", s=38, zorder=5, edgecolors=col, linewidths=1.4, marker="D")
+
+        # Text with zorder=7 so it sits on top of all lines
+        ax_c.text(0.98, ypos, f"{raw_r:+.2f} → {part_r:+.2f}", transform=ax_c.get_yaxis_transform(),
+                  va="center", ha="right", fontsize=8.6, family="monospace", color=COLOR_DARK_NEUTRAL, zorder=7)
+
+    ax_c.set_ylim(-0.7, 7.7)
+    ax_c.set_yticks([r[2] for r in rows])
+    ax_c.set_yticklabels([r[3] for r in rows], fontsize=8.8)
+    ax_c.set_xlim(-0.35, 1.05)
+    ax_c.set_xticks([-0.2, 0.0, 0.2, 0.4, 0.6, 0.8])
+    ax_c.set_xticklabels(["-0.2", "0.0", "+0.2", "+0.4", "+0.6", "+0.8"], fontsize=9.2)
+    ax_c.set_xlabel("Spearman $\\rho$: Raw (●) vs. Partial on $f_{\\mathrm{snow}}$ (◇)", labelpad=2, fontsize=10.2)
+    ax_c.grid(True, axis="x", linestyle=":", alpha=0.35, color=COLOR_LIGHT_REF)
+
+    # ═════════════════════════════════════════════════════════════════════════
+    # GLOBAL LEGENDS (Positioned closely at top of figure)
+    # ═════════════════════════════════════════════════════════════════════════
+    struct_handles = [
+        Line2D([0], [0], color=COLOR_BASE, lw=1.6, marker="o", markersize=5.0, markerfacecolor=COLOR_BASE, markeredgecolor="white", label="Base refit"),
+        Line2D([0], [0], color=COLOR_TGD, lw=1.6, marker="^", markersize=5.0, markerfacecolor=COLOR_TGD, markeredgecolor="white", label="TGD refit"),
+        Line2D([0], [0], color=COLOR_CN, lw=1.6, marker="s", markersize=5.0, markerfacecolor=COLOR_CN, markeredgecolor="white", label="CN refit"),
+    ]
+    regime_handles = [
+        Line2D([0], [0], color=COLOR_DARK_NEUTRAL, ls="-", lw=1.4, marker="o", markersize=4.5, markerfacecolor=COLOR_DARK_NEUTRAL, markeredgecolor="white", label="IC (filled)"),
+        Line2D([0], [0], color=COLOR_DARK_NEUTRAL, ls="--", lw=1.4, marker="^", markersize=4.5, markerfacecolor="white", markeredgecolor=COLOR_DARK_NEUTRAL, markeredgewidth=1.2, label="dPL (hollow)"),
+        Line2D([0], [0], marker="o", color="w", markerfacecolor="#555555", markeredgecolor="#222222", markersize=4.5, label="Raw $\\rho$"),
+        Line2D([0], [0], marker="D", color="w", markerfacecolor="white", markeredgecolor="#555555", markeredgewidth=1.2, markersize=4.5, label="Partial $\\rho$ (adj. $f_{\\mathrm{snow}}$)"),
+    ]
+
+    fig.legend(handles=struct_handles, loc="upper left", bbox_to_anchor=(0.075, 0.985), ncol=3, frameon=False, fontsize=8.5, handlelength=1.5, columnspacing=1.0)
+    fig.legend(handles=regime_handles, loc="upper right", bbox_to_anchor=(0.985, 0.985), ncol=4, frameon=False, fontsize=8.5, handlelength=1.5, columnspacing=0.9)
+
+    out_path = target_dir / f"{OUT_NAME}.png"
+    plt.savefig(out_path, dpi=600, bbox_inches="tight", facecolor="white", edgecolor="none")
+    plt.close(fig)
+
+    file_size_mb = os.path.getsize(out_path) / (1024 * 1024)
+    print(f"Saved Figure 6 -> {out_path} ({file_size_mb:.2f} MB)", flush=True)
+
+    return out_path
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Render R3 Figure 6.")
+    parser.add_argument("--out-dir", type=Path, default=None, help="Output directory for generated figure.")
+    args = parser.parse_args()
     tidy, seedmed, summary = load_data()
-    build_figure(tidy, seedmed, summary)
-    print("Final Figure 6 (6-panel composite) generated successfully.")
+    build_figure(tidy, seedmed, summary, args.out_dir)
 
 
 if __name__ == "__main__":

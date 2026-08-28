@@ -1,0 +1,9 @@
+{
+  "status": "PASS",
+  "total_canonical_rows": 3186,
+  "expected_canonical_rows": 3186,
+  "total_basins": 531,
+  "ic_reduction_rule": "complete IC restart with maximum stored train-period KGE; lowest start tie-breaker",
+  "dpl_reduction_rule": "within-basin coordinate-wise median across seeds (42, 123, 2026)",
+  "output_file": "/home/jingxin/code/dmg-research/project/hydrodiag/manuscript/analysis/R2/results/r2_parameter_values_canonical.csv"
+}

@@ -1,0 +1,77 @@
+{
+  "status": "COMPLETED",
+  "scope": "Results 3.2 (R2) Canonical Statistical Audit and Rebuild",
+  "canonical_gates": "PASS",
+  "gate_breakdown": {
+    "gate_01_provenance": "PASS",
+    "gate_02_shared_parameter_definition": "PASS",
+    "gate_03_normalized_coordinates": "PASS",
+    "gate_04_canonical_vector_rule": "PASS",
+    "gate_05_ensemble_formulas": "PASS",
+    "gate_06_basin_weighting": "PASS",
+    "gate_07_basin_joins": "PASS",
+    "gate_08_snow_axis": "PASS",
+    "gate_09_paired_bootstrap": "PASS",
+    "gate_10_historical_conflicts": "PASS",
+    "gate_11_all_parameter_transparency": "PASS",
+    "gate_12_scope": "PASS"
+  },
+  "readiness_classification": {
+    "F3_Base_CN_whole_space_macro_response": "PASS_CANONICAL",
+    "F3_Base_CN_snow_conditioned_excess": "PASS_CANONICAL",
+    "F3_Base_TGD_attribution_control": "PASS_CANONICAL",
+    "F3_Full_and_Excl_S5_Delta_beta": "PASS_CANONICAL",
+    "F4_all_15_Base_CN_parameter_shifts": "PASS_CANONICAL",
+    "F4_candidate_anchors_um_ki_ci": "PASS_CANONICAL",
+    "F4_qualified_parameter_im": "PASS_CANONICAL",
+    "R2_main_summary_table": "PASS_CANONICAL",
+    "R2_supplement_robustness": "PASS_CANONICAL"
+  },
+  "dataset_dimensions": {
+    "total_basins": 531,
+    "raw_ledger_rows": 310635,
+    "canonical_vector_rows": 3186,
+    "paired_shifts_rows": 15930,
+    "ensemble_basin_rows": 1062,
+    "strata_counts": {
+      "S1": 165,
+      "S2": 156,
+      "S3": 121,
+      "S4": 34,
+      "S5": 55
+    }
+  },
+  "macro_ensemble_results": {
+    "prevalence_between_gt_within": {
+      "IC_Full531": 0.6308851224105462,
+      "dPL_Full531": 0.8380414312617702
+    },
+    "excess_slope_Full531": {
+      "IC_Full531": 0.15424736864090052,
+      "dPL_Full531": 0.1974019418626811
+    }
+  },
+  "tgd_attribution_delta_beta": {
+    "IC_Full531": "+0.000 [-0.029, +0.030]",
+    "IC_ExcludeS5": "+0.023 [-0.011, +0.054]",
+    "dPL_Full531": "+0.041 [+0.011, +0.082]",
+    "dPL_ExcludeS5": "+0.086 [+0.017, +0.155]"
+  },
+  "key_parameter_slopes": {
+    "IC_xaj_im": "-0.3635 [-0.4905, -0.1834] (rho=-0.248)",
+    "IC_xaj_um": "+0.5211 [+0.3529, +0.7064] (rho=+0.216)",
+    "IC_xaj_ki": "-0.4746 [-0.6304, -0.3107] (rho=-0.237)",
+    "IC_xaj_ci": "-0.4138 [-0.6101, -0.1949] (rho=-0.183)",
+    "dPL_xaj_im": "-0.1418 [-0.2212, -0.0628] (rho=-0.345)",
+    "dPL_xaj_um": "+0.5655 [+0.3765, +0.7688] (rho=+0.253)",
+    "dPL_xaj_ki": "-0.3146 [-0.4532, -0.2103] (rho=-0.328)",
+    "dPL_xaj_ci": "-0.5312 [-0.6903, -0.3681] (rho=-0.290)"
+  },
+  "compute_profile": {
+    "elapsed_seconds": 58.81,
+    "peak_ram_mb": 1517.7,
+    "bootstrap_draws": 200,
+    "base_seed": 20260730,
+    "no_training_or_forward_simulations": true
+  }
+}

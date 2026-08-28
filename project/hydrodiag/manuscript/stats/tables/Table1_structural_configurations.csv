@@ -1,0 +1,7 @@
+Property / Characteristic,Base,TGD,CN
+Shared host parameters,15,15,15
+Calibrated parameters (shared + added),15 + 0,15 + 2,15 + 2
+Temperature used by added structural component,No,Yes,Yes
+Additional generic temperature-conditioned storage / memory,No,Yes,No
+Explicit snow accumulation–melt sequence,No,No,Yes
+Primary diagnostic role,Snow-process omission configuration,Temperature-conditioned generic control,Explicit snow accumulation–melt representation

@@ -1,0 +1,19 @@
+section,paradigm,period,snow_stratum,metric,N_total,N_invalid,N_valid,median,Q25,Q75,P05,P95,P_below_0,P_above_1,P_delta_F_gt_0,P_F_TGD_lt_F_close,invalid_rate_within_stratum_pct,share_of_all_invalid_basins_pct,source
+overall,IC,test,All,D,531,104,427,0.1555,0.0428,0.4232,0.0072,1.0771,,,,,,,recovery_denominator_tail_audit.csv
+overall,IC,test,All,F_close,531,104,427,0.1015,-0.0476,0.176,-1.0436,0.3795,0.3162,0.0047,,,,,recovery_denominator_tail_audit.csv
+overall,IC,test,All,F_TGD,531,104,427,0.5456,0.3708,0.7171,-0.3883,0.9117,0.0843,0.0398,,,,,recovery_denominator_tail_audit.csv
+overall,IC,test,All,Delta F,531,104,427,0.46,,,,,,,0.9157,0.0843,,,recovery_denominator_tail_audit.csv
+overall,dPL,test,All,D,531,71,460,0.131,0.0365,0.4005,0.0053,1.0723,,,,,,,recovery_denominator_tail_audit.csv
+overall,dPL,test,All,F_close,531,71,460,0.1019,0.0002,0.1701,-0.6274,0.3651,0.25,0.0022,,,,,recovery_denominator_tail_audit.csv
+overall,dPL,test,All,F_TGD,531,71,460,0.524,0.3608,0.6615,-0.0294,0.8693,0.0587,0.0065,,,,,recovery_denominator_tail_audit.csv
+overall,dPL,test,All,Delta F,531,71,460,0.4432,,,,,,,0.9283,0.0717,,,recovery_denominator_tail_audit.csv
+stratum,IC,test,S1,D validity,165,95,70,,,,,,,,,,57.58,91.35,invalid_denominator_strata_breakdown.csv
+stratum,IC,test,S2,D validity,156,8,148,,,,,,,,,,5.13,7.69,invalid_denominator_strata_breakdown.csv
+stratum,IC,test,S3,D validity,121,1,120,,,,,,,,,,0.83,0.96,invalid_denominator_strata_breakdown.csv
+stratum,IC,test,S4,D validity,34,0,34,,,,,,,,,,0.0,0.0,invalid_denominator_strata_breakdown.csv
+stratum,IC,test,S5,D validity,55,0,55,,,,,,,,,,0.0,0.0,invalid_denominator_strata_breakdown.csv
+stratum,dPL,test,S1,D validity,165,65,100,,,,,,,,,,39.39,91.55,invalid_denominator_strata_breakdown.csv
+stratum,dPL,test,S2,D validity,156,5,151,,,,,,,,,,3.21,7.04,invalid_denominator_strata_breakdown.csv
+stratum,dPL,test,S3,D validity,121,1,120,,,,,,,,,,0.83,1.41,invalid_denominator_strata_breakdown.csv
+stratum,dPL,test,S4,D validity,34,0,34,,,,,,,,,,0.0,0.0,invalid_denominator_strata_breakdown.csv
+stratum,dPL,test,S5,D validity,55,0,55,,,,,,,,,,0.0,0.0,invalid_denominator_strata_breakdown.csv

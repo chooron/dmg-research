@@ -50,13 +50,13 @@ def export_all():
             validate_subset=5,
         )
         
-        # Check and clean any NaNs defensively by replacing with finite boundary values
+        # Preserve non-finite states so invalid parameter rows remain auditable;
+        # never convert them into apparently valid zero-storage trajectories.
         for k, v in states.items():
-            if np.isnan(v).any():
-                print(f"Defensive cleanup of NaNs in state {k} for dPL seed {seed} ({np.isnan(v).sum()} NaNs)")
-                states[k] = np.nan_to_num(v, nan=0.0)
-        q_full = np.nan_to_num(q_full, nan=0.0)
-        
+            if not np.isfinite(v).all():
+                print(f"Non-finite values retained in state {k} for dPL seed {seed}", flush=True)
+        if not np.isfinite(q_full).all():
+            print(f"Non-finite discharge values retained for dPL seed {seed}", flush=True)
         export_dict = {
             "basin_ids": np.array(basin_ids),
             "dates": np.array([str(d) for d in bundle.dates]),
@@ -85,10 +85,10 @@ def export_all():
         validate_subset=5,
     )
     for k, v in states.items():
-        if np.isnan(v).any():
-            print(f"Defensive cleanup of NaNs in state {k} for IC ({np.isnan(v).sum()} NaNs)")
-            states[k] = np.nan_to_num(v, nan=0.0)
-    q_full = np.nan_to_num(q_full, nan=0.0)
+        if not np.isfinite(v).all():
+            print(f"Non-finite values retained in state {k} for IC", flush=True)
+    if not np.isfinite(q_full).all():
+        print("Non-finite discharge values retained for IC", flush=True)
     
     export_dict = {
         "basin_ids": np.array(basin_ids),

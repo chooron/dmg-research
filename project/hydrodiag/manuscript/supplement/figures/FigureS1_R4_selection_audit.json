@@ -1,0 +1,115 @@
+{
+  "selection_rule": "Deterministic outcome-independent external Snow-17 SWE tercile ranking (fixed ~33% and ~67% intra-tercile ranks)",
+  "evaluation_period": "1995-10-01 to 2010-09-30 (15 water years)",
+  "tercile_thresholds_mm": {
+    "low_tercile_max": 23.88,
+    "mid_tercile_max": 98.42
+  },
+  "eligibility_rule": "At least 10 snow-active days (SWE >= 5.0 mm) in snowiest water year",
+  "selected_example_basins": [
+    {
+      "group": "Low",
+      "basin_id": "02472000",
+      "mean_annual_peak_swe_mm": 2.82,
+      "selected_water_year": 1996,
+      "water_year_peak_swe_mm": 25.88
+    },
+    {
+      "group": "Low",
+      "basin_id": "07195800",
+      "mean_annual_peak_swe_mm": 13.27,
+      "selected_water_year": 2009,
+      "water_year_peak_swe_mm": 24.78
+    },
+    {
+      "group": "Middle",
+      "basin_id": "05495000",
+      "mean_annual_peak_swe_mm": 37.8,
+      "selected_water_year": 2008,
+      "water_year_peak_swe_mm": 75.06
+    },
+    {
+      "group": "Middle",
+      "basin_id": "03473000",
+      "mean_annual_peak_swe_mm": 61.18,
+      "selected_water_year": 1999,
+      "water_year_peak_swe_mm": 122.39
+    },
+    {
+      "group": "High",
+      "basin_id": "12167000",
+      "mean_annual_peak_swe_mm": 179.59,
+      "selected_water_year": 1997,
+      "water_year_peak_swe_mm": 511.34
+    },
+    {
+      "group": "High",
+      "basin_id": "08377900",
+      "mean_annual_peak_swe_mm": 511.52,
+      "selected_water_year": 2005,
+      "water_year_peak_swe_mm": 851.27
+    }
+  ],
+  "population_summaries": {
+    "Low": {
+      "total_basins": 177,
+      "eligible_basins": 88,
+      "delta_r_CN_Base": {
+        "median": -0.0116,
+        "ci_95": [
+          -0.0416,
+          0.0411
+        ],
+        "prop_positive": 0.477
+      },
+      "delta_r_TGD_Base": {
+        "median": 0.0111,
+        "ci_95": [
+          -0.0072,
+          0.0229
+        ],
+        "prop_positive": 0.545
+      }
+    },
+    "Middle": {
+      "total_basins": 177,
+      "eligible_basins": 177,
+      "delta_r_CN_Base": {
+        "median": 0.1303,
+        "ci_95": [
+          0.0896,
+          0.2268
+        ],
+        "prop_positive": 0.655
+      },
+      "delta_r_TGD_Base": {
+        "median": 0.011,
+        "ci_95": [
+          0.0022,
+          0.021
+        ],
+        "prop_positive": 0.621
+      }
+    },
+    "High": {
+      "total_basins": 177,
+      "eligible_basins": 177,
+      "delta_r_CN_Base": {
+        "median": 0.3451,
+        "ci_95": [
+          0.2718,
+          0.4421
+        ],
+        "prop_positive": 0.864
+      },
+      "delta_r_TGD_Base": {
+        "median": 0.1017,
+        "ci_95": [
+          0.0444,
+          0.1493
+        ],
+        "prop_positive": 0.684
+      }
+    }
+  }
+}

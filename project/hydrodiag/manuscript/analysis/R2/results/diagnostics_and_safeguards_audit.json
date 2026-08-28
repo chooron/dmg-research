@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "ic_restart_quality": {
+    "mean_base_kge_iqr": 0.027106557301040037,
+    "mean_cn_kge_iqr": 0.02395084701642402,
+    "all10_excess_median": 0.007462556745992055,
+    "top5_excess_median": 0.02066096998368483,
+    "top3_excess_median": 0.020309554821237807
+  },
+  "dpl_seed_stability": {
+    "max_across_seed_std": 0.0796205255098369,
+    "mean_across_seed_std": 0.03166933018216767
+  },
+  "boundary_safeguards_rows": 270
+}

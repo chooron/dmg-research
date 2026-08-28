@@ -1,0 +1,12 @@
+# Table 1: Structural Configurations and Diagnostic Roles
+
+| Property / Characteristic | Base | TGD | CN |
+| :--- | :---: | :---: | :---: |
+| Shared host parameters | 15 | 15 | 15 |
+| Calibrated parameters (shared + added) | 15 + 0 | 15 + 2 | 15 + 2 |
+| Temperature used by added structural component | No | Yes | Yes |
+| Additional generic temperature-conditioned storage / memory | No | Yes | No |
+| Explicit snow accumulation–melt sequence | No | No | Yes |
+| Primary diagnostic role | Snow-process omission configuration | Temperature-conditioned generic control | Explicit snow accumulation–melt representation |
+
+*Note*: Base represents the snow-process omission configuration lacking explicit snow dynamics (15 core host parameters). TGD is the parameter-count-matched, temperature-conditioned generic storage control that provides non-specific thermal retention/memory without snow physics (15 host + 2 temperature-smoothing/storage parameters: $\tau_{\mathrm{warm}}, \Delta\tau_{\mathrm{cold}}$). CN incorporates an explicit degree-day snow accumulation–melt sequence comprising precipitation phase partitioning, persistent snowpack storage, and temperature-threshold melt release (15 host + 2 snow parameters: snowpack thermal inertia coefficient $C_{\mathrm{TG}}$ and degree-day melt factor $K_f$). Matching the number of added parameters does not imply that TGD and CN encode the same structural information. TGD serves as a generic control rather than an intermediate step in a physical decomposition or an additive performance ladder. CN is the generating structure in the controlled synthetic experiment only; it is not treated as hydrological truth in real catchments. Independent calibration (IC-CMA-ES; catchment-wise independent optimization) and differentiable parameter learning (dPL-MLP; shared cross-catchment parameter mapping) represent contrasting parameter-estimation constraints evaluated in parallel, not competitive ranking benchmarks.

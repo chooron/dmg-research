@@ -51,8 +51,8 @@ def load_period(basin_ids: np.ndarray, config: dict, split: str, device: str | t
     # Attribute layout is project benchmark standard; area_gages2 index 11 in COMMON_ATTRIBUTES.
     area = attributes[index, 11].astype(np.float64)
     y *= (0.0283168 * 86400 * 1e3 / (area * 1e6))[:, None]
-    return (torch.as_tensor(np.transpose(x, (1, 0, 2)), dtype=torch.float32, device=device),
-            torch.as_tensor(y.T, dtype=torch.float32, device=device), attributes[index], index)
+    return (torch.as_tensor(np.transpose(x, (1, 0, 2)), dtype=torch.float64, device=device),
+            torch.as_tensor(y.T, dtype=torch.float64, device=device), attributes[index], index)
 
 
 def load_repeated_warmup_and_train(
@@ -62,9 +62,11 @@ def load_repeated_warmup_and_train(
 ) -> tuple[torch.Tensor, torch.Tensor, dict[str, int]]:
     """Return repeated warm-up forcing followed by train forcing and train-only targets.
 
-    The repeated forcing is deliberately excluded from the objective.  This
-    keeps the 1989--1998 calibration target fixed while allowing model states
-    to equilibrate from a deterministic 1980--1981 water-year cycle.
+
+    The repeated forcing is deliberately excluded from the objective.  The
+    training split may overlap the warm-up source for the explicit DPL-aligned
+    protocol; in that case the warm-up is still prepended as a state-equilibration
+    prefix and its targets remain excluded from the objective.
     """
     dcfg, wcfg = config["data"], config["warmup"]
     if wcfg.get("mode") != "repeat_forcing":
@@ -88,7 +90,7 @@ def load_repeated_warmup_and_train(
     repetitions = int(wcfg["repetitions"])
     if source_days != expected_source_days:
         raise ValueError(f"warm-up source has {source_days} days; expected {expected_source_days}")
-    if warm_right > train_left:
+    if warm_right > train_left and config.get("stage") != "dpl_aligned_full_production":
         raise ValueError("warm-up source overlaps the training selection period")
 
     warm_forcing = forcings[index, warm_left:warm_right, :3]
@@ -110,8 +112,8 @@ def load_repeated_warmup_and_train(
         "input_days": forcing.shape[1],
     }
     return (
-        torch.as_tensor(np.transpose(forcing, (1, 0, 2)), dtype=torch.float32, device=device),
-        torch.as_tensor(y.T, dtype=torch.float32, device=device),
+        torch.as_tensor(np.transpose(forcing, (1, 0, 2)), dtype=torch.float64, device=device),
+        torch.as_tensor(y.T, dtype=torch.float64, device=device),
         metadata,
     )
 
@@ -188,8 +190,8 @@ def load_warmup_and_period(
     area = attributes[index, 11].astype(np.float64)
     y *= (0.0283168 * 86400.0 * 1e3 / (area * 1e6))[:, None]
     return (
-        torch.as_tensor(forcing.transpose(1, 0, 2), dtype=torch.float32, device=device),
-        torch.as_tensor(y.T, dtype=torch.float32, device=device),
+        torch.as_tensor(forcing.transpose(1, 0, 2), dtype=torch.float64, device=device),
+        torch.as_tensor(y.T, dtype=torch.float64, device=device),
         source_days * repetitions,
     )
 
@@ -233,10 +235,10 @@ def frozen_parameters(model_dir: Path, generations: int, expected_starts: int) -
 
 def evaluate_period(model_name: str, latent: torch.Tensor, basin_ids: np.ndarray, config: dict, period: str, device: str, backend: str) -> np.ndarray:
     x, y, warmup_days = load_warmup_and_period(basin_ids, config, period, device)
-    model = build_model(model_name, device, warm_up=warmup_days, backend=backend)
+    model = build_model(model_name, device, warm_up=warmup_days, backend=backend, dtype=torch.float64)
     # HydrologyModel expects [basin, parameter, group]. One group is one
     # already-frozen best training start for each basin.
-    raw = torch.sigmoid(latent.to(device=device, dtype=torch.float64)).unsqueeze(-1).float()
+    raw = torch.sigmoid(latent.to(device=device, dtype=torch.float64)).unsqueeze(-1)
     with torch.inference_mode():
         q = model({"x_phy": x}, (None, raw))["streamflow"].reshape(-1, len(basin_ids), 1, 1)
         score, invalid = streaming_kge(q, y)

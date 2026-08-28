@@ -1,0 +1,11 @@
+{
+  "case_description": "Illustrative Q3 basin-year under external SWE conditioning",
+  "selection_rule": "Among Q3 basins and externally snow-active water years (annual SWE max >= 5 mm, at least 300 finite SWE days), minimize standardized distance from the joint median of annual SWE peak and basin SWE burden; tie-break by basin ID then water year. No model W_total threshold is used for inclusion.",
+  "condition_source": "r4_swe_reference_v1/swe_ensemble.npz::swe_median; external SWE only",
+  "q3_threshold_mm": 133.38849639892578,
+  "q3_basin_count": 133,
+  "selected_basin_id": "09306242",
+  "selected_water_year": 2004,
+  "selected_year_annual_swe_max_mm": 388.42608642578125,
+  "selected_basin_swe_burden_mm": 359.4067077636719
+}

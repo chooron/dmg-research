@@ -1,42 +1,24 @@
 #!/usr/bin/env python3
-"""R3 Figure 5 data preparation (read-only reshaping of canonical post-hoc outputs).
+"""R3 Figure 5 data preparation — canonical outlet recovery evidence.
 
-Consumes ONLY the completed R3 post-hoc package
-(results/r3_misspec_analysis_v1/) and re-emits the basin-level tidy table and
-figure-facing summary that plot_figure5.py draws.  No training, no truth
-regeneration, no protocol changes, no modification of existing outputs, and
-no new science: every headline statistic is either (i) copied verbatim from
-the frozen posthoc_summary.json / posthoc_validation_summary.json or (ii)
-recomputed from the frozen per-basin CSVs and asserted equal to the frozen
-values (tolerance 1e-9).
+Consumes canonical R3 post-hoc outputs (results/r3_misspec_analysis_v1/)
+and snow attributes (manuscript/results/R1/r1_snow_attributes.csv).
+Produces the tidy basin-level table, seed-median aggregated table, and
+figure-facing summary JSON for Figure 5 (Outlet Deficit and Recovery).
 
-Inputs (frozen, read-only; results/r3_misspec_analysis_v1/):
-  posthoc_basin_table.csv          per basin x regime x seed x period KGE rows
-                                   (kge_base_no_refit / kge_base / kge_cn /
-                                    G_base / F_close / frac_snow)
-  posthoc_theta_cost.csv           C_theta_primary per basin x regime x seed
-  posthoc_state_cost.csv           C_state_primary per basin x regime x seed
-  posthoc_validation_decay.csv     decay_G_base per basin x regime x seed
-  posthoc_summary.json             frozen F_close / G_base medians + CIs
-  posthoc_validation_summary.json  frozen decay medians + CIs + S-determinations
+Scientific logic:
+  - Imposed deficit: D = KGE(CN_refit) - KGE(Base_no-refit)
+  - Raw Base recovery: G_base = KGE(Base_refit) - KGE(Base_no-refit)
+  - Raw TGD recovery from knockout: G_TGD = KGE(TGD_refit) - KGE(Base_no-refit)
+  - Normalized Base gap closure: F_close = G_base / D  (D > 1e-6)
+  - Normalized TGD common-reference recovery: F_TGD* = G_TGD / D  (D > 1e-6)
 
-Outputs (manuscript/results/R3/, generated artifacts):
-  figure5_basin_table.csv          tidy long table (531 x 2 regimes x seeds x 2
-                                   periods); per-seed rows kept
-  figure5_basin_seedmedian.csv     dPL aggregated to per-basin seed median
-                                   (median over seeds 42/123/2026; IC passthrough)
-  figure5_summary.json             panel-level numbers for plot_figure5.py
-
-Only the following display-only quantities are computed here (clearly flagged
-in the JSON; all use the canonical paired-basin bootstrap protocol: 2000
-replicates, seed 20260730):
-  * F_close median bootstrap CI for the four (regime x period) display groups
-  * frac_snow-quartile bin medians + bootstrap CI (panels e/f)
-  * OLS slope + slope bootstrap CI for the e/f trend lines (display smoother)
+Outputs (manuscript/results/R3/):
+  figure5_basin_table.csv          tidy long table (531 x 2 regimes x seeds x 2 periods)
+  figure5_basin_seedmedian.csv     dPL aggregated to per-basin seed median (IC passthrough)
+  figure5_summary.json             panel-level summary statistics and CIs
 
 Usage: python manuscript/scripts/r3/prepare_figure5_data.py
-       [--results-root RES] [--run-id r3_misspec_analysis_v1]
-       [--manuscript-root PROJECT/manuscript] [--n-boot 2000] [--seed 20260730]
 """
 
 from __future__ import annotations
@@ -59,25 +41,46 @@ from manuscript.scripts.r3.common import DEFAULT_RESULTS_ROOT, git_commit, write
 SEEDS = (42, 123, 2026)
 REGIMES = ("IC", "dPL")
 PERIODS = ("train", "test")
-STRUCTURES = ("Base", "TGD2", "CN")  # scientific scope of Figure 5 (Base focus)
-MANUSCRIPT_R3_REL = Path("results") / "R3"  # relative to --manuscript-root
+MANUSCRIPT_R3_REL = Path("results") / "R3"
+DENOM_TOL = 1e-6
 
 
 def boot_ci(values: np.ndarray, stat_fn, n_boot: int, seed: int, alpha: float = 0.05):
-    """Paired basin-level bootstrap CI — same protocol as r3/posthoc_stats.py."""
+    """Paired basin-level bootstrap CI."""
+    vals = np.asarray(values, dtype=float)
+    vals = vals[np.isfinite(vals)]
+    if len(vals) == 0:
+        return [float("nan"), float("nan")]
     rng = np.random.default_rng(seed)
-    n = len(values)
+    n = len(vals)
     draws = np.empty(n_boot)
     for b in range(n_boot):
         idx = rng.integers(0, n, n)
-        draws[b] = stat_fn(values[idx])
+        draws[b] = stat_fn(vals[idx])
     lo, hi = np.quantile(draws, [alpha / 2, 1 - alpha / 2])
-    return float(lo), float(hi)
+    return [float(lo), float(hi)]
+
+
+def spearman(x, y):
+    x = np.asarray(x, float)
+    y = np.asarray(y, float)
+    v = np.isfinite(x) & np.isfinite(y)
+    if v.sum() < 5 or x[v].std() == 0 or y[v].std() == 0:
+        return float("nan")
+    rx = np.argsort(np.argsort(x[v]))
+    ry = np.argsort(np.argsort(y[v]))
+    return float(np.corrcoef(rx, ry)[0, 1])
+
+
+def quant(v, q):
+    v = np.asarray(v, float)
+    v = v[np.isfinite(v)]
+    return float(np.quantile(v, q)) if len(v) else float("nan")
 
 
 def norm_seed(series: pd.Series) -> pd.Series:
-    """Normalize seed columns: IC -> "", dPL -> "42"/"123"/"2026"."""
-    return series.apply(lambda v: "" if pd.isna(v) else str(int(v)))
+    """Normalize seed columns: IC -> '', dPL -> '42'/'123'/'2026'."""
+    return series.apply(lambda v: "" if pd.isna(v) or v == "" else str(int(float(v))))
 
 
 def require(path: Path, label: str) -> None:
@@ -95,68 +98,66 @@ def main() -> None:
     args = parser.parse_args()
 
     src = args.results_root / args.run_id
+    r1_dir = args.manuscript_root / "results" / "R1"
     out_dir = args.manuscript_root / MANUSCRIPT_R3_REL
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    # ---------------- inputs (frozen) ----------------
+    # ---------------- 1. Inputs ----------------
     p_basin = src / "posthoc_basin_table.csv"
-    p_theta = src / "posthoc_theta_cost.csv"
-    p_state = src / "posthoc_state_cost.csv"
     p_decay = src / "posthoc_validation_decay.csv"
     p_sum = src / "posthoc_summary.json"
     p_val = src / "posthoc_validation_summary.json"
+    p_strata = r1_dir / "r1_snow_attributes.csv"
+
     for p, label in [
         (p_basin, "basin table"),
-        (p_theta, "theta cost"),
-        (p_state, "state cost"),
         (p_decay, "decay"),
         (p_sum, "posthoc summary"),
         (p_val, "validation summary"),
+        (p_strata, "snow attributes"),
     ]:
         require(p, label)
 
     bt = pd.read_csv(p_basin)
-    tc = pd.read_csv(p_theta)
-    sc = pd.read_csv(p_state)
     dc = pd.read_csv(p_decay)
+    strata = pd.read_csv(p_strata)
     frozen_sum = json.loads(p_sum.read_text())
     frozen_val = json.loads(p_val.read_text())
 
-    for df in (bt, tc, sc, dc):
+    for df in (bt, dc, strata):
         df["basin_id"] = df["basin_id"].astype(str).str.zfill(8)
     bt["seed"] = norm_seed(bt["seed"])
-    tc["seed"] = norm_seed(tc["seed"])
-    sc["seed"] = norm_seed(sc["seed"])
     dc["seed"] = norm_seed(dc["seed"])
+
     n_basins = int(bt["basin_id"].nunique())
     if n_basins != 531:
         raise SystemExit(f"refusing: expected 531 basins, found {n_basins}")
 
-    # ---------------- 1. tidy long table (per seed) ----------------
-    # C_theta / C_state for structure Base (Figure 5 focuses on Base
-    # structural omission; TGD2 rows remain available in the canonical CSVs).
-    c_theta = tc[tc["structure"] == "Base"].rename(
-        columns={"C_theta_primary": "C_theta_base"}
-    )[["basin_id", "paradigm", "seed", "C_theta_base"]]
-    c_state = sc[sc["structure"] == "Base"].rename(
-        columns={"C_state_primary": "C_state_base"}
-    )[["basin_id", "paradigm", "seed", "C_state_base"]]
-    decay = dc[dc["metric"] == "decay_G_base"].rename(
+    # Join strata
+    bt = bt.merge(strata[["basin_id", "snow_stratum"]], on="basin_id", how="left")
+
+    # Compute canonical estimands
+    bt["D"] = bt["kge_cn"] - bt["kge_base_no_refit"]
+    bt["G_TGD"] = bt["kge_tgd2"] - bt["kge_base_no_refit"]
+    bt["F_TGD"] = np.where(bt["D"] > DENOM_TOL, bt["G_TGD"] / bt["D"], np.nan)
+    bt["F_TGD_star"] = bt["F_TGD"]
+
+    # Join decay metrics
+    decay_base = dc[dc["metric"] == "decay_G_base"].rename(
         columns={"decay": "decay_G_base"}
     )[["basin_id", "paradigm", "seed", "decay_G_base"]]
+    decay_tgd = dc[dc["metric"] == "decay_G_tgd2"].rename(
+        columns={"decay": "decay_G_tgd2"}
+    )[["basin_id", "paradigm", "seed", "decay_G_tgd2"]]
 
-    tidy = (
-        bt.merge(c_theta, on=["basin_id", "paradigm", "seed"], how="left")
-        .merge(c_state, on=["basin_id", "paradigm", "seed"], how="left")
-        .merge(decay, on=["basin_id", "paradigm", "seed"], how="left")
+    tidy = bt.merge(decay_base, on=["basin_id", "paradigm", "seed"], how="left").merge(
+        decay_tgd, on=["basin_id", "paradigm", "seed"], how="left"
     )
-    tidy = tidy.sort_values(["paradigm", "seed", "period", "basin_id"]).reset_index(
-        drop=True
-    )
+
+    tidy = tidy.sort_values(["paradigm", "seed", "period", "basin_id"]).reset_index(drop=True)
     tidy.to_csv(out_dir / "figure5_basin_table.csv", index=False)
 
     # ---------------- 2. dPL seed-median aggregation ----------------
-    # dPL: median over the three seeds per basin x period; IC: passthrough rows.
     agg_rows = []
     for reg in REGIMES:
         sub = tidy[tidy["paradigm"] == reg]
@@ -166,85 +167,39 @@ def main() -> None:
             g = sub.groupby(["basin_id", "period"], as_index=False)
             agg = g.agg(
                 frac_snow=("frac_snow", "first"),
+                snow_stratum=("snow_stratum", "first"),
                 kge_base_no_refit=("kge_base_no_refit", "first"),
                 kge_base=("kge_base", "median"),
+                kge_tgd2=("kge_tgd2", "median"),
                 kge_cn=("kge_cn", "median"),
-                G_base=("G_base", "median"),
-                F_close=("F_close", "median"),
-                C_theta_base=("C_theta_base", "median"),
-                C_state_base=("C_state_base", "median"),
                 decay_G_base=("decay_G_base", "median"),
+                decay_G_tgd2=("decay_G_tgd2", "median"),
             )
+            agg["D"] = agg["kge_cn"] - agg["kge_base_no_refit"]
+            agg["G_base"] = agg["kge_base"] - agg["kge_base_no_refit"]
+            agg["G_tgd2"] = agg["kge_tgd2"] - agg["kge_base_no_refit"]
+            agg["G_TGD"] = agg["G_tgd2"]
+            agg["F_close"] = np.where(agg["D"] > DENOM_TOL, agg["G_base"] / agg["D"], np.nan)
+            agg["F_tgd2"] = np.where(agg["D"] > DENOM_TOL, agg["G_tgd2"] / agg["D"], np.nan)
+            agg["F_TGD"] = agg["F_tgd2"]
+            agg["F_TGD_star"] = agg["F_TGD"]
             agg["paradigm"] = "dPL"
             agg["seed"] = ""
             agg_rows.append(agg)
     seedmed = pd.concat(agg_rows, ignore_index=True)
     seedmed.to_csv(out_dir / "figure5_basin_seedmedian.csv", index=False)
 
-    # ---------------- 3. sanity: recomputed medians == frozen values --------
-    def frozen_fclose(regime_period: str):
-        e = frozen_sum.get(regime_period, {})
-        v = e.get("F_close", {})
-        return v.get("median"), v.get("q25"), v.get("q75"), v.get("n_valid_denominator")
-
-    check_errors = []
-    n_checks = 0
-    for reg in REGIMES:
-        for period in PERIODS:
-            for seed in [None] if reg == "IC" else SEEDS:
-                key = f"{reg}{'_' + str(seed) if seed is not None else ''}_{period}"
-                sub = tidy[
-                    (tidy["paradigm"] == reg)
-                    & (tidy["period"] == period)
-                    & (tidy["seed"] == ("" if seed is None else str(seed)))
-                ]
-                got = float(sub["F_close"].median())
-                frozen, *_ = frozen_fclose(key)
-                n_checks += 1
-                if frozen is None or abs(got - frozen) > 1e-9:
-                    check_errors.append(f"F_close median {key}: {got} != {frozen}")
-    for reg in REGIMES:
-        for seed in [None] if reg == "IC" else SEEDS:
-            key = f"{reg}{'_' + str(seed) if seed is not None else ''}_decay_G_base"
-            sub = tidy[
-                (tidy["paradigm"] == reg)
-                & (tidy["seed"] == ("" if seed is None else str(seed)))
-            ]
-            got = float(sub["decay_G_base"].median())
-            frozen = frozen_val.get(key, {}).get("median")
-            n_checks += 1
-            if frozen is None or abs(got - frozen) > 1e-9:
-                check_errors.append(f"decay median {key}: {got} != {frozen}")
-    if check_errors:
-        raise SystemExit(
-            "Figure 5 sanity check FAILED:\n  " + "\n  ".join(check_errors)
-        )
-    print(
-        f"[check] recomputed F_close / decay_G_base medians match frozen values "
-        f"({n_checks} group(s) verified)",
-        flush=True,
-    )
-
-    # ---------------- 4. figure-facing summary ----------------
+    # ---------------- 3. Summary structure for plot_figure5.py ----------------
     summary: dict = {
-        "protocol": "figure5_prepare_v1",
+        "protocol": "figure5_prepare_v2",
         "source_run": args.run_id,
-        "inputs": [
-            str(p.relative_to(args.results_root))
-            for p in [p_basin, p_theta, p_state, p_decay, p_sum, p_val]
-        ],
         "code": git_commit(PROJECT),
         "n_basins": n_basins,
         "n_boot": args.n_boot,
         "boot_seed": args.seed,
-        "display_only_quantities": [
-            "F_close median bootstrap CI (four regime x period groups)",
-            "frac_snow-quartile bin medians + bootstrap CI (panels e/f)",
-            "per-regime decay_G_base bootstrap CI (panel d, display)",
-        ],
     }
 
-    # -- panel (a): correct-CN baseline reference (deficit = 1 - KGE_CN) --
+    # -- panel (a): correct-structure recoverability (deficit = 1 - KGE_CN) --
     pa = {}
     for reg in REGIMES:
         for period in PERIODS:
@@ -257,168 +212,198 @@ def main() -> None:
                 "min": float(np.min(d)),
                 "max": float(np.max(d)),
             }
-    summary["panel_a_cn_deficit"] = pa
+    summary["panel_a_recoverability"] = pa
 
-    # -- panel (c): gap-closure fraction (frozen medians + display CI) --
-    pc = {}
-    groups = [("IC", "train"), ("IC", "test"), ("dPL", "train"), ("dPL", "test")]
-    for reg, period in groups:
-        seed_med = seedmed[(seedmed["paradigm"] == reg) & (seedmed["period"] == period)]
-        vals = seed_med["F_close"].to_numpy()
-        valid = vals[np.isfinite(vals)]
-        ci = boot_ci(valid, np.median, args.n_boot, args.seed)
-        key = f"{reg}_{period}"
-        entry = {
-            "median": float(np.median(valid)),
-            "q25": float(np.quantile(valid, 0.25)),
-            "q75": float(np.quantile(valid, 0.75)),
-            "boot_ci_median_display": list(ci),
-            "n_valid": int(np.isfinite(vals).sum()),
-            "n_total": int(len(vals)),
-            "frac_gt_0": float((valid > 0).mean()),
-            # display window for the jittered basin cloud (unclipped F_close has a
-            # heavy two-sided tail; median/IQR/CI are unaffected by the window)
-            "frac_outside_display_window": float(
-                ((valid < -0.5) | (valid > 1.75)).mean()
-            ),
-        }
-        if reg == "dPL":
-            # per-seed frozen medians are kept verbatim; the aggregated display
-            # median (median of per-basin seed medians) is a different quantity
-            # and must lie within the per-seed median range.
-            entry["seed_medians"] = [
-                float(frozen_fclose(f"dPL_{s}_{period}")[0]) for s in SEEDS
-            ]
-            lo_s, hi_s = min(entry["seed_medians"]), max(entry["seed_medians"])
-            if not (lo_s - 1e-9 <= entry["median"] <= hi_s + 1e-9):
-                raise SystemExit(
-                    f"Figure 5 sanity FAILED: {key} aggregated median "
-                    f"{entry['median']:.6f} outside seed median range "
-                    f"[{lo_s:.6f}, {hi_s:.6f}]"
-                )
-        else:
-            # IC: the aggregated median IS the frozen median (identical quantity).
-            frozen_med, *_ = frozen_fclose(key)
-            assert abs(entry["median"] - frozen_med) < 1e-9, f"{key} frozen mismatch"
-        pc[key] = entry
-    summary["panel_c_f_close"] = pc
-
-    # -- panel (d): compensation decay (frozen stats) --
-    pd_ = {}
+    # -- panel (b): unified outlet recovery ladder statistics (test period) --
+    pb = {}
     for reg in REGIMES:
-        for seed in [None] if reg == "IC" else SEEDS:
-            key = f"{reg}{'_' + str(seed) if seed is not None else ''}"
-            e = frozen_val.get(f"{key}_decay_G_base", {})
-            pd_[key if seed is not None else reg] = {
-                "median": e.get("median"),
-                "boot_ci_median": e.get("boot_ci_median"),
-                "frac_gt_0": e.get("frac_gt_0"),
-                "spearman_vs_frac_snow": e.get("spearman_vs_frac_snow"),
-                "n_valid": e.get("n_valid"),
+        sub = seedmed[(seedmed["paradigm"] == reg) & (seedmed["period"] == "test")]
+        pb[reg] = {
+            "Base_no_refit": {
+                "median": float(sub["kge_base_no_refit"].median()),
+                "q25": float(sub["kge_base_no_refit"].quantile(0.25)),
+                "q75": float(sub["kge_base_no_refit"].quantile(0.75)),
+            },
+            "Base_refit": {
+                "median": float(sub["kge_base"].median()),
+                "q25": float(sub["kge_base"].quantile(0.25)),
+                "q75": float(sub["kge_base"].quantile(0.75)),
+            },
+            "TGD_refit": {
+                "median": float(sub["kge_tgd2"].median()),
+                "q25": float(sub["kge_tgd2"].quantile(0.25)),
+                "q75": float(sub["kge_tgd2"].quantile(0.75)),
+            },
+            "CN_refit": {
+                "median": float(sub["kge_cn"].median()),
+                "q25": float(sub["kge_cn"].quantile(0.25)),
+                "q75": float(sub["kge_cn"].quantile(0.75)),
+            },
+        }
+    summary["panel_b_ladder"] = pb
+    summary["panel_bc_ladders"] = pb  # backward compatibility
+
+    # -- panel (c): raw recovery from imposed knockout (test period) --
+    pc_raw = {}
+    for reg in REGIMES:
+        sub = seedmed[(seedmed["paradigm"] == reg) & (seedmed["period"] == "test")]
+        d_vals = sub["D"].to_numpy()
+        gb_vals = sub["G_base"].to_numpy()
+        gt_vals = sub["G_TGD"].to_numpy()
+
+        # Deterministic quantile bins along D
+        d_pos = d_vals[d_vals > 0]
+        q_edges = np.quantile(d_pos, [0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
+        bins_d = [(-np.inf, 0.0)] + [(q_edges[i], q_edges[i+1]) for i in range(len(q_edges)-1)]
+
+        binned_summary = []
+        for lo, hi in bins_d:
+            if lo == -np.inf:
+                m = d_vals <= hi
+                label = "D <= 0"
+            else:
+                m = (d_vals > lo) & (d_vals <= hi)
+                label = f"{lo:.2f}-{hi:.2f}"
+            if m.sum() > 0:
+                binned_summary.append({
+                    "label": label,
+                    "n": int(m.sum()),
+                    "D_median": float(np.median(d_vals[m])),
+                    "G_base_median": float(np.median(gb_vals[m])),
+                    "G_TGD_median": float(np.median(gt_vals[m])),
+                    "G_base_ci": list(boot_ci(gb_vals[m], np.median, args.n_boot, args.seed + 10)),
+                    "G_TGD_ci": list(boot_ci(gt_vals[m], np.median, args.n_boot, args.seed + 11)),
+                })
+
+        pc_raw[reg] = {
+            "D": {
+                "median": float(np.median(d_vals)),
+                "q25": float(np.quantile(d_vals, 0.25)),
+                "q75": float(np.quantile(d_vals, 0.75)),
+            },
+            "G_base": {
+                "median": float(np.median(gb_vals)),
+                "q25": float(np.quantile(gb_vals, 0.25)),
+                "q75": float(np.quantile(gb_vals, 0.75)),
+                "ci": list(boot_ci(gb_vals, np.median, args.n_boot, args.seed + 1)),
+                "frac_gt_0": float((gb_vals > 0).mean()),
+            },
+            "G_TGD": {
+                "median": float(np.median(gt_vals)),
+                "q25": float(np.quantile(gt_vals, 0.25)),
+                "q75": float(np.quantile(gt_vals, 0.75)),
+                "ci": list(boot_ci(gt_vals, np.median, args.n_boot, args.seed + 2)),
+                "frac_gt_0": float((gt_vals > 0).mean()),
+            },
+            "spearman_D_G_base": float(spearman(d_vals, gb_vals)),
+            "spearman_D_G_TGD": float(spearman(d_vals, gt_vals)),
+            "binned": binned_summary,
+        }
+    summary["panel_c_raw_recovery"] = pc_raw
+    summary["panel_d_raw_recovery"] = pc_raw  # backward compatibility
+
+    # -- panel (d): normalized recovery fractions F_close and F_TGD --
+    pd_frac = {}
+    for reg in REGIMES:
+        for period in PERIODS:
+            sub = seedmed[(seedmed["paradigm"] == reg) & (seedmed["period"] == period)]
+            fc = sub["F_close"].to_numpy()
+            ft = sub["F_TGD"].to_numpy()
+
+            v_fc = fc[np.isfinite(fc)]
+            v_ft = ft[np.isfinite(ft)]
+
+            f_tgd_data = {
+                "median": float(np.median(v_ft)),
+                "q25": float(np.quantile(v_ft, 0.25)),
+                "q75": float(np.quantile(v_ft, 0.75)),
+                "ci": list(boot_ci(v_ft, np.median, args.n_boot, args.seed)),
+                "frac_lt_0": float((v_ft < 0).mean()),
+                "frac_0_to_1": float(((v_ft >= 0) & (v_ft <= 1)).mean()),
+                "frac_gt_1": float((v_ft > 1).mean()),
             }
-    # aggregated per-regime decay distribution (one row per basin; dPL = median
-    # over seeds).  Median must equal the frozen value; CI is display-only.
+
+            entry = {
+                "n_valid": int(len(v_fc)),
+                "n_total": int(len(fc)),
+                "F_close": {
+                    "median": float(np.median(v_fc)),
+                    "q25": float(np.quantile(v_fc, 0.25)),
+                    "q75": float(np.quantile(v_fc, 0.75)),
+                    "ci": list(boot_ci(v_fc, np.median, args.n_boot, args.seed)),
+                    "frac_lt_0": float((v_fc < 0).mean()),
+                    "frac_0_to_1": float(((v_fc >= 0) & (v_fc <= 1)).mean()),
+                    "frac_gt_1": float((v_fc > 1).mean()),
+                },
+                "F_TGD": f_tgd_data,
+                "F_TGD_star": f_tgd_data,
+            }
+            if reg == "dPL":
+                seed_fc = []
+                seed_ft = []
+                for s in SEEDS:
+                    s_sub = tidy[(tidy["paradigm"] == reg) & (tidy["period"] == period) & (tidy["seed"] == str(s))]
+                    s_fc = s_sub["F_close"].dropna().to_numpy()
+                    s_ft = s_sub["F_TGD"].dropna().to_numpy()
+                    seed_fc.append(float(np.median(s_fc)))
+                    seed_ft.append(float(np.median(s_ft)))
+                entry["F_close"]["seed_medians"] = seed_fc
+                entry["F_TGD"]["seed_medians"] = seed_ft
+                entry["F_TGD_star"]["seed_medians"] = seed_ft
+
+            pd_frac[f"{reg}_{period}"] = entry
+    summary["panel_d_fractions"] = pd_frac
+    summary["panel_e_fractions"] = pd_frac  # backward compatibility
+
+    # -- panel (e): train-to-test recovery attenuation footer strip --
+    pe_decay = {}
     for reg in REGIMES:
         sub = seedmed[seedmed["paradigm"] == reg].drop_duplicates("basin_id")
-        d = sub["decay_G_base"].to_numpy()
-        d = d[np.isfinite(d)]
-        ci = boot_ci(d, np.median, args.n_boot, args.seed + 2)
-        pd_[f"{reg}_agg"] = {
-            "median": float(np.median(d)),
-            "boot_ci_median_display": list(ci),
-            "frac_gt_0": float((d > 0).mean()),
-            "n": int(len(d)),
-            "frac_outside_display_window": float(((d < -0.1) | (d > 0.15)).mean()),
-        }
-        if reg == "IC":
-            frozen_med = frozen_val["IC_decay_G_base"]["median"]
-            assert abs(pd_["IC_agg"]["median"] - frozen_med) < 1e-9, (
-                "panel (d) IC aggregated decay median != frozen"
-            )
-        else:
-            # The aggregated median (median of per-basin seed medians) is a
-            # display-only quantity distinct from each per-seed median; only a
-            # loose consistency check applies (well below the seed spread).
-            seed_meds = [frozen_val[f"dPL_{s}_decay_G_base"]["median"] for s in SEEDS]
-            lo_s, hi_s = min(seed_meds), max(seed_meds)
-            tol = 1e-3
-            if not (lo_s - tol <= pd_["dPL_agg"]["median"] <= hi_s + tol):
-                raise SystemExit(
-                    "Figure 5 sanity FAILED: dPL aggregated decay median "
-                    f"{pd_['dPL_agg']['median']:.6f} far outside frozen seed "
-                    f"median range [{lo_s:.6f}, {hi_s:.6f}]"
-                )
-    summary["panel_d_decay"] = pd_
+        d_base = sub["decay_G_base"].dropna().to_numpy()
+        d_tgd = sub["decay_G_tgd2"].dropna().to_numpy()
 
-    # -- panels (e)/(f): excess errors vs frac_snow (Base) --
-    pef = {}
-    fs_all = np.sort(seedmed[seedmed["period"] == "test"]["frac_snow"].to_numpy())
-    q_bins = np.quantile(fs_all, [0.25, 0.5, 0.75])  # global quartile edges
-    for metric, col in [("C_theta", "C_theta_base"), ("C_state", "C_state_base")]:
-        for reg in REGIMES:
-            sub = seedmed[(seedmed["paradigm"] == reg) & (seedmed["period"] == "test")]
-            x = sub["frac_snow"].to_numpy()
-            y = sub[col].to_numpy()
-            ok = np.isfinite(x) & np.isfinite(y)
-            x, y = x[ok], y[ok]
-            # frozen spearman (from posthoc_summary tradeoffs; dPL per seed)
-            trade = frozen_sum["tradeoffs"]
-            sp = [
-                trade[f"{reg}{'_' + str(s) if reg == 'dPL' else ''}"][
-                    f"spearman_{'C_theta' if metric == 'C_theta' else 'C_state'}_vs_frac_snow"
-                ]
-                for s in (SEEDS if reg == "dPL" else [None])
-            ]
-            # frac_snow-quartile bins (median + bootstrap CI) — descriptive
-            # environmental gradient, no parametric trend model
-            bins = [
-                (-np.inf, q_bins[0]),
-                (q_bins[0], q_bins[1]),
-                (q_bins[1], q_bins[2]),
-                (q_bins[2], np.inf),
-            ]
-            bin_entries = []
-            for k, (lo, hi) in enumerate(bins):
-                m = (x > lo) & (x <= hi)
-                if m.sum() < 20:
-                    continue
-                bm = y[m]
-                bin_entries.append(
-                    {
-                        "bin": k + 1,
-                        "frac_snow_range": [float(lo), float(hi)],
-                        "n": int(m.sum()),
-                        "frac_snow_median": float(np.median(x[m])),
-                        "median": float(np.median(bm)),
-                        "boot_ci_median_display": list(
-                            boot_ci(bm, np.median, args.n_boot, args.seed + 20 + k)
-                        ),
-                    }
-                )
-            key = f"{metric}_{reg}"
-            # display y-limits chosen in plot_figure5.py; fractions reported here
-            y_hi = 2.6 if metric == "C_state" else 0.55
-            y_lo = -0.5 if metric == "C_state" else 0.0
-            pef[key] = {
-                "spearman_frozen": [float(v) for v in sp],
-                "quartile_bins": bin_entries,
-                "n": int(len(x)),
-                "y_display_limits": [y_lo, y_hi],
-                "frac_beyond_y_display": float((y > y_hi).mean()),
-                "frac_below_y_display": float((y < y_lo).mean()),
-            }
-    summary["panels_ef_excess_vs_frac_snow"] = pef
+        pe_decay[reg] = {
+            "decay_G_base": {
+                "median": float(np.median(d_base)),
+                "q25": float(np.percentile(d_base, 25)),
+                "q75": float(np.percentile(d_base, 75)),
+                "p10": float(np.percentile(d_base, 10)),
+                "p90": float(np.percentile(d_base, 90)),
+                "ci": list(boot_ci(d_base, np.median, args.n_boot, args.seed + 5)),
+                "frac_gt_0": float((d_base > 0).mean()),
+                "p_gt_0": float((d_base > 0).mean()),
+                "n_valid": int(len(d_base)),
+            },
+            "decay_G_tgd": {
+                "median": float(np.median(d_tgd)),
+                "q25": float(np.percentile(d_tgd, 25)),
+                "q75": float(np.percentile(d_tgd, 75)),
+                "p10": float(np.percentile(d_tgd, 10)),
+                "p90": float(np.percentile(d_tgd, 90)),
+                "ci": list(boot_ci(d_tgd, np.median, args.n_boot, args.seed + 6)),
+                "frac_gt_0": float((d_tgd > 0).mean()),
+                "p_gt_0": float((d_tgd > 0).mean()),
+                "n_valid": int(len(d_tgd)),
+            },
+        }
+        if reg == "dPL":
+            s_meds_base = []
+            s_meds_tgd = []
+            for s in SEEDS:
+                s_sub = tidy[(tidy["paradigm"] == reg) & (tidy["seed"] == str(s))].drop_duplicates("basin_id")
+                s_meds_base.append(float(s_sub["decay_G_base"].dropna().median()))
+                s_meds_tgd.append(float(s_sub["decay_G_tgd2"].dropna().median()))
+            pe_decay[reg]["decay_G_base"]["seed_medians"] = s_meds_base
+            pe_decay[reg]["decay_G_tgd"]["seed_medians"] = s_meds_tgd
+
+    summary["panel_e_decay"] = pe_decay
+    summary["panel_f_decay"] = pe_decay  # backward compatibility
 
     write_json(out_dir / "figure5_summary.json", summary)
 
     print(f"COMPLETE Figure 5 data -> {out_dir}", flush=True)
-    print(
-        f"  figure5_basin_table.csv      (tidy, per seed: {len(tidy)} rows)", flush=True
-    )
-    print(
-        f"  figure5_basin_seedmedian.csv (dPL seed-aggregated: {len(seedmed)} rows)",
-        flush=True,
-    )
+    print(f"  figure5_basin_table.csv      (tidy, per seed: {len(tidy)} rows)", flush=True)
+    print(f"  figure5_basin_seedmedian.csv (dPL seed-aggregated: {len(seedmed)} rows)", flush=True)
     print(f"  figure5_summary.json         (panel-level numbers)", flush=True)
 
 

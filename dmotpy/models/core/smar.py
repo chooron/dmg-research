@@ -120,7 +120,7 @@ def smar_step(
     # --- 3. Soil layers evap + overflow chain ---
     flux_e1 = evap_13(
         c_evap,
-        torch.tensor(0.0, device=P.device),
+        torch.tensor(0.0, device=P.device, dtype=P.dtype),
         flux_estar,
         S1,
         nearzero=nearzero,
@@ -132,11 +132,11 @@ def smar_step(
 
     flux_e2 = evap_14(
         c_evap,
-        torch.tensor(1.0, device=P.device),
+        torch.tensor(1.0, device=P.device, dtype=P.dtype),
         flux_estar,
         S2,
         S1,
-        torch.tensor(0.1, device=P.device),
+        torch.tensor(0.1, device=P.device, dtype=P.dtype),
         nearzero=nearzero,
     )
     flux_e2 = torch.minimum(flux_e2, S2 - nearzero)
@@ -146,11 +146,11 @@ def smar_step(
 
     flux_e3 = evap_14(
         c_evap,
-        torch.tensor(2.0, device=P.device),
+        torch.tensor(2.0, device=P.device, dtype=P.dtype),
         flux_estar,
         S3,
         S2,
-        torch.tensor(0.1, device=P.device),
+        torch.tensor(0.1, device=P.device, dtype=P.dtype),
         nearzero=nearzero,
     )
     flux_e3 = torch.minimum(flux_e3, S3 - nearzero)
@@ -160,11 +160,11 @@ def smar_step(
 
     flux_e4 = evap_14(
         c_evap,
-        torch.tensor(3.0, device=P.device),
+        torch.tensor(3.0, device=P.device, dtype=P.dtype),
         flux_estar,
         S4,
         S3,
-        torch.tensor(0.1, device=P.device),
+        torch.tensor(0.1, device=P.device, dtype=P.dtype),
         nearzero=nearzero,
     )
     flux_e4 = torch.minimum(flux_e4, S4 - nearzero)
@@ -174,11 +174,11 @@ def smar_step(
 
     flux_e5 = evap_14(
         c_evap,
-        torch.tensor(4.0, device=P.device),
+        torch.tensor(4.0, device=P.device, dtype=P.dtype),
         flux_estar,
         S5,
         S4,
-        torch.tensor(0.1, device=P.device),
+        torch.tensor(0.1, device=P.device, dtype=P.dtype),
         nearzero=nearzero,
     )
     flux_e5 = torch.minimum(flux_e5, S5 - nearzero)

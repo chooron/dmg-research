@@ -1,0 +1,57 @@
+{
+  "status": "PASS",
+  "total_rows": 310635,
+  "expected_rows": 310635,
+  "ic_audit": {
+    "Base": {
+      "total_files": 5310,
+      "complete_basins": 531,
+      "starts_per_basin": 10
+    },
+    "CN": {
+      "total_files": 5310,
+      "complete_basins": 531,
+      "starts_per_basin": 10
+    },
+    "TGD": {
+      "total_files": 5310,
+      "complete_basins": 531,
+      "starts_per_basin": 10
+    }
+  },
+  "dpl_audit": {
+    "Base": {
+      "seeds": [
+        42,
+        123,
+        2026
+      ]
+    },
+    "CN": {
+      "seeds": [
+        42,
+        123,
+        2026
+      ]
+    },
+    "TGD": {
+      "seeds": [
+        42,
+        123,
+        2026
+      ]
+    }
+  },
+  "total_basins": 531,
+  "structures": [
+    "Base",
+    "CN",
+    "TGD"
+  ],
+  "paradigms": [
+    "IC",
+    "dPL"
+  ],
+  "parameters_count": 15,
+  "output_file": "/home/jingxin/code/dmg-research/project/hydrodiag/manuscript/analysis/R2/results/raw_parameter_ledger.csv"
+}

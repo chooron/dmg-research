@@ -1,0 +1,7 @@
+paradigm,period,metric,variable_x,variable_y,n_basins,spearman_rho,ci_low,ci_high,bootstrap_draws,seed,description
+IC-CMA-ES,test,delta_absCT_Base_CN,frac_snow,delta_absCT_Base_CN,531,0.545501631884666,0.462544218272187,0.6183609106878083,1000,20309753,Spearman rank correlation between frac_snow and delta_absCT_Base_CN
+IC-CMA-ES,test,delta_KGE_Base_CN,frac_snow,delta_KGE_Base_CN,531,0.7012021432567278,0.63683133473864,0.7565811862336522,1000,20315838,Spearman rank correlation between frac_snow and delta_KGE_Base_CN
+IC-CMA-ES,test,delta_absCT_TGD_CN,frac_snow,delta_absCT_TGD_CN,531,0.2204879028442273,0.1327520268947993,0.30500634608794525,1000,20351116,Spearman rank correlation between frac_snow and delta_absCT_TGD_CN
+dPL-MLP,test,delta_absCT_Base_CN,frac_snow,delta_absCT_Base_CN,531,0.4593943152075206,0.37169366272820503,0.5442824173489446,1000,20350861,Spearman rank correlation between frac_snow and delta_absCT_Base_CN
+dPL-MLP,test,delta_KGE_Base_CN,frac_snow,delta_KGE_Base_CN,531,0.6662160138938189,0.5977871886879845,0.724846931721568,1000,20350736,Spearman rank correlation between frac_snow and delta_KGE_Base_CN
+dPL-MLP,test,delta_absCT_TGD_CN,frac_snow,delta_absCT_TGD_CN,531,0.2000753388713837,0.10789227011545666,0.2936097320437886,1000,20286844,Spearman rank correlation between frac_snow and delta_absCT_TGD_CN

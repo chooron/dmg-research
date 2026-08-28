@@ -6,39 +6,101 @@ Provides fixed visual grammar, model color palettes, typography, and axes stylin
 import matplotlib.font_manager as fm
 import matplotlib.pyplot as plt
 
-# 3.1 Categorical model palette (Tol vibrant + neutral grey for HBV)
-# Canonical structure palette shared by every manuscript figure.
-# TGD2 is the matched generic temperature-memory control. The legacy key
-# ``TGD`` remains as a compatibility alias only; plotting code must not use it
-# to relabel legacy inputs as TGD2.
+# 3.1 Nature Research Figure Guide / Wong (2011) / Okabe-Ito Colorblind-Safe Palette
+# Base = Vermillion / deep orange, TGD = Bluish green / teal, CN = Blue
+COLOR_BASE = "#D55E00"           # Okabe-Ito vermillion / deep orange; omitted-process baseline
+COLOR_TGD = "#009E73"            # Okabe-Ito bluish green / teal; matched generic control
+COLOR_CN = "#0072B2"             # Okabe-Ito blue; explicit snow-process structure
+COLOR_OBSERVATION = "#303438"    # dark neutral; observation / truth / reference
+COLOR_DARK_NEUTRAL = "#303438"   # text, primary ticks, axis spines
+COLOR_SECONDARY_NEUTRAL = "#C8CDD1" # light neutral reference, bounds
+COLOR_ZERO_LINE = "#70767B"      # mid grey; zero lines, reference guides
+COLOR_LIGHT_REF = "#C8CDD1"      # grid and secondary bounds
+COLOR_TOLERANCE_BAND = "#B3B3B3" # tolerance shading (±15 d band, low alpha)
+
 MODEL_COLORS = {
-    "Base": "#EE7733",  # warm orange; omitted-process baseline
-    "TGD2": "#009988",  # teal; matched generic temperature-memory control
-    "CN": "#0077BB",  # deep blue; explicit snow-process structure
-    "HBV": "#6F6F6F",  # neutral grey; independent benchmark
+    "Base": COLOR_BASE,
+    "TGD2": COLOR_TGD,
+    "TGD": COLOR_TGD,
+    "CN": COLOR_CN,
+    "HBV": "#6F6F6F",  # neutral grey legacy benchmark
+    "XAJ-Base": COLOR_BASE,
+    "XAJ-TGD": COLOR_TGD,
+    "XAJ-TGD2": COLOR_TGD,
+    "XAJ-CN": COLOR_CN,
 }
-MODEL_COLORS["TGD"] = MODEL_COLORS["TGD2"]  # legacy source compatibility
+
 MODEL_LABELS = {
     "Base": "Base",
-    "TGD2": "TGD2",
-    "TGD": "TGD (legacy; not TGD2)",
+    "TGD2": "TGD",
+    "TGD": "TGD",
     "CN": "CN",
     "HBV": "HBV benchmark",
+    "XAJ-Base": "Base",
+    "XAJ-TGD": "TGD",
+    "XAJ-CN": "CN",
 }
 
 # 3.2 Model markers for redundant encoding in dot/interval panels
 MODEL_MARKERS = {
     "Base": "o",
     "TGD2": "^",
+    "TGD": "^",
     "CN": "s",
     "HBV": "D",
+    "XAJ-Base": "o",
+    "XAJ-TGD": "^",
+    "XAJ-CN": "s",
 }
-MODEL_MARKERS["TGD"] = MODEL_MARKERS["TGD2"]
 
-# 3.3 Train/test line encoding
+# 3.2b Cross-host model palette (Tol vibrant; used by R5 Figure 9 only)
+HOST_COLORS = {
+    "XAJ": COLOR_CN,
+    "GR4J": COLOR_TGD,
+    "SIMHYD": "#78A79F",
+}
+HOST_LABELS = {
+    "XAJ": "XAJ",
+    "GR4J": "GR4J",
+    "SIMHYD": "SIMHYD",
+}
+HOST_MARKERS = {
+    "XAJ": "o",
+    "GR4J": "s",
+    "SIMHYD": "^",
+}
+
+# 3.2c Sequential snow strata palette (lightness progression)
+SNOW_STRATA_PALETTE = {
+    "S1": "#E8F0F4",
+    "S2": "#D2E2EB",
+    "S3": "#B7D1E0",
+    "S4": "#91B7CD",
+    "S5": "#6597B6",
+}
+
+# 3.2d Seven-level diverging palette (zero-centered variables)
+DIVERGING_PALETTE_7 = [
+    "#B87555",  # negative (orange)
+    "#D19A7C",
+    "#E7C9B9",
+    "#F2F1EE",  # zero (warm light grey)
+    "#C8DAE6",
+    "#91B5CD",
+    "#5E8DB0",  # positive (blue)
+]
+
+# 3.3 Train/test and IC/dPL line encodings
 PERIOD_STYLES = {
-    "train": {"linestyle": "-", "linewidth": 1.65, "alpha": 0.92},
-    "test": {"linestyle": (0, (4.0, 2.0)), "linewidth": 1.75, "alpha": 1.00},
+    "train": {"linestyle": "-", "linewidth": 1.4, "alpha": 0.85},
+    "test": {"linestyle": (0, (4.0, 2.0)), "linewidth": 1.6, "alpha": 1.00},
+}
+
+PARADIGM_STYLES = {
+    "IC": {"linestyle": "-", "linewidth": 1.4},
+    "IC-CMA-ES": {"linestyle": "-", "linewidth": 1.4},
+    "dPL": {"linestyle": (0, (4.0, 2.0)), "linewidth": 1.5},
+    "dPL-MLP": {"linestyle": (0, (4.0, 2.0)), "linewidth": 1.5},
 }
 
 # 3.4 Future heatmap and GIS colormaps (cmcrameri map names)

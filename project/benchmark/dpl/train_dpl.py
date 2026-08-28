@@ -93,7 +93,9 @@ def train_dpl_model(
     # normalized-to-physical mapping, so the dPL output stays normalized.
     spec = get_spec(model_name, device=device)
     n_params = NPARAM_INFO_36[model_name]
-    hydro_model = build_model(model_name, device, warm_up=warmup_days, backend="eager")
+    hydro_model = build_model(
+        model_name, device, warm_up=warmup_days, backend="compile", dtype=torch.float64
+    )
     dpl_config = resolved.get("dpl", {})
     parameterizer = CatchmentParameterizer(
         in_features=n_attr,
@@ -104,7 +106,7 @@ def train_dpl_model(
         parameter_groups=spec.parameter_groups,
         saturation_floor=float(dpl_config.get("saturation_floor", 0.01)),
         saturation_regularizer_weight=float(dpl_config.get("saturation_regularizer_weight", 0.0)),
-    ).to(device)
+    ).to(device, dtype=torch.float64)
 
     optimizer = optim.Adam(parameterizer.parameters(), lr=lr)
     transaction = FiniteOptimizerTransaction(

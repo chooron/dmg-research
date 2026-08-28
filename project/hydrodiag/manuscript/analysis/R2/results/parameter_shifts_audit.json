@@ -1,0 +1,28 @@
+{
+  "status": "PASS",
+  "total_basin_shift_rows": 15930,
+  "total_full_summary_rows": 30,
+  "total_strata_summary_rows": 150,
+  "total_robustness_rows": 180,
+  "parameters_evaluated": [
+    "xaj_k",
+    "xaj_b",
+    "xaj_im",
+    "xaj_um",
+    "xaj_lm",
+    "xaj_dm",
+    "xaj_c",
+    "xaj_sm",
+    "xaj_ex",
+    "xaj_ki",
+    "xaj_kg",
+    "xaj_ci",
+    "xaj_cg",
+    "xaj_a",
+    "xaj_theta"
+  ],
+  "paradigms": [
+    "IC",
+    "dPL"
+  ]
+}

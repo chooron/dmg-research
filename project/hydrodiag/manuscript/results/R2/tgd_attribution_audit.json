@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "total_basin_contrast_rows": 3186,
+  "total_specificity_summary_rows": 294,
+  "total_regression_rows": 36,
+  "slope_difference_rows": 4,
+  "delta_beta_results": {
+    "IC_Full531": "+0.000 [-0.032, +0.030]",
+    "IC_ExcludeS5": "+0.023 [-0.011, +0.057]",
+    "dPL_Full531": "+0.041 [+0.011, +0.081]",
+    "dPL_ExcludeS5": "+0.086 [+0.023, +0.155]"
+  }
+}

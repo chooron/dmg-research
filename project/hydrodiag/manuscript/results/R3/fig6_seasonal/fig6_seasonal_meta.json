@@ -1,0 +1,282 @@
+{
+  "protocol": "figure6_process_reexport_v1",
+  "provenance": "deterministic recorded-forward replay of frozen fitted parameters; no training, calibration, or new experiment",
+  "git": {
+    "commit": "55b1ecbf2a6f4b9b0dfe29ee94a06105782f873a",
+    "dirty": true
+  },
+  "device": "cuda",
+  "fit_catalog": {
+    "Base_IC": {
+      "structure": "XAJ",
+      "run_dir": "/home/jingxin/code/dmg-research/project/hydrodiag/results/r3_misspec_ic_xaj_531_v1",
+      "kind": "ic",
+      "seed": null
+    },
+    "TGD2_IC": {
+      "structure": "XAJ_TGD2",
+      "run_dir": "/home/jingxin/code/dmg-research/project/hydrodiag/results/r3_misspec_ic_xaj_tgd2_531_v1",
+      "kind": "ic",
+      "seed": null
+    },
+    "CN_IC": {
+      "structure": "XAJ_CN",
+      "run_dir": "/home/jingxin/code/dmg-research/project/hydrodiag/results/r3_gate_ic_xaj_cn_531_v1",
+      "kind": "ic",
+      "seed": null
+    },
+    "Base_dPL_s42": {
+      "structure": "XAJ",
+      "run_dir": "/home/jingxin/code/dmg-research/project/hydrodiag/results/r3_misspec_dpl_xaj_seed_42",
+      "kind": "dpl",
+      "seed": 42
+    },
+    "TGD2_dPL_s42": {
+      "structure": "XAJ_TGD2",
+      "run_dir": "/home/jingxin/code/dmg-research/project/hydrodiag/results/r3_misspec_dpl_xaj_tgd2_seed_42",
+      "kind": "dpl",
+      "seed": 42
+    },
+    "CN_dPL_s42": {
+      "structure": "XAJ_CN",
+      "run_dir": "/home/jingxin/code/dmg-research/project/hydrodiag/results/r3_gate_dpl_xaj_cn_seed_42",
+      "kind": "dpl",
+      "seed": 42
+    },
+    "Base_dPL_s123": {
+      "structure": "XAJ",
+      "run_dir": "/home/jingxin/code/dmg-research/project/hydrodiag/results/r3_misspec_dpl_xaj_seed_123",
+      "kind": "dpl",
+      "seed": 123
+    },
+    "TGD2_dPL_s123": {
+      "structure": "XAJ_TGD2",
+      "run_dir": "/home/jingxin/code/dmg-research/project/hydrodiag/results/r3_misspec_dpl_xaj_tgd2_seed_123",
+      "kind": "dpl",
+      "seed": 123
+    },
+    "CN_dPL_s123": {
+      "structure": "XAJ_CN",
+      "run_dir": "/home/jingxin/code/dmg-research/project/hydrodiag/results/r3_gate_dpl_xaj_cn_seed_123",
+      "kind": "dpl",
+      "seed": 123
+    },
+    "Base_dPL_s2026": {
+      "structure": "XAJ",
+      "run_dir": "/home/jingxin/code/dmg-research/project/hydrodiag/results/r3_misspec_dpl_xaj_seed_2026",
+      "kind": "dpl",
+      "seed": 2026
+    },
+    "TGD2_dPL_s2026": {
+      "structure": "XAJ_TGD2",
+      "run_dir": "/home/jingxin/code/dmg-research/project/hydrodiag/results/r3_misspec_dpl_xaj_tgd2_seed_2026",
+      "kind": "dpl",
+      "seed": 2026
+    },
+    "CN_dPL_s2026": {
+      "structure": "XAJ_CN",
+      "run_dir": "/home/jingxin/code/dmg-research/project/hydrodiag/results/r3_gate_dpl_xaj_cn_seed_2026",
+      "kind": "dpl",
+      "seed": 2026
+    }
+  },
+  "quantity": "effective liquid-water input entering the shared XAJ core (Base raw precipitation; TGD2 delayed effective precipitation; CN rain plus snowmelt)",
+  "state": "wt = wu + wl + wd, total XAJ tension-water storage (shared derived state)",
+  "shared_state_components": [
+    "wu",
+    "wl",
+    "wd"
+  ],
+  "subset": {
+    "criterion": "frac_snow >= upper quartile",
+    "threshold": 0.21769666937653748,
+    "n_basins": 133,
+    "basin_ids": [
+      "01022500",
+      "01031500",
+      "01047000",
+      "01052500",
+      "01054200",
+      "01055000",
+      "01057000",
+      "01078000",
+      "01134500",
+      "01137500",
+      "01139000",
+      "01139800",
+      "01142500",
+      "01144000",
+      "01162500",
+      "01169000",
+      "01170100",
+      "04296000",
+      "01333000",
+      "01350000",
+      "01350080",
+      "01350140",
+      "01423000",
+      "01434025",
+      "01435000",
+      "01510000",
+      "04027000",
+      "04040500",
+      "04043050",
+      "04045500",
+      "04057510",
+      "04057800",
+      "04059500",
+      "04127918",
+      "04127997",
+      "04216418",
+      "04256000",
+      "06221400",
+      "06224000",
+      "06278300",
+      "06280300",
+      "06289000",
+      "06291500",
+      "06311000",
+      "06409000",
+      "06431500",
+      "06614800",
+      "06622700",
+      "06623800",
+      "06632400",
+      "06746095",
+      "07083000",
+      "07208500",
+      "08267500",
+      "08269000",
+      "08271000",
+      "08324000",
+      "08377900",
+      "08378500",
+      "08380500",
+      "09035800",
+      "09035900",
+      "09047700",
+      "09065500",
+      "09066000",
+      "09066200",
+      "09066300",
+      "09081600",
+      "09107000",
+      "09210500",
+      "09223000",
+      "09306242",
+      "09312600",
+      "09352900",
+      "09378170",
+      "09386900",
+      "09404450",
+      "09492400",
+      "09494000",
+      "09505800",
+      "10234500",
+      "10244950",
+      "10336645",
+      "10336660",
+      "10343500",
+      "12048000",
+      "12054000",
+      "12056500",
+      "12082500",
+      "12092000",
+      "12114500",
+      "12115000",
+      "12143600",
+      "12144000",
+      "12175500",
+      "12178100",
+      "12186000",
+      "12189500",
+      "12375900",
+      "12377150",
+      "12381400",
+      "12383500",
+      "12390700",
+      "12411000",
+      "12447390",
+      "12451000",
+      "12488500",
+      "13011500",
+      "13011900",
+      "13018300",
+      "13023000",
+      "13161500",
+      "13235000",
+      "13240000",
+      "13313000",
+      "13331500",
+      "14020000",
+      "14096850",
+      "14137000",
+      "14138800",
+      "14138870",
+      "14138900",
+      "14158790",
+      "14216500",
+      "11230500",
+      "11237500",
+      "11264500",
+      "11266500",
+      "11473900",
+      "11480390",
+      "11522500",
+      "11523200",
+      "11528700"
+    ]
+  },
+  "period": {
+    "name": "test",
+    "start": "1995-10-01",
+    "end": "2010-09-30",
+    "n_days": 5479
+  },
+  "seasonal_axis": {
+    "type": "water-year month",
+    "start": "October 1",
+    "labels": [
+      "Oct",
+      "Nov",
+      "Dec",
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep"
+    ]
+  },
+  "aggregation": "per-basin mean over each water-year month across the test period; dPL median across seeds per basin; plot median and IQR across high-snow basins",
+  "output_shapes": {
+    "Base_IC": [
+      133,
+      12
+    ],
+    "Base_dPL": [
+      133,
+      12
+    ],
+    "TGD2_IC": [
+      133,
+      12
+    ],
+    "TGD2_dPL": [
+      133,
+      12
+    ],
+    "CN_IC": [
+      133,
+      12
+    ],
+    "CN_dPL": [
+      133,
+      12
+    ]
+  },
+  "runtime_seconds": 882.9247076511383
+}

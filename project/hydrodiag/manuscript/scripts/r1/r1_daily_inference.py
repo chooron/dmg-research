@@ -329,7 +329,7 @@ def _predict_dpl(
         [specs[name]["upper"] for name in names], device=device, dtype=torch.float32
     )
     parameter_range = upper - lower
-    attributes = torch.from_numpy(attrs_np)
+    attributes = torch.from_numpy(attrs_np).to(device=device, dtype=torch.float32)
     output: dict[str, np.ndarray] = {}
     with torch.no_grad():
         for period in ("train", "test"):
@@ -339,7 +339,7 @@ def _predict_dpl(
             )
             for start in range(0, len(indices), batch_size):
                 stop = min(start + batch_size, len(indices))
-                theta = net(attributes[start:stop].to(device))
+                theta = net(attributes[start:stop])
                 params = physical_parameters(theta, names, lower, parameter_range)
                 fc = {
                     "precip": torch.from_numpy(forcing[start:stop, :, 0]).to(

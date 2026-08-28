@@ -1,0 +1,9 @@
+Quantity,IC,dPL
+"Denominator-valid catchments, $N_{\mathrm{valid}}$ (rate)",427 (80.4%),460 (86.6%)
+"Reference outlet gap, $D_b = \mathrm{KGE}(\mathrm{CN}) - \mathrm{KGE}(\mathrm{Base}_{\mathrm{no\text{-}refit}})$","+0.087 [+0.061, +0.106]","+0.091 [+0.070, +0.114]"
+"Raw Base-refit gain, $G_{\mathrm{Base}} = \mathrm{KGE}(\mathrm{Base}_{\mathrm{refit}}) - \mathrm{KGE}(\mathrm{Base}_{\mathrm{no\text{-}refit}})$","+0.0026 [+0.0008, +0.0077]","+0.0073 [+0.0039, +0.0099]"
+"Raw TGD generic gain, $G_{\mathrm{TGD}} = \mathrm{KGE}(\mathrm{TGD}) - \mathrm{KGE}(\mathrm{Base}_{\mathrm{no\text{-}refit}})$","+0.0386 [+0.0254, +0.0498]","+0.0360 [+0.0268, +0.0446]"
+"Recalibration gap-closure fraction, $F_{\mathrm{close}} = G_{\mathrm{Base}} / D_b$","0.101 [0.080, 0.113]","0.102 [0.095, 0.111]"
+"Generic-control recovery fraction, $F_{\mathrm{TGD}} = G_{\mathrm{TGD}} / D_b$","0.546 [0.519, 0.572]","0.521 [0.505, 0.538]"
+"Paired recovery-fraction difference, $\Delta F = F_{\mathrm{TGD}} - F_{\mathrm{close}}$","+0.460 [+0.433, +0.498]","+0.441 [+0.412, +0.467]"
+"Positive paired fraction, $P(F_{\mathrm{TGD}} > F_{\mathrm{close}})$",91.6%,92.8%

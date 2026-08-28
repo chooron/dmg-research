@@ -1,0 +1,16 @@
+active_model_key,code_name,lower_bound,upper_bound,default,unit,description,process,is_snow
+XAJ,xaj_k,0.5,2.0,1.0,-,Ratio of potential ET to reference crop evaporation,soil,False
+XAJ,xaj_b,0.1,2.0,0.3,-,Exponent of tension water capacity curve,soil,False
+XAJ,xaj_im,0.0,0.3,0.01,-,Impervious area fraction,soil,False
+XAJ,xaj_um,5.0,50.0,20.0,mm,Upper layer tension water capacity,soil,False
+XAJ,xaj_lm,20.0,200.0,80.0,mm,Lower layer tension water capacity,soil,False
+XAJ,xaj_dm,20.0,200.0,40.0,mm,Deep layer tension water capacity,soil,False
+XAJ,xaj_c,0.05,0.3,0.15,-,Deep layer evaporation coefficient,soil,False
+XAJ,xaj_sm,5.0,100.0,30.0,mm,Areal mean free water capacity of surface layer,routing,False
+XAJ,xaj_ex,0.1,2.0,1.2,-,Exponent of free water capacity curve,routing,False
+XAJ,xaj_ki,0.0,0.7,0.3,1/day,Outflow coefficient for interflow,routing,False
+XAJ,xaj_kg,0.0,0.7,0.2,1/day,Outflow coefficient for groundwater,routing,False
+XAJ,xaj_ci,0.1,1.0,0.5,-,Recession constant for interflow reservoir,routing,False
+XAJ,xaj_cg,0.9,1.0,0.98,-,Recession constant for groundwater reservoir,routing,False
+XAJ,xaj_a,0.0,2.9,2.5,-,HBV-compatible Gamma-UH shape parameter,routing,False
+XAJ,xaj_theta,0.0,6.5,1.5,day,HBV-compatible Gamma-UH scale parameter,routing,False

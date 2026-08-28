@@ -47,7 +47,9 @@ def evaluate_single_model(model_dir: Path, config: dict, device: str, backend: s
     # checkpoints loudly instead of silently evaluating them.
     validate_canonical_checkpoint(
         model_dir, model_name=model_name,
-        required_generation=generations, required_basins=531,
+        required_generation=generations,
+        required_basins=531,
+        required_basin_ids=load_ids(config["data"]["basin_ids"]),
     )
 
     basin_ids, latent, checkpoint_train = frozen_parameters(model_dir, generations, starts)

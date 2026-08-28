@@ -1,0 +1,7 @@
+paradigm,period,metric,stratum,n_basins,estimate_median,ci_low,ci_high,bootstrap_draws,seed
+IC-CMA-ES,test,delta_KGE_Base_CN,all,531,0.02354613777865644,0.016941897091595205,0.03556356301412905,128,20313908
+IC-CMA-ES,test,delta_absCT_Base_CN,all,531,2.0,1.0,2.0,128,20289802
+IC-CMA-ES,test,delta_absCT_TGD_CN,all,531,1.0,0.0,1.0,128,20329535
+dPL-MLP,test,delta_KGE_Base_CN,all,531,0.015742390494070335,0.012713309266632163,0.022099655379633338,128,20280566
+dPL-MLP,test,delta_absCT_Base_CN,all,531,0.0,0.0,1.0,128,20315268
+dPL-MLP,test,delta_absCT_TGD_CN,all,531,0.0,0.0,0.0,128,20309196

@@ -1,0 +1,33 @@
+\begin{table*}[t]
+\centering
+\caption{R3 controlled synthetic-truth SI statistics (XAJ-CN generating structure).}
+\label{tab:tables5_r3_statistics}
+\begin{threeparttable}
+\begin{tabular}{llrr}
+\toprule
+Estimand & Regime & $N$ & Median [95\% CI] \\
+\midrule
+Limited compensation: F_close (test) & IC & 427 & 0.1015 [0.0773, 0.1126] \\
+Limited compensation: F_close (test) & dPL & 468 & 0.1009 [0.0889, 0.1092] \\
+Generic mitigation: F_tgd2 (test) & IC & 466 & 0.5105 [0.4867, 0.5412] \\
+Generic mitigation: F_tgd2 (test) & dPL & 528 & 0.5036 [0.4732, 0.5295] \\
+Parameter relief: R_theta_tgd2 & IC & 531 & 0.0047 [0.0027, 0.0071] \\
+Parameter relief: R_theta_tgd2 & dPL & 531 & 0.0067 [0.0042, 0.0096] \\
+State relief: R_state_tgd2 & IC & 531 & 0.0749 [0.0457, 0.1037] \\
+State relief: R_state_tgd2 & dPL & 531 & 0.1101 [0.0887, 0.1284] \\
+Residual CN advantage: G_CN_over_TGD2 (test) & IC & 531 & 0.0487 [0.0382, 0.0608] \\
+Residual CN advantage: G_CN_over_TGD2 (test) & dPL & 531 & 0.0466 [0.0383, 0.0573] \\
+Generalization decay: decay_G_base & IC & 531 & 0.0137 [0.0118, 0.0151] \\
+Generalization decay: decay_G_base & dPL & 531 & 0.0021 [0.0014, 0.0035] \\
+Process residual RMSE gap [snow_active] (TGD2-CN) & IC & 521 & 0.4785 [0.4371, 0.5228] \\
+Process residual RMSE gap [snow_active] (TGD2-CN) & dPL & 521 & 0.4646 [0.4201, 0.5029] \\
+Process residual RMSE gap [no_snow_active] (TGD2-CN) & IC & 476 & 0.0768 [0.0618, 0.0945] \\
+Process residual RMSE gap [no_snow_active] (TGD2-CN) & dPL & 476 & 0.0632 [0.0461, 0.0745] \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\small
+\item \textit{Note}: Main R3 estimands with paired-basin bootstrap 95\% CIs (2000 replicates, seed 20260730); dPL values aggregate the three seeds (42/123/2026) to per-basin seed medians as in Figures 5--6. Full Block 1 (correct-CN reference), Block 3 (seed stability), Block 4 (association boundary) and Block 5 (aggregate definitions) rows are in the Markdown/csv companion output.
+\end{tablenotes}
+\end{threeparttable}
+\end{table*}

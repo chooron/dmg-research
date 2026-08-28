@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "dpl_seeds_evaluated": [
+    42,
+    123,
+    2026
+  ],
+  "dpl_seed_consistency": "PASS (all seeds show positive D_activity, positive Spearman rho, and monotonic S1-S5 increase)",
+  "ic_restart_policy": "selected_restart per train period KGE",
+  "unit_of_inference": "basin (seeds/restarts are sensitivity only, N is not inflated)"
+}

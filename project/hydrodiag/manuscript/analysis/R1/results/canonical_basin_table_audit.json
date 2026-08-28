@@ -1,0 +1,125 @@
+{
+  "status": "PASS",
+  "total_unique_basins": 531,
+  "paradigms": [
+    "IC-CMA-ES",
+    "dPL-MLP"
+  ],
+  "structures": [
+    "Base",
+    "TGD",
+    "CN"
+  ],
+  "periods": [
+    "test",
+    "train"
+  ],
+  "canonical_eval_rows": 3186,
+  "all_periods_rows": 6372,
+  "strata_counts": {
+    "S1": 165,
+    "S2": 156,
+    "S3": 121,
+    "S4": 34,
+    "S5": 55
+  },
+  "input_tables": {
+    "r1_basin_level_performance_rebuilt.csv": {
+      "path": "/home/jingxin/code/dmg-research/project/hydrodiag/manuscript/cache/r1_rebuild_audit_staged/r1_basin_level_performance_rebuilt.csv",
+      "sha256": "f9c30837aab2c68f544e00b7b03efe6bf7c3d0cecf9bc8284d5d354356e8c0f9",
+      "row_count": 6372,
+      "schema": [
+        "basin_id",
+        "paradigm",
+        "structure",
+        "model",
+        "period",
+        "seed_or_restart",
+        "selected_run",
+        "KGE",
+        "NSE",
+        "PBIAS",
+        "RMSE",
+        "valid_observation_count",
+        "valid_simulation_count",
+        "valid_days",
+        "valid_metric",
+        "basin_median_Delta_CT"
+      ]
+    },
+    "r1_basin_level_ct.csv": {
+      "path": "/home/jingxin/code/dmg-research/project/hydrodiag/manuscript/cache/r1_rebuild_audit_staged/r1_basin_level_ct.csv",
+      "sha256": "c19ab2e7fc9d7d5f68008abc2d976c8777322e2f3d1dcf05ab79c6af5432d14c",
+      "row_count": 6372,
+      "schema": [
+        "basin_id",
+        "paradigm",
+        "structure",
+        "period",
+        "seed_or_restart",
+        "valid_year_count",
+        "basin_median_Delta_CT",
+        "basin_CT_q25_years",
+        "basin_CT_q75_years",
+        "CT_obs_median_years",
+        "CT_sim_median_years",
+        "frac_snow",
+        "snow_stratum",
+        "KGE_pass_0p60",
+        "KGE",
+        "basin_test_KGE"
+      ]
+    },
+    "r1_basin_year_ct.csv": {
+      "path": "/home/jingxin/code/dmg-research/project/hydrodiag/manuscript/cache/r1_rebuild_audit_staged/r1_basin_year_ct.csv",
+      "sha256": "cf63c7c70787a23835b38f71a586cda8aeed2c6f7a9882de442f70f89dde2cae",
+      "row_count": 92394,
+      "schema": [
+        "basin_id",
+        "paradigm",
+        "structure",
+        "model",
+        "period",
+        "seed_or_restart",
+        "water_year",
+        "complete_year",
+        "valid_year",
+        "invalid_reason",
+        "n_valid_days",
+        "CT_obs",
+        "CT_sim",
+        "Delta_CT",
+        "seed_count",
+        "frac_snow",
+        "snow_stratum"
+      ]
+    },
+    "r1_basin_year_ct_runs.csv": {
+      "path": "/home/jingxin/code/dmg-research/project/hydrodiag/manuscript/cache/r1_rebuild_audit_staged/r1_basin_year_ct_runs.csv",
+      "sha256": "ac86e599f2b60e96b6c1941ea66dd6f865d00ac5710866fcef7c87bfceafc69a",
+      "row_count": 184788,
+      "schema": [
+        "basin_id",
+        "paradigm",
+        "structure",
+        "model",
+        "period",
+        "seed_or_restart",
+        "water_year",
+        "complete_year",
+        "valid_year",
+        "invalid_reason",
+        "n_valid_days",
+        "CT_obs",
+        "CT_sim",
+        "Delta_CT",
+        "frac_snow",
+        "snow_stratum"
+      ]
+    }
+  },
+  "dpl_seed_aggregation": "median across seeds (42, 123, 2026) per basin x structure",
+  "ic_restart_selection": "selected restart per basin x structure",
+  "canonical_test_path": "/home/jingxin/code/dmg-research/project/hydrodiag/manuscript/analysis/R1/results/canonical_basin_level.csv",
+  "canonical_all_path": "/home/jingxin/code/dmg-research/project/hydrodiag/manuscript/analysis/R1/results/canonical_basin_level_all_periods.csv"
+}

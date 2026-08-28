@@ -1,0 +1,13 @@
+item,historical_anchor,draft_conflict_value,rebuilt_canonical_value,verdict
+Figure 3 IC between > within prevalence,63.1% (335/531),~97.36% (draft script used fixed 0.08 threshold),"63.09% [59.51%, 66.86%]",RESOLVED: 63.09% is the true ensemble 10-restart cross-structure prevalence
+Figure 3 dPL between > within prevalence,83.8% (445/531),100% (draft script used single-point baseline),"83.80% [80.60%, 86.83%]",RESOLVED: 83.80% is the true ensemble 3-seed cross-structure prevalence
+Figure 3 IC Base-CN excess slope (Full531),0.1542,0.1542,"0.1542 [0.1341, 0.1732]",RESOLVED: exact match with canonical 0.1542
+Figure 3 dPL Base-CN excess slope (Full531),0.1974,0.1974,"0.1974 [0.1362, 0.2653]",RESOLVED: exact match with canonical 0.1974
+Figure 3 dPL Delta_beta (Full531),+0.0411,"+0.0411 [0.008, 0.077]","+0.0412 [+0.0106, +0.0823]",RESOLVED: paired bootstrap confirms positive specific slope difference
+Figure 3 dPL Delta_beta (ExcludeS5),+0.0861,"+0.0861 [0.017, 0.157]","+0.0861 [+0.0173, +0.1554]",RESOLVED: paired bootstrap confirms robust specific slope difference
+Figure 4 IC xaj_um slope,+0.5211,+0.5211,"+0.5211 [+0.3529, +0.7064]",RESOLVED: confirmed recurring directional shift (rho=+0.216)
+Figure 4 dPL xaj_um slope,+0.5655,+0.5655,"+0.5655 [+0.3765, +0.7688]",RESOLVED: confirmed recurring directional shift (rho=+0.253)
+Figure 4 IC xaj_ki slope,-0.4746,-0.4746,"-0.4746 [-0.6304, -0.3107]",RESOLVED: confirmed recurring directional shift (rho=-0.237)
+Figure 4 dPL xaj_ki slope,-0.3146,-0.3146,"-0.3146 [-0.4532, -0.2103]",RESOLVED: confirmed recurring directional shift (rho=-0.328)
+Figure 4 IC xaj_ci slope,-0.4138,-0.4138,"-0.4138 [-0.6101, -0.1949]",RESOLVED: confirmed recurring directional shift (rho=-0.183)
+Figure 4 dPL xaj_ci slope,-0.5312,-0.5312,"-0.5312 [-0.6903, -0.3681]",RESOLVED: confirmed recurring directional shift (rho=-0.290)

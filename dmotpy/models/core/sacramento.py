@@ -106,17 +106,17 @@ def sacramento_step(
     # Using torch.maximum/minimum to ensure physical constraints on parameters
     uztwm = f1 * smax
     uzfwm = torch.maximum(
-        torch.tensor(0.005 / 4.0, device=P.device), f2 * (smax - uztwm)
+        torch.tensor(0.005 / 4.0, device=P.device, dtype=P.dtype), f2 * (smax - uztwm)
     )
     lztwm = torch.maximum(
-        torch.tensor(0.005 / 4.0, device=P.device), f3 * (smax - uztwm - uzfwm)
+        torch.tensor(0.005 / 4.0, device=P.device, dtype=P.dtype), f3 * (smax - uztwm - uzfwm)
     )
     lzfwpm = torch.maximum(
-        torch.tensor(0.005 / 4.0, device=P.device),
+        torch.tensor(0.005 / 4.0, device=P.device, dtype=P.dtype),
         f4 * (smax - uztwm - uzfwm - lztwm),
     )
     lzfwsm = torch.maximum(
-        torch.tensor(0.005 / 4.0, device=P.device),
+        torch.tensor(0.005 / 4.0, device=P.device, dtype=P.dtype),
         (1.0 - f4) * (smax - uztwm - uzfwm - lztwm),
     )
 
@@ -128,7 +128,7 @@ def sacramento_step(
     zperc_num = (lztwm + lzfwsm * (1.0 - klzs)) / denom_zperc + (
         lzfwpm * (1.0 - klzp)
     ) / denom_zperc
-    zperc = torch.minimum(torch.tensor(100000.0, device=P.device), zperc_num)
+    zperc = torch.minimum(torch.tensor(100000.0, device=P.device, dtype=P.dtype), zperc_num)
 
     # --- 1. Surface Split ---
     flux_qdir = split_1(pctim, P)

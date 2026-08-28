@@ -1,0 +1,38 @@
+extends: default.yaml
+stage: dpl_aligned_full_production
+resume: true
+model_freeze_manifest: frozen_versions/cmaes36_dpl_aligned_20260819/manifest.json
+
+# Keep the canonical Full300 CMA-ES budget and solver settings unchanged.
+optimization:
+  starts: 10
+  generations: 300
+  population_by_dimension:
+    '1': 8
+    '4-6': 12
+    '7-10': 16
+    '12-15': 20
+  active_cma: true
+  full_covariance: true
+  separable: false
+  stdev_init: 0.10
+
+# Match the dPL experiment's five-repeat warm-up contract.
+warmup:
+  mode: repeat_forcing
+  source: {start_time: '1980-10-01', end_time: '1981-09-30'}
+  source_days: 365
+  repetitions: 5
+  total_days: 1825
+  objective_includes_warmup: false
+
+checkpoint_every_generations: 5
+checkpoint_milestones: [25, 50, 100, 150, 200, 250, 300]
+data:
+  basin_ids: data/531sub_id.txt
+  reference_ids: data/gage_id.npy
+  data_path: data/camels_dataset
+  # DPL-aligned training period.
+  train: {start_time: '1980-10-01', end_time: '1995-09-30'}
+  # DPL-aligned validation period.
+  test: {start_time: '1995-10-01', end_time: '2010-09-30'}

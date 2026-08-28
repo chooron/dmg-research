@@ -60,26 +60,43 @@ results.tsv
 *.bak
 *.orig
 releases/
+release/
+/releases/
+/release/
+
+# --- Logs & Compiler Cache ---
+*.log
+.torchinductor_cache/
+.r1_torchinductor_cache/
+*.cubin
+*.ttgir
+*.ttir
+*.ptx
 
 # --- Paper / manuscript generated artifacts (source scripts stay possible) ---
 manuscript/
 manuscriptv2/
 !project/hydrodiag/manuscript/
 project/hydrodiag/manuscript/*
-!project/hydrodiag/manuscript/scripts/
 !project/hydrodiag/manuscript/README.md
 !project/hydrodiag/manuscript/FIGURE_OPTIMIZATION_HANDOFF.md
-!project/hydrodiag/manuscript/scripts/shared/
-!project/hydrodiag/manuscript/scripts/r1/
-!project/hydrodiag/manuscript/scripts/r2/
-!project/hydrodiag/manuscript/scripts/r3/
-!project/hydrodiag/manuscript/scripts/r4/
-!project/hydrodiag/manuscript/scripts/r5/
-!project/hydrodiag/manuscript/cache/*.csv
-!project/hydrodiag/manuscript/figures/
-!project/hydrodiag/manuscript/tables/
-!project/hydrodiag/manuscript/cache/
+!project/hydrodiag/manuscript/DISCUSSION_STATISTICAL_AUDIT.md
+!project/hydrodiag/manuscript/scripts/
+!project/hydrodiag/manuscript/scripts/**
 !project/hydrodiag/manuscript/figure_manifests/
+!project/hydrodiag/manuscript/figure_manifests/**
+!project/hydrodiag/manuscript/stats/
+!project/hydrodiag/manuscript/stats/**
+!project/hydrodiag/manuscript/supplement/
+!project/hydrodiag/manuscript/supplement/**
+!project/hydrodiag/manuscript/analysis/
+!project/hydrodiag/manuscript/analysis/**
+!project/hydrodiag/manuscript/results/
+!project/hydrodiag/manuscript/results/**
+!project/hydrodiag/manuscript/archive/
+!project/hydrodiag/manuscript/archive/**
+!project/hydrodiag/manuscript/cache/gis/
+!project/hydrodiag/manuscript/cache/gis/**
 
 # --- Local LLM / agent tooling ---
 .pi-subagents/
@@ -87,6 +104,8 @@ project/hydrodiag/manuscript/*
 .agents/
 .omx/
 .claude/
+audit_scout.md
+context.md
 
 # --- Deployment snapshots / vendored copies ---
 project/benchmark/dmotpy/
@@ -103,3 +122,11 @@ MARRMoT/
 !project/benchmark/docs/*.csv
 r3_runlogs/
 tools/
+backup/
+
+# --- Always ignore caches and bytecode ---
+**/__pycache__/**
+*.py[cod]
+*.log
+*.bak
+*.orig

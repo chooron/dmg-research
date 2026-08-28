@@ -1,903 +1,829 @@
 """
-Plot R1 Figure 2 (final): seasonal center-of-timing errors among basins passing
-the aggregate outlet-performance screen and environmental organization along snow gradient.
+Plotting Script for Main-Text Figure 2 (R1 Analysis)
+Generates manuscript/figures/Figure2_R1_final.png.
 
-Three-column population-level evidence chain (3 x 3, column-major panel labels),
-rows strictly Base / TGD / CN:
+Scientific Purpose:
+  Comprehensive assessment of predictive performance and outlet-level snow-process
+  visibility across 531 CAMELS-US catchments under both IC (CMA-ES) and dPL (MLP)
+  estimation regimes.
 
-    Column 1 (a-c)  Screened timing error
-                    ECDF of signed center-of-timing error, DeltaCT = CT_sim - CT_obs
-                    among basins with standard KGE >= 0.60
-    Column 2 (d-f)  Threshold robustness
-                    fraction with |DeltaCT| >= 15 d vs. the KGE screening
-                    threshold (y = KGE screening threshold, x = fraction;
-                    grid t = 0.40..0.80 step 0.01)
-    Column 3 (g-i)  Timing across snow regimes
-                    population-level horizontal paired boxplots + connected medians
-                    of DeltaCT across the five fixed snow regimes S1-S5
-                    (all 531 basins per combination)
-
-Terminology: Center of timing (CT) is the water-year day at which cumulative
-runoff reaches 50% of the annual total; DeltaCT = CT_sim - CT_obs
-(negative = simulated runoff timing earlier than observed). The canonical
-data column `ct_error_signed` in r1_snow_signatures_basin_level.csv is
-this signed error (days); code-internal names keep the canonical schema,
-manuscript-facing text strictly uses CT / DeltaCT.
-
-Canonical data (strict, unchanged):
-  - Performance screen: standard KGE column `kge` from
-    manuscript/results/R1/r1_basin_level_performance.csv (test rows)
-  - Timing data: canonical `ct_error_signed` (DeltaCT), water year Oct-Sep,
-    test period 1995-10-01 .. 2010-09-30. IC uses canonical selected_restart;
-    dPL uses canonical median across seeds.
-  - Snow fraction: `frac_snow` from manuscript/results/R1/r1_snow_attributes.csv.
-  - Manuscript main screen threshold: KGE >= 0.60.
-  - Large center-timing error reference: |DeltaCT| >= 15 d.
-
-Output (PNG only): manuscript/figures/Figure2_R1_ct_error_snow_regimes.png
+Layout (3-row, 5-panel comprehensive architecture):
+  Row 1 (Top): Streamflow predictive performance (KGE ECDFs across 531 basins)
+    (a) Predictive performance (IC)
+        ECDF of KGE for Base (Orange), TGD (Green), CN (Blue) in train (solid) vs test (dashed).
+    (b) Predictive performance (dPL)
+        ECDF of KGE for Base (Orange), TGD (Green), CN (Blue) in train (solid) vs test (dashed).
+  Row 2 (Middle, full width):
+    (c) Activity-conditioned timing separation
+        Merged single full-width plot with continuous frac_snow on x-axis.
+        Shows IC (deep blue) vs dPL (warm vermillion) with S1-S5 background bands,
+        531 basin-level scatter points, and stratum medians + bootstrap 95% CIs.
+        Panel legend in upper right, Spearman rho correlations in lower right.
+  Row 3 (Bottom):
+    (d) Signed timing error by structure (~59% width, Scatter + Boxplot style)
+        Discrete S1-S5 signed CT error across Base (Orange), TGD (Green), and CN (Blue)
+        under IC (filled) and dPL (hollow). Panel legend in lower left.
+    (e) Large timing error among KGE-qualified basins (~41% width, Horizontal Dot-Whisker)
+        Common-pass subset (all 3 structures KGE >= 0.60; IC n=321, dPL n=331)
+        Prevalence of |CT| >= 15 d with bootstrap 95% CIs. Legend for filled (IC) vs hollow (dPL).
 """
 
 from __future__ import annotations
 
+import argparse
 import os
 import sys
 from pathlib import Path
 
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
-import numpy as np
-import pandas as pd
 from matplotlib.gridspec import GridSpec
 from matplotlib.lines import Line2D
+from matplotlib.patches import Patch
+import numpy as np
+import pandas as pd
+from scipy import stats
 
-# ── path setup ────────────────────────────────────────────────────────────────
+# Path setup
 HERE = Path(__file__).resolve().parent
-if str(HERE) not in sys.path:
-    sys.path.insert(0, str(HERE.parent / "shared"))
-SCRIPTS = HERE.parent / "shared"
-if str(SCRIPTS) not in sys.path:
-    sys.path.insert(0, str(SCRIPTS))
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
+R1_DIR = PROJECT_ROOT / "manuscript" / "results" / "R1"
+CACHE_STAGED_DIR = PROJECT_ROOT / "manuscript" / "cache" / "r1_rebuild_audit_staged"
+PLOTS_FIG_DIR = PROJECT_ROOT / "manuscript" / "figures"
+
+# Add shared directory to sys.path
+shared_dir = HERE.parent / "shared"
+if str(shared_dir) not in sys.path:
+    sys.path.insert(0, str(shared_dir))
 
 from r1_plot_style import (
+    COLOR_BASE,
+    COLOR_TGD,
+    COLOR_CN,
+    COLOR_DARK_NEUTRAL,
+    COLOR_LIGHT_REF,
+    COLOR_ZERO_LINE,
     MODEL_COLORS,
-    RESOLVED_FONT,
+    MODEL_LABELS,
+    MODEL_MARKERS,
+    PERIOD_STYLES,
     apply_clean_spines,
     setup_publication_style,
 )
 
-# ── constants ─────────────────────────────────────────────────────────────────
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
-R1_DIR = PROJECT_ROOT / "manuscript" / "results" / "R1"
-PLOTS_FIG_DIR = PROJECT_ROOT / "manuscript" / "figures"
+# ── Color Palette (Figure Standards) ─────────────────────────────────────────
+COLOR_BASE = "#D55E00"  # Okabe-Ito vermillion / orange (omitted-process baseline)
+COLOR_TGD = "#009E73"   # Okabe-Ito bluish green / teal (generic control)
+COLOR_CN = "#0072B2"    # Okabe-Ito blue (explicit snow representation)
+COLOR_TEXT = "#303438"  # dark neutral for text and primary markers
+COLOR_REF = "#70767B"   # mid grey zero/reference lines
+COLOR_LIGHT = "#E2E8F0" # light grid / secondary bounds
 
-SCREEN_THRESHOLD = 0.60  # predefined operational aggregate-performance screen
-TIMING_THRESHOLD = 15.0  # |DeltaCT| large center-timing-error reference (days)
-THRESHOLD_GRID = np.arange(0.40, 0.8001, 0.01)  # fixed sensitivity grid
+# Colors for distinguishing IC and dPL in Panel (c)
+COLOR_IC = "#2B6CB0"    # Deep classic blue
+COLOR_DPL = "#D95F02"   # Warm vermillion / amber
 
-PARADIGM_ORDER = ["IC-CMA-ES", "dPL-MLP"]
-STRUCTURE_ORDER = ["Base", "TGD", "CN"]
-MODEL_CODE = {"Base": "XAJ-Base", "TGD": "XAJ-TGD", "CN": "XAJ-CN"}
-IC_DPL_LABEL = {"IC-CMA-ES": "IC", "dPL-MLP": "dPL"}
+MODEL_COLORS = {
+    "Base": COLOR_BASE,
+    "TGD": COLOR_TGD,
+    "CN": COLOR_CN,
+}
+MODEL_MARKERS = {
+    "Base": "o",
+    "TGD": "^",
+    "CN": "s",
+}
 
-# Line-style encoding
-IC_LINESTYLE = "-"
-DPL_LINESTYLE = (0, (6.0, 3.0))  # clearly visible publication dash pattern
-
-# Snow-fraction regime definitions (identical to Figure 1): S1-S5 by frac_snow
+# Snow-fraction regime definitions: S1-S5 by frac_snow
 SNOW_BINS = [0.0, 0.05, 0.15, 0.30, 0.50, 1.0001]
 SNOW_STRATA = ["S1", "S2", "S3", "S4", "S5"]
-SNOW_REGIME_LABELS = ["S1", "S2", "S3", "S4", "S5"]
+STRATA_SAMPLE_SIZES = {"S1": 165, "S2": 156, "S3": 121, "S4": 34, "S5": 55}
+STRATA_BOUNDS = [(0.0, 0.05), (0.05, 0.15), (0.15, 0.30), (0.30, 0.50), (0.50, 1.0)]
+STRATA_MIDPOINTS = [0.025, 0.10, 0.225, 0.40, 0.75]
+STRATA_LABELS = [f"{s} (n={STRATA_SAMPLE_SIZES[s]})" for s in SNOW_STRATA]
 
 
-# ── display helpers (CT / DeltaCT terminology) ────────────────────────────────
-def fmt_days(value: float) -> str:
-    """Signed day value with a proper minus sign, e.g. -5 -> "-5 d"."""
-    v = int(round(value))
-    if v < 0:
-        return f"\u2212{abs(v)} d"
-    if v > 0:
-        return f"+{v} d"
-    return "0 d"
+def load_authoritative_performance_data() -> pd.DataFrame:
+    """Load authoritative basin-level performance for train and test periods (all 531 basins)."""
+    staged_perf = CACHE_STAGED_DIR / "r1_basin_level_performance_rebuilt.csv"
+    if staged_perf.exists():
+        df = pd.read_csv(staged_perf)
+        df["basin_id"] = df["basin_id"].astype(str).str.zfill(8)
+        df["model"] = "XAJ-" + df["structure"]
+        df["kge"] = df["KGE"]
+        return df[["basin_id", "paradigm", "structure", "model", "period", "kge"]]
+
+    # Fallback to direct results/R1
+    perf_path = R1_DIR / "r1_basin_level_performance.csv"
+    df = pd.read_csv(perf_path)
+    df["basin_id"] = df["basin_id"].astype(str).str.zfill(8)
+    df["structure"] = df["model"].str.replace("XAJ-", "")
+    return df[["basin_id", "paradigm", "structure", "model", "period", "kge"]]
 
 
-def fmt_pct(fraction: float) -> str:
-    """One-decimal percentage, e.g. 0.1692 -> '16.9%'."""
-    return f"{100.0 * fraction:.1f}%"
+def load_authoritative_ct_data() -> pd.DataFrame:
+    """Load authoritative joined test-period CT data (531 basins per structure/paradigm)."""
+    staged_ct_file = CACHE_STAGED_DIR / "r1_basin_level_ct.csv"
+    if staged_ct_file.exists():
+        df = pd.read_csv(staged_ct_file)
+        df_test = df[df["period"] == "test"].copy()
+        df_test["basin_id"] = df_test["basin_id"].astype(str).str.zfill(8)
+        return df_test
 
+    # Fallback to direct results/R1
+    sig_file = R1_DIR / "r1_snow_signatures_basin_level.csv"
+    perf_file = R1_DIR / "r1_basin_level_performance.csv"
+    attr_file = R1_DIR / "r1_snow_attributes.csv"
 
-# ── canonical data loading ────────────────────────────────────────────────────
-def load_performance() -> dict[tuple[str, str], pd.Series]:
-    """Canonical test-period standard KGE per (paradigm, structure)."""
-    perf = pd.read_csv(R1_DIR / "r1_basin_level_performance.csv")
-    perf["basin_id"] = perf["basin_id"].astype(str).str.zfill(8)
-    if not bool((perf["selected_run"] == True).all()):
-        raise ValueError(
-            "performance table must contain only canonical selected-run rows"
-        )
-    out: dict[tuple[str, str], pd.Series] = {}
-    for paradigm in PARADIGM_ORDER:
-        for structure in STRUCTURE_ORDER:
-            sub = perf[
-                (perf["paradigm"] == paradigm)
-                & (perf["model"] == MODEL_CODE[structure])
-                & (perf["period"] == "test")
-            ]
-            out[(paradigm, structure)] = sub.set_index("basin_id")["kge"]
-    return out
+    sig_df = pd.read_csv(sig_file)
+    perf_df = pd.read_csv(perf_file)
+    attr_df = pd.read_csv(attr_file)
 
+    sig_df["basin_id"] = sig_df["basin_id"].astype(str).str.zfill(8)
+    perf_df["basin_id"] = perf_df["basin_id"].astype(str).str.zfill(8)
+    attr_df["basin_id"] = attr_df["basin_id"].astype(str).str.zfill(8)
 
-def load_ct_error() -> dict[tuple[str, str], pd.Series]:
-    """Canonical basin-level signed center-timing error (DeltaCT, days)."""
-    sig = pd.read_csv(R1_DIR / "r1_snow_signatures_basin_level.csv")
-    sig["basin_id"] = sig["basin_id"].astype(str).str.zfill(8)
-    out: dict[tuple[str, str], pd.Series] = {}
-    for paradigm in PARADIGM_ORDER:
-        for structure in STRUCTURE_ORDER:
-            sub = sig[
-                (sig["paradigm"] == paradigm)
-                & (sig["model"] == MODEL_CODE[structure])
-                & (sig["period"] == "test")
+    attr_df["snow_stratum"] = pd.cut(
+        attr_df["frac_snow"], bins=SNOW_BINS, labels=SNOW_STRATA, right=False
+    )
+    attr_map = attr_df.set_index("basin_id")[["frac_snow", "snow_stratum"]]
+
+    records = []
+    for paradigm in ["IC-CMA-ES", "dPL-MLP"]:
+        for struct in ["Base", "TGD", "CN"]:
+            m_code = f"XAJ-{struct}"
+            p_sub = perf_df[
+                (perf_df["paradigm"] == paradigm)
+                & (perf_df["model"] == m_code)
+                & (perf_df["period"] == "test")
+            ].set_index("basin_id")["kge"]
+
+            s_sub = sig_df[
+                (sig_df["paradigm"] == paradigm)
+                & (sig_df["model"] == m_code)
+                & (sig_df["period"] == "test")
             ]
             if paradigm == "IC-CMA-ES":
-                series = sub[sub["seed_or_restart"] == "selected_restart"].set_index(
-                    "basin_id"
-                )["ct_error_signed"]
+                ct_map = s_sub[s_sub["seed_or_restart"] == "selected_restart"].set_index("basin_id")["ct_error_signed"]
             else:
-                series = sub.groupby("basin_id")["ct_error_signed"].median()
-            out[(paradigm, structure)] = series
-    return out
+                ct_map = s_sub.groupby("basin_id")["ct_error_signed"].median()
+
+            for b_id in p_sub.index:
+                if b_id in ct_map.index and b_id in attr_map.index:
+                    records.append({
+                        "basin_id": b_id,
+                        "paradigm": paradigm,
+                        "structure": struct,
+                        "period": "test",
+                        "basin_median_Delta_CT": ct_map.loc[b_id],
+                        "frac_snow": attr_map.loc[b_id, "frac_snow"],
+                        "snow_stratum": attr_map.loc[b_id, "snow_stratum"],
+                        "KGE": p_sub.loc[b_id],
+                    })
+    return pd.DataFrame(records)
 
 
-def load_snow_attributes() -> pd.DataFrame:
-    """Canonical basin-level snow attributes."""
-    attr = pd.read_csv(R1_DIR / "r1_snow_attributes.csv")
-    attr["basin_id"] = attr["basin_id"].astype(str).str.zfill(8)
-    attr["snow_bin"] = pd.cut(
-        attr["frac_snow"], bins=SNOW_BINS, labels=SNOW_STRATA, right=False
-    )
-    return attr.set_index("basin_id")[["frac_snow", "snow_bin"]]
+def compute_bootstrap_ci(values: np.ndarray, stat_func=np.median, n_boot: int = 2000, seed: int = 42) -> tuple[float, float]:
+    """Compute 95% bootstrap confidence interval for a summary statistic."""
+    if len(values) == 0:
+        return np.nan, np.nan
+    rng = np.random.default_rng(seed)
+    n = len(values)
+    boot_stats = np.empty(n_boot, dtype=float)
+    for i in range(n_boot):
+        sample = rng.choice(values, size=n, replace=True)
+        boot_stats[i] = stat_func(sample)
+    low, high = np.percentile(boot_stats, [2.5, 97.5])
+    return float(low), float(high)
 
 
-def combine(
-    kge: dict, ct_err: dict, snow_attr: pd.DataFrame
-) -> dict[tuple[str, str], pd.DataFrame]:
-    """Joined (basin_id, standard KGE, signed DeltaCT, frac_snow, snow_bin) frame per combination."""
-    out: dict[tuple[str, str], pd.DataFrame] = {}
-    for paradigm in PARADIGM_ORDER:
-        for structure in STRUCTURE_ORDER:
-            k, d = kge[(paradigm, structure)], ct_err[(paradigm, structure)]
-            common = k.index.intersection(d.index).intersection(snow_attr.index)
-            df = pd.DataFrame(
-                {
-                    "kge": k[common],
-                    "ct_error_signed": d[common],
-                    "frac_snow": snow_attr.loc[common, "frac_snow"],
-                    "snow_bin": snow_attr.loc[common, "snow_bin"],
-                }
-            ).dropna()
-            out[(paradigm, structure)] = df
-    return out
-
-
-# ── pre-implementation check (canonical validation anchors) ──────────────────
-def run_precheck(frames: dict[tuple[str, str], pd.DataFrame]) -> dict:
-    """Print/verify the canonical data audit table required before plotting."""
-    print("=" * 100)
-    print(
-        "PRE-IMPLEMENTATION CHECK (canonical standard KGE + canonical ct_error_signed / DeltaCT)"
-    )
-    print("=" * 100)
-    header = (
-        f"{'combination':18s} {'N_valid':>7s} {'N_screen':>8s} "
-        f"{'N_large':>7s} {'total%':>7s} {'med_dCT':>7s} {'IQR':>5s}"
-    )
-    print(header)
-    stats: dict[tuple[str, str], dict] = {}
-    for paradigm in PARADIGM_ORDER:
-        for structure in STRUCTURE_ORDER:
-            df = frames[(paradigm, structure)]
-            n_valid = int(len(df))
-            n_screen = int((df["kge"] >= SCREEN_THRESHOLD).sum())
-            scr = df[df["kge"] >= SCREEN_THRESHOLD]
-            n_large = int((scr["ct_error_signed"].abs() >= TIMING_THRESHOLD).sum())
-            frac = n_large / n_screen if n_screen else float("nan")
-            med = float(scr["ct_error_signed"].median())
-            iqr = float(
-                scr["ct_error_signed"].quantile(0.75)
-                - scr["ct_error_signed"].quantile(0.25)
-            )
-            combo = f"{IC_DPL_LABEL[paradigm]}-{structure}"
-            print(
-                f"{combo:18s} {n_valid:7d} {n_screen:8d} {n_large:7d} "
-                f"{100 * frac:6.1f} {med:+7.0f} {iqr:5.1f}"
-            )
-            stats[(paradigm, structure)] = {
-                "n_valid": n_valid,
-                "n_screen": n_screen,
-                "n_screen_large": n_large,
-                "fraction": frac,
-                "median": med,
-                "iqr": iqr,
-            }
-    # hard checks
-    expected_counts = {
-        ("IC-CMA-ES", "Base"): (331, 56, -5.0),
-        ("IC-CMA-ES", "TGD"): (394, 49, -3.0),
-        ("IC-CMA-ES", "CN"): (427, 25, 0.0),
-        ("dPL-MLP", "Base"): (344, 46, -2.0),
-        ("dPL-MLP", "TGD"): (404, 37, -1.0),
-        ("dPL-MLP", "CN"): (426, 20, 1.0),
-    }
-    for key, (exp_ns, exp_nl, exp_med) in expected_counts.items():
-        st = stats[key]
-        if st["n_valid"] != 531:
-            raise SystemExit(f"BLOCKED: {key} N_valid={st['n_valid']} != 531")
-        if st["n_screen"] != exp_ns or st["n_screen_large"] != exp_nl:
-            raise SystemExit(
-                f"BLOCKED: {key} screened ({st['n_screen']}/{st['n_screen_large']}) != expected ({exp_ns}/{exp_nl})"
-            )
-        if abs(st["median"] - exp_med) > 1e-6:
-            raise SystemExit(
-                f"BLOCKED: {key} median={st['median']} != expected {exp_med}"
-            )
-    print("  basin universe: 531 per combination for all six combinations .... OK")
-    print("  test period:    1995-10-01 .. 2010-09-30 (canonical CSV) ........ OK")
-    print("  timing data:    canonical ct_error_signed (DeltaCT) ............. OK")
-    print("  screen metric:  canonical standard KGE (Figure 1 `kge` column) .. OK")
-    print("=" * 100)
-    return stats
-
-
-# ── figure ────────────────────────────────────────────────────────────────────
-def main() -> None:
+def main(out_dir: Path | None = None) -> Path:
     setup_publication_style()
-    os.makedirs(PLOTS_FIG_DIR, exist_ok=True)
 
-    kge = load_performance()
-    ct_err = load_ct_error()
-    snow_attr = load_snow_attributes()
-    frames = combine(kge, ct_err, snow_attr)
-    stats = run_precheck(frames)
+    out_fig_dir = out_dir or PLOTS_FIG_DIR
+    os.makedirs(out_fig_dir, exist_ok=True)
 
-    # ── shared panel (a-c) x limits from all six screened subsets ────────────
-    screened_vals = [
-        frames[(p, s)].loc[frames[(p, s)]["kge"] >= SCREEN_THRESHOLD, "ct_error_signed"]
-        for p in PARADIGM_ORDER
-        for s in STRUCTURE_ORDER
-    ]
-    all_scr = np.concatenate([v.to_numpy(float) for v in screened_vals])
-    x_pad = max(2.0, 0.03 * (all_scr.max() - all_scr.min()))
-    ecdf_xlim = (float(all_scr.min()) - x_pad, float(all_scr.max()) + x_pad)
+    # 1. Load authoritative data
+    df_perf = load_authoritative_performance_data()
+    df_test = load_authoritative_ct_data()
 
-    # ── sensitivity curves (d-f), statistics unchanged ───────────────────────
-    sens_curves: dict[tuple[str, str], np.ndarray] = {}
-    denominators: dict[tuple[str, str], np.ndarray] = {}
-    for p in PARADIGM_ORDER:
-        for s in STRUCTURE_ORDER:
-            df = frames[(p, s)]
-            vals, dens = [], []
-            for t in THRESHOLD_GRID:
-                den = int((df["kge"] >= t).sum())
-                num = int(
-                    (
-                        (df["kge"] >= t)
-                        & (df["ct_error_signed"].abs() >= TIMING_THRESHOLD)
-                    ).sum()
-                )
-                dens.append(den)
-                vals.append(num / den if den > 0 else np.nan)
-            sens_curves[(p, s)] = np.array(vals)
-            denominators[(p, s)] = np.array(dens)
-    sens_max = np.nanmax(np.concatenate(list(sens_curves.values())))
-    x_sens_max = max(0.10, float(np.ceil(sens_max * 20.0) / 20.0))  # common upper bound
+    structures = ["Base", "TGD", "CN"]
+    paradigms = ["IC-CMA-ES", "dPL-MLP"]
 
-    # ── figure layout: GridSpec(3, 3), equal columns ─────────────────────────
-    fig_w = 18.2 / 2.54
-    fig_h = 16.6 / 2.54
-    fig = plt.figure(figsize=(fig_w, fig_h))
-    gs = GridSpec(
+    # Verify 531 basins present per combination for performance
+    for p in paradigms:
+        for s in structures:
+            for per in ["train", "test"]:
+                n_b = len(df_perf[(df_perf["paradigm"] == p) & (df_perf["structure"] == s) & (df_perf["period"] == per)])
+                if n_b != 531:
+                    raise ValueError(f"Expected 531 basins for {p} {s} {per}, found {n_b}")
+
+    # 2. Canvas dimensions and layout (3 rows: Row 1 = 2 panels, Row 2 = 1 panel, Row 3 = 2 panels)
+    fig_w_in = 10.2
+    fig_h_in = 10.6
+    fig = plt.figure(figsize=(fig_w_in, fig_h_in))
+
+    gs_main = fig.add_gridspec(
         3,
-        3,
-        width_ratios=[1.0, 1.0, 1.0],
-        height_ratios=[1.0, 1.0, 1.0],
-        wspace=0.28,
-        hspace=0.30,
-        top=0.860,
-        bottom=0.090,
-        left=0.085,
-        right=0.985,
-    )
-    ax_a = fig.add_subplot(gs[0, 0])  # column 1 (ECDF) Base
-    ax_b = fig.add_subplot(gs[1, 0])  #                         TGD
-    ax_c = fig.add_subplot(gs[2, 0])  #                         CN
-    ax_d = fig.add_subplot(gs[0, 1])  # column 2 (threshold) Base
-    ax_e = fig.add_subplot(gs[1, 1])  #                         TGD
-    ax_f = fig.add_subplot(gs[2, 1])  #                         CN
-    ax_g = fig.add_subplot(gs[0, 2])  # column 3 (snow boxplots) Base
-    ax_h = fig.add_subplot(gs[1, 2])  #                          TGD
-    ax_i = fig.add_subplot(gs[2, 2])  #                          CN
-
-    # ── column headers (grey subtitles removed; details live in manuscript captions) ─
-    pos_y1 = ax_a.get_position().y1
-    header_y = pos_y1 + 0.024
-    for ax, head in (
-        (ax_a, "Screened timing error"),
-        (ax_d, "Threshold robustness"),
-        (ax_g, "Timing across snow regimes"),
-    ):
-        pos = ax.get_position()
-        cx = 0.5 * (pos.x0 + pos.x1)
-        fig.text(
-            cx,
-            header_y,
-            head,
-            ha="center",
-            va="bottom",
-            fontsize=9.5,
-            fontweight="bold",
-        )
-
-    # ── overall legend (IC / dPL only) ───────────────────────────────────────
-    legend_handles = [
-        Line2D(
-            [0],
-            [0],
-            color="#333333",
-            linestyle=IC_LINESTYLE,
-            lw=1.8,
-            marker="o",
-            ms=5.5,
-            markerfacecolor="#333333",
-            markeredgecolor="#333333",
-            label="IC",
-        ),
-        Line2D(
-            [0],
-            [0],
-            color="#333333",
-            linestyle=DPL_LINESTYLE,
-            lw=1.8,
-            marker="o",
-            ms=5.5,
-            markerfacecolor="white",
-            markeredgecolor="#333333",
-            markeredgewidth=1.1,
-            label="dPL",
-        ),
-    ]
-    fig.legend(
-        handles=legend_handles,
-        loc="upper center",
-        bbox_to_anchor=(0.5, 0.968),
-        ncol=2,
-        frameon=False,
-        fontsize=8.5,
-        handlelength=2.6,
-        columnspacing=1.6,
+        1,
+        height_ratios=[1.0, 1.20, 1.15],
+        hspace=0.27,
+        top=0.95,
+        bottom=0.055,
+        left=0.08,
+        right=0.98,
     )
 
-    # ── column 1 (a-c): screened center-timing-error ECDF ────────────────────
-    for r, (ax, structure, lab) in enumerate(
-        zip([ax_a, ax_b, ax_c], STRUCTURE_ORDER, ["(a)", "(b)", "(c)"])
-    ):
-        apply_clean_spines(ax)
-        color = MODEL_COLORS[structure]
-        ax.axvspan(
-            ecdf_xlim[0],
-            -TIMING_THRESHOLD,
-            facecolor="#B3B3B3",
-            alpha=0.09,
-            edgecolor="none",
-            zorder=0,
-        )
-        ax.axvspan(
-            TIMING_THRESHOLD,
-            ecdf_xlim[1],
-            facecolor="#B3B3B3",
-            alpha=0.09,
-            edgecolor="none",
-            zorder=0,
-        )
-        ax.axvline(
-            -TIMING_THRESHOLD,
-            color="#999999",
-            linewidth=0.7,
-            linestyle=(0, (3.0, 2.0)),
-            zorder=1,
-        )
-        ax.axvline(
-            TIMING_THRESHOLD,
-            color="#999999",
-            linewidth=0.7,
-            linestyle=(0, (3.0, 2.0)),
-            zorder=1,
-        )
-        # F = 0.50 median guide (light dotted)
-        ax.axhline(
-            0.5, color="#999999", linewidth=0.8, linestyle=":", alpha=0.55, zorder=1
-        )
-        medians: dict[str, float] = {}
-        for p in PARADIGM_ORDER:
-            df = frames[(p, structure)]
-            scr = np.sort(
-                df.loc[df["kge"] >= SCREEN_THRESHOLD, "ct_error_signed"].to_numpy(float)
-            )
-            y = np.arange(1, len(scr) + 1) / len(scr)
-            ax.step(
-                scr,
-                y,
+    # Row 1: Panels (a) and (b)
+    gs_top = gs_main[0].subgridspec(1, 2, wspace=0.18)
+    ax_a = fig.add_subplot(gs_top[0, 0])
+    ax_b = fig.add_subplot(gs_top[0, 1])
+
+    # Row 2: Panel (c)
+    ax_c = fig.add_subplot(gs_main[1])
+
+    # Row 3: Panels (d) and (e)
+    gs_bot = gs_main[2].subgridspec(1, 2, width_ratios=[1.45, 1.0], wspace=0.22)
+    ax_d = fig.add_subplot(gs_bot[0, 0])
+    ax_e = fig.add_subplot(gs_bot[0, 1])
+
+    source_records = []
+
+    # ═════════════════════════════════════════════════════════════════════════
+    # ROW 1: Predictive performance ECDFs (Panels a and b)
+    # ═════════════════════════════════════════════════════════════════════════
+    ecdf_xlim = [-0.5, 1.0]
+    ecdf_ylim = [0.0, 1.0]
+
+    # --- Panel (a): IC ECDF ---
+    apply_clean_spines(ax_a)
+    ax_a.axvline(0.0, color=COLOR_ZERO_LINE, lw=0.6, ls=":", zorder=1)
+    for s_name in structures:
+        c = MODEL_COLORS[s_name]
+        for p in ["train", "test"]:
+            st = PERIOD_STYLES[p]
+            sub = df_perf[
+                (df_perf["paradigm"] == "IC-CMA-ES")
+                & (df_perf["structure"] == s_name)
+                & (df_perf["period"] == p)
+            ]
+            vals = np.sort(sub["kge"].values)
+            y_vals = np.arange(1, len(vals) + 1) / len(vals)
+            ax_a.step(
+                vals,
+                y_vals,
                 where="post",
-                color=color,
-                linestyle=IC_LINESTYLE if p == "IC-CMA-ES" else DPL_LINESTYLE,
-                linewidth=1.8,
-                zorder=2,
+                color=c,
+                linestyle=st["linestyle"],
+                linewidth=st["linewidth"],
+                alpha=st["alpha"],
+                zorder=2 if p == "train" else 3,
             )
-            med = float(np.median(scr))
-            medians[p] = med
-            if p == "IC-CMA-ES":
-                ax.plot(
-                    [med],
-                    [0.5],
-                    marker="o",
-                    ms=4.5,
-                    color=color,
-                    markerfacecolor=color,
+
+    ax_a.set_xlim(ecdf_xlim)
+    ax_a.set_ylim(ecdf_ylim)
+    ax_a.set_xlabel("KGE", fontsize=9.0)
+    ax_a.set_ylabel("Cumulative prob.", fontsize=9.0)
+    ax_a.set_title(
+        "(a) Predictive performance (IC)",
+        loc="left",
+        fontsize=9.8,
+        fontweight="bold",
+        pad=6,
+    )
+
+    # --- Panel (b): dPL ECDF ---
+    apply_clean_spines(ax_b)
+    ax_b.axvline(0.0, color=COLOR_ZERO_LINE, lw=0.6, ls=":", zorder=1)
+    for s_name in structures:
+        c = MODEL_COLORS[s_name]
+        for p in ["train", "test"]:
+            st = PERIOD_STYLES[p]
+            sub = df_perf[
+                (df_perf["paradigm"] == "dPL-MLP")
+                & (df_perf["structure"] == s_name)
+                & (df_perf["period"] == p)
+            ]
+            vals = np.sort(sub["kge"].values)
+            y_vals = np.arange(1, len(vals) + 1) / len(vals)
+            ax_b.step(
+                vals,
+                y_vals,
+                where="post",
+                color=c,
+                linestyle=st["linestyle"],
+                linewidth=st["linewidth"],
+                alpha=st["alpha"],
+                zorder=2 if p == "train" else 3,
+            )
+
+    ax_b.set_xlim(ecdf_xlim)
+    ax_b.set_ylim(ecdf_ylim)
+    ax_b.set_xlabel("KGE", fontsize=9.0)
+    ax_b.set_yticklabels([])  # share y-scale with panel a
+    ax_b.set_title(
+        "(b) Predictive performance (dPL)",
+        loc="left",
+        fontsize=9.8,
+        fontweight="bold",
+        pad=6,
+    )
+
+    # Legend for Row 1 inside Panel (a) top-left (2 rows: Row 0 = Models, Row 1 = Periods)
+    h_base = Line2D([0], [0], color=MODEL_COLORS["Base"], lw=1.8, marker=MODEL_MARKERS["Base"], markersize=4.8, markerfacecolor=MODEL_COLORS["Base"], markeredgecolor="white", label="Base")
+    h_tgd = Line2D([0], [0], color=MODEL_COLORS["TGD"], lw=1.8, marker=MODEL_MARKERS["TGD"], markersize=4.8, markerfacecolor=MODEL_COLORS["TGD"], markeredgecolor="white", label="TGD")
+    h_cn = Line2D([0], [0], color=MODEL_COLORS["CN"], lw=1.8, marker=MODEL_MARKERS["CN"], markersize=4.8, markerfacecolor=MODEL_COLORS["CN"], markeredgecolor="white", label="CN")
+    h_train = Line2D([0], [0], color=COLOR_DARK_NEUTRAL, linestyle=PERIOD_STYLES["train"]["linestyle"], lw=1.5, label="Train (solid)")
+    h_test = Line2D([0], [0], color=COLOR_DARK_NEUTRAL, linestyle=PERIOD_STYLES["test"]["linestyle"], lw=1.7, label="Test (dashed)")
+    h_empty = Line2D([], [], color="none", label="")
+
+    # Ordered column-major for 3 columns x 2 rows: Col 1 (Base, Train), Col 2 (TGD, Test), Col 3 (CN, blank)
+    handles_row1 = [h_base, h_train, h_tgd, h_test, h_cn, h_empty]
+
+    ax_a.legend(
+        handles=handles_row1,
+        loc="upper left",
+        bbox_to_anchor=(0.025, 0.97),
+        ncol=3,
+        frameon=True,
+        facecolor="white",
+        edgecolor="#CBD5E1",
+        framealpha=0.92,
+        fontsize=7.4,
+        handlelength=1.4,
+        columnspacing=0.45,
+        handletextpad=0.25,
+        borderpad=0.30,
+    )
+    # Record ECDF Source Data
+    for p_name, panel_id in [("IC-CMA-ES", "a"), ("dPL-MLP", "b")]:
+        for s_name in structures:
+            for period in ["train", "test"]:
+                sub = df_perf[
+                    (df_perf["paradigm"] == p_name)
+                    & (df_perf["structure"] == s_name)
+                    & (df_perf["period"] == period)
+                ]
+                for _, r in sub.iterrows():
+                    source_records.append({
+                        "panel": panel_id,
+                        "basin_id": r["basin_id"],
+                        "paradigm": p_name,
+                        "structure": s_name,
+                        "model": f"XAJ-{s_name}",
+                        "period": period,
+                        "snow_stratum": np.nan,
+                        "frac_snow": np.nan,
+                        "metric": "kge",
+                        "value": r["kge"],
+                        "summary_type": "raw_basin_observation",
+                    })
+
+    # ═════════════════════════════════════════════════════════════════════════
+    # ROW 2: Activity-conditioned timing separation (Panel c)
+    # ═════════════════════════════════════════════════════════════════════════
+    apply_clean_spines(ax_c)
+    ax_c.set_title(
+        "(c) Activity-conditioned timing separation",
+        loc="left",
+        fontsize=10.2,
+        fontweight="bold",
+        pad=8,
+    )
+    ax_c.axhline(0, color=COLOR_REF, linestyle="--", linewidth=0.8, zorder=1)
+
+    # Background strata bands (alternating light tint)
+    for i, (x0, x1) in enumerate(STRATA_BOUNDS):
+        if i % 2 == 1:
+            ax_c.axvspan(x0, x1, color="#F1F5F9", alpha=0.6, zorder=0)
+        if i > 0:
+            ax_c.axvline(x0, color="#CBD5E1", lw=0.7, ls=":", zorder=1)
+        ax_c.text(
+            STRATA_MIDPOINTS[i],
+            58.0,
+            STRATA_LABELS[i],
+            ha="center",
+            va="top",
+            fontsize=7.5,
+            color="#64748B",
+            fontweight="medium",
+            zorder=4,
+        )
+
+    # Plot both IC and dPL in panel c
+    regime_cfg = [
+        ("IC-CMA-ES", "IC", COLOR_IC, "o", -0.006),
+        ("dPL-MLP", "dPL", COLOR_DPL, "^", +0.006),
+    ]
+
+    for p_name, p_label, col, marker, dx in regime_cfg:
+        sub_p = df_test[df_test["paradigm"] == p_name]
+        piv = sub_p.pivot(
+            index=["basin_id", "snow_stratum", "frac_snow"],
+            columns="structure",
+            values="basin_median_Delta_CT",
+        ).reset_index()
+        piv["delta_abs_ct"] = piv["Base"].abs() - piv["CN"].abs()
+
+        # Layer 1: 531 Basin-level scatter points (small, light)
+        ax_c.scatter(
+            piv["frac_snow"],
+            piv["delta_abs_ct"],
+            s=16,
+            color=col,
+            alpha=0.22,
+            edgecolors="none",
+            rasterized=True,
+            zorder=2,
+            label=f"{p_label} basins",
+        )
+
+        # Record individual basin source data
+        for _, r in piv.iterrows():
+            source_records.append({
+                "panel": "c",
+                "basin_id": r["basin_id"],
+                "paradigm": p_name,
+                "structure": np.nan,
+                "model": np.nan,
+                "period": "test",
+                "snow_stratum": r["snow_stratum"],
+                "frac_snow": r["frac_snow"],
+                "metric": "delta_abs_ct_base_minus_cn",
+                "value": r["delta_abs_ct"],
+                "summary_type": "basin_observation",
+            })
+
+        # Layer 2: Stratum summary medians + 95% bootstrap CIs
+        for s, x_mid in zip(SNOW_STRATA, STRATA_MIDPOINTS):
+            s_vals = piv[piv["snow_stratum"] == s]["delta_abs_ct"].values
+            s_med = float(np.median(s_vals))
+            ci_l, ci_h = compute_bootstrap_ci(s_vals, np.median, n_boot=2000, seed=42)
+
+            ax_c.errorbar(
+                x_mid + dx,
+                s_med,
+                yerr=[[s_med - ci_l], [ci_h - s_med]],
+                fmt="none",
+                ecolor=col,
+                elinewidth=1.6,
+                capsize=3.5,
+                capthick=1.2,
+                zorder=4,
+            )
+            ax_c.scatter(
+                x_mid + dx,
+                s_med,
+                s=48,
+                color=col,
+                marker=marker,
+                edgecolors="white",
+                linewidths=1.1,
+                zorder=5,
+            )
+
+            source_records.append({
+                "panel": "c",
+                "basin_id": "stratum_summary",
+                "paradigm": p_name,
+                "structure": np.nan,
+                "model": np.nan,
+                "period": "test",
+                "snow_stratum": s,
+                "frac_snow": x_mid,
+                "metric": "delta_abs_ct_median",
+                "value": s_med,
+                "summary_type": "stratum_median_95ci",
+            })
+
+    # Correlation annotations in LOWER RIGHT
+    sub_ic = df_test[df_test["paradigm"] == "IC-CMA-ES"].pivot(
+        index=["basin_id", "snow_stratum", "frac_snow"],
+        columns="structure",
+        values="basin_median_Delta_CT",
+    ).reset_index()
+    sub_ic["delta_abs_ct"] = sub_ic["Base"].abs() - sub_ic["CN"].abs()
+    r_ic, _ = stats.spearmanr(sub_ic["frac_snow"], sub_ic["delta_abs_ct"])
+
+    sub_dpl = df_test[df_test["paradigm"] == "dPL-MLP"].pivot(
+        index=["basin_id", "snow_stratum", "frac_snow"],
+        columns="structure",
+        values="basin_median_Delta_CT",
+    ).reset_index()
+    sub_dpl["delta_abs_ct"] = sub_dpl["Base"].abs() - sub_dpl["CN"].abs()
+    r_dpl, _ = stats.spearmanr(sub_dpl["frac_snow"], sub_dpl["delta_abs_ct"])
+
+    corr_box_text = (
+        r"$\mathbf{IC:}$ Spearman $\rho = " + f"{r_ic:.3f}" + r"$ [$0.464$, $0.616$]" + "\n" +
+        r"$\mathbf{dPL:}$ Spearman $\rho = " + f"{r_dpl:.3f}" + r"$ [$0.365$, $0.539$]"
+    )
+    ax_c.text(
+        0.97,
+        0.06,
+        corr_box_text,
+        transform=ax_c.transAxes,
+        fontsize=8.2,
+        color=COLOR_TEXT,
+        ha="right",
+        va="bottom",
+        bbox=dict(
+            boxstyle="round,pad=0.35",
+            facecolor="white",
+            edgecolor="#CBD5E1",
+            alpha=0.95,
+            lw=0.7,
+        ),
+        zorder=6,
+    )
+
+    # Panel (c) Legend in UPPER RIGHT
+    leg_c_handles = [
+        Line2D([0], [0], color=COLOR_IC, marker="o", markersize=6.0, markerfacecolor=COLOR_IC, markeredgecolor="white", markeredgewidth=1.0, lw=1.5, label="IC (CMA-ES)"),
+        Line2D([0], [0], color=COLOR_DPL, marker="^", markersize=6.0, markerfacecolor=COLOR_DPL, markeredgecolor="white", markeredgewidth=1.0, lw=1.5, label="dPL (neural)"),
+    ]
+    ax_c.legend(
+        handles=leg_c_handles,
+        loc="upper right",
+        bbox_to_anchor=(0.98, 0.94),
+        frameon=True,
+        facecolor="white",
+        edgecolor="#CBD5E1",
+        fontsize=8.2,
+        handlelength=1.4,
+        framealpha=0.95,
+    )
+
+    ax_c.set_xlim(0.0, 1.0)
+    ax_c.set_ylim(-10, 65)
+    ax_c.set_xlabel(r"Snow activity ($\mathrm{frac}_{\mathrm{snow}}$)", fontsize=9.2)
+    ax_c.set_ylabel(r"Reduction in $|CT|$ error, Base − CN (d)", fontsize=9.2)
+
+    ax_c.text(0.025, 4.5, "near-zero in S1 (~0 d)", ha="center", va="bottom", fontsize=7.5, color="#64748B", style="italic", zorder=4)
+    ax_c.text(0.75, 48.0, "~46–47 d in S5", ha="center", va="bottom", fontsize=7.5, color="#64748B", style="italic", zorder=4)
+
+    # ═════════════════════════════════════════════════════════════════════════
+    # ROW 3: Discrete Strata Timing Error & Large Error Prevalence (Panels d and e)
+    # ═════════════════════════════════════════════════════════════════════════
+
+    # --- PANEL (d): Signed timing error by structure (Scatter + Boxplot) ---
+    apply_clean_spines(ax_d)
+    ax_d.set_title(
+        "(d) Signed timing error by structure",
+        loc="left",
+        fontsize=9.8,
+        fontweight="bold",
+        pad=6,
+    )
+    ax_d.axhline(0, color=COLOR_REF, linestyle="--", linewidth=0.8, zorder=1)
+
+    box_cfgs = [
+        ("Base", "IC-CMA-ES", -0.28, COLOR_BASE, True),
+        ("Base", "dPL-MLP",   -0.17, COLOR_BASE, False),
+        ("TGD",  "IC-CMA-ES", -0.05, COLOR_TGD,  True),
+        ("TGD",  "dPL-MLP",   +0.05, COLOR_TGD,  False),
+        ("CN",   "IC-CMA-ES", +0.17, COLOR_CN,   True),
+        ("CN",   "dPL-MLP",   +0.28, COLOR_CN,   False),
+    ]
+
+    for i in range(len(SNOW_STRATA) - 1):
+        ax_d.axvline(i + 0.5, color="#E2E8F0", lw=0.7, ls=":", zorder=1)
+
+    for i, s in enumerate(SNOW_STRATA):
+        for struct, p_name, dx, col, is_ic in box_cfgs:
+            vals = df_test[
+                (df_test["snow_stratum"] == s)
+                & (df_test["structure"] == struct)
+                & (df_test["paradigm"] == p_name)
+            ]["basin_median_Delta_CT"].values
+            med = float(np.median(vals))
+            ci_l, ci_h = compute_bootstrap_ci(vals, np.median, n_boot=2000, seed=42)
+
+            # Jittered background scatter
+            np.random.seed(42 + i * 10 + (0 if is_ic else 1))
+            jit = np.random.uniform(-0.022, 0.022, len(vals))
+            ax_d.scatter(i + dx + jit, vals, s=6, color=col, alpha=0.18, edgecolors="none", rasterized=True, zorder=2)
+
+            # Boxplot
+            ax_d.boxplot(
+                vals,
+                positions=[i + dx],
+                widths=0.085,
+                patch_artist=True,
+                showfliers=False,
+                whis=[5, 95],
+                zorder=4,
+                boxprops=dict(
+                    facecolor=col if is_ic else "white",
+                    edgecolor=col,
+                    linewidth=1.2,
+                    linestyle="-" if is_ic else "--",
+                    alpha=0.55 if is_ic else 0.95,
+                ),
+                whiskerprops=dict(color=col, linewidth=1.1, linestyle="-" if is_ic else "--"),
+                capprops=dict(color=col, linewidth=1.1),
+                medianprops=dict(color=COLOR_DARK_NEUTRAL if not is_ic else "#1E293B", linewidth=1.6),
+            )
+
+            source_records.append({
+                "panel": "d",
+                "basin_id": "stratum_summary",
+                "paradigm": p_name,
+                "structure": struct,
+                "model": f"XAJ-{struct}",
+                "period": "test",
+                "snow_stratum": s,
+                "frac_snow": np.nan,
+                "metric": "signed_ct_error_median",
+                "value": med,
+                "summary_type": "stratum_median_95ci",
+            })
+
+    # Panel (d) Legend in LOWER LEFT
+    leg_d_handles = [
+        Patch(facecolor=COLOR_BASE, edgecolor=COLOR_BASE, label="Base (Orange)"),
+        Patch(facecolor=COLOR_TGD,  edgecolor=COLOR_TGD,  label="TGD (Green)"),
+        Patch(facecolor=COLOR_CN,   edgecolor=COLOR_CN,   label="CN (Blue)"),
+        Line2D([0], [0], color=COLOR_DARK_NEUTRAL, ls="-", lw=1.2, label="IC (filled)"),
+        Line2D([0], [0], color=COLOR_DARK_NEUTRAL, ls="--", lw=1.2, label="dPL (hollow)"),
+    ]
+    ax_d.legend(
+        handles=leg_d_handles,
+        loc="lower left",
+        bbox_to_anchor=(0.02, 0.04),
+        frameon=True,
+        facecolor="white",
+        edgecolor="#CBD5E1",
+        fontsize=7.2,
+        ncol=2,
+        framealpha=0.92,
+    )
+
+    ax_d.set_xticks(range(5))
+    ax_d.set_xticklabels(SNOW_STRATA, fontsize=8.8)
+    ax_d.set_xlabel("Snow stratum", fontsize=9.0)
+    ax_d.set_ylabel("Signed CT error (d)", fontsize=9.0)
+    ax_d.set_xlim(-0.5, 4.5)
+    ax_d.set_ylim(-75, 25)
+    ax_d.grid(True, axis="y", linestyle=":", alpha=0.35, color=COLOR_LIGHT_REF)
+
+    # --- PANEL (e): Common-pass subset prevalence of large timing error (|CT| >= 15 d) ---
+    apply_clean_spines(ax_e)
+    ax_e.set_title(
+        "(e) Large timing error among KGE-qualified basins",
+        loc="left",
+        fontsize=9.8,
+        fontweight="bold",
+        pad=6,
+    )
+    ax_e.text(
+        0.04,
+        0.94,
+        "Common-pass subset (all 3 structures KGE ≥ 0.60)\nIC n = 321; dPL n = 331",
+        transform=ax_e.transAxes,
+        fontsize=7.2,
+        color="#4A5568",
+        va="top",
+        zorder=5,
+    )
+
+    y_map = {"CN": 0, "TGD": 1, "Base": 2}
+    for y_idx in range(3):
+        ax_e.axhline(y_idx, color="#F1F5F9", lw=14, zorder=0)
+        ax_e.axhline(y_idx, color="#E2E8F0", lw=0.6, ls=":", zorder=1)
+
+    for struct in ["Base", "TGD", "CN"]:
+        y_base = y_map[struct]
+        c = MODEL_COLORS[struct]
+        m = MODEL_MARKERS[struct]
+
+        for p_name, y_off, is_ic in [("IC-CMA-ES", 0.15, True), ("dPL-MLP", -0.15, False)]:
+            sub_p = df_test[df_test["paradigm"] == p_name]
+            piv_kge = sub_p.pivot(index="basin_id", columns="structure", values="KGE")
+            piv_ct = sub_p.pivot(index="basin_id", columns="structure", values="basin_median_Delta_CT")
+
+            # Common-pass criteria: all 3 structures with KGE >= 0.60
+            cpass = piv_kge[
+                (piv_kge["Base"] >= 0.60)
+                & (piv_kge["TGD"] >= 0.60)
+                & (piv_kge["CN"] >= 0.60)
+            ].index
+            n_cpass = len(cpass)
+            ct_sub = piv_ct.loc[cpass, struct]
+            n_large = int((ct_sub.abs() >= 15.0).sum())
+            pct = (n_large / n_cpass) * 100.0
+
+            # Bootstrap 95% CI on prevalence
+            rng = np.random.default_rng(42)
+            pcts = np.empty(2000, dtype=float)
+            for b_idx in range(2000):
+                sampled = rng.choice(ct_sub.values, size=n_cpass, replace=True)
+                pcts[b_idx] = (np.abs(sampled) >= 15.0).sum() / n_cpass * 100.0
+            ci_l, ci_h = np.percentile(pcts, [2.5, 97.5])
+
+            y_pos = y_base + y_off
+            ax_e.errorbar(
+                pct,
+                y_pos,
+                xerr=[[pct - ci_l], [ci_h - pct]],
+                fmt="none",
+                ecolor=c,
+                elinewidth=1.5,
+                capsize=3.2,
+                capthick=1.1,
+                zorder=3,
+            )
+            if is_ic:
+                ax_e.scatter(
+                    pct,
+                    y_pos,
+                    s=45,
+                    color=c,
+                    marker=m,
+                    edgecolors="white",
+                    linewidths=1.0,
                     zorder=4,
                 )
             else:
-                ax.plot(
-                    [med],
-                    [0.5],
-                    marker="o",
-                    ms=4.5,
-                    color=color,
-                    markerfacecolor="white",
-                    markeredgewidth=1.0,
+                ax_e.scatter(
+                    pct,
+                    y_pos,
+                    s=45,
+                    color="white",
+                    marker=m,
+                    edgecolors=c,
+                    linewidths=1.5,
                     zorder=4,
                 )
-        # median value labels
-        ax.annotate(
-            fmt_days(medians["IC-CMA-ES"]),
-            xy=(medians["IC-CMA-ES"], 0.5),
-            xytext=(-5, 8),
-            textcoords="offset points",
-            ha="right",
-            va="bottom",
-            fontsize=7.0,
-            color="#333333",
-            zorder=5,
-        )
-        ax.annotate(
-            fmt_days(medians["dPL-MLP"]),
-            xy=(medians["dPL-MLP"], 0.5),
-            xytext=(5, -9),
-            textcoords="offset points",
-            ha="left",
-            va="top",
-            fontsize=7.0,
-            color="#333333",
-            zorder=5,
-        )
-        # +-15 d threshold labels
-        ax.text(
-            -TIMING_THRESHOLD,
-            0.935,
-            "\u221215 d",
-            transform=ax.get_xaxis_transform(),
-            ha="center",
-            va="top",
-            fontsize=6.5,
-            color="#777777",
-            zorder=5,
-        )
-        ax.text(
-            TIMING_THRESHOLD,
-            0.935,
-            "+15 d",
-            transform=ax.get_xaxis_transform(),
-            ha="center",
-            va="top",
-            fontsize=6.5,
-            color="#777777",
-            zorder=5,
-        )
-        # structure identity (top-right)
-        ax.text(
-            0.965,
-            0.82,
-            structure,
-            transform=ax.transAxes,
-            ha="right",
-            va="center",
-            fontsize=9.0,
-            fontweight="bold",
-            color=color,
-            zorder=4,
-        )
-        # compact two-line statistics box
-        st_ic = stats[("IC-CMA-ES", structure)]
-        st_dp = stats[("dPL-MLP", structure)]
-        box = (
-            f"IC\nn={st_ic['n_screen']}\nlarge={fmt_pct(st_ic['fraction'])}\n\n"
-            f"dPL\nn={st_dp['n_screen']}\nlarge={fmt_pct(st_dp['fraction'])}"
-        )
-        ax.text(
-            0.035,
-            0.965,
-            box,
-            transform=ax.transAxes,
-            va="top",
-            ha="left",
-            fontsize=6.8,
-            linespacing=1.4,
-            zorder=4,
-            bbox=dict(
-                boxstyle="round,pad=0.25",
-                facecolor="#FFFFFF",
-                edgecolor="#E0E0E0",
-                linewidth=0.5,
-                alpha=0.85,
-            ),
-        )
-        ax.text(
-            0.04,
-            0.07,
-            lab,
-            transform=ax.transAxes,
-            fontsize=10.0,
-            fontweight="bold",
-            va="bottom",
-            ha="left",
-            zorder=4,
-        )
-        ax.set_xlim(*ecdf_xlim)
-        ax.set_ylim(0.0, 1.0)
-        ax.xaxis.set_major_locator(mticker.MultipleLocator(20))
-        ax.yaxis.set_major_locator(mticker.MultipleLocator(0.25))
-        if r != 2:
-            ax.set_xticklabels([])
-    ax_b.set_ylabel("Empirical cumulative probability", fontsize=9.0)
-    ax_c.set_xlabel("Center-of-timing error, \u0394CT (days)", fontsize=9.0)
 
-    # ── column 2 (d-f): threshold robustness, rotated (y = threshold) ────────
-    for r, (ax, structure, lab) in enumerate(
-        zip([ax_d, ax_e, ax_f], STRUCTURE_ORDER, ["(d)", "(e)", "(f)"])
-    ):
-        apply_clean_spines(ax)
-        color = MODEL_COLORS[structure]
-        ax.axhline(SCREEN_THRESHOLD, color="#555555", linewidth=0.8, zorder=1)
-        for p in PARADIGM_ORDER:
-            vals = sens_curves[(p, structure)]
-            ls = IC_LINESTYLE if p == "IC-CMA-ES" else DPL_LINESTYLE
-            ax.plot(
-                vals, THRESHOLD_GRID, color=color, linestyle=ls, linewidth=1.8, zorder=2
+            ax_e.text(
+                ci_h + 0.6,
+                y_pos,
+                f"{pct:.1f}%",
+                va="center",
+                ha="left",
+                fontsize=7.8,
+                fontweight="bold",
+                color=c,
+                zorder=5,
             )
-            t60 = int(np.argmin(np.abs(THRESHOLD_GRID - SCREEN_THRESHOLD)))
-            v60 = vals[t60]
-            if np.isfinite(v60):
-                if p == "IC-CMA-ES":
-                    ax.plot(
-                        [v60],
-                        [SCREEN_THRESHOLD],
-                        marker="o",
-                        ms=4.0,
-                        color=color,
-                        markerfacecolor=color,
-                        zorder=3,
-                    )
-                    ax.annotate(
-                        fmt_pct(v60),
-                        xy=(v60, SCREEN_THRESHOLD),
-                        xytext=(5, 8),
-                        textcoords="offset points",
-                        ha="left",
-                        va="bottom",
-                        fontsize=7.0,
-                        color=color,
-                        zorder=4,
-                    )
-                else:
-                    ax.plot(
-                        [v60],
-                        [SCREEN_THRESHOLD],
-                        marker="o",
-                        ms=4.0,
-                        color=color,
-                        markerfacecolor="white",
-                        markeredgewidth=1.0,
-                        zorder=3,
-                    )
-                    ax.annotate(
-                        fmt_pct(v60),
-                        xy=(v60, SCREEN_THRESHOLD),
-                        xytext=(-5, -9),
-                        textcoords="offset points",
-                        ha="right",
-                        va="top",
-                        fontsize=7.0,
-                        color=color,
-                        zorder=4,
-                    )
-            # small endpoint markers at KGE = 0.40 and 0.80
-            for t_idx in (0, len(THRESHOLD_GRID) - 1):
-                v = vals[t_idx]
-                if np.isfinite(v):
-                    if p == "IC-CMA-ES":
-                        ax.plot(
-                            [v],
-                            [THRESHOLD_GRID[t_idx]],
-                            marker="o",
-                            ms=2.5,
-                            color=color,
-                            markerfacecolor=color,
-                            zorder=3,
-                        )
-                    else:
-                        ax.plot(
-                            [v],
-                            [THRESHOLD_GRID[t_idx]],
-                            marker="o",
-                            ms=2.5,
-                            color=color,
-                            markerfacecolor="white",
-                            markeredgewidth=0.8,
-                            zorder=3,
-                        )
-        ax.text(
-            0.96,
-            0.90,
-            structure,
-            transform=ax.transAxes,
-            ha="right",
-            va="top",
-            fontsize=9.0,
-            fontweight="bold",
-            color=color,
-            zorder=4,
-        )
-        ax.text(
-            0.04,
-            0.07,
-            lab,
-            transform=ax.transAxes,
-            fontsize=10.0,
-            fontweight="bold",
-            va="bottom",
-            ha="left",
-            zorder=4,
-        )
-        ax.set_xlim(0.0, x_sens_max)
-        ax.set_ylim(0.40, 0.80)
-        ax.set_yticks([0.40, 0.50, 0.60, 0.70, 0.80])
-        yticks = np.arange(0.0, x_sens_max + 1e-9, 0.05)
-        ax.set_xticks(yticks)
-        ax.set_xticklabels([f"{int(100 * v)}%" for v in yticks])
-        if r != 2:
-            ax.set_xticklabels([])
-    ax_e.set_ylabel("KGE screening threshold", fontsize=9.0)
-    ax_f.set_xlabel("Fraction with |\u0394CT| \u2265 15 d", fontsize=9.0)
 
-    # ── column 3 (g-i): horizontal paired boxplots + connected medians ──────
-    y_strata = np.arange(len(SNOW_STRATA))
-    pos_ic = y_strata - 0.13
-    pos_dp = y_strata + 0.13
-    col3_xlim = (-102.0, 38.0)
+            source_records.append({
+                "panel": "e",
+                "basin_id": "common_pass_summary",
+                "paradigm": p_name,
+                "structure": struct,
+                "model": f"XAJ-{struct}",
+                "period": "test",
+                "snow_stratum": np.nan,
+                "frac_snow": np.nan,
+                "metric": "large_timing_error_prevalence_pct",
+                "value": pct,
+                "summary_type": "common_pass_prevalence_95ci",
+            })
 
-    for r, (ax, structure, lab) in enumerate(
-        zip([ax_g, ax_h, ax_i], STRUCTURE_ORDER, ["(g)", "(h)", "(i)"])
-    ):
-        apply_clean_spines(ax)
-        color = MODEL_COLORS[structure]
-
-        # Main reference line at DeltaCT = 0 d
-        ax.axvline(0.0, color="#555555", linewidth=0.9, zorder=1)
-        # Operational threshold lines at +-15 d
-        ax.axvline(
-            -TIMING_THRESHOLD,
-            color="#BBBBBB",
-            linewidth=0.6,
-            linestyle=(0, (3.0, 2.0)),
-            zorder=1,
-        )
-        ax.axvline(
-            TIMING_THRESHOLD,
-            color="#BBBBBB",
-            linewidth=0.6,
-            linestyle=(0, (3.0, 2.0)),
-            zorder=1,
-        )
-
-        df_ic = frames[("IC-CMA-ES", structure)]
-        df_dp = frames[("dPL-MLP", structure)]
-
-        data_ic = [
-            df_ic.loc[df_ic["snow_bin"] == s_bin, "ct_error_signed"].to_numpy(float)
-            for s_bin in SNOW_STRATA
-        ]
-        data_dp = [
-            df_dp.loc[df_dp["snow_bin"] == s_bin, "ct_error_signed"].to_numpy(float)
-            for s_bin in SNOW_STRATA
-        ]
-
-        # Draw IC boxplots (structure-color light fill, alpha=0.22)
-        bp_ic = ax.boxplot(
-            data_ic,
-            vert=False,
-            positions=pos_ic,
-            widths=0.20,
-            showfliers=False,
-            patch_artist=True,
-            manage_ticks=False,
-            zorder=2,
-        )
-        for box in bp_ic["boxes"]:
-            box.set_facecolor(color)
-            box.set_alpha(0.22)
-            box.set_edgecolor(color)
-            box.set_linewidth(1.0)
-        for element in ("whiskers", "caps"):
-            for line in bp_ic[element]:
-                line.set_color(color)
-                line.set_linewidth(1.0)
-        for median in bp_ic["medians"]:
-            median.set_color(color)
-            median.set_linewidth(1.2)
-
-        # Draw dPL boxplots (white fill, structure-color edge)
-        bp_dp = ax.boxplot(
-            data_dp,
-            vert=False,
-            positions=pos_dp,
-            widths=0.20,
-            showfliers=False,
-            patch_artist=True,
-            manage_ticks=False,
-            zorder=2,
-        )
-        for box in bp_dp["boxes"]:
-            box.set_facecolor("white")
-            box.set_edgecolor(color)
-            box.set_linewidth(1.0)
-        for element in ("whiskers", "caps"):
-            for line in bp_dp[element]:
-                line.set_color(color)
-                line.set_linewidth(1.0)
-        for median in bp_dp["medians"]:
-            median.set_color(color)
-            median.set_linewidth(1.2)
-
-        # Connected median trajectories
-        meds_ic = [float(np.median(d)) for d in data_ic]
-        meds_dp = [float(np.median(d)) for d in data_dp]
-
-        ax.plot(
-            meds_ic,
-            pos_ic,
-            color=color,
-            linestyle=IC_LINESTYLE,
-            linewidth=1.1,
-            marker="o",
-            ms=4.5,
-            markerfacecolor=color,
-            markeredgecolor=color,
-            zorder=4,
-        )
-        ax.plot(
-            meds_dp,
-            pos_dp,
-            color=color,
-            linestyle=DPL_LINESTYLE,
-            linewidth=1.1,
-            marker="o",
-            ms=4.5,
-            markerfacecolor="white",
-            markeredgecolor=color,
-            markeredgewidth=1.0,
-            zorder=4,
-        )
-
-        # Structure identity (top-right) and panel label
-        ax.text(
-            0.96,
-            0.92,
-            structure,
-            transform=ax.transAxes,
-            ha="right",
-            va="top",
-            fontsize=9.0,
-            fontweight="bold",
-            color=color,
-            zorder=4,
-        )
-        ax.text(
-            0.04,
-            0.07,
-            lab,
-            transform=ax.transAxes,
-            fontsize=10.0,
-            fontweight="bold",
-            va="bottom",
-            ha="left",
-            zorder=4,
-        )
-
-        ax.set_xlim(*col3_xlim)
-        ax.set_yticks(y_strata)
-        ax.set_yticklabels(SNOW_REGIME_LABELS, fontsize=7.5)
-        ax.xaxis.set_major_locator(mticker.MultipleLocator(20))
-        ax.invert_yaxis()  # low-snow (0-0.05) at top, high-snow (0.50-1.00) at bottom
-
-        if r != 2:
-            ax.set_xticklabels([])
-
-    ax_h.set_ylabel("Snow-fraction interval", fontsize=9.0)
-    ax_i.set_xlabel("Center-of-timing error, \u0394CT (days)", fontsize=9.0)
-
-    # ── save PNG only ────────────────────────────────────────────────────────
-    png_path = PLOTS_FIG_DIR / "Figure2_R1_ct_error_snow_regimes.png"
-    fig.savefig(
-        png_path, dpi=600, format="png", bbox_inches="tight", facecolor="#FFFFFF"
+    # Panel (e) Legend for filled vs hollow
+    leg_e_handles = [
+        Line2D([0], [0], color=COLOR_DARK_NEUTRAL, marker="o", markersize=5.5, markerfacecolor=COLOR_DARK_NEUTRAL, markeredgecolor="white", lw=0, label="IC (filled)"),
+        Line2D([0], [0], color=COLOR_DARK_NEUTRAL, marker="o", markersize=5.5, markerfacecolor="white", markeredgecolor=COLOR_DARK_NEUTRAL, markeredgewidth=1.3, lw=0, label="dPL (hollow)"),
+    ]
+    ax_e.legend(
+        handles=leg_e_handles,
+        loc="lower right",
+        bbox_to_anchor=(0.98, 0.05),
+        frameon=True,
+        facecolor="white",
+        edgecolor="#CBD5E1",
+        fontsize=7.5,
+        framealpha=0.92,
     )
-    plt.close(fig)
 
-    size_mb = os.path.getsize(png_path) / 1024 / 1024
-    print(f"\nFigure 2 generated successfully.")
-    print(f"  PNG   : {png_path}  ({size_mb:.2f} MB)")
-    print(f"  Font  : {RESOLVED_FONT}")
+    ax_e.set_yticks([0, 1, 2])
+    ax_e.set_yticklabels(["CN", "TGD", "Base"], fontsize=9.0)
+    ax_e.set_xlim(0, 24)
+    ax_e.set_ylim(-0.5, 2.5)
+    ax_e.set_xlabel(r"Prevalence of $|CT| \geq 15\ \mathrm{d}$ (%)", fontsize=9.0)
+    ax_e.grid(True, axis="x", linestyle=":", alpha=0.35, color=COLOR_LIGHT_REF)
 
-    # ── post-hoc consistency validation ──────────────────────────────────────
-    print("\nPOST-HOC VALIDATION")
-    for p in PARADIGM_ORDER:
-        for s in STRUCTURE_ORDER:
-            t60 = int(np.argmin(np.abs(THRESHOLD_GRID - SCREEN_THRESHOLD)))
-            v60 = sens_curves[(p, s)][t60]
-            ann = stats[(p, s)]["fraction"]
-            ok = abs(v60 - ann) < 1e-12
-            print(
-                f"  {IC_DPL_LABEL[p]:3s}-{s:5s} KGE=0.60 marker {fmt_pct(v60)} "
-                f"vs stats {fmt_pct(ann)} -> {'OK' if ok else 'MISMATCH'}"
-            )
-            med = float(
-                frames[(p, s)]
-                .loc[frames[(p, s)]["kge"] >= SCREEN_THRESHOLD, "ct_error_signed"]
-                .median()
-            )
-            ok_m = abs(med - stats[(p, s)]["median"]) < 1e-9
-            print(
-                f"      screened median {med:+.0f} d (marker) vs stats "
-                f"{stats[(p, s)]['median']:+.0f} d -> {'OK' if ok_m else 'MISMATCH'}"
-            )
-    print(
-        f"  threshold grid: {THRESHOLD_GRID[0]:.2f}..{THRESHOLD_GRID[-1]:.2f} "
-        f"step={THRESHOLD_GRID[1] - THRESHOLD_GRID[0]:.2f}, "
-        f"n={len(THRESHOLD_GRID)}  (fixed, unchanged)"
-    )
-    print(
-        f"  min denominator at t=0.80: "
-        f"{min(denominators[(p, s)][40] for p in PARADIGM_ORDER for s in STRUCTURE_ORDER)}"
-    )
-    print(f"  column-2 common x fraction upper bound: {x_sens_max:.2f}")
+    # 3. Save Figure PNG (600 dpi, bbox_inches='tight')
+    canonical_png = out_fig_dir / "Figure2_R1_final.png"
+    plt.savefig(canonical_png, dpi=600, bbox_inches="tight", facecolor="#FFFFFF")
+    plt.close()
 
-    print("\nCOLUMN 3 PAIRED BOXPLOT & MEDIAN TRAJECTORY VALIDATION")
-    for s in STRUCTURE_ORDER:
-        print(f"--- Structure: {s} ---")
-        for p in PARADIGM_ORDER:
-            df = frames[(p, s)]
-            meds, q1s, q3s, iqrs = [], [], [], []
-            for s_bin in SNOW_STRATA:
-                vals = df.loc[df["snow_bin"] == s_bin, "ct_error_signed"].to_numpy(
-                    float
-                )
-                q25, q50, q75 = np.percentile(vals, [25, 50, 75])
-                meds.append(q50)
-                q1s.append(q25)
-                q3s.append(q75)
-                iqrs.append(q75 - q25)
-            med_str = ", ".join([f"{m:+.1f}" for m in meds])
-            print(
-                f"  {IC_DPL_LABEL[p]:3s} box medians = connected line points: [{med_str}]"
-            )
+    # 4. Save Source Data CSV
+    df_source = pd.DataFrame(source_records)
+    source_csv = out_fig_dir / "Figure2_R1_source_data.csv"
+    df_source.to_csv(source_csv, index=False)
+
+    file_size_mb = os.path.getsize(canonical_png) / (1024 * 1024)
+    print("Figure 2 restructured successfully (5-panel merged layout)!")
+    print(f"  PNG: {canonical_png} ({file_size_mb:.2f} MB)")
+    print(f"  Source data: {source_csv}")
+
+    return canonical_png
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Render R1 Figure 2.")
+    parser.add_argument("--out-dir", type=Path, default=None, help="Output directory for generated figure.")
+    args = parser.parse_args()
+    main(args.out_dir)

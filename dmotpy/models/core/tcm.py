@@ -128,7 +128,7 @@ def tcm_step(
         gam,
         inf_tensor,
         S1_new,
-        torch.tensor(0.01, device=P.device),
+        torch.tensor(0.01, device=P.device, dtype=P.dtype),
         PET,
         nearzero=nearzero,
     )
@@ -139,7 +139,7 @@ def tcm_step(
     # flux_qex2 = saturation_9(flux_qex1, S2, 0.01):
     #   passes qex1 through when S2 deficit is near zero (saturated)
     flux_qex2 = saturation_9(
-        flux_qex1, S2, torch.tensor(0.01, device=P.device), nearzero=nearzero
+        flux_qex1, S2, torch.tensor(0.01, device=P.device, dtype=P.dtype), nearzero=nearzero
     )
     S2_raw = S2 + flux_et + flux_qex2 - flux_qex1
     # If discrete recharge over-fills the deficit store, route the excess forward
@@ -164,7 +164,7 @@ def tcm_step(
     S4 = S4 - flux_a
 
     # Baseflow: baseflow_6(k2, 0, S4) — quadratic, threshold=0
-    flux_q = baseflow_6(k2, torch.tensor(0.0, device=P.device), S4, nearzero=nearzero)
+    flux_q = baseflow_6(k2, torch.tensor(0.0, device=P.device, dtype=P.dtype), S4, nearzero=nearzero)
     flux_q = torch.minimum(flux_q, S4)
     S4 = S4 - flux_q
     S4_new = torch.clamp(S4, min=nearzero)

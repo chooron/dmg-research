@@ -1,0 +1,41 @@
+{
+  "snow_strata": {
+    "S1": "[0,.05)",
+    "S2": "[.05,.15)",
+    "S3": "[.15,.30)",
+    "S4": "[.30,.50)",
+    "S5": "[.50,1.00]",
+    "counts": {
+      "S1": 165,
+      "S2": 156,
+      "S3": 121,
+      "S4": 34,
+      "S5": 55
+    }
+  },
+  "ic": "selected_restart",
+  "dPL": "median across seeds 42/123/2026 at basin level before inference",
+  "ct": "staged basin-level CT is median valid water-year Delta_CT",
+  "primary": {
+    "delta_KGE_Base_CN": "KGE_CN - KGE_Base",
+    "delta_absCT_Base_CN": "abs(e_Base) - abs(e_CN)"
+  },
+  "secondary": {
+    "delta_absCT_TGD_CN": "abs(e_TGD) - abs(e_CN)"
+  },
+  "kge": "standard Gupta alpha=sd_sim/sd_obs using population SD denominator n in validated GPU reducer",
+  "bootstrap": {
+    "unit": "basin",
+    "draws": 128,
+    "seed": 20260730,
+    "paired_indices": true
+  },
+  "endpoint": "S1 versus S5",
+  "loro": "each HUC group",
+  "legacy_conflicts": [
+    "legacy kge_prime CV-ratio conflict",
+    "old region mean/median conflict",
+    "legacy outputs diagnostic only",
+    "SPO unresolved"
+  ]
+}

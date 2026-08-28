@@ -1,0 +1,68 @@
+block,estimand,short,regime,seed,n,median,ci_low,ci_high,raw_spearman,partial_spearman,note
+1,CN test KGE (vs Q*),,IC,,531.0,0.9925699054151976,,,,,deficit 1-KGE = 0.0074
+1,CN parameter recovery D_theta,,IC,,,0.06994254089205432,,,,,gate equifinality median
+1,CN state NRMSE [wu],,IC,,,0.4485876594268284,,,,,"gate state summary, primary states"
+1,CN state NRMSE [wl],,IC,,,0.49729461533322866,,,,,"gate state summary, primary states"
+1,CN state NRMSE [s],,IC,,,0.368756425807004,,,,,"gate state summary, primary states"
+1,CN state NRMSE [qi],,IC,,,0.23692262597852096,,,,,"gate state summary, primary states"
+1,CN state NRMSE [qg],,IC,,,0.14756192139120775,,,,,"gate state summary, primary states"
+1,CN test KGE (vs Q*),,dPL,,531.0,0.9954945127785042,,,,,deficit 1-KGE = 0.0045
+1,CN parameter recovery D_theta,,dPL,,,0.024286233591231943,,,,,gate equifinality median
+1,CN state NRMSE [wu],,dPL,,,0.06325450955584846,,,,,"gate state summary, primary states"
+1,CN state NRMSE [wl],,dPL,,,0.09534272810382244,,,,,"gate state summary, primary states"
+1,CN state NRMSE [s],,dPL,,,0.16043381939567888,,,,,"gate state summary, primary states"
+1,CN state NRMSE [qi],,dPL,,,0.13335057176946438,,,,,"gate state summary, primary states"
+1,CN state NRMSE [qg],,dPL,,,0.07781515415157214,,,,,"gate state summary, primary states"
+2,Limited compensation: F_close (test),F_close,IC,,427.0,0.1014937993294627,0.07726125268195307,0.1125507145073968,,,
+2,Limited compensation: F_close (test),F_close,dPL,,468.0,0.10089264370831895,0.0889265188077969,0.1091519445587436,,,
+2,Generic mitigation: F_tgd2 (test),F_tgd2,IC,,466.0,0.5104903520271837,0.4867151679707774,0.5412061897653468,,,
+2,Generic mitigation: F_tgd2 (test),F_tgd2,dPL,,528.0,0.5036088096045312,0.47322087511841693,0.5294674662121622,,,
+2,Parameter relief: R_theta_tgd2,R_theta,IC,,531.0,0.0047034918275578,0.0026839224032563,0.0070596507309566,,,
+2,Parameter relief: R_theta_tgd2,R_theta,dPL,,531.0,0.0066554638055655,0.0041884550681481,0.0096283594767253,,,
+2,State relief: R_state_tgd2,R_state,IC,,531.0,0.074917248227905,0.0457270472726708,0.1036893759569368,,,
+2,State relief: R_state_tgd2,R_state,dPL,,531.0,0.1101289155474904,0.0886998980765039,0.1283807563871215,,,
+2,Residual CN advantage: G_CN_over_TGD2 (test),G_CN,IC,,531.0,0.048683855094738,0.0382171881335128,0.0607941728644452,,,
+2,Residual CN advantage: G_CN_over_TGD2 (test),G_CN,dPL,,531.0,0.0466057700835644,0.03827990322180751,0.0572927892275262,,,
+2,Generalization decay: decay_G_base,decay,IC,,531.0,0.0136881426219224,0.011810391234057204,0.01508079278167771,,,
+2,Generalization decay: decay_G_base,decay,dPL,,531.0,0.0021426996784341,0.0014224077852855997,0.0034544907631680003,,,
+2,Process residual RMSE gap [snow_active] (TGD2-CN),dRMSE_snow_active,IC,,521.0,0.47854236809454104,0.4370721877321141,0.5228471949504339,,,
+2,Process residual RMSE gap [snow_active] (TGD2-CN),dRMSE_snow_active,dPL,,521.0,0.464563987149993,0.42008382470016276,0.5028843974747825,,,
+2,Process residual RMSE gap [no_snow_active] (TGD2-CN),dRMSE_no_snow_active,IC,,476.0,0.0768363171076693,0.06175098964513395,0.09446501661053701,,,
+2,Process residual RMSE gap [no_snow_active] (TGD2-CN),dRMSE_no_snow_active,dPL,,476.0,0.0632151194559287,0.04611307133981528,0.07449012111600661,,,
+3,F_close (test),F_close,dPL,42,,0.09514428570683867,,,,,
+3,F_close (test),F_close,dPL,123,,0.10366690242577993,,,,,
+3,F_close (test),F_close,dPL,2026,,0.1054906753858585,,,,,
+3,F_tgd2 (test),F_tgd2,dPL,42,,0.47465958122151175,,,,,
+3,F_tgd2 (test),F_tgd2,dPL,123,,0.4909806091482426,,,,,
+3,F_tgd2 (test),F_tgd2,dPL,2026,,0.5207323586709475,,,,,
+3,R_theta_tgd2,R_theta,dPL,42,,0.011360219974293706,,,,,
+3,R_theta_tgd2,R_theta,dPL,123,,0.006740570068359399,,,,,
+3,R_theta_tgd2,R_theta,dPL,2026,,0.01148345735338,,,,,
+3,R_state_tgd2,R_state,dPL,42,,0.107485801143366,,,,,
+3,R_state_tgd2,R_state,dPL,123,,0.1115589250618012,,,,,
+3,R_state_tgd2,R_state,dPL,2026,,0.1036692256891264,,,,,
+3,G_CN_over_TGD2 (test),G_CN,dPL,42,,0.046286209387124466,,,,,
+3,G_CN_over_TGD2 (test),G_CN,dPL,123,,0.04738107666529667,,,,,
+3,G_CN_over_TGD2 (test),G_CN,dPL,2026,,0.04692813101599835,,,,,
+3,decay_G_base,decay,dPL,42,,0.0021801047665234,,,,,
+3,decay_G_base,decay,dPL,123,,0.0023200576556979004,,,,,
+3,decay_G_base,decay,dPL,2026,,0.0029812210886597,,,,,
+4,G_base|C_theta_primary,,IC,,,,,,0.3563032140633002,-0.0776533276005719,
+4,G_base|C_theta_primary,,dPL,42,,,,,0.7815524580559169,0.112124473763615,
+4,G_base|C_theta_primary,,dPL,123,,,,,0.7708022053855458,0.0967764676262852,
+4,G_base|C_theta_primary,,dPL,2026,,,,,0.7701706296441455,0.0811790465856116,
+4,G_base|C_state_primary,,IC,,,,,,0.6606820857708711,0.0053619482283151,
+4,G_base|C_state_primary,,dPL,42,,,,,0.8216458959999936,-0.02071304943297,
+4,G_base|C_state_primary,,dPL,123,,,,,0.8173436469331307,-0.0564298617563761,
+4,G_base|C_state_primary,,dPL,2026,,,,,0.8225098242888961,-0.007455304775469,
+4,C_theta vs frac_snow,,IC,,,,,,0.49566024110484064,,
+4,C_state vs frac_snow,,IC,,,,,,0.823147892115963,,
+4,C_theta vs frac_snow,,dPL,42,,,,,0.8810734864022866,,
+4,C_state vs frac_snow,,dPL,42,,,,,0.9633141856880769,,
+4,C_theta vs frac_snow,,dPL,123,,,,,0.8733444580430929,,
+4,C_state vs frac_snow,,dPL,123,,,,,0.9654006298124588,,
+4,C_theta vs frac_snow,,dPL,2026,,,,,0.8803291407283798,,
+4,C_state vs frac_snow,,dPL,2026,,,,,0.9666036693909381,,
+5,C_theta definition,,IC,,,,,,,,median over frozen primary params of |e_M - e_CN|; IC primary = ['xaj_k']; secondary = ['xaj_b']
+5,C_theta definition,,dPL,,,,,,,,"median over frozen primary params of |e_M - e_CN|; dPL primary = ['xaj_k', 'xaj_theta', 'xaj_um', 'xaj_cg', 'xaj_ci']; secondary = ['xaj_b', 'xaj_lm', 'xaj_c', 'xaj_sm', 'xaj_ki']"
+5,C_state definition,,IC/dPL,,,,,,,,"median over primary states of delta_NRMSE (test); primary = ['wu', 'wl', 's', 'qi', 'qg']; secondary = ['wd'] (wd excluded: correct-CN recovery of wd is already poor (gate NRMSE ~1.5-2.5), so it is secondary); derived total tension storage wt = wu+wl+wd (wt = wu + wl + wd (total tension-water storage))"

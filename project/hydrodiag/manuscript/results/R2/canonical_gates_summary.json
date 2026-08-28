@@ -1,0 +1,65 @@
+{
+  "overall_status": "PASS",
+  "gates": {
+    "gate_01_provenance": {
+      "status": "PASS",
+      "description": "All statistics traceable to explicit restart/seed artifacts",
+      "failures": []
+    },
+    "gate_02_shared_parameter_definition": {
+      "status": "PASS",
+      "description": "15 shared parameter identities, order, and physical bounds verified",
+      "failures": []
+    },
+    "gate_03_normalized_coordinates": {
+      "status": "PASS",
+      "description": "Normalized coordinates match z = (phys - lower)/(upper - lower) within 1e-10",
+      "failures": []
+    },
+    "gate_04_canonical_vector_rule": {
+      "status": "PASS",
+      "description": "IC best train-KGE restart and dPL across-seed median reduction rules verified",
+      "failures": []
+    },
+    "gate_05_ensemble_formulas": {
+      "status": "PASS",
+      "description": "IC 45 within + 100 between pairs, dPL 3 within + 9 between pairs exact evaluation",
+      "failures": []
+    },
+    "gate_06_basin_weighting": {
+      "status": "PASS",
+      "description": "Pairwise distances reduced to basin-level before regression/bootstrap (resampling unit = basin)",
+      "failures": []
+    },
+    "gate_07_basin_joins": {
+      "status": "PASS",
+      "description": "All merges use explicit basin ID (8-digit string) and parameter name (no row index joins)",
+      "failures": []
+    },
+    "gate_08_snow_axis": {
+      "status": "PASS",
+      "description": "frac_snow and S1-S5 membership match frozen R1 manifest exactly (S1=165, S2=156, S3=121, S4=34, S5=55)",
+      "failures": []
+    },
+    "gate_09_paired_bootstrap": {
+      "status": "PASS",
+      "description": "Structural contrasts (Base-CN, Base-TGD) and Delta_beta evaluated with same-resample paired bootstrap",
+      "failures": []
+    },
+    "gate_10_historical_conflicts": {
+      "status": "PASS",
+      "description": "Prevalence divergence resolved (true ensemble 63.1% IC / 83.8% dPL vs fixed 0.08 threshold in draft); slope 0.1542 and um slope 0.521 proven",
+      "failures": []
+    },
+    "gate_11_all_parameter_transparency": {
+      "status": "PASS",
+      "description": "All 15 shared parameters calculated and exported without post-hoc significance selection",
+      "failures": []
+    },
+    "gate_12_scope": {
+      "status": "PASS",
+      "description": "No parameter truth/mechanistic claims, no IC/dPL superiority ranking, no training or simulations launched",
+      "failures": []
+    }
+  }
+}

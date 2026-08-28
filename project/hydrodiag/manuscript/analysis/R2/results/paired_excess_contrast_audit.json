@@ -1,0 +1,23 @@
+{
+  "status": "PASS",
+  "verdict": "VERDICT_A_INTERMEDIATE_EMERGENCE",
+  "description": "CN-TGD macro differentiation emerges at intermediate snow activity (S2/S3) and persists into high snow activity (S4/S5); S5 is a mutual saturation plateau.",
+  "dpl_delta_excess_medians": {
+    "Full531": 0.017713291459606005,
+    "ExcludeS5": 0.015983243369869046,
+    "S1": 0.0046756903620450985,
+    "S2": 0.028708128504407095,
+    "S3": 0.02389285396687499,
+    "S4": 0.0362506291074613,
+    "S5": 0.0317278952624058
+  },
+  "ic_delta_excess_medians": {
+    "Full531": -0.0014459138799959,
+    "ExcludeS5": -0.00144794787406375,
+    "S1": -0.0045704433239377,
+    "S2": -0.00087347227937255,
+    "S3": -0.0012910596002764,
+    "S4": 0.01545156822866885,
+    "S5": 0.0017861944983366962
+  }
+}

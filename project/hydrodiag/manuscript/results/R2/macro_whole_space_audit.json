@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "total_basins": 531,
+  "prevalence_between_gt_within": {
+    "IC_Full531": 0.6308851224105462,
+    "dPL_Full531": 0.8380414312617702
+  },
+  "excess_slope": {
+    "IC_Full531": 0.15424736864090052,
+    "dPL_Full531": 0.1974019418626811
+  }
+}

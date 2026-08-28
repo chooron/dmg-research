@@ -272,15 +272,15 @@ class DmgNativeBenchmarkTrainer(BaseTrainer):
         self.train_x, self.train_y, self.val_x, self.val_y = load_camels_time_series(self.ids)
         self.n_train_days = self.train_x.shape[0]
 
-        self.train_x_t = torch.as_tensor(self.train_x, dtype=torch.float32, device=device)
-        self.train_y_t = torch.as_tensor(self.train_y, dtype=torch.float32, device=device)
+        self.train_x_t = torch.as_tensor(self.train_x, dtype=torch.float64, device=device)
+        self.train_y_t = torch.as_tensor(self.train_y, dtype=torch.float64, device=device)
         self.train_dates = pd.date_range("1980-10-01", "1995-09-30", freq="D")
         self.validation_dates = pd.date_range("1994-10-01", "2010-09-30", freq="D")
         self.is_calendar_model = self.model_name in CALENDAR_MODELS
         if self.is_calendar_model:
             self.train_doy_t = calendar_features(
                 self.train_dates,
-                dtype=torch.float32,
+                dtype=torch.float64,
                 device=torch.device(device),
             ).reshape(-1)
         else:
@@ -302,7 +302,9 @@ class DmgNativeBenchmarkTrainer(BaseTrainer):
         # Use DMG's compiled step path.  The eager path executes every daily
         # step through Python and leaves the GPU underutilized.
         backend = config["model"].get("backend", "compile")
-        self.hydro_model = build_model(model_name, device, warm_up=365, backend=backend)
+        self.hydro_model = build_model(
+            model_name, device, warm_up=365, backend=backend, dtype=torch.float64
+        )
         self.parameterizer = CatchmentParameterizer(
             in_features=self.n_attr,
             out_features=n_params,
@@ -319,8 +321,7 @@ class DmgNativeBenchmarkTrainer(BaseTrainer):
             head_hidden_dims=self.parameterizer_head_hidden_dims,
             saturation_floor=self.saturation_floor,
             saturation_regularizer_weight=self.saturation_regularizer_weight,
-        ).to(device)
-
+        ).to(device, dtype=torch.float64)
         self.optimizer = self.init_optimizer()
         self.transaction = FiniteOptimizerTransaction(
             self.optimizer,

@@ -1,0 +1,7 @@
+paradigm,period,metric,n_S1,n_S5,median_S1,median_S5,D_activity,high_minus_low_median,ci_low,ci_high,bootstrap_draws,seed,definition
+IC-CMA-ES,test,delta_absCT_Base_CN,165,55,0.0,47.0,47.0,47.0,42.0,51.0,1000,20272995,median(delta_absCT_Base_CN in S5) - median(delta_absCT_Base_CN in S1)
+IC-CMA-ES,test,delta_KGE_Base_CN,165,55,7.353456106840017e-05,0.6703158177827705,0.6702422832217021,0.6702422832217021,0.5656832532582392,0.7552679553014453,1000,20303800,median(delta_KGE_Base_CN in S5) - median(delta_KGE_Base_CN in S1)
+IC-CMA-ES,test,delta_absCT_TGD_CN,165,55,0.0,10.0,10.0,10.0,7.0,13.0,1000,20304183,median(delta_absCT_TGD_CN in S5) - median(delta_absCT_TGD_CN in S1)
+dPL-MLP,test,delta_absCT_Base_CN,165,55,0.0,46.0,46.0,46.0,40.0,48.0,1000,20318009,median(delta_absCT_Base_CN in S5) - median(delta_absCT_Base_CN in S1)
+dPL-MLP,test,delta_KGE_Base_CN,165,55,-0.0014959681704411754,0.6390206539261183,0.6405166220965595,0.6405166220965595,0.5868133394431517,0.7189225988173102,1000,20299282,median(delta_KGE_Base_CN in S5) - median(delta_KGE_Base_CN in S1)
+dPL-MLP,test,delta_absCT_TGD_CN,165,55,0.0,8.0,8.0,8.0,5.0,13.0,1000,20276322,median(delta_absCT_TGD_CN in S5) - median(delta_absCT_TGD_CN in S1)

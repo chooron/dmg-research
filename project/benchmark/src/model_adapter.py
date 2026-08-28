@@ -23,9 +23,9 @@ class BatchedModelAdapter:
                  invalid_penalty: float = -1_000_000.0) -> None:
         self.device = torch.device(device)
         self.spec: ModelSpec = get_spec(model_name, self.device)
-        self.model = build_model(model_name, self.device, warm_up=warm_up, backend=backend)
-        self.forcing = forcing.to(self.device, dtype=torch.float32, non_blocking=True)
-        self.observation = observation.to(self.device, dtype=torch.float32, non_blocking=True)
+        self.model = build_model(model_name, self.device, warm_up=warm_up, backend=backend, dtype=torch.float64)
+        self.forcing = forcing.to(self.device, dtype=torch.float64, non_blocking=True)
+        self.observation = observation.to(self.device, dtype=torch.float64, non_blocking=True)
         self.warm_up = min(int(warm_up), int(self.forcing.shape[0]))
         self.transform = LatentBoundTransform(self.spec.bounds)
         self.invalid_penalty = float(invalid_penalty)
@@ -45,7 +45,7 @@ class BatchedModelAdapter:
         if latent.ndim != 4 or latent.shape[0] != self.basin_count or latent.shape[-1] != self.spec.dimension:
             raise ValueError(f"expected [B,S,P,{self.spec.dimension}], got {tuple(latent.shape)}")
         b, starts, pop, dim = latent.shape
-        normalized = self.transform.latent_to_normalized(latent).to(torch.float32)
+        normalized = self.transform.latent_to_normalized(latent).to(torch.float64)
         raw = normalized.permute(0, 3, 1, 2).reshape(b, dim, starts * pop)
         with torch.inference_mode():
             q = self.model({"x_phy": self.forcing}, (None, raw))["streamflow"]

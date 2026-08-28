@@ -112,6 +112,7 @@ class HydrologyModel(nn.Module):
 
         self.backend = self.config.get("backend", backend)
         self.device = device or torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.compute_dtype: torch.dtype | None = None
         self.step_fn = _maybe_compile(self.raw_step_fn, self.backend)
 
         self._load_config(self.config)
@@ -173,12 +174,15 @@ class HydrologyModel(nn.Module):
         n_grid: int,
         n_groups: Optional[int] = None,
     ) -> Tuple[torch.Tensor, ...]:
-        return self.init_fn(
+        states = self.init_fn(
             n_grid,
             n_groups if n_groups is not None else self.nmul,
             self.device,
             self.nearzero,
         )
+        if self.compute_dtype is not None:
+            states = tuple(state.to(dtype=self.compute_dtype) for state in states)
+        return states
 
     @staticmethod
     def _change_param_range(

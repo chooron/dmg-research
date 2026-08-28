@@ -48,7 +48,21 @@ def validate_full_run_config(config: dict[str, Any]) -> None:
         raise ValueError("production warm-up must use repeat_forcing")
     if int(warmup["repetitions"]) != 5:
         raise ValueError("production warm-up must repeat the source period five times")
-    if data["train"]["start_time"] != "1989-01-01" or data["train"]["end_time"] != "1998-12-31":
-        raise ValueError("production training split must remain 1989-01-01..1998-12-31")
-    if data["test"]["start_time"] != "1999-01-01" or data["test"]["end_time"] != "2009-12-31":
-        raise ValueError("production test split is frozen and must not be used for selection")
+    if config.get("stage") == "dpl_aligned_full_production":
+        expected_train = ("1980-10-01", "1995-09-30")
+        expected_test = ("1995-10-01", "2010-09-30")
+    else:
+        expected_train = ("1989-01-01", "1998-12-31")
+        expected_test = ("1999-01-01", "2009-12-31")
+    train = (data["train"]["start_time"], data["train"]["end_time"])
+    test = (data["test"]["start_time"], data["test"]["end_time"])
+    if train != expected_train:
+        raise ValueError(
+            f"{config.get('stage', 'production')} training split must be "
+            f"{expected_train[0]}..{expected_train[1]}"
+        )
+    if test != expected_test:
+        raise ValueError(
+            f"{config.get('stage', 'production')} test split must be "
+            f"{expected_test[0]}..{expected_test[1]}"
+        )

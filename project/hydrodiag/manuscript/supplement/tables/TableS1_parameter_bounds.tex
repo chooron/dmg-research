@@ -1,0 +1,42 @@
+\begin{table*}[t]
+\centering
+\small
+\begin{threeparttable}
+\caption{Model parameter definitions, hydrological roles, units, and optimization bounds for the shared XAJ host model and structural variants.}
+\label{tab:parameter_bounds}
+\begin{tabular}{cllccc}
+\toprule
+Parameter & Identifier & Hydrological role & Unit & Lower bound & Upper bound & Applies to \\
+\midrule
+\multicolumn{7}{l}{\textbf{A. Shared XAJ Host Model Parameters (15 Core Parameters)}} \\
+$k$ & \texttt{xaj\_k} & Ratio of potential ET to reference crop evaporation & $-$ & 0.5 & 2.0 & Shared host \\
+$b$ & \texttt{xaj\_b} & Exponent of tension water storage capacity distribution curve & $-$ & 0.1 & 2.0 & Shared host \\
+$i_m$ & \texttt{xaj\_im} & Fraction of impervious and saturated direct runoff area & $-$ & 0.0 & 0.3 & Shared host \\
+$u_m$ & \texttt{xaj\_um} & Upper-layer soil tension water capacity & $mm$ & 5.0 & 50.0 & Shared host \\
+$l_m$ & \texttt{xaj\_lm} & Lower-layer soil tension water capacity & $mm$ & 20.0 & 200.0 & Shared host \\
+$d_m$ & \texttt{xaj\_dm} & Deep-layer soil tension water capacity & $mm$ & 20.0 & 200.0 & Shared host \\
+$c$ & \texttt{xaj\_c} & Deep-layer evapotranspiration coefficient & $-$ & 0.05 & 0.3 & Shared host \\
+$s_m$ & \texttt{xaj\_sm} & Areal mean free water capacity of surface/shallow layer & $mm$ & 5.0 & 100.0 & Shared host \\
+$ex$ & \texttt{xaj\_ex} & Exponent of free water capacity distribution curve & $-$ & 0.1 & 2.0 & Shared host \\
+$k_i$ & \texttt{xaj\_ki} & Outflow coefficient from free water storage to interflow & $\text{d}^{-1}$ & 0.0 & 0.7 & Shared host \\
+$k_g$ & \texttt{xaj\_kg} & Outflow coefficient from free water storage to groundwater & $\text{d}^{-1}$ & 0.0 & 0.7 & Shared host \\
+$c_i$ & \texttt{xaj\_ci} & Recession constant of the linear interflow reservoir & $-$ & 0.1 & 1.0 & Shared host \\
+$c_g$ & \texttt{xaj\_cg} & Recession constant of the linear groundwater reservoir & $-$ & 0.9 & 1.0 & Shared host \\
+$a$ & \texttt{xaj\_a} & Shape parameter of the Gamma unit hydrograph (Gamma-UH) & $-$ & 0.0 & 2.9 & Shared host \\
+$\theta$ & \texttt{xaj\_theta} & Scale parameter of the Gamma unit hydrograph (Gamma-UH) & $d$ & 0.0 & 6.5 & Shared host \\
+\midrule
+\multicolumn{7}{l}{\textbf{B. Generic Temperature Control Additional Parameters (TGD, 2 Parameters)}} \\
+$\tau_{\mathrm{warm}}$ & \texttt{tgd\_tau\_warm} & Warm-condition linear reservoir residence time / baseline smoothing & $d$ & 0.0001 & 3.0 & TGD only \\
+$\Delta\tau_{\mathrm{cold}}$ & \texttt{tgd\_delta\_tau\_cold} & Additional cold-condition linear reservoir residence time increment & $d$ & 0.1 & 180.0 & TGD only \\
+\midrule
+\multicolumn{7}{l}{\textbf{C. Explicit Snow Accumulation--Melt Additional Parameters (CN / CemaNeige, 2 Parameters)}} \\
+$C_{\mathrm{TG}}$ & \texttt{cn\_ctg} & Snowpack thermal inertia and temperature weighting coefficient & $-$ & 0.0 & 1.0 & CN only \\
+$K_f$ & \texttt{cn\_kf} & Degree-day snowmelt factor ($D_f$) & $mm\ ^{\circ}\text{C}^{-1}\ \text{d}^{-1}$ & 0.0 & 10.0 & CN only \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Note}: Parameters 1--15 define the shared host parameter space across Base, TGD, and CN within the Xinanjiang (XAJ) structure. TGD incorporates two generic temperature-dependent delay parameters ($\tau_{\mathrm{warm}}, \Delta\tau_{\mathrm{cold}}$). CN incorporates two degree-day snowpack accumulation and melt parameters ($C_{\mathrm{TG}}, K_f$). Bounds define the physical search space across both IC and dPL estimation regimes.
+\end{tablenotes}
+\end{threeparttable}
+\end{table*}

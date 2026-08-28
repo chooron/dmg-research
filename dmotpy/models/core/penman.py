@@ -210,7 +210,7 @@ def penman_step(
         gam,
         inf_tensor, # S1 (Supply) -> Inf
         S2,         # S2 (Deficit Store) -> 应该传 S2
-        torch.tensor(0.01, device=P.device),
+        torch.tensor(0.01, device=P.device, dtype=P.dtype),
         pet_rem,
         nearzero=nearzero,
     )

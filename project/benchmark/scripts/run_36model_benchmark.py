@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import sys
 import time
 import traceback
@@ -25,6 +26,7 @@ from src.checkpointing import atomic_torch_save, load_checkpoint
 from src.data_selection import load_ids, load_repeated_warmup_and_train
 from src.model_registry import NPARAM_INFO_36, build_model
 from src.objective import streaming_kge
+from src.streaming_evaluator import compute_streaming_fitness
 from src.production_config import load_resolved_config, validate_full_run_config
 
 
@@ -33,14 +35,61 @@ def get_population_size(dimension: int) -> int:
 
 
 def compute_fitness(model, x, y, latent, target_offset: int, objective_fn):
+    """Compatibility full-series reference path with explicit FP64 inputs."""
+    model.to(dtype=torch.float64)
+    model.compute_dtype = torch.float64
+    x = x if x.dtype == torch.float64 else x.to(torch.float64)
+    y = y if y.dtype == torch.float64 else y.to(torch.float64)
+    latent = latent if latent.dtype == torch.float64 else latent.to(torch.float64)
     basin_count, starts, population, dimension = latent.shape
-    raw = torch.sigmoid(latent).permute(0, 3, 1, 2).reshape(basin_count, dimension, starts * population).float()
+    raw = torch.sigmoid(latent).permute(0, 3, 1, 2).reshape(
+        basin_count, dimension, starts * population
+    ).to(torch.float64)
     with torch.inference_mode():
         q = model({"x_phy": x}, (None, raw))["streamflow"].reshape(-1, basin_count, starts, population)
     target = y[target_offset : target_offset + q.shape[0]]
     if target.shape[0] != q.shape[0]:
         raise RuntimeError(f"Target and output length mismatch: target={target.shape[0]}, output={q.shape[0]}")
     return objective_fn(q, target)
+
+def compute_model_fitness(
+    model_name: str,
+    model,
+    x: torch.Tensor,
+    y: torch.Tensor,
+    latent: torch.Tensor,
+    warmup_days: int,
+    target_offset: int,
+    objective_fn,
+ ) -> tuple[torch.Tensor, torch.Tensor]:
+    return compute_streaming_fitness(
+        model, x, y, latent, warmup_days=warmup_days
+    )
+
+def checkpoint_chunk_start(path: Path) -> int:
+    match = re.match(r"chunk_(\d+)_gen_\d+\.pt$", path.name)
+    if match is None:
+        raise ValueError(f"checkpoint filename has no chunk start: {path}")
+    return int(match.group(1))
+
+
+def checkpoint_generation(path: Path) -> int:
+    match = re.search(r"_gen_(\d+)\.pt$", path.name)
+    if match is None:
+        raise ValueError(f"checkpoint filename has no generation: {path}")
+    return int(match.group(1))
+
+
+def existing_checkpoint_chunk_size(checkpoint_root: Path) -> int | None:
+    paths = list(checkpoint_root.glob("chunk_*_gen_*.pt"))
+    if not paths:
+        return None
+    starts = sorted({checkpoint_chunk_start(path) for path in paths})
+    if len(starts) > 1:
+        return starts[1] - starts[0]
+    checkpoint = load_checkpoint(min(paths, key=checkpoint_generation), "cpu")
+    basin_ids = checkpoint.get("basin_ids")
+    return len(basin_ids) if basin_ids is not None else None
 
 
 def run_single_model(
@@ -52,6 +101,8 @@ def run_single_model(
     device: str = "cuda",
 ) -> dict:
     """Train a single model using CMA-ES across all 531 basins."""
+    if backend != "compile":
+        raise ValueError("This DPL-aligned IC run requires backend=compile for every model.")
     resolved = load_resolved_config(config_path)
     validate_full_run_config(resolved)
 
@@ -74,56 +125,103 @@ def run_single_model(
     x, y, data_metadata = load_repeated_warmup_and_train(ids, resolved, device)
     warmup_days, target_offset = data_metadata["warmup_total_days"], 0
 
-    objective_fn = streaming_kge if backend == "eager" else torch.compile(streaming_kge, backend="inductor", mode="default")
+    objective_fn = torch.compile(streaming_kge, backend="inductor", mode="default")
     vram_gib = torch.cuda.get_device_properties(0).total_memory / 2**30 if torch.cuda.is_available() else 12.0
     safety_gib = min(10.5, 0.88 * vram_gib)
 
-    # Preflight compiled output check
+    # Compile-only preflight on two basins using the same streaming family hooks.
     z0 = torch.zeros((2, 2, population, dimension), device=device, dtype=torch.float64)
-    eager_m = build_model(model_name, device, warm_up=warmup_days, backend="eager")
-    eager_fit, _ = compute_fitness(eager_m, x[:, :2], y[:, :2], z0, target_offset, streaming_kge)
-    if backend == "compile":
-        comp_m = build_model(model_name, device, warm_up=warmup_days, backend="compile")
-        comp_fit, _ = compute_fitness(comp_m, x[:, :2], y[:, :2], z0, target_offset, objective_fn)
-        err = float((eager_fit - comp_fit).abs().max())
-        if not np.isfinite(err) or err > 1e-5:
-            raise RuntimeError(f"Preflight validation failed for [{model_name}] compile vs eager diff = {err}")
+    comp_m = build_model(
+        model_name, device, warm_up=warmup_days, backend="compile", dtype=torch.float64
+    )
+    comp_fit, probe_invalid = compute_streaming_fitness(
+        comp_m, x[:, :2], y[:, :2], z0, warmup_days=warmup_days
+    )
+    if bool(probe_invalid.any()) or not bool(torch.isfinite(comp_fit).all()):
+        raise RuntimeError(f"Compile preflight produced invalid fitness for [{model_name}]")
 
     rows = []
     for left in range(0, len(ids), chunk_size):
         right = min(len(ids), left + chunk_size)
         basin_count = right - left
 
-        model = build_model(model_name, device, warm_up=warmup_days, backend=backend)
+        model = build_model(
+            model_name, device, warm_up=warmup_days, backend=backend, dtype=torch.float64
+        )
         seed = int.from_bytes(hashlib.sha256(f"{global_seed}:{model_name}:{left}".encode()).digest()[:4], "little")
 
         solver = BatchedCMAES(basin_count * starts, dimension, population, stdev_init=0.10, active=True, seed=seed, device=device)
         solver.set_centers(torch.zeros((basin_count * starts, dimension), device=device, dtype=torch.float64))
 
         history, start_gen = [], 0
-        saved = sorted(checkpoint_root.glob(f"chunk_{left}_gen_*.pt"))
+        saved = sorted(
+            checkpoint_root.glob(f"chunk_{left}_gen_*.pt"),
+            key=checkpoint_generation,
+        )
         if saved:
             ckpt = load_checkpoint(saved[-1], device)
+            checkpoint_basin_ids = ckpt.get("basin_ids")
+            if checkpoint_basin_ids is not None and len(checkpoint_basin_ids) != basin_count:
+                raise RuntimeError(
+                    f"checkpoint {saved[-1]} has {len(checkpoint_basin_ids)} basins; "
+                    f"requested chunk has {basin_count}"
+                )
+            expected_basin_ids = tuple(int(basin_id) for basin_id in ids[left:right])
+            actual_basin_ids = tuple(int(basin_id) for basin_id in (checkpoint_basin_ids if checkpoint_basin_ids is not None else ()))
+            if actual_basin_ids != expected_basin_ids:
+                raise RuntimeError(
+                    f"checkpoint {saved[-1]} basin IDs do not match requested chunk "
+                    f"{expected_basin_ids[:3]}..."
+                )
             start_gen = int(ckpt["generation"])
             solver.load_state_dict(ckpt["solver"])
             history = list(ckpt.get("history", []))
+        if start_gen >= generations:
+            if not history:
+                raise RuntimeError(
+                    f"{saved[-1]} is at generation {start_gen} but has no history"
+                )
+            # A final-generation checkpoint may exist without DONE after interruption.
+            # Preserve its solver state and make resume idempotent without another step.
+            rows.append({
+                "seconds_per_generation": 0.0,
+                "baseline_allocated_gib": 0.0,
+                "peak_allocated_gib": 0.0,
+                "incremental_peak_allocated_gib": 0.0,
+                "baseline_reserved_gib": 0.0,
+                "peak_reserved_gib": 0.0,
+                "incremental_peak_reserved_gib": 0.0,
+                "invalid_fraction": 0.0,
+                "initial": history[0],
+                "final": history[-1],
+            })
+            continue
 
         for generation in range(start_gen + 1, generations + 1):
             torch.cuda.reset_peak_memory_stats()
+            baseline_allocated = torch.cuda.memory_allocated()
+            baseline_reserved = torch.cuda.memory_reserved()
             t0 = time.perf_counter()
             _z, _shape, latent = solver.ask()
 
-            fitness, invalid = compute_fitness(
-                model, x[:, left:right], y[:, left:right],
+            fitness, invalid = compute_model_fitness(
+                model_name,
+                model,
+                x[:, left:right],
+                y[:, left:right],
                 latent.reshape(basin_count, starts, population, dimension),
-                target_offset, objective_fn
+                warmup_days,
+                target_offset,
+                objective_fn,
             )
             solver.tell(_z, _shape, latent, fitness.reshape(-1, population))
             torch.cuda.synchronize()
+            peak_allocated = torch.cuda.max_memory_allocated()
+            peak_reserved = torch.cuda.max_memory_reserved()
             elapsed = time.perf_counter() - t0
 
             history.append(float(fitness.median()))
-            if torch.cuda.max_memory_reserved() / 2**30 > safety_gib:
+            if peak_reserved / 2**30 > safety_gib:
                 raise torch.OutOfMemoryError(f"Peak GPU memory reserved exceeds safety threshold {safety_gib:.2f} GiB")
 
             if generation % 5 == 0 or generation == generations:
@@ -135,7 +233,12 @@ def run_single_model(
 
         rows.append({
             "seconds_per_generation": elapsed,
-            "peak_allocated_gib": torch.cuda.max_memory_allocated() / 2**30,
+            "baseline_allocated_gib": baseline_allocated / 2**30,
+            "peak_allocated_gib": peak_allocated / 2**30,
+            "incremental_peak_allocated_gib": max(0, peak_allocated - baseline_allocated) / 2**30,
+            "baseline_reserved_gib": baseline_reserved / 2**30,
+            "peak_reserved_gib": peak_reserved / 2**30,
+            "incremental_peak_reserved_gib": max(0, peak_reserved - baseline_reserved) / 2**30,
             "invalid_fraction": float(invalid.double().mean()),
             "initial": history[0],
             "final": history[-1],
@@ -146,12 +249,18 @@ def run_single_model(
         "model": model_name, "n_params": dimension, "population": population, "starts": starts,
         "generations_requested": generations, "generations_completed": generations,
         "backend": "full_batch" if chunk_size == len(ids) else "chunk",
-        "compile_mode": "default" if backend == "compile" else "eager",
-        "basin_chunk": chunk_size, "validation_status": "passed", "compile_success": (backend == "compile"),
+        "compile_mode": "default",
+        "basin_chunk": chunk_size, "validation_status": "passed", "compile_success": True,
         "seconds_per_generation": mean_sec,
-        "candidates_per_second": len(ids) * starts * population / mean_sec,
+        "candidates_per_second": (
+            len(ids) * starts * population / mean_sec if mean_sec > 0 else 0.0
+        ),
+        "baseline_allocated_gib": max(r["baseline_allocated_gib"] for r in rows),
         "peak_allocated_gib": max(r["peak_allocated_gib"] for r in rows),
-        "peak_reserved_gib": torch.cuda.max_memory_reserved() / 2**30,
+        "incremental_peak_allocated_gib": max(r["incremental_peak_allocated_gib"] for r in rows),
+        "baseline_reserved_gib": max(r["baseline_reserved_gib"] for r in rows),
+        "peak_reserved_gib": max(r["peak_reserved_gib"] for r in rows),
+        "incremental_peak_reserved_gib": max(r["incremental_peak_reserved_gib"] for r in rows),
         "invalid_candidate_fraction": float(np.mean([r["invalid_fraction"] for r in rows])),
         "initial_median_train_kge": float(np.mean([r["initial"] for r in rows])),
         "final_median_train_kge": float(np.mean([r["final"] for r in rows])),
@@ -166,17 +275,24 @@ def run_single_model(
 def run_with_memory_fallback(model_name: str, run_id: str, config_path: Path, device: str = "cuda") -> dict:
     """Run model training with automatic memory-aware chunk size fallback."""
     # Attempt strategies sequentially (from full batch to smaller chunks)
+    # Every attempt stays on torch.compile; eager fallback would violate the
+    # benchmark's compile-only contract. OOM is handled by smaller chunks only.
     attempts = [
         (531, "compile"),
         (256, "compile"),
         (128, "compile"),
         (64,  "compile"),
-        (256, "eager"),
-        (64,  "eager"),
     ]
     # Specialized strategy for unit hydrograph stack models if known to OOM
     if model_name in ["flexis", "gr4j"]:
-        attempts = [(256, "compile"), (128, "compile"), (64, "compile"), (64, "eager")]
+        # Existing Flex checkpoints use 128-basin chunks; keep resume boundaries stable.
+        attempts = [(128, "compile"), (64, "compile")]
+    checkpoint_root = BENCHMARK_ROOT / "checkpoints" / run_id / model_name
+    resume_chunk = existing_checkpoint_chunk_size(checkpoint_root)
+    if resume_chunk is not None:
+        attempts = [(resume_chunk, "compile")] + [
+            attempt for attempt in attempts if attempt[0] != resume_chunk
+        ]
 
     last_error = None
     for chunk, backend in attempts:
@@ -198,7 +314,7 @@ def main() -> None:
     parser.add_argument("--run-id", required=True, help="Unique run identifier")
     parser.add_argument("--config", default="configs/full_run_10starts_300gen_warm1980_1981x5.yaml")
     parser.add_argument("--chunk", type=int, help="Override chunk size (if omitted, uses memory-aware fallback)")
-    parser.add_argument("--backend", choices=["compile", "eager"], help="Override backend mode")
+    parser.add_argument("--backend", choices=["compile"], default="compile", help="Compile backend is mandatory for this run")
     parser.add_argument("--device", default="cuda", help="Execution device (cuda/cpu)")
     args = parser.parse_args()
 

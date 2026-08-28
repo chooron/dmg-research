@@ -1,0 +1,76 @@
+{
+  "overall_status": "PASS",
+  "gates": {
+    "provenance_gate": {
+      "status": "PASS",
+      "failures": [],
+      "details": {
+        "staged_files_verified": [
+          "r1_basin_level_performance_rebuilt.csv",
+          "r1_basin_level_ct.csv",
+          "r1_basin_year_ct.csv",
+          "r1_basin_year_ct_runs.csv"
+        ],
+        "upstream_manifests_verified": [
+          "r1_streaming_validation.json",
+          "r1_audit_manifest.json"
+        ],
+        "evaluation_period": "test",
+        "paradigms": [
+          "IC-CMA-ES",
+          "dPL-MLP"
+        ],
+        "structures": [
+          "Base",
+          "TGD",
+          "CN"
+        ],
+        "no_training_calibration_inference_launched": true
+      }
+    },
+    "basin_alignment_gate": {
+      "status": "PASS",
+      "failures": [],
+      "details": {
+        "total_basins": 531,
+        "paired_rows_per_paradigm": {
+          "IC-CMA-ES": 531,
+          "dPL-MLP": 531
+        },
+        "silent_drop_count": 0,
+        "duplicate_key_count": 0
+      }
+    },
+    "ct_definition_gate": {
+      "status": "PASS",
+      "failures": [],
+      "details": {
+        "water_year_definition": "Delta_CT = CT_sim - CT_obs",
+        "basin_level_aggregation": "median of valid water years",
+        "absolute_CT_definition": "abs(signed_CT_error)",
+        "valid_year_criterion": "complete_year & valid_days >= 300 & finite(Delta_CT)"
+      }
+    },
+    "statistical_unit_gate": {
+      "status": "PASS",
+      "failures": [],
+      "details": {
+        "inferential_unit": "basin",
+        "sample_size_N": 531,
+        "dpl_seed_policy": "median across seeds (42, 123, 2026) per basin x structure before inference",
+        "ic_restart_policy": "selected_restart",
+        "no_seed_restart_sample_inflation": true
+      }
+    },
+    "reproducibility_gate": {
+      "status": "PASS",
+      "failures": [],
+      "details": {
+        "builder_script": "manuscript/scripts/r1/rebuild_r1_statistics_streaming.py",
+        "downstream_analysis_path": "manuscript/analysis/R1/",
+        "reproducible_from_staged_tables": true,
+        "no_dependence_on_legacy_summaries": true
+      }
+    }
+  }
+}

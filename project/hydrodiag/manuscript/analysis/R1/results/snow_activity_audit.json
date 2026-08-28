@@ -1,0 +1,28 @@
+{
+  "status": "PASS",
+  "bootstrap_draws": 1000,
+  "base_seed": 20260730,
+  "strata": [
+    "S1",
+    "S2",
+    "S3",
+    "S4",
+    "S5"
+  ],
+  "strata_counts": {
+    "S1": 165,
+    "S2": 156,
+    "S3": 121,
+    "S4": 34,
+    "S5": 55
+  },
+  "metrics_evaluated": [
+    "delta_absCT_Base_CN",
+    "delta_KGE_Base_CN",
+    "delta_absCT_TGD_CN"
+  ],
+  "endpoints_evaluated": [
+    "S5_minus_S1"
+  ],
+  "low_snow_interpretation": "small / centered near zero in low-snow (S1) regime; no equivalence claim"
+}

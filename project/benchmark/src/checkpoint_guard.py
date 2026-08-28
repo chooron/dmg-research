@@ -6,7 +6,7 @@ checkpoints.  Any checkpoint root that contains older generations (e.g. the
 12:05 pilot run) is rejected loudly — no silent fallback, no auto-downgrade.
 """
 from __future__ import annotations
-
+from collections.abc import Iterable
 import json
 import re
 from pathlib import Path
@@ -37,6 +37,7 @@ def validate_canonical_checkpoint(
     model_name: str | None = None,
     required_generation: int = 300,
     required_basins: int = 531,
+    required_basin_ids: Iterable[int] | None = None,
     require_done: bool = True,
     require_manifest_dim: bool = True,
 ) -> dict:
@@ -47,6 +48,7 @@ def validate_canonical_checkpoint(
       * no chunk_*_gen_300.pt (and a loud hint if only pilot/gen-30 content exists);
       * embedded payload generation != required_generation;
       * basin coverage != required_basins (after merging all chunks, no overlap);
+      * basin IDs do not match required_basin_ids, when supplied;
       * registry dimension mismatch with the frozen manifest (when provided).
     """
     model_dir = Path(model_dir)
@@ -95,6 +97,15 @@ def validate_canonical_checkpoint(
             f"{model_dir}: basin coverage {len(seen)} != {required_basins} "
             f"(n_chunks={len(targets)}) — truncated/partial checkpoint"
         )
+    if required_basin_ids is not None:
+        expected = {int(basin_id) for basin_id in required_basin_ids}
+        if seen != expected:
+            missing = sorted(expected - seen)
+            unexpected = sorted(seen - expected)
+            raise RuntimeError(
+                f"{model_dir}: basin ID coverage mismatch; "
+                f"missing={missing[:5]}, unexpected={unexpected[:5]}"
+            )
 
     if require_manifest_dim:
         dim = NPARAM_INFO_36.get(model_dir.name) if model_dir.name in NPARAM_INFO_36 else None

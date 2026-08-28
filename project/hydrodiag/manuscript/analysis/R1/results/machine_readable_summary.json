@@ -1,0 +1,242 @@
+{
+  "status": "COMPLETED",
+  "canonical_gates": "PASS",
+  "gate_breakdown": {
+    "provenance_gate": "PASS",
+    "basin_alignment_gate": "PASS",
+    "ct_definition_gate": "PASS",
+    "statistical_unit_gate": "PASS",
+    "reproducibility_gate": "PASS"
+  },
+  "dataset_dimensions": {
+    "total_basins": 531,
+    "canonical_eval_rows": 3186,
+    "all_periods_rows": 6372,
+    "paired_contrast_rows": 1062,
+    "strata_counts": {
+      "S1": 165,
+      "S2": 156,
+      "S3": 121,
+      "S4": 34,
+      "S5": 55
+    }
+  },
+  "primary_estimands": {
+    "delta_absCT_Base_CN_endpoints_S5_minus_S1": {
+      "IC-CMA-ES": {
+        "D_activity": 47.0,
+        "ci_low": 44.0,
+        "ci_high": 51.0,
+        "median_S1": 0.0,
+        "median_S5": 47.0,
+        "n_S1": 165,
+        "n_S5": 55
+      },
+      "dPL-MLP": {
+        "D_activity": 46.0,
+        "ci_low": 40.0,
+        "ci_high": 48.0,
+        "median_S1": 0.0,
+        "median_S5": 46.0,
+        "n_S1": 165,
+        "n_S5": 55
+      }
+    },
+    "delta_absCT_Base_CN_spearman_rho_frac_snow": {
+      "IC-CMA-ES": {
+        "rho": 0.545501631884666,
+        "ci_low": 0.45811052941408786,
+        "ci_high": 0.6159627208176548,
+        "n_basins": 531
+      },
+      "dPL-MLP": {
+        "rho": 0.4593943152075206,
+        "ci_low": 0.37169366272820503,
+        "ci_high": 0.5497665378676595,
+        "n_basins": 531
+      }
+    }
+  },
+  "secondary_tgd_control": {
+    "status": "PASS",
+    "role": "secondary_output_level_structural_control",
+    "overall_median_delta_absCT_TGD_CN": {
+      "IC-CMA-ES": {
+        "median": 1.0,
+        "ci_low": 0.0,
+        "ci_high": 1.0
+      },
+      "dPL-MLP": {
+        "median": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0
+      }
+    }
+  },
+  "threshold_prevalence_audit": {
+    "definitions": {
+      "conditional_prevalence": "P(|CT| >= c | KGE >= k) = numerator / conditional_denominator",
+      "joint_prevalence": "P(KGE >= k & |CT| >= c) = numerator / all_valid_denominator",
+      "structure_specific_denominator": "N_s(KGE_s >= k)",
+      "common_pass_denominator": "N_common(KGE_Base >= k & KGE_TGD >= k & KGE_CN >= k)"
+    },
+    "key_prevalence_kge060_ct15d": {
+      "IC-CMA-ES|Base|structure_specific": {
+        "paradigm": "IC-CMA-ES",
+        "structure": "Base",
+        "denominator_type": "structure_specific",
+        "numerator": 56,
+        "conditional_denominator": 331,
+        "conditional_prevalence": 0.1691842900302115,
+        "conditional_ci_low": 0.1357601770867077,
+        "conditional_ci_high": 0.21519474196689387,
+        "all_valid_denominator": 531,
+        "joint_prevalence": 0.10546139359698682
+      },
+      "IC-CMA-ES|Base|common_all_structures_pass": {
+        "paradigm": "IC-CMA-ES",
+        "structure": "Base",
+        "denominator_type": "common_all_structures_pass",
+        "numerator": 55,
+        "conditional_denominator": 321,
+        "conditional_prevalence": 0.17133956386292834,
+        "conditional_ci_low": 0.13782126793745983,
+        "conditional_ci_high": 0.21640328534895234,
+        "all_valid_denominator": 531,
+        "joint_prevalence": 0.10357815442561205
+      },
+      "IC-CMA-ES|TGD|structure_specific": {
+        "paradigm": "IC-CMA-ES",
+        "structure": "TGD",
+        "denominator_type": "structure_specific",
+        "numerator": 46,
+        "conditional_denominator": 397,
+        "conditional_prevalence": 0.11586901763224182,
+        "conditional_ci_low": 0.08620689655172414,
+        "conditional_ci_high": 0.14798495155638014,
+        "all_valid_denominator": 531,
+        "joint_prevalence": 0.08662900188323917
+      },
+      "IC-CMA-ES|TGD|common_all_structures_pass": {
+        "paradigm": "IC-CMA-ES",
+        "structure": "TGD",
+        "denominator_type": "common_all_structures_pass",
+        "numerator": 35,
+        "conditional_denominator": 321,
+        "conditional_prevalence": 0.10903426791277258,
+        "conditional_ci_low": 0.079744863180446,
+        "conditional_ci_high": 0.14476583746600546,
+        "all_valid_denominator": 531,
+        "joint_prevalence": 0.06591337099811675
+      },
+      "IC-CMA-ES|CN|structure_specific": {
+        "paradigm": "IC-CMA-ES",
+        "structure": "CN",
+        "denominator_type": "structure_specific",
+        "numerator": 25,
+        "conditional_denominator": 427,
+        "conditional_prevalence": 0.0585480093676815,
+        "conditional_ci_low": 0.03881278538812785,
+        "conditional_ci_high": 0.08297265724718915,
+        "all_valid_denominator": 531,
+        "joint_prevalence": 0.047080979284369114
+      },
+      "IC-CMA-ES|CN|common_all_structures_pass": {
+        "paradigm": "IC-CMA-ES",
+        "structure": "CN",
+        "denominator_type": "common_all_structures_pass",
+        "numerator": 18,
+        "conditional_denominator": 321,
+        "conditional_prevalence": 0.056074766355140186,
+        "conditional_ci_low": 0.034367018188854494,
+        "conditional_ci_high": 0.08151110979673114,
+        "all_valid_denominator": 531,
+        "joint_prevalence": 0.03389830508474576
+      },
+      "dPL-MLP|Base|structure_specific": {
+        "paradigm": "dPL-MLP",
+        "structure": "Base",
+        "denominator_type": "structure_specific",
+        "numerator": 46,
+        "conditional_denominator": 344,
+        "conditional_prevalence": 0.13372093023255813,
+        "conditional_ci_low": 0.09535522632790631,
+        "conditional_ci_high": 0.16428893622353088,
+        "all_valid_denominator": 531,
+        "joint_prevalence": 0.08662900188323917
+      },
+      "dPL-MLP|Base|common_all_structures_pass": {
+        "paradigm": "dPL-MLP",
+        "structure": "Base",
+        "denominator_type": "common_all_structures_pass",
+        "numerator": 44,
+        "conditional_denominator": 331,
+        "conditional_prevalence": 0.13293051359516617,
+        "conditional_ci_low": 0.09592974749708495,
+        "conditional_ci_high": 0.16266445604375962,
+        "all_valid_denominator": 531,
+        "joint_prevalence": 0.08286252354048965
+      },
+      "dPL-MLP|TGD|structure_specific": {
+        "paradigm": "dPL-MLP",
+        "structure": "TGD",
+        "denominator_type": "structure_specific",
+        "numerator": 39,
+        "conditional_denominator": 405,
+        "conditional_prevalence": 0.0962962962962963,
+        "conditional_ci_low": 0.07124806026121816,
+        "conditional_ci_high": 0.1228156598392533,
+        "all_valid_denominator": 531,
+        "joint_prevalence": 0.07344632768361582
+      },
+      "dPL-MLP|TGD|common_all_structures_pass": {
+        "paradigm": "dPL-MLP",
+        "structure": "TGD",
+        "denominator_type": "common_all_structures_pass",
+        "numerator": 27,
+        "conditional_denominator": 331,
+        "conditional_prevalence": 0.08157099697885196,
+        "conditional_ci_low": 0.05403918069012409,
+        "conditional_ci_high": 0.10674664051576822,
+        "all_valid_denominator": 531,
+        "joint_prevalence": 0.05084745762711865
+      },
+      "dPL-MLP|CN|structure_specific": {
+        "paradigm": "dPL-MLP",
+        "structure": "CN",
+        "denominator_type": "structure_specific",
+        "numerator": 20,
+        "conditional_denominator": 426,
+        "conditional_prevalence": 0.046948356807511735,
+        "conditional_ci_low": 0.02829201404124616,
+        "conditional_ci_high": 0.067029014263362,
+        "all_valid_denominator": 531,
+        "joint_prevalence": 0.03766478342749529
+      },
+      "dPL-MLP|CN|common_all_structures_pass": {
+        "paradigm": "dPL-MLP",
+        "structure": "CN",
+        "denominator_type": "common_all_structures_pass",
+        "numerator": 14,
+        "conditional_denominator": 331,
+        "conditional_prevalence": 0.04229607250755287,
+        "conditional_ci_low": 0.019277579108693692,
+        "conditional_ci_high": 0.065711807932813,
+        "all_valid_denominator": 531,
+        "joint_prevalence": 0.026365348399246705
+      }
+    }
+  },
+  "robustness": {
+    "regional_loro": "not_executed",
+    "seed_restart_consistency": "PASS (all seeds show positive D_activity, positive Spearman rho, and monotonic S1-S5 increase)"
+  },
+  "compute_profile": {
+    "elapsed_seconds": 3.57,
+    "peak_vram_mb": 9.98,
+    "peak_ram_mb": 1269.65,
+    "gpu_device": "NVIDIA GeForce RTX 3060",
+    "bootstrap_draws": 200,
+    "base_seed": 20260730
+  }
+}

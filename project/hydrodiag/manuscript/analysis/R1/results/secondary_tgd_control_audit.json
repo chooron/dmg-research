@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "role": "secondary output-level structural control",
+  "exclusions": [
+    "No F_TGD calculation",
+    "No irreducible snow contribution claim",
+    "No parameter compensation inference",
+    "No internal state verification claim"
+  ],
+  "output_path": "/home/jingxin/code/dmg-research/project/hydrodiag/manuscript/analysis/R1/results/secondary_tgd_control_summaries.csv"
+}

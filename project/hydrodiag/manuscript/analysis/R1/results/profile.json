@@ -1,0 +1,8 @@
+{
+  "wall_seconds": 2.1940062230005424,
+  "rss_max_kb": 1125928,
+  "vram_peak_bytes": 7633408,
+  "coarse_host_to_device_transfers": 3,
+  "coarse_device_to_host_transfers": 0,
+  "transfer_note": "measured table/index/region boundary transfers"
+}

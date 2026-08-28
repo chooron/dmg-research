@@ -1,0 +1,244 @@
+{
+  "status": "PASS_WITH_DATA_SCOPE",
+  "estimand": "abs(signed_CT_Base) - abs(signed_CT_CN)",
+  "ct_operator": "water-year (Oct 1-Sep 30) 50 percent cumulative-flow day; signed CT = CT_sim - CT_obs",
+  "water_year_rule": "exact contiguous complete water year; finite nonnegative paired series; at least five valid water years",
+  "basin_aggregation": "median signed CT across valid water years, then absolute value for the paired contrast",
+  "ic_aggregation": "maximum stored train-period KGE with minimum-start tie break",
+  "xaj_primary_source": "R1 canonical paired contrasts and basin-level signed CT rows are used verbatim",
+  "dpl_aggregation": "median signed CT across available completed seed parameter files per basin and structure before Base-CN contrast",
+  "dpl_requested_seeds": [
+    42,
+    123,
+    2026
+  ],
+  "snow_strata": {
+    "S1": {
+      "range": "[0, 0.05)",
+      "N": 165
+    },
+    "S2": {
+      "range": "[0.05, 0.15)",
+      "N": 156
+    },
+    "S3": {
+      "range": "[0.15, 0.30)",
+      "N": 121
+    },
+    "S4": {
+      "range": "[0.30, 0.50)",
+      "N": 34
+    },
+    "S5": {
+      "range": "[0.50, 1.00]",
+      "N": 55
+    }
+  },
+  "source_results_root": "/home/jingxin/code/dmg-research/project/hydrodiag/results",
+  "source_data_root": "/mnt/f/python/generic_deltamodel/data",
+  "device": "cuda",
+  "primary_source": "/home/jingxin/code/dmg-research/project/hydrodiag/manuscript/results/R5/r5_figure9_primary_effects.csv",
+  "timing_source": "/home/jingxin/code/dmg-research/project/hydrodiag/manuscript/results/R5/r5_figure9_timing_distributions.csv",
+  "continuous_source": "/home/jingxin/code/dmg-research/project/hydrodiag/manuscript/results/R5/r5_figure9_continuous_summary.csv",
+  "agreement_source": "/home/jingxin/code/dmg-research/project/hydrodiag/manuscript/results/R5/r5_figure9_primary_agreement.csv",
+  "provenance": [
+    {
+      "regime": "IC",
+      "host": "XAJ",
+      "structure": "Base",
+      "seeds": [
+        "selected_restart"
+      ],
+      "n_seeds": 1
+    },
+    {
+      "regime": "dPL",
+      "host": "XAJ",
+      "structure": "Base",
+      "seeds": [
+        42,
+        123,
+        2026
+      ],
+      "n_seeds": 3,
+      "missing_requested_seeds": []
+    },
+    {
+      "regime": "IC",
+      "host": "XAJ",
+      "structure": "TGD",
+      "seeds": [
+        "selected_restart"
+      ],
+      "n_seeds": 1
+    },
+    {
+      "regime": "dPL",
+      "host": "XAJ",
+      "structure": "TGD",
+      "seeds": [
+        42
+      ],
+      "n_seeds": 1,
+      "missing_requested_seeds": []
+    },
+    {
+      "regime": "IC",
+      "host": "XAJ",
+      "structure": "CN",
+      "seeds": [
+        "selected_restart"
+      ],
+      "n_seeds": 1
+    },
+    {
+      "regime": "dPL",
+      "host": "XAJ",
+      "structure": "CN",
+      "seeds": [
+        42,
+        123,
+        2026
+      ],
+      "n_seeds": 3,
+      "missing_requested_seeds": []
+    },
+    {
+      "regime": "IC",
+      "host": "GR4J",
+      "structure": "Base",
+      "seeds": [
+        "selected_restart"
+      ],
+      "n_seeds": 1
+    },
+    {
+      "regime": "dPL",
+      "host": "GR4J",
+      "structure": "Base",
+      "seeds": [
+        42,
+        123,
+        2026
+      ],
+      "n_seeds": 3,
+      "missing_requested_seeds": []
+    },
+    {
+      "regime": "IC",
+      "host": "GR4J",
+      "structure": "TGD",
+      "seeds": [
+        "selected_restart"
+      ],
+      "n_seeds": 1
+    },
+    {
+      "regime": "dPL",
+      "host": "GR4J",
+      "structure": "TGD",
+      "seeds": [
+        42
+      ],
+      "n_seeds": 1,
+      "missing_requested_seeds": []
+    },
+    {
+      "regime": "IC",
+      "host": "GR4J",
+      "structure": "CN",
+      "seeds": [
+        "selected_restart"
+      ],
+      "n_seeds": 1
+    },
+    {
+      "regime": "dPL",
+      "host": "GR4J",
+      "structure": "CN",
+      "seeds": [
+        42,
+        123,
+        2026
+      ],
+      "n_seeds": 3,
+      "missing_requested_seeds": []
+    },
+    {
+      "regime": "IC",
+      "host": "SIMHYD",
+      "structure": "Base",
+      "seeds": [
+        "selected_restart"
+      ],
+      "n_seeds": 1
+    },
+    {
+      "regime": "dPL",
+      "host": "SIMHYD",
+      "structure": "Base",
+      "seeds": [
+        42,
+        123,
+        2026
+      ],
+      "n_seeds": 3,
+      "missing_requested_seeds": []
+    },
+    {
+      "regime": "IC",
+      "host": "SIMHYD",
+      "structure": "TGD",
+      "seeds": [
+        "selected_restart"
+      ],
+      "n_seeds": 1
+    },
+    {
+      "regime": "dPL",
+      "host": "SIMHYD",
+      "structure": "TGD",
+      "seeds": [
+        42
+      ],
+      "n_seeds": 1,
+      "missing_requested_seeds": []
+    },
+    {
+      "regime": "IC",
+      "host": "SIMHYD",
+      "structure": "CN",
+      "seeds": [
+        "selected_restart"
+      ],
+      "n_seeds": 1
+    },
+    {
+      "regime": "dPL",
+      "host": "SIMHYD",
+      "structure": "CN",
+      "seeds": [
+        42,
+        123
+      ],
+      "n_seeds": 2,
+      "missing_requested_seeds": [
+        2026
+      ]
+    },
+    {
+      "regime": "IC",
+      "host": "XAJ",
+      "source": "analysis/R1/results/canonical_basin_level.csv",
+      "aggregation": "R1 canonical"
+    },
+    {
+      "regime": "dPL",
+      "host": "XAJ",
+      "source": "analysis/R1/results/canonical_basin_level.csv",
+      "aggregation": "R1 canonical median_across_seeds"
+    }
+  ],
+  "tgd_secondary_scope": "TGD dPL uses the available audited seed-42 TGD2 parameter files; no incomplete seed is imputed.",
+  "training_or_calibration": "not performed; existing parameter files and selected IC records only"
+}

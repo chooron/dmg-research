@@ -78,6 +78,25 @@ class BatchedCMAES:
                               torch.full((units,), -torch.inf, dtype=torch.float64, device=self.device),
                               torch.zeros((units, dimension), dtype=torch.float64, device=self.device))
 
+    def _refresh_factor(self) -> None:
+        """Restore a usable covariance factor for numerically unstable units."""
+        eye = torch.eye(self.dimension, dtype=torch.float64, device=self.device)
+        covariance = 0.5 * (self.state.C + self.state.C.transpose(1, 2))
+        finite = torch.isfinite(covariance).all(dim=(1, 2))
+        covariance[~finite] = eye
+        try:
+            eig_min = torch.linalg.eigvalsh(covariance)[:, 0]
+            finite_eig = torch.isfinite(eig_min)
+            covariance[~finite_eig] = eye
+            eig_min = torch.where(finite_eig, eig_min, torch.ones_like(eig_min))
+            shift = (1e-10 - eig_min).clamp_min(0.0)
+            covariance = covariance + shift[:, None, None] * eye
+            factor = torch.linalg.cholesky(covariance + 1e-12 * eye)
+        except RuntimeError:
+            covariance = eye.expand(self.units, -1, -1).clone()
+            factor = eye.expand(self.units, -1, -1).clone()
+        self.state.C.copy_(covariance)
+        self.state.A.copy_(factor)
     def set_centers(self, centers: torch.Tensor) -> None:
         if centers.shape != self.state.mean.shape:
             raise ValueError(f"center shape {tuple(centers.shape)} != {tuple(self.state.mean.shape)}")
@@ -119,15 +138,7 @@ class BatchedCMAES:
         self.state.C.copy_(0.5 * (self.state.C + self.state.C.transpose(1, 2)))
         self.state.generation += 1
         if self.state.generation % self.decompose_frequency == 0:
-            jitter = torch.eye(self.dimension, dtype=torch.float64, device=self.device)[None] * 1e-12
-            try:
-                self.state.A.copy_(torch.linalg.cholesky(self.state.C + jitter))
-            except RuntimeError:
-                # isolate failed solvers: reset only non-positive-definite units, retaining best state
-                eig = torch.linalg.eigvalsh(self.state.C)
-                bad = eig[:, 0] <= 1e-12
-                self.state.C[bad] = torch.eye(self.dimension, dtype=torch.float64, device=self.device)
-                self.state.A.copy_(torch.linalg.cholesky(self.state.C + jitter))
+            self._refresh_factor()
         best, index = f.max(dim=1)
         improved = best > self.state.best_fitness
         self.state.best_fitness[improved] = best[improved]
@@ -143,4 +154,9 @@ class BatchedCMAES:
             raise ValueError("checkpoint solver shape mismatch")
         self.generator.set_state(payload["generator_state"].cpu())
         for key, value in payload["state"].items():
-            setattr(self.state, key, value.to(self.device) if isinstance(value, torch.Tensor) else value)
+            if isinstance(value, torch.Tensor):
+                if value.is_floating_point():
+                    value = value.to(self.device, dtype=torch.float64)
+                else:
+                    value = value.to(self.device)
+            setattr(self.state, key, value)

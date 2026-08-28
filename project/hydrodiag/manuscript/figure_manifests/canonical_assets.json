@@ -1,36 +1,192 @@
 {
-  "schema": "hydrodiag-manuscript-assets-v1",
-  "git_commit": "cd0b000",
+  "schema": "hydrodiag-manuscript-assets-v2",
+  "git_commit": "ed6729c",
   "canonical_figure_dir": "manuscript/figures",
-  "canonical_supplement_dir": "manuscript/supplement/figures",
-  "canonical_table_dir": "manuscript/tables",
+  "canonical_supplement_figure_dir": "manuscript/supplement/figures",
+  "canonical_table_dir": "manuscript/stats/tables",
+  "canonical_supplement_table_dir": "manuscript/supplement/tables",
   "palette": {
-    "Base": "#EE7733",
-    "TGD2": "#009988",
-    "CN": "#0077BB",
-    "HBV": "#6F6F6F",
-    "reference": "#555555"
+    "Base": "#D55E00",
+    "TGD": "#009E73",
+    "CN": "#0072B2",
+    "reference": "#70767B"
+  },
+  "submission_structure": {
+    "main_figures": ["Figure 1", "Figure 2", "Figure 3", "Figure 4", "Figure 5", "Figure 6", "Figure 7", "Figure 8", "Figure 9"],
+    "main_tables": ["Table 1", "Table 2"],
+    "supplement_figures": ["Figure S1"],
+    "supplement_tables": ["Table S1", "Table S2"]
   },
   "assets": [
-    {"id":"Figure1_R1","status":"blocked_missing_source","script":"manuscript/scripts/r1/plot_r1_figure1.py","output":"manuscript/figures/Figure1_R1_final.png","source_data":["manuscript/results/R1/r1_basin_level_performance.csv","manuscript/results/R1/r1_absolute_metrics_summary.csv"]},
-    {"id":"Figure2_R1","status":"blocked_missing_source","script":"manuscript/scripts/r1/plot_r1_figure2_canonical.py","output":"manuscript/figures/Figure2_R1_final.png","source_data":["manuscript/results/R1/r1_basin_level_performance.csv","manuscript/results/R1/r1_snow_signatures_basin_level.csv"]},
-    {"id":"Figure3_R2","status":"blocked_missing_source","script":"manuscript/scripts/r2/plot_r2_figure3_final.py","output":"manuscript/figures/Figure3_R2_final.png","source_data":["manuscript/results/R2/r2_tgd2_specificity_basin_level.csv","manuscript/results/R2/r2_tgd2_specificity_summary.csv","manuscript/results/R2/r2_tgd2_specificity_regressions.csv"]},
-    {"id":"Figure4_R2","status":"blocked_missing_source","script":"manuscript/scripts/r2/plot_r2_figure4_canonical.py","output":"manuscript/figures/Figure4_R2_final.png","source_data":["manuscript/results/R2/r2_snow_gradients_summary.csv","manuscript/results/R2/r2_paired_shifts_basin_level.csv"]},
-    {"id":"Figure5_R3","status":"final","script":"manuscript/scripts/r3/plot_figure5.py","output":"manuscript/figures/Figure5_R3_final.png","source_data":["manuscript/results/R3/figure5_summary.json","manuscript/results/R3/figure5_basin_table.csv","manuscript/results/R3/figure5_basin_seedmedian.csv"],"tgd2_role":"absent_by_design"},
-    {"id":"Figure6_R3","status":"final","script":"manuscript/scripts/r3/plot_figure6.py","output":"manuscript/figures/Figure6_R3_final.png","source_data":["manuscript/results/R3/figure6_summary.json","manuscript/results/R3/figure6_basin_table.csv","manuscript/results/R3/fig6_seasonal/fig6_seasonal_meta.json"],"tgd2_role":"canonical_matched_control"},
-    {"id":"Figure7_R4","status":"interim_tgd2_pending","script":"manuscript/scripts/r4/generate_three_structure_r4_all.py","output":"manuscript/figures/Figure7_R4_interim.png","source_data":["results/r4_phase1_soil_official/three_structure_swe_decile_shape.csv","results/r4_phase1_soil_official/three_structure_process_phase_consistency.csv"],"tgd2_role":"TGD2_PENDING"},
-    {"id":"Figure8_R4","status":"interim_tgd2_pending","script":"manuscript/scripts/r4/generate_three_structure_r4_all.py","output":"manuscript/figures/Figure8_R4_interim.png","source_data":["results/r4_phase1_soil_official/three_structure_timing_metrics_basin_summary.csv","results/r4_phase1_soil_official/robustness_timing_sensitivity.csv"],"tgd2_role":"TGD2_PENDING"},
-    {"id":"FigureS5_R3","status":"final","script":"manuscript/scripts/r3/plot_r3_si_components.py","output":"manuscript/supplement/figures/FigureS5_R3_final.png","source_data":["results/r3_misspec_analysis_v1/paired_parameters.csv","results/r3_misspec_analysis_v1/state_excess.csv"]},
-    {"id":"FigureS6_R4","status":"interim_tgd2_pending","script":"manuscript/scripts/r4/generate_three_structure_r4_all.py","output":"manuscript/supplement/figures/FigureS6_R4_interim.png","source_data":["results/r4_phase1_soil_official/robustness_swe_decile_shape.csv","results/r4_phase1_soil_official/robustness_process_phase_consistency.csv"],"tgd2_role":"TGD2_PENDING"},
-    {"id":"Table1_R1","status":"blocked_missing_source","script":"manuscript/scripts/r1/generate_table1.py","output":"manuscript/tables/Table1_R1_final.tex"},
-    {"id":"Table2","status":"unresolved_definition","script":null,"output":null},
-    {"id":"Table3","status":"unresolved_definition","script":null,"output":null},
-    {"id":"Table4_R4_base_cn","status":"final_base_cn","script":"manuscript/scripts/r4/generate_table_r4.py","output":"manuscript/tables/Table4_R4_base_cn_final.tex"},
-    {"id":"Table4_R4","status":"interim_tgd2_pending","script":"manuscript/scripts/r4/generate_three_structure_r4_all.py","output":"manuscript/tables/Table4_R4_interim.tex","tgd2_role":"TGD2_PENDING"},
-    {"id":"Table5_R3","status":"final","script":"manuscript/scripts/r3/generate_table_r3_main.py","output":"manuscript/tables/Table5_R3_final.tex"},
-    {"id":"TableS4_R4","status":"final_base_cn","script":"manuscript/scripts/r4/generate_table_r4.py","output":"manuscript/tables/TableS4_R4_final.tex"},
-    {"id":"TableS5_R3","status":"final","script":"manuscript/scripts/r3/generate_table_r3_si.py","output":"manuscript/tables/TableS5_R3_final.tex"},
-    {"id":"TableS6_R4","status":"interim_tgd2_pending","script":"manuscript/scripts/r4/generate_three_structure_r4_all.py","output":"manuscript/tables/TableS6_R4_interim.tex","tgd2_role":"TGD2_PENDING"},
-    {"id":"TableS7_R4","status":"interim_tgd2_pending","script":"manuscript/scripts/r4/generate_three_structure_r4_all.py","output":"manuscript/tables/TableS7_R4_interim.tex","tgd2_role":"TGD2_PENDING"}
+    {
+      "id": "Figure1_R0",
+      "type": "main_figure",
+      "status": "final",
+      "script": "manuscript/scripts/r0/plot_r0_figure1.py",
+      "output": "manuscript/figures/Figure1_final.png",
+      "source_data": [
+        "manuscript/results/R1/r1_snow_attributes.csv"
+      ]
+    },
+    {
+      "id": "Figure2_R1",
+      "type": "main_figure",
+      "status": "final",
+      "script": "manuscript/scripts/r1/plot_r1_figure2.py",
+      "output": "manuscript/figures/Figure2_R1_final.png",
+      "source_data": [
+        "manuscript/results/R1/r1_basin_level_performance.csv",
+        "manuscript/results/R1/r1_snow_signatures_basin_level.csv"
+      ]
+    },
+    {
+      "id": "Figure3_R2",
+      "type": "main_figure",
+      "status": "final",
+      "script": "manuscript/scripts/r2/plot_r2_figure3_final.py",
+      "output": "manuscript/figures/Figure3_R2_final.png",
+      "source_data": [
+        "manuscript/analysis/R2/results/r2_within_structure_basin_level.csv",
+        "manuscript/analysis/R2/results/r2_s1_s5_macro_trajectory.csv",
+        "manuscript/analysis/R2/results/r2_canonical_prevalence_summary.csv",
+        "manuscript/analysis/R2/results/r2_paired_cn_tgd_delta_excess_summary.csv",
+        "manuscript/analysis/R2/results/r2_tgd2_slope_difference_summary.csv",
+        "manuscript/analysis/R2/results/r2_macro_regressions.csv"
+      ]
+    },
+    {
+      "id": "Figure4_R2",
+      "type": "main_figure",
+      "status": "final",
+      "script": "manuscript/scripts/r2/plot_r2_figure4_canonical.py",
+      "output": "manuscript/figures/Figure4_R2_final.png",
+      "source_data": [
+        "manuscript/analysis/R2/results/authoritative_15_parameter_specs.csv",
+        "manuscript/analysis/R2/results/r2_snow_gradients_summary.csv",
+        "manuscript/analysis/R2/results/r2_parameter_shifts_strata_summary.csv",
+        "manuscript/analysis/R2/results/r2_parameter_values_canonical.csv",
+        "manuscript/analysis/R2/results/r2_paired_shifts_basin_level.csv"
+      ]
+    },
+    {
+      "id": "Figure5_R3",
+      "type": "main_figure",
+      "status": "final",
+      "script": "manuscript/scripts/r3/plot_figure5.py",
+      "output": "manuscript/figures/Figure5_R3_final.png",
+      "source_data": [
+        "manuscript/results/R3/figure5_summary.json",
+        "manuscript/results/R3/figure5_basin_table.csv",
+        "manuscript/results/R3/figure5_basin_seedmedian.csv"
+      ]
+    },
+    {
+      "id": "Figure6_R3",
+      "type": "main_figure",
+      "status": "final",
+      "script": "manuscript/scripts/r3/plot_figure6.py",
+      "output": "manuscript/figures/Figure6_R3_final.png",
+      "source_data": [
+        "manuscript/results/R3/figure6_summary.json",
+        "manuscript/results/R3/figure6_basin_table.csv",
+        "manuscript/results/R3/fig6_seasonal/fig6_seasonal_meta.json"
+      ]
+    },
+    {
+      "id": "Figure7_R4",
+      "type": "main_figure",
+      "status": "final",
+      "script": "manuscript/scripts/r4/plot_r4_figure7.py",
+      "output": "manuscript/figures/figure7_r4_soil_consistency.png",
+      "source_data": [
+        "results/r4_phase1_soil_official/three_structure_paired_structural_effects.csv",
+        "results/r4_phase1_soil_official/robustness_process_phase_consistency.csv",
+        "results/r4_caravan_soil_reference_v1/caravan_soil_ensemble.npz"
+      ]
+    },
+    {
+      "id": "Figure8_R4",
+      "type": "main_figure",
+      "status": "final",
+      "script": "manuscript/scripts/r4/plot_r4_figure8.py",
+      "output": "manuscript/figures/figure8_r4_soil_timing.png",
+      "source_data": [
+        "results/r4_caravan_soil_reference_v1/caravan_soil_ensemble.npz",
+        "results/r4_swe_reference_v1/swe_ensemble.npz",
+        "results/r4_phase1_soil_official/paired_structural_effects.csv",
+        "results/r4_phase1_soil_official/basin_state_consistency.csv"
+      ]
+    },
+    {
+      "id": "Figure9_R5",
+      "type": "main_figure",
+      "status": "final",
+      "script": "manuscript/scripts/r5/plot_r5_figure9.py",
+      "output": "manuscript/figures/Figure9_R5_cross_model_replication.png",
+      "source_data": [
+        "manuscript/results/R5/r5_figure9_primary_effects.csv",
+        "manuscript/results/R5/r5_figure9_primary_effect_matrix.csv",
+        "manuscript/results/R5/r5_figure9_continuous_summary.csv",
+        "manuscript/results/R5/r5_figure9_endpoint_summary.csv",
+        "manuscript/results/R5/r5_figure9_timing_distributions.csv",
+        "manuscript/results/R5/r5_figure9_primary_agreement.csv"
+      ]
+    },
+    {
+      "id": "Table1",
+      "type": "main_table",
+      "status": "final",
+      "script": "manuscript/scripts/shared/generate_table1_structural_configurations.py",
+      "output_tex": "manuscript/stats/tables/Table1_structural_configurations.tex",
+      "output_md": "manuscript/stats/tables/Table1_structural_configurations.md",
+      "output_csv": "manuscript/stats/tables/Table1_structural_configurations.csv"
+    },
+    {
+      "id": "Table2",
+      "type": "main_table",
+      "status": "final",
+      "script": "manuscript/scripts/shared/generate_table2_controlled_recovery.py",
+      "output_tex": "manuscript/stats/tables/Table2_controlled_recovery.tex",
+      "output_md": "manuscript/stats/tables/Table2_controlled_recovery.md",
+      "output_csv": "manuscript/stats/tables/Table2_controlled_recovery.csv",
+      "source_data": [
+        "manuscript/results/discussion_audit/r3_gap_recovery_ratio_audit.csv"
+      ]
+    },
+    {
+      "id": "FigureS1_R4",
+      "type": "supplement_figure",
+      "status": "final",
+      "script": "manuscript/scripts/r4/plot_r4_figure_s1_multibasin.py",
+      "output": "manuscript/supplement/figures/FigureS1_R4_multibasin_validation.png",
+      "audit_json": "manuscript/supplement/figures/FigureS1_R4_selection_audit.json",
+      "audit_csv": "manuscript/supplement/figures/FigureS1_R4_population_audit.csv",
+      "source_data": [
+        "results/r4_caravan_soil_reference_v1/caravan_soil_ensemble.npz",
+        "results/r4_swe_reference_v1/swe_ensemble.npz"
+      ]
+    },
+    {
+      "id": "TableS1",
+      "type": "supplement_table",
+      "status": "final",
+      "script": "manuscript/scripts/shared/generate_table_s1_parameter_bounds.py",
+      "output_tex": "manuscript/stats/tables/TableS1_parameter_bounds.tex",
+      "output_md": "manuscript/stats/tables/TableS1_parameter_bounds.md",
+      "output_csv": "manuscript/stats/tables/TableS1_parameter_bounds.csv"
+    },
+    {
+      "id": "TableS2",
+      "type": "supplement_table",
+      "status": "final",
+      "script": "manuscript/scripts/shared/generate_table_s2_sensitivity.py",
+      "output_tex": "manuscript/stats/tables/TableS2_sensitivity_audits.tex",
+      "output_md": "manuscript/stats/tables/TableS2_sensitivity_audits.md",
+      "output_csv": "manuscript/stats/tables/TableS2_PanelA_threshold_sensitivity.csv",
+      "source_data": [
+        "manuscript/cache/r1_rebuild_audit_staged/r1_basin_level_ct.csv",
+        "manuscript/results/discussion_audit/r3_denominator_sensitivity_audit.csv"
+      ]
+    }
   ]
 }

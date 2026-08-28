@@ -69,7 +69,7 @@ def topmodel_step(
     # ==========================================================================
     # 1. Surface Runoff (S2 Control)
     # ==========================================================================
-    mu_fixed = torch.tensor(3.0, device=P.device)
+    mu_fixed = torch.tensor(3.0, device=P.device, dtype=P.dtype)
     lambda_para = chi * phi + mu_fixed
     
     # flux_qof: 饱和坡面流

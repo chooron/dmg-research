@@ -95,5 +95,5 @@ class CatchmentAttributeBuilder:
         else:
             norm_attr = raw_attr
 
-        return torch.as_tensor(norm_attr, dtype=torch.float32, device=device)
+        return torch.as_tensor(norm_attr, dtype=torch.float64, device=device)
 
