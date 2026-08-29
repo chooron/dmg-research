@@ -184,7 +184,16 @@ def build_figure(summary, out_dir: Path | None = None) -> Path:
         Line2D([0], [0], color=COLOR_DARK_NEUTRAL, lw=1.3, ls="-", label="IC (solid)"),
         Line2D([0], [0], color=COLOR_DARK_NEUTRAL, lw=1.3, ls="--", label="dPL (dashed)"),
     ]
-    fig.legend(handles=struct_handles, loc="upper center", bbox_to_anchor=(0.98, 0.98), ncol=6, frameon=False, fontsize=7.0)
+    fig.legend(
+        handles=struct_handles,
+        loc="upper center",
+        bbox_to_anchor=(0.5, 0.985),
+        ncol=6,
+        frameon=False,
+        fontsize=7.2,
+        columnspacing=1.3,
+        handletextpad=0.4,
+    )
 
     out_path = target_dir / f"{OUT_NAME}.png"
     plt.savefig(out_path, dpi=600, bbox_inches="tight", facecolor="white", edgecolor="none")

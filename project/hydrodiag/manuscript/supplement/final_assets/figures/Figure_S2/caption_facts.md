@@ -27,5 +27,10 @@
 - Teal/green line family; line style identifies response setting.
 - Horizontal zero reference is retained.
 
+## Notes for Caption
+- Panels (a–b) use the frozen mathematical response table (351 temperatures).
+- Panel (c) uses frozen basin-level test metrics; fractions are unclipped and denominator-valid.
+- Intervals in panel (c) represent Q25–Q75; IC is shown with open circles and dPL with filled triangles (N = 427 for IC, N = 460 for dPL).
+
 ## Interpretation qualifier
 - Response-shape sensitivity within the frozen TGD control family; not a physical snow model or universal bound.

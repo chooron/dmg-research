@@ -358,7 +358,7 @@ def main():
     )
 
     out_png = SUPPLEMENT_FIG_DIR / "FigureS1_R4_multibasin_validation.png"
-    plt.savefig(out_png, dpi=300, bbox_inches="tight", facecolor="#FFFFFF")
+    plt.savefig(out_png, dpi=600, bbox_inches="tight", facecolor="#FFFFFF")
     plt.close()
 
     print(f"Canonical Figure S1 updated successfully:\n  {out_png}")

@@ -144,8 +144,17 @@ def main() -> None:
         Line2D([0], [0], marker="o", color=COLOR_BASE, markerfacecolor="white", lw=0, markersize=5, label="Base; dPL open"),
         Line2D([0], [0], marker="^", color=COLOR_TGD, markerfacecolor="white", lw=0, markersize=5, label="TGD; dPL open"),
     ]
-    fig.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, 0.995), ncol=4, frameon=False, fontsize=7.0)
-    fig.subplots_adjust(left=0.08, right=0.99, bottom=0.08, top=0.88)
+    fig.legend(
+        handles=handles,
+        loc="upper center",
+        bbox_to_anchor=(0.5, 0.985),
+        ncol=4,
+        frameon=False,
+        fontsize=7.2,
+        columnspacing=1.5,
+        handletextpad=0.4,
+    )
+    fig.subplots_adjust(left=0.08, right=0.99, bottom=0.06, top=0.935, hspace=0.28, wspace=0.08)
     OUT.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(OUT, dpi=600, bbox_inches="tight", facecolor="white", edgecolor="none")
     plt.close(fig)

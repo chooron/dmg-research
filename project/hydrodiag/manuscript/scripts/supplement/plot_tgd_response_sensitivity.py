@@ -135,19 +135,27 @@ def build_figure(out_path: Path) -> Path:
         dpl = _point_interval(ax_shape, i + 0.10, frame, "delta_F_dpl", "^", open_marker=False)
         ax_shape.text(i + 0.02, 0.98, f"IC {ic[0]:+.3f}\ndPL {dpl[0]:+.3f}", transform=ax_shape.get_xaxis_transform(), ha="center", va="top", fontsize=5.9, color=COLOR_DARK_NEUTRAL)
 
+    response_line_styles = ("-", "--", ":", "-.", (0, (5, 1, 1, 1)), (0, (2, 2)))
     response_handles = [
-        Line2D([0], [0], color=COLOR_TGD, lw=1.5, label="TGD parameter family; line style = setting"),
-        Line2D([0], [0], marker="o", color=COLOR_TGD, markerfacecolor="white", lw=0, markersize=5.2, label="IC"),
-        Line2D([0], [0], marker="^", color=COLOR_TGD, markerfacecolor=COLOR_TGD, lw=0, markersize=5.2, label="dPL"),
+        Line2D([0], [0], color=COLOR_TGD, lw=1.5, ls=linestyle, label=f"{label} {parameter_label}")
+        for (label, _tau_col, _retention_col, parameter_label), linestyle in zip(RESPONSE_SPECS, response_line_styles)
     ]
-    fig.legend(response_handles, [h.get_label() for h in response_handles], loc="upper center", bbox_to_anchor=(0.5, 1.02), ncol=3, frameon=False, fontsize=7.0)
-    fig.text(
-        0.5, -0.01,
-        "Panels (a–b) use the frozen mathematical response table (351 temperatures). "
-        "Panel (c) uses frozen basin-level test metrics; fractions are unclipped and denominator-valid.",
-        ha="center", va="top", fontsize=6.6, color="#555555",
+    response_handles.extend([
+        Line2D([0], [0], marker="o", color=COLOR_TGD, markerfacecolor="white", lw=0, markersize=5.2, label="IC (open circle)"),
+        Line2D([0], [0], marker="^", color=COLOR_TGD, markerfacecolor=COLOR_TGD, lw=0, markersize=5.2, label="dPL (filled triangle)"),
+    ])
+    fig.legend(
+        response_handles,
+        [h.get_label() for h in response_handles],
+        loc="upper center",
+        bbox_to_anchor=(0.5, 0.99),
+        ncol=4,
+        frameon=False,
+        fontsize=6.8,
+        columnspacing=1.2,
+        handletextpad=0.4,
     )
-    fig.subplots_adjust(left=0.06, right=0.99, bottom=0.21, top=0.78, wspace=0.28)
+    fig.subplots_adjust(left=0.06, right=0.99, bottom=0.14, top=0.82, wspace=0.28)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(out_path, dpi=600, bbox_inches="tight", facecolor="white", edgecolor="none")
     plt.close(fig)
