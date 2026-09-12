@@ -79,6 +79,25 @@ def parameter_groups_for_model(name: str, parameter_names: Iterable[str]) -> dic
     return {group: members for group, members in groups.items() if members}
 
 
+def _validate_warmup_grad_mode(mode: str) -> None:
+    """Fail fast on warmup_grad_mode values that were declared but never implemented.
+
+    Historical modes 'truncate:N', 'full', 'state_init' were never consumed by
+    HydrologyModel (the config key was silently ignored). See
+    project/benchmark/PENMAN_TRUNCATE90_PROVENANCE_AUDIT_20260831.md.
+    Only 'detach' (no-grad warmup + state detach at the warmup boundary, then
+    full-graph backpropagation over the scored period) is implemented.
+    """
+    if mode != "detach":
+        raise ValueError(
+            f"Unsupported warmup_grad_mode: {mode!r}. Only 'detach' is implemented "
+            "(no-grad warmup + state detach at the warmup boundary; scored period "
+            "runs full backpropagation). Modes such as 'truncate:N', 'full', and "
+            "'state_init' were historically declared but never implemented; passing "
+            "them now raises instead of silently changing nothing."
+        )
+
+
 def model_config(
     name: str,
     *,
@@ -93,6 +112,7 @@ def model_config(
     key = name.lower()
     if key not in NPARAM_INFO_36:
         raise KeyError(f"Not a fixed 36-model calibration target: {name}")
+    _validate_warmup_grad_mode(str(warmup_grad_mode))
     cfg = {"model_name": key, "warm_up": int(warm_up), "warm_up_states": True,
            "variables": ["prcp", "tmean", "pet"], "nearzero": 1e-6,
            "nmul": 1, "parameter_mapping": str(parameter_mapping),

@@ -28,6 +28,7 @@ reports/
 validation_results/
 tmp/
 .tmp/
+.pi/
 archive/
 
 # --- Generated result/data file extensions ---
@@ -38,8 +39,9 @@ archive/
 *.h5
 *.ckpt
 *.csv
-*.nc
+*.json
 *.parquet
+*.txt
 results.tsv
 
 # --- Figures / generated charts ---
@@ -75,8 +77,6 @@ release/
 *.ptx
 
 # --- Paper / manuscript generated artifacts (source scripts stay possible) ---
-manuscript/
-manuscriptv2/
 !project/hydrodiag/manuscript/
 project/hydrodiag/manuscript/*
 !project/hydrodiag/manuscript/README.md
@@ -109,15 +109,10 @@ audit_scout.md
 context.md
 
 # --- Deployment snapshots / vendored copies ---
-project/benchmark/dmotpy/
+project/benchmark/dmotpy
 
 # --- Third-party vendored reference (local only) ---
 MARRMoT/
-vendor/upstream/
-project/autofuse/.cache/
-project/autofuse/docs/coupled_rk2_teacher_forced_trace.json
-project/autofuse/docs/coupled_rk2_free_run_divergence.json
-project/autofuse/docs/coupled_rk2_accepted_flux_audit.json
 
 # --- Secrets ---
 .env

@@ -66,7 +66,9 @@ def latest_checkpoint(model: str) -> Path:
 def run_model(model: str) -> tuple[list[dict], dict]:
     started = time.time()
     ids, attrs, train_x, train_y, val_x, val_y = build_inputs(model)
-    warm_mode = "truncate:90" if model == "penman" else "detach"
+    # Single implemented mode for all models; historical "truncate:90" penman label
+    # was never implemented (no-op) and is removed (see PENMAN_TRUNCATE90_PROVENANCE_AUDIT).
+    warm_mode = "detach"
     hydro = k.build_model(model, DEVICE, warm_up=365, backend="compile", parameter_mapping="auto", warmup_grad_mode=warm_mode)
     net = k.CatchmentParameterizer(attrs.shape[1], k.NPARAM_INFO_36[model], hidden_dims=[256, 256], dropout=.05).to(DEVICE)
     payload = torch.load(latest_checkpoint(model), map_location="cpu", weights_only=False)

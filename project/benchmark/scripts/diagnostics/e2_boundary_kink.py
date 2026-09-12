@@ -67,7 +67,8 @@ def slices(n: int):
 
 def loss_and_gradient(model_name: str, x: torch.Tensor, y: torch.Tensor, theta: torch.Tensor) -> tuple[float, torch.Tensor]:
     """Return the global mean loss and its correctly normalized batched gradient."""
-    model = build_model(model_name, DEVICE, warm_up=1825, backend="compile", warmup_grad_mode="full")
+    # "full" (gradient through warmup) was never implemented; only "detach" exists.
+    model = build_model(model_name, DEVICE, warm_up=1825, backend="compile", warmup_grad_mode="detach")
     parts = slices(theta.shape[0])
     grads, losses = [], []
     for part in parts:
@@ -81,7 +82,7 @@ def loss_and_gradient(model_name: str, x: torch.Tensor, y: torch.Tensor, theta: 
 
 
 def loss_only(model_name: str, x: torch.Tensor, y: torch.Tensor, theta: torch.Tensor) -> float:
-    model = build_model(model_name, DEVICE, warm_up=1825, backend="compile", warmup_grad_mode="full")
+    model = build_model(model_name, DEVICE, warm_up=1825, backend="compile", warmup_grad_mode="detach")
     values = []
     with torch.no_grad():
         for part in slices(theta.shape[0]):

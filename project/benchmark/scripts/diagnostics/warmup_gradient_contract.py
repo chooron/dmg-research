@@ -26,7 +26,12 @@ DEVICE = torch.device("cuda")
 OUT = ROOT / "results/dpl_warmup_contract_20260731"
 EVIDENCE = ROOT / "results/dpl_gradient_evidence_20260731_epoch"
 MODELS = ("collie3", "newzealand1", "penman", "flexi", "flexis")
-MODES = ("detach", "truncate:90", "truncate:180", "full")
+# Historical "truncate:90"/"truncate:180"/"full"/"state_init" modes were declared
+# but NEVER implemented (warmup_grad_mode was not consumed by HydrologyModel). They
+# are rejected by src.model_registry._validate_warmup_grad_mode since the 2026-08-31
+# cleanup; this script keeps the single implemented mode "detach" (see
+# project/benchmark/PENMAN_TRUNCATE90_PROVENANCE_AUDIT_20260831.md).
+MODES = ("detach",)
 
 
 def module_from(path: Path, name: str):
@@ -177,13 +182,16 @@ def t5() -> None:
     rows = []
     for model_name in ("penman", "collie3", "flexi", "hbv96"):
         outputs = {}
-        for mode in ("detach", "full", "truncate:90"):
-            model = build_model(model_name, DEVICE, warm_up=365, backend="compile", warmup_grad_mode=mode)
+        # Only the implemented mode "detach" remains; runs 1 and 2 check
+        # forward determinism (historical multi-mode comparison was vacuous: all
+        # declared modes were never implemented and produced identical outputs).
+        for run_tag in ("run1", "run2"):
+            model = build_model(model_name, DEVICE, warm_up=365, backend="compile", warmup_grad_mode="detach")
             theta = torch.full((len(ids), NPARAM_INFO_36[model_name]), 0.5, device=DEVICE, dtype=torch.float32)
             with torch.no_grad():
-                outputs[mode] = model({"x_phy": x}, (None, theta.unsqueeze(-1)))["streamflow"]
+                outputs[run_tag] = model({"x_phy": x}, (None, theta.unsqueeze(-1)))["streamflow"]
             del model
-        rows.append({"model": model_name, "detach_full_bit_exact": bool(torch.equal(outputs["detach"], outputs["full"])), "detach_truncate90_bit_exact": bool(torch.equal(outputs["detach"], outputs["truncate:90"])), "max_abs_difference": float((outputs["detach"] - outputs["full"]).abs().max())})
+        rows.append({"model": model_name, "detach_run1_run2_bit_exact": bool(torch.equal(outputs["run1"], outputs["run2"])), "max_abs_difference": float((outputs["run1"] - outputs["run2"]).abs().max())})
     write_csv(OUT / "t5_forward_parity.csv", rows)
 
 
@@ -211,7 +219,9 @@ def t7() -> None:
     for model_name in NPARAM_INFO_36:
         theta = torch.full((len(ids), NPARAM_INFO_36[model_name]), 0.5, device=DEVICE, dtype=torch.float32)
         detach_grad = dpl_loss_and_grad(model_name, "detach", x, y, theta)
-        full_grad = dpl_loss_and_grad(model_name, "full", x, y, theta)
+        # "full" mode was never implemented; gradients under both historical labels
+        # are identical by construction (see module header note).
+        full_grad = detach_grad
         for index, parameter in enumerate(PARAM_INFO[model_name]):
             detach_zero = float((detach_grad[:, index] == 0).float().mean())
             full_zero = float((full_grad[:, index] == 0).float().mean())
@@ -231,9 +241,13 @@ def t7_state_init() -> None:
     revived_params, revived_models = 0, set()
     for model_name in NPARAM_INFO_36:
         theta = torch.full((len(ids), NPARAM_INFO_36[model_name]), 0.5, device=DEVICE, dtype=torch.float32)
+        # "state_init"/"full" modes were never implemented; keep the historical
+        # schema with all labels resolving to the single implemented "detach" mode.
+        detach_grad = dpl_loss_and_grad(model_name, "detach", x, y, theta)
         gradients = {
-            mode: dpl_loss_and_grad(model_name, mode, x, y, theta)
-            for mode in ("detach", "state_init", "full")
+            "detach": detach_grad,
+            "state_init": detach_grad,
+            "full": detach_grad,
         }
         for index, parameter in enumerate(PARAM_INFO[model_name]):
             zero = {mode: float((gradients[mode][:, index] == 0).float().mean()) for mode in gradients}
@@ -275,7 +289,7 @@ def t8() -> None:
     x, y = dpl_data([int(value) for value in ids])
     rows = []
     for model_name in ("hbv96", "collie3", "flexis"):
-        for mode in (*MODES, "state_init"):
+        for mode in MODES:  # single implemented mode; "state_init" was never implemented
             try:
                 rows.append(benchmark_one(model_name, mode, x, y))
             except torch.OutOfMemoryError as exc:

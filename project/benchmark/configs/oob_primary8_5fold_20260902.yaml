@@ -1,0 +1,58 @@
+# Frozen local/remote execution contract for PRIMARY 8 basin-held-out OOB.
+# Do not change protocol values for a formal run.
+experiment_id: oob_primary8_5fold_20260902
+models:
+  - alpine2
+  - hbv96
+  - xinanjiang
+  - newzealand2
+  - ihacres
+  - us1
+  - mopex4
+  - hillslope
+folds:
+  n_splits: 5
+  shuffle: true
+  random_state: 20260902
+  assignment_file: project/benchmark/results/oob_primary8_5fold_20260902/OOB_FOLD_ASSIGNMENT.csv
+  expected_basin_count: 531
+protocol:
+  training_warmup_days: 730
+  scored_horizon_days: 365
+  evaluation_warmup_days: 365
+  parameter_mapping: auto
+  optimizer: AdamW
+  lr: 0.001
+  weight_decay: 0.0001
+  scheduler: None
+  clip_norm: 1.0
+  kge_eps: 0.1
+  seed: 42
+  min_epochs: 50
+  patience: 10
+  plateau_eps: 0.0001
+  max_epochs: 100
+  selection_metric: train_loss
+  exact_best_checkpoint: true
+  batch_size: 100
+  steps_per_epoch: 169
+  parameterizer_hidden_dims: [256, 256]
+  parameterizer_dropout: 0.05
+  parameterizer_architecture: legacy
+  warmup_grad_mode: detach
+  backend: auto
+data:
+  basin_ids: data/531sub_id.txt
+  reference_ids: data/gage_id.npy
+  data_path: data/camels_dataset
+  attributes_path: data/caravan_671_attributes.npy
+  source_start: '1980-10-01'
+  source_end: '2014-09-30'
+  train: {start_time: '1980-10-01', end_time: '1995-09-30'}
+  test: {start_time: '1995-10-01', end_time: '2010-09-30'}
+outputs:
+  root: project/benchmark/results/oob_primary8_5fold_20260902
+  smoke_root: project/benchmark/results/oob_smoke_local_20260902
+  data_cache_root: project/benchmark/results/oob_primary8_5fold_20260902/data_cache
+  concurrency: 4
+  retry_limit: 1

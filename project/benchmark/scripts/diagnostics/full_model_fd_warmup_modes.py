@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Verify the full-model FD-vs-autograd discrepancy cause.
+"""Verify the full-model FD-vs-autograd consistency under the implemented warmup mode.
 
-Hypothesis: the canonical warmup_grad_mode="detach" makes autograd exclude
-the warmup-state trajectory (gradient flows only through scored steps),
-while centered FD measures total sensitivity (incl. warmup states).  With
-warmup_grad_mode="full", autograd should match FD.
+Only warmup_grad_mode="detach" is implemented (no-grad warmup + state detach at
+the warmup boundary; scored period full backpropagation). The historical
+"full" mode (gradient through warmup states) was declared but never implemented
+and is now rejected by src.model_registry; see
+project/benchmark/PENMAN_TRUNCATE90_PROVENANCE_AUDIT_20260831.md.
 """
 from __future__ import annotations
 import sys
@@ -67,12 +68,10 @@ def run(mode: str):
 
 
 print("warmup_grad_mode = detach (canonical)")
-r_detach = run("detach")
-print("warmup_grad_mode = full")
-r_full = run("full")
+r_detach = run("detach")  # "full" mode was never implemented; only "detach" exists
 
 import json
 OUT = ROOT / "results/mopex4_formula_decouple_20260811"
 (OUT / "full_model_fd_vs_autograd_warmup_modes.json").write_text(
-    json.dumps({"detach": r_detach, "full": r_full}, indent=2) + "\n")
+    json.dumps({"detach": r_detach}, indent=2) + "\n")
 print("written:", OUT / "full_model_fd_vs_autograd_warmup_modes.json")
