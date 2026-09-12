@@ -78,6 +78,8 @@ def vic_step(
     S2: torch.Tensor,
     S3: torch.Tensor,
     nearzero: float = 1e-6,
+    *,
+    doy: torch.Tensor = None,
 ) -> Tuple[
     torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor
 ]:
@@ -100,7 +102,7 @@ def vic_step(
 
     # --- 1. Interception Store (S1) ---
     # Interception capacity varies seasonally (Phenology)
-    t_idx = torch.ones_like(P)
+    t_idx = doy if doy is not None else torch.ones_like(P)
     aux_imax = phenology_2(ibar, idelta, ishift, t_idx, tmax, nearzero=nearzero)
 
     # flux_ei: Evaporation from interception

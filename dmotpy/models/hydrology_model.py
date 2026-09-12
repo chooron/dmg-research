@@ -357,11 +357,22 @@ class HydrologyModel(nn.Module):
         effective_warmup = min(self.warm_up, n_steps)
 
         p_seq, t_seq, pet_seq = self._make_forcing_sequences(forcing, n_groups)
+        doy_seq = None
+        if forcing.shape[-1] >= 4:
+            doy_seq = forcing[..., 3:4].expand(-1, -1, n_groups).unbind(0) if n_groups > 1 else forcing[..., 3:4].unbind(0)
+        elif "doy" in x_dict:
+            doy_t = x_dict["doy"]
+            if doy_t.dim() == 2:
+                doy_t = doy_t.unsqueeze(-1)
+            elif doy_t.dim() != 3:
+                doy_t = doy_t.view(forcing.shape[0], n_grid, 1)
+            doy_seq = doy_t.expand(-1, -1, n_groups).unbind(0) if n_groups > 1 else doy_t.unbind(0)
 
         param_values = [params_dict[name] for name in self.phy_param_names]
         curr_states = states
         with torch.no_grad():
             for t in range(effective_warmup):
+                step_kwargs = {"doy": doy_seq[t]} if (self.model_name == "vic" and doy_seq is not None) else {}
                 outputs = self.step_fn(
                     p_seq[t],
                     t_seq[t],
@@ -369,6 +380,7 @@ class HydrologyModel(nn.Module):
                     *param_values,
                     *curr_states,
                     nearzero=self.nearzero,
+                    **step_kwargs,
                 )
                 curr_states = tuple(outputs[2:])
         curr_states = tuple(state.detach() for state in curr_states)
@@ -381,6 +393,7 @@ class HydrologyModel(nn.Module):
         )
 
         for offset, t in enumerate(range(effective_warmup, n_steps)):
+            step_kwargs = {"doy": doy_seq[t]} if (self.model_name == "vic" and doy_seq is not None) else {}
             outputs = self.step_fn(
                 p_seq[t],
                 t_seq[t],
@@ -388,10 +401,10 @@ class HydrologyModel(nn.Module):
                 *param_values,
                 *curr_states,
                 nearzero=self.nearzero,
+                **step_kwargs,
             )
             streamflow[offset] = outputs[0]
             curr_states = outputs[2:]
-
         return self._finalize_output(streamflow)
 
     def _finalize_output(self, streamflow: torch.Tensor) -> Dict[str, torch.Tensor]:

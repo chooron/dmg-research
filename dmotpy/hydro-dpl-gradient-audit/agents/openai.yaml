@@ -1,3 +1,0 @@
-interface:
-  display_name: "Hydrological Differentiability Audit"
-  short_description: "Audit PyTorch hydrological models for valid dPL gradients"
