@@ -1,0 +1,975 @@
+{
+  "aggregation_pass": {
+    "aggregation_rule_dpl": "within-seed basin metrics followed by median across seeds",
+    "aggregation_rule_ic": "selected best-train-KGE restart per basin",
+    "analysis_set": "all_531_basins",
+    "bootstrap_statistic": "median",
+    "input_tables": [
+      "r1_basin_level_performance.csv",
+      "r1_structural_effects_basin_level.csv",
+      "r1_generalization_effects_basin_level.csv",
+      "r1_snow_signatures_basin_level.csv",
+      "r1_snow_attributes.csv",
+      "r1_snow_relationships_summary.csv"
+    ],
+    "primary_signature_requirement": "minimum five complete water years",
+    "remaining_checks": {
+      "analysis_sets": [
+        "r1_remaining_signature_effect",
+        "r1_remaining_signature_snow_strata",
+        "r1_remaining_transfer_full_sample",
+        "r1_remaining_transfer_snow_strata"
+      ],
+      "regional_slope_bootstrap": "seven-region block bootstrap of OLS slope sensitivity; robust slope retains Theil-Sen 95% CI",
+      "signature_requirement": "minimum five complete water years; three-year sensitivity retained",
+      "signature_units": {
+        "AMJJ": "fractional-flow error",
+        "CT": "days"
+      },
+      "tgd_transfer": "A=KGE_IC,train-KGE_dPL,train; B=KGE_IC,test-KGE_dPL,test; D=B-A; G_IC-G_dPL=-D",
+      "transfer_gradient": "D ~ frac_snow + structure + frac_snow:structure; TGD reference; cluster=basin_id"
+    },
+    "result_role": "primary",
+    "sensitivity_signature_requirement": "minimum three complete water years",
+    "summary_level": "full_sample"
+  },
+  "bootstrap": {
+    "ordinary_method": "paired basin resampling",
+    "region_method": "region block resampling when authoritative grouping is available",
+    "resamples": 10000,
+    "seed": 20260730
+  },
+  "bootstrap_resamples": 10000,
+  "command": "PYTHONDONTWRITEBYTECODE=1 python manuscript/scripts/build_r1_statistics.py --mode summary --project-root /home/jingxin/code/dmg-research/project/hydro_structure_diagnosis --results-root /home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/results --data-root /home/jingxin/code/dmg-research/data --output-root /home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/manuscript/results/R1",
+  "extension_estimands": {
+    "generalization_exposure": "(KGE_enhanced,test-KGE_base,test)-(KGE_enhanced,train-KGE_base,train) for CN-Base, TGD-Base, and CN-TGD",
+    "ic_dpl_transfer": "KGE_IC - median_seed(KGE_dPL), by structure and period",
+    "interaction_model": "effect_value ~ frac_snow + paradigm_dPL + frac_snow:paradigm_dPL; reference=IC-CMA-ES; cluster=basin_id",
+    "signature_error_reduction": "abs(error_first)-abs(error_second) for CT and AMJJ; primary minimum five complete water years; sensitivity minimum three",
+    "snow_specificity": "KGE_CN,test-KGE_TGD,test",
+    "support_status": "supported_positive if CI is entirely above zero; supported_negative if entirely below zero; inconclusive if CI crosses zero; otherwise descriptive_only"
+  },
+  "inference": {
+    "batch_size": 64,
+    "device": "cuda",
+    "partition_count": 5,
+    "partition_execution": "sequential"
+  },
+  "metric": {
+    "alpha": "std_sim/std_obs",
+    "beta": "mean_sim/mean_obs",
+    "formula": "1-sqrt((r-1)^2+(alpha-1)^2+(beta-1)^2)",
+    "invalid_rules": "shared finite nonnegative paired mask; minimum 30 paired days; invalid zero-variance observations excluded",
+    "name": "KGE(Q)",
+    "source": "repository production evaluators"
+  },
+  "output_schemas": {
+    "r1_absolute_metrics_summary.csv": [
+      "paradigm",
+      "model",
+      "period",
+      "metric",
+      "status",
+      "valid_basin_count",
+      "median",
+      "p25",
+      "p75",
+      "mean",
+      "sd",
+      "minimum",
+      "maximum",
+      "fraction_positive",
+      "bootstrap_ci_low",
+      "bootstrap_ci_high",
+      "analysis_set",
+      "summary_level",
+      "result_role",
+      "aggregation_rule",
+      "bootstrap_statistic",
+      "snow_stratum",
+      "snow_interval",
+      "stratum_n",
+      "valid_year_requirement",
+      "metric_unit"
+    ],
+    "r1_basin_level_performance.csv": [
+      "basin_id",
+      "paradigm",
+      "model",
+      "period",
+      "seed_or_restart",
+      "selected_run",
+      "kge",
+      "kge_prime",
+      "nse",
+      "pbias",
+      "rmse",
+      "valid_observation_count",
+      "valid_simulation_count",
+      "valid_days",
+      "period_start",
+      "period_end",
+      "discharge_unit",
+      "status",
+      "source_file",
+      "source_checkpoint_or_parameter_file",
+      "source_configuration"
+    ],
+    "r1_bootstrap_intervals.csv": [
+      "record_type",
+      "family",
+      "paradigm",
+      "model",
+      "period",
+      "metric",
+      "n",
+      "ci_low",
+      "ci_high",
+      "resamples",
+      "seed",
+      "method",
+      "status",
+      "effect",
+      "analysis_set",
+      "wilcoxon_p",
+      "sign_test_p",
+      "robustness_type",
+      "block_count",
+      "block_source",
+      "claim_id",
+      "summary_level",
+      "result_role",
+      "bootstrap_statistic",
+      "snow_stratum",
+      "snow_interval",
+      "stratum_n",
+      "valid_year_requirement",
+      "signature",
+      "comparison",
+      "metric_unit"
+    ],
+    "r1_daily_simulation_inventory.csv": [
+      "file",
+      "rows",
+      "sha256",
+      "basins",
+      "periods",
+      "date_start",
+      "date_end",
+      "status",
+      "model",
+      "paradigm",
+      "seed_or_restart",
+      "source_selection",
+      "checkpoint_epoch"
+    ],
+    "r1_dpl_seed_level_performance.csv": [
+      "basin_id",
+      "paradigm",
+      "model",
+      "period",
+      "seed_or_restart",
+      "selected_run",
+      "kge",
+      "kge_prime",
+      "nse",
+      "pbias",
+      "rmse",
+      "valid_observation_count",
+      "valid_simulation_count",
+      "valid_days",
+      "period_start",
+      "period_end",
+      "discharge_unit",
+      "status",
+      "source_file",
+      "source_checkpoint_or_parameter_file",
+      "source_configuration"
+    ],
+    "r1_epoch100_comparison.csv": [
+      "record_type",
+      "checkpoint_epoch",
+      "paradigm",
+      "model",
+      "period",
+      "metric",
+      "status",
+      "valid_basin_count",
+      "median",
+      "p25",
+      "p75",
+      "mean",
+      "sd",
+      "minimum",
+      "maximum",
+      "fraction_positive",
+      "bootstrap_ci_low",
+      "bootstrap_ci_high",
+      "analysis_set",
+      "effect",
+      "robustness_type",
+      "primary_estimate",
+      "difference_from_primary",
+      "same_direction_as_primary",
+      "seed_or_restart",
+      "effect_value",
+      "estimate",
+      "seed_min",
+      "seed_max",
+      "same_sign_count",
+      "all_seeds_agree",
+      "claim_id",
+      "estimand",
+      "ci_lower_bound",
+      "ci_upper_bound",
+      "positive_fraction",
+      "statistical_method",
+      "support_status"
+    ],
+    "r1_exclusion_log.csv": [
+      "item",
+      "status",
+      "reason"
+    ],
+    "r1_generalization_effects_basin_level.csv": [
+      "basin_id",
+      "paradigm",
+      "period",
+      "effect",
+      "effect_value",
+      "status",
+      "metric",
+      "effect_family",
+      "estimand",
+      "seed_count",
+      "seed_or_restart",
+      "model",
+      "structure",
+      "analysis_set"
+    ],
+    "r1_ic_restart_level_performance.csv": [
+      "basin_id",
+      "start",
+      "seed",
+      "status",
+      "train_kge",
+      "test_kge",
+      "source_file",
+      "generations",
+      "selected_run",
+      "model",
+      "paradigm",
+      "stored_metric_definition",
+      "selection_rule",
+      "recomputed_train_kge",
+      "median_restart_train_kge",
+      "recomputed_test_kge",
+      "median_restart_test_kge",
+      "recomputed_metric"
+    ],
+    "r1_input_inventory.csv": [
+      "result_set",
+      "model",
+      "calibration_paradigm",
+      "train_period",
+      "test_period",
+      "basin_count",
+      "basin_ids",
+      "seed_or_restart_count",
+      "seed_or_restart_ids",
+      "prediction_file_path",
+      "observation_file_path",
+      "forcing_or_attribute_file_path",
+      "date_coverage",
+      "discharge_units",
+      "missing_files",
+      "duplicated_basins",
+      "incomplete_runs",
+      "non_finite_values",
+      "failed_or_unusable_runs",
+      "interpretation",
+      "source_path",
+      "source_evidence"
+    ],
+    "r1_online_performance.csv": [
+      "basin_id",
+      "paradigm",
+      "model",
+      "period",
+      "seed_or_restart",
+      "selected_run",
+      "kge",
+      "kge_prime",
+      "nse",
+      "pbias",
+      "rmse",
+      "valid_observation_count",
+      "valid_simulation_count",
+      "valid_days",
+      "period_start",
+      "period_end",
+      "discharge_unit",
+      "status",
+      "source_file",
+      "source_checkpoint_or_parameter_file",
+      "source_configuration"
+    ],
+    "r1_online_signature_basin_year.csv": [
+      "basin_id",
+      "paradigm",
+      "model",
+      "seed_or_restart",
+      "period",
+      "water_year",
+      "status",
+      "ct_obs",
+      "ct_sim",
+      "ct_error_signed",
+      "ct_error_absolute",
+      "spo_obs",
+      "spo_sim",
+      "spo_error_signed",
+      "spo_error_absolute",
+      "amjj_obs",
+      "amjj_sim",
+      "amjj_error_signed",
+      "amjj_error_absolute",
+      "spo_status"
+    ],
+    "r1_paired_effects_summary.csv": [
+      "paradigm",
+      "model",
+      "period",
+      "effect",
+      "metric",
+      "status",
+      "valid_basin_count",
+      "median",
+      "p25",
+      "p75",
+      "mean",
+      "sd",
+      "minimum",
+      "maximum",
+      "fraction_positive",
+      "bootstrap_ci_low",
+      "bootstrap_ci_high",
+      "analysis_set",
+      "robustness_type",
+      "primary_estimate",
+      "difference_from_primary",
+      "same_direction_as_primary",
+      "seed_or_restart",
+      "effect_value",
+      "estimate",
+      "seed_min",
+      "seed_max",
+      "same_sign_count",
+      "all_seeds_agree",
+      "claim_id",
+      "estimand",
+      "ci_lower_bound",
+      "ci_upper_bound",
+      "positive_fraction",
+      "statistical_method",
+      "support_status",
+      "summary_level",
+      "result_role",
+      "aggregation_rule",
+      "bootstrap_statistic",
+      "regional_bootstrap_ci_low",
+      "regional_bootstrap_ci_high",
+      "wilcoxon_p",
+      "sign_test_p",
+      "valid_year_requirement",
+      "wilcoxon_bh_p",
+      "sign_test_bh_p",
+      "snow_stratum",
+      "snow_interval",
+      "stratum_n",
+      "effect_family",
+      "signature",
+      "comparison",
+      "metric_unit"
+    ],
+    "r1_signature_effects_basin_level.csv": [
+      "basin_id",
+      "paradigm",
+      "period",
+      "seed_or_restart",
+      "signature",
+      "first_model",
+      "second_model",
+      "effect_value",
+      "status",
+      "analysis_set",
+      "valid_years",
+      "effect_family",
+      "snow_stratum",
+      "snow_interval",
+      "stratum_n"
+    ],
+    "r1_snow_attributes.csv": [
+      "basin_id",
+      "frac_snow",
+      "attribute_name",
+      "attribute_index",
+      "unit",
+      "source_file",
+      "match_status"
+    ],
+    "r1_snow_relationships_summary.csv": [
+      "paradigm",
+      "effect",
+      "period",
+      "paired_basin_count",
+      "median",
+      "iqr",
+      "mean",
+      "fraction_greater_zero",
+      "spearman_rho",
+      "spearman_p",
+      "robust_slope",
+      "robust_ci_low",
+      "robust_ci_high",
+      "ols_slope",
+      "ols_ci_low",
+      "ols_ci_high",
+      "analysis_type",
+      "status",
+      "term",
+      "estimate",
+      "std_error",
+      "ci_low",
+      "ci_high",
+      "p_value",
+      "matched_basin_count",
+      "reference_category",
+      "model_specification",
+      "support_status",
+      "x_metric",
+      "y_metric",
+      "analysis_set",
+      "summary_level",
+      "result_role",
+      "bootstrap_ci_low",
+      "bootstrap_ci_high",
+      "bootstrap_statistic",
+      "aggregation_rule",
+      "snow_stratum",
+      "snow_interval",
+      "stratum_n",
+      "structure",
+      "regional_slope_ci_low",
+      "regional_slope_ci_high",
+      "bootstrap_method",
+      "effect_family",
+      "signature",
+      "comparison",
+      "metric_unit",
+      "association_x"
+    ],
+    "r1_snow_signatures_basin_level.csv": [
+      "basin_id",
+      "paradigm",
+      "model",
+      "seed_or_restart",
+      "period",
+      "valid_years",
+      "analysis_set",
+      "status",
+      "ct_obs",
+      "ct_sim",
+      "ct_error_signed",
+      "ct_error_absolute",
+      "amjj_obs",
+      "amjj_sim",
+      "amjj_error_signed",
+      "amjj_error_absolute",
+      "spo_obs",
+      "spo_sim",
+      "spo_error_signed",
+      "spo_error_absolute"
+    ],
+    "r1_snow_signatures_basin_year.csv": [
+      "basin_id",
+      "paradigm",
+      "model",
+      "seed_or_restart",
+      "period",
+      "water_year",
+      "status",
+      "ct_obs",
+      "ct_sim",
+      "ct_error_signed",
+      "ct_error_absolute",
+      "spo_obs",
+      "spo_sim",
+      "spo_error_signed",
+      "spo_error_absolute",
+      "amjj_obs",
+      "amjj_sim",
+      "amjj_error_signed",
+      "amjj_error_absolute",
+      "spo_status"
+    ],
+    "r1_statistical_tests.csv": [
+      "record_type",
+      "family",
+      "paradigm",
+      "model",
+      "period",
+      "metric",
+      "n",
+      "ci_low",
+      "ci_high",
+      "resamples",
+      "seed",
+      "method",
+      "status",
+      "effect",
+      "analysis_set",
+      "wilcoxon_p",
+      "sign_test_p",
+      "robustness_type",
+      "bh_family",
+      "wilcoxon_bh_p",
+      "sign_test_bh_p",
+      "claim_id",
+      "support_status",
+      "summary_level",
+      "result_role",
+      "snow_stratum",
+      "snow_interval",
+      "stratum_n",
+      "valid_year_requirement",
+      "signature",
+      "comparison",
+      "metric_unit"
+    ],
+    "r1_structural_effects_basin_level.csv": [
+      "basin_id",
+      "paradigm",
+      "period",
+      "effect",
+      "effect_value",
+      "status",
+      "metric",
+      "effect_family",
+      "estimand",
+      "seed_count",
+      "seed_or_restart"
+    ]
+  },
+  "outputs": [
+    "r1_absolute_metrics_summary.csv",
+    "r1_basin_level_performance.csv",
+    "r1_bootstrap_intervals.csv",
+    "r1_daily_simulation_inventory.csv",
+    "r1_daily_simulations_dpl_hbv_seed_123.parquet",
+    "r1_daily_simulations_dpl_hbv_seed_2026.parquet",
+    "r1_daily_simulations_dpl_hbv_seed_42.parquet",
+    "r1_daily_simulations_dpl_xaj_cn_seed_123.parquet",
+    "r1_daily_simulations_dpl_xaj_cn_seed_2026.parquet",
+    "r1_daily_simulations_dpl_xaj_cn_seed_42.parquet",
+    "r1_daily_simulations_dpl_xaj_seed_123.parquet",
+    "r1_daily_simulations_dpl_xaj_seed_2026.parquet",
+    "r1_daily_simulations_dpl_xaj_seed_42.parquet",
+    "r1_daily_simulations_dpl_xaj_tgd2_seed_123.parquet",
+    "r1_daily_simulations_dpl_xaj_tgd2_seed_2026.parquet",
+    "r1_daily_simulations_dpl_xaj_tgd2_seed_42.parquet",
+    "r1_daily_simulations_ic_xaj.parquet",
+    "r1_daily_simulations_ic_xaj_cn.parquet",
+    "r1_daily_simulations_ic_xaj_tgd2.parquet",
+    "r1_data_audit.md",
+    "r1_dpl_seed_level_performance.csv",
+    "r1_epoch100_comparison.csv",
+    "r1_epoch100_partition_manifest.json",
+    "r1_exclusion_log.csv",
+    "r1_execution.log",
+    "r1_generalization_effects_basin_level.csv",
+    "r1_ic_restart_level_performance.csv",
+    "r1_inference_audit.md",
+    "r1_input_inventory.csv",
+    "r1_online_performance.csv",
+    "r1_online_signature_basin_year.csv",
+    "r1_paired_effects_summary.csv",
+    "r1_result_manifest.json",
+    "r1_signature_effects_basin_level.csv",
+    "r1_snow_attributes.csv",
+    "r1_snow_relationships_summary.csv",
+    "r1_snow_signatures_basin_level.csv",
+    "r1_snow_signatures_basin_year.csv",
+    "r1_statistical_tests.csv",
+    "r1_statistics_notes.md",
+    "r1_structural_effects_basin_level.csv"
+  ],
+  "random_seed": 20260730,
+  "region_block_bootstrap": {
+    "definition": "group_11..group_17 are the seven LORO regions documented by project/flexmopex/run_model.py",
+    "region_count": 7,
+    "source_files": [
+      "/home/jingxin/code/dmg-research/data/basin_groups/group_11.npy",
+      "/home/jingxin/code/dmg-research/data/basin_groups/group_12.npy",
+      "/home/jingxin/code/dmg-research/data/basin_groups/group_13.npy",
+      "/home/jingxin/code/dmg-research/data/basin_groups/group_14.npy",
+      "/home/jingxin/code/dmg-research/data/basin_groups/group_15.npy",
+      "/home/jingxin/code/dmg-research/data/basin_groups/group_16.npy",
+      "/home/jingxin/code/dmg-research/data/basin_groups/group_17.npy"
+    ],
+    "status": "available"
+  },
+  "reproducibility": {
+    "deterministic_artifacts": [
+      {
+        "classification": "deterministic_scientific_artifact",
+        "logical_key": "paradigm|model|period|metric|analysis_set|snow_stratum|result_role|valid_year_requirement",
+        "relative_path": "r1_absolute_metrics_summary.csv",
+        "row_count": 392,
+        "sha256": "bb5fcf59ef6056a0e965097e96b56953721a4287815e618bbf711b7ac113ff58"
+      },
+      {
+        "classification": "deterministic_scientific_artifact",
+        "logical_key": "not_applicable",
+        "relative_path": "r1_basin_level_performance.csv",
+        "row_count": 7434,
+        "sha256": "46749335b3baf081aca27ff8d47c19b4b7aee4d0360917775801a4073d51efd8"
+      },
+      {
+        "classification": "deterministic_scientific_artifact",
+        "logical_key": "record_type|family|paradigm|model|period|metric|effect|analysis_set|method|snow_stratum|signature|comparison|claim_id|robustness_type",
+        "relative_path": "r1_bootstrap_intervals.csv",
+        "row_count": 1347,
+        "sha256": "20092a14953d0f48aa3b12d3f1dc5fd8de5294a34f7607f57797c1d9f500f7f9"
+      },
+      {
+        "classification": "deterministic_scientific_artifact",
+        "logical_key": "not_applicable",
+        "relative_path": "r1_daily_simulation_inventory.csv",
+        "row_count": 15,
+        "sha256": "88228d7b996c6990efa4876d6c0e9da7c6914454b23c362111564f3b207dc488"
+      },
+      {
+        "classification": "deterministic_documentation_or_metadata",
+        "relative_path": "r1_data_audit.md",
+        "sha256": "25aa09ff096900627abc2f27a6c25304f3ed1dec8189d4a0da77e2a79d19e010"
+      },
+      {
+        "classification": "deterministic_scientific_artifact",
+        "logical_key": "not_applicable",
+        "relative_path": "r1_dpl_seed_level_performance.csv",
+        "row_count": 12744,
+        "sha256": "c17a25c51999ab7cfade8e649b1df4cb9393d3164a3a3aa8d68a672d4078770f"
+      },
+      {
+        "classification": "deterministic_scientific_artifact",
+        "logical_key": "not_applicable",
+        "relative_path": "r1_epoch100_comparison.csv",
+        "row_count": 220,
+        "sha256": "d9b8ce5188d211f3e1b876583219066a37272d6937f1113751b52723902f965f"
+      },
+      {
+        "classification": "deterministic_documentation_or_metadata",
+        "relative_path": "r1_epoch100_partition_manifest.json",
+        "sha256": "9ed382ec7080a90558c2501d01e29f16da01fd90b40d37a4b2f9ebf49f4f04af"
+      },
+      {
+        "classification": "deterministic_scientific_artifact",
+        "logical_key": "not_applicable",
+        "relative_path": "r1_exclusion_log.csv",
+        "row_count": 15,
+        "sha256": "f6b2dc385058b6c59d70d10aa2aa98d3e4a7fb59f4b08fb32a0363a9ea35c4c9"
+      },
+      {
+        "classification": "deterministic_scientific_artifact",
+        "logical_key": "basin_id|paradigm|model|period|effect|metric|effect_family|seed_or_restart|analysis_set",
+        "relative_path": "r1_generalization_effects_basin_level.csv",
+        "row_count": 30267,
+        "sha256": "9ca1a63d94af6827d8cd13c5c107f445cb48335aaa00e14936aac026fa5a0b96"
+      },
+      {
+        "classification": "deterministic_scientific_artifact",
+        "logical_key": "not_applicable",
+        "relative_path": "r1_ic_restart_level_performance.csv",
+        "row_count": 15930,
+        "sha256": "42772e4dcfd9c6a1c577a9a07890b4c1e2a2a30c19134da7842e6637b5606833"
+      },
+      {
+        "classification": "deterministic_documentation_or_metadata",
+        "relative_path": "r1_inference_audit.md",
+        "sha256": "048296f17f6368b445fcbef873b4b93c737d919fed9bc5992777ad3ea953393f"
+      },
+      {
+        "classification": "deterministic_scientific_artifact",
+        "logical_key": "not_applicable",
+        "relative_path": "r1_input_inventory.csv",
+        "row_count": 7,
+        "sha256": "dad6587de53dbb06ae55c2a075646efb158e67d2118b1e8c8a4e3d79c26cda49"
+      },
+      {
+        "classification": "deterministic_scientific_artifact",
+        "logical_key": "not_applicable",
+        "relative_path": "r1_online_performance.csv",
+        "row_count": 3186,
+        "sha256": "95c14629b82083c993c0380ce8a23f605f456257453d9c2596eb0db3eff12d88"
+      },
+      {
+        "classification": "deterministic_scientific_artifact",
+        "logical_key": "not_applicable",
+        "relative_path": "r1_online_signature_basin_year.csv",
+        "row_count": 46197,
+        "sha256": "3848be4a0b9d909cce758907c9138b50d49aaf7a530aff7149186d7efc4033a7"
+      },
+      {
+        "classification": "deterministic_scientific_artifact",
+        "logical_key": "paradigm|model|period|effect|metric|analysis_set|robustness_type|seed_or_restart|snow_stratum|signature|comparison|result_role",
+        "relative_path": "r1_paired_effects_summary.csv",
+        "row_count": 788,
+        "sha256": "5e56b47b9a769eb2c13f27316b3edc404adb0989f21f7937c8d72f610668d846"
+      },
+      {
+        "classification": "deterministic_scientific_artifact",
+        "logical_key": "basin_id|paradigm|period|seed_or_restart|signature|first_model|second_model|analysis_set|snow_stratum",
+        "relative_path": "r1_signature_effects_basin_level.csv",
+        "row_count": 101952,
+        "sha256": "fa7b261321c6129b8fb03cadbb9c6a97401d81adc5e24d9bdca319e1eb495898"
+      },
+      {
+        "classification": "deterministic_scientific_artifact",
+        "logical_key": "not_applicable",
+        "relative_path": "r1_snow_attributes.csv",
+        "row_count": 531,
+        "sha256": "1c2e1e858ee00397d28f5cb8033575e2d28c7757cd9cdec7e4516a3e0a594ff8"
+      },
+      {
+        "classification": "deterministic_scientific_artifact",
+        "logical_key": "not_applicable",
+        "relative_path": "r1_snow_relationships_summary.csv",
+        "row_count": 198,
+        "sha256": "28730cf394c7b9755378a7e829a8b4e3913bb2fea68730f13c56f09acfeb61f2"
+      },
+      {
+        "classification": "deterministic_scientific_artifact",
+        "logical_key": "not_applicable",
+        "relative_path": "r1_snow_signatures_basin_level.csv",
+        "row_count": 15930,
+        "sha256": "7351226b73877c62d61cee375e4f02840b54af48321a00001e80033ef25eced8"
+      },
+      {
+        "classification": "deterministic_scientific_artifact",
+        "logical_key": "not_applicable",
+        "relative_path": "r1_snow_signatures_basin_year.csv",
+        "row_count": 230985,
+        "sha256": "109f206e59f79013f1f31e770211875e5ea10b455c3d6518ff17c9ae86d44192"
+      },
+      {
+        "classification": "deterministic_scientific_artifact",
+        "logical_key": "record_type|family|paradigm|model|period|metric|effect|analysis_set|method|snow_stratum|signature|comparison|claim_id|robustness_type",
+        "relative_path": "r1_statistical_tests.csv",
+        "row_count": 582,
+        "sha256": "29a5ec26d3930d334c2d6ca59278816452377dd401ad1b8d788e8714dd334889"
+      },
+      {
+        "classification": "deterministic_documentation_or_metadata",
+        "relative_path": "r1_statistics_notes.md",
+        "sha256": "c776e4ac89217a743e68585a8d8e05a726df38dde429489ad196bfe7c3f66dde"
+      },
+      {
+        "classification": "deterministic_scientific_artifact",
+        "logical_key": "basin_id|paradigm|period|effect|metric|seed_or_restart|analysis_set",
+        "relative_path": "r1_structural_effects_basin_level.csv",
+        "row_count": 6372,
+        "sha256": "7586186558c6ac3d2b38c8d38a8ca55e5beeb65bc13403ecc37168c1ae8dfa8f"
+      }
+    ],
+    "manifest_hash_excluded": true,
+    "master_seed": 20260730,
+    "serialization": {
+      "csv_index": false,
+      "encoding": "UTF-8",
+      "float_format": "%.17g",
+      "json": "sort_keys=True, indent=2, one trailing newline",
+      "newline": "\\n"
+    },
+    "stable_seed_rule": "SHA-256-derived keyed seeds for semantic estimands; fixed ordered loops for composite aggregation",
+    "volatile_artifacts": [
+      {
+        "relative_path": "r1_execution.log",
+        "volatile_fields": [
+          "timestamps",
+          "runtime paths",
+          "git-status snapshots"
+        ]
+      }
+    ]
+  },
+  "reproduction_command": "for i in 0 1 2 3 4; do python manuscript/scripts/build_r1_statistics.py --mode daily-inference --models XAJ_TGD2 --paradigm dpl --tgd2-epoch 100 --device cuda --batch-size 64 --partition-count 5 --partition-index $i --partition-suffix _part_$i --project-root /home/jingxin/code/dmg-research/project/hydro_structure_diagnosis --results-root /home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/results --data-root /home/jingxin/code/dmg-research/data --output-root /home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/manuscript/results/R1/epoch100_partitions/part_$i || exit $?; done && python manuscript/scripts/build_r1_statistics.py --mode merge-partitions --partition-root /home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/manuscript/results/R1/epoch100_partitions --partition-count 5 --tgd2-epoch 100 --project-root /home/jingxin/code/dmg-research/project/hydro_structure_diagnosis --results-root /home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/results --data-root /home/jingxin/code/dmg-research/data --output-root /home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/manuscript/results/R1",
+  "scope": [
+    "XAJ-Base",
+    "XAJ-TGD",
+    "XAJ-CN",
+    "HBV benchmark",
+    "IC-CMA-ES",
+    "dPL-MLP"
+  ],
+  "script_sha256": {
+    "build_r1_statistics.py": "26e1a32e7d5db4e0f470abc69522da44941ba12a65f6350957995a5f662d65d2",
+    "r1_daily_inference.py": "7533f42419cabc4ce158c54d5e21fc33327618473ed218689f72f4c2146f141d",
+    "r1_metrics.py": "301bbe7fa497b3a75979f2ec8d11a797bb3ca7b729f74635605db49b3cc75813",
+    "r1_statistics.py": "130ebd126e2d9cb29040370307487516c9cc57b0b0da97fb7dda4269a2cae3eb"
+  },
+  "scripts": [
+    "/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/manuscript/scripts/build_r1_statistics.py",
+    "/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/manuscript/scripts/r1_daily_inference.py",
+    "/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/manuscript/scripts/r1_metrics.py",
+    "/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/manuscript/scripts/r1_statistics.py"
+  ],
+  "selected_artifacts": {
+    "dPL-MLP/XAJ-TGD": {
+      "checkpoint_epoch": 100,
+      "root": "/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/results/dpl_camels_531_lite_v3_tgd2_dpl_audited/XAJ_TGD2",
+      "seeds": [
+        "42",
+        "123",
+        "2026"
+      ],
+      "selection_rule": "maximum checkpoint epoch common to all three seeds and present in epoch_history"
+    }
+  },
+  "snow_stratification": {
+    "analysis_set": "snow_fixed_strata",
+    "field": "frac_snow",
+    "interpretation": "descriptive stratified accuracy differences; no new threshold introduced",
+    "result_role": "stratified_primary",
+    "scheme": "project-fixed S1-S5 boundaries from manuscript/supplement/S1_Data_and_study_catchments_verified.md",
+    "source": "/home/jingxin/code/dmg-research/data/camels_dataset attributes[:,3]",
+    "strata": [
+      {
+        "snow_interval": "[0, 0.05)",
+        "snow_stratum": "S1",
+        "stratum_n": 165
+      },
+      {
+        "snow_interval": "[0.05, 0.15)",
+        "snow_stratum": "S2",
+        "stratum_n": 156
+      },
+      {
+        "snow_interval": "[0.15, 0.30)",
+        "snow_stratum": "S3",
+        "stratum_n": 121
+      },
+      {
+        "snow_interval": "[0.30, 0.50)",
+        "snow_stratum": "S4",
+        "stratum_n": 34
+      },
+      {
+        "snow_interval": "[0.50, 1.00]",
+        "snow_stratum": "S5",
+        "stratum_n": 55
+      }
+    ],
+    "summary_level": "snow_stratum"
+  },
+  "source_roots": {
+    "data": "/home/jingxin/code/dmg-research/data",
+    "project": "/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis",
+    "results": "/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/results"
+  },
+  "spo": {
+    "missing_definition_fields": [
+      "cumulative start date",
+      "search window",
+      "reference discharge",
+      "no-pulse handling",
+      "incomplete-year handling",
+      "tied-minimum handling",
+      "date encoding"
+    ],
+    "reason": "Daily simulation data are available; the complete prespecified SPO definition is not.",
+    "status": "excluded_from_R1_incomplete_prespecified_definition"
+  },
+  "statistics_input_mode": "inference_arrays_in_full_mode; daily_parquet_recomputation_in_statistics_mode",
+  "status": "complete_spo_excluded_incomplete_definition",
+  "unresolved_issues": [
+    {
+      "item": "AMJJ primary threshold",
+      "reason": "Primary basin-level AMJJ requires at least five complete water years; three-year sensitivity is retained in valid_years metadata.",
+      "status": "documented"
+    },
+    {
+      "item": "daily inference",
+      "reason": "Existing daily simulations and online partition summaries were reused; this extension launched no inference.",
+      "status": "complete"
+    },
+    {
+      "item": "region block bootstrap",
+      "reason": "group_11..group_17 are the seven LORO regions documented by project/flexmopex/run_model.py",
+      "status": "available"
+    },
+    {
+      "item": "IC restart signature robustness",
+      "reason": "Restart-level tables contain KGE records but no non-selected-restart daily CT/AMJJ series; no signature restart estimate was fabricated.",
+      "status": "unavailable"
+    },
+    {
+      "item": "inventory_note",
+      "reason": "historical XNES path discovered and excluded from main R1: /home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/results/archive/ic_xnes_full",
+      "status": "audit_note"
+    },
+    {
+      "item": "inventory_note",
+      "reason": "historical XNES path discovered and excluded from main R1: /home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/results/archive/ic_xnes_full_8start",
+      "status": "audit_note"
+    },
+    {
+      "item": "inventory_note",
+      "reason": "historical XNES path discovered and excluded from main R1: /home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/results/archive/ic_xnes_minimal",
+      "status": "audit_note"
+    },
+    {
+      "item": "inventory_note",
+      "reason": "historical XNES path discovered and excluded from main R1: /home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/results/archive/ic_xnes_minimal/summary_xnes_xaj.csv",
+      "status": "audit_note"
+    },
+    {
+      "item": "inventory_note",
+      "reason": "historical XNES path discovered and excluded from main R1: /home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/results/archive/legacy_archive_results_20260730/xnes_vram_probe",
+      "status": "audit_note"
+    },
+    {
+      "item": "inventory_note",
+      "reason": "historical XNES path discovered and excluded from main R1: /home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/results/archive/legacy_outputs_20260730/ic_ablation/stage1_preflight/xnes",
+      "status": "audit_note"
+    },
+    {
+      "item": "inventory_note",
+      "reason": "historical XNES path discovered and excluded from main R1: /home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/results/archive/legacy_outputs_20260730/ic_ablation/stage1_screening/v1/xnes",
+      "status": "audit_note"
+    },
+    {
+      "item": "inventory_note",
+      "reason": "historical XNES path discovered and excluded from main R1: /home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/results/archive/legacy_outputs_20260730/ic_ablation/stage1_screening/v1/xnes_audit",
+      "status": "audit_note"
+    },
+    {
+      "item": "inventory_note",
+      "reason": "historical XNES path discovered and excluded from main R1: /home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/results/archive/legacy_outputs_20260730/xnes_vs_cmaes_ablation_report.md",
+      "status": "audit_note"
+    },
+    {
+      "item": "inventory_note",
+      "reason": "obsolete GD design, historical XAJ_TGD, and XNES results are excluded from main outputs",
+      "status": "audit_note"
+    },
+    {
+      "item": "SPO",
+      "reason": "Daily simulation data are available; the complete prespecified SPO definition is not.",
+      "status": "excluded_from_R1_incomplete_prespecified_definition"
+    }
+  ],
+  "volatile_metadata": {
+    "created_at_utc": "2026-07-31T03:07:53.956252+00:00"
+  }
+}

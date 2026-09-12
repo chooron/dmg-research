@@ -1,0 +1,89 @@
+\begin{table*}[t]
+\centering
+\caption{Basin-wise paired KGE differences among the controlled XAJ structures.}
+\label{tab:s2_paired_structural_kge_differences}
+\begin{threeparttable}
+\begin{tabular}{lllccccccc}
+\toprule
+Paradigm & Period & Snow regime & Contrast & n & Median $\Delta\text{KGE}$ & Bootstrap 95\% CI & Positive Fraction \\
+\midrule
+IC-CMA-ES & Train & All basins & TGD - Base & 531 & 0.014 & [0.012, 0.019] & 0.825 \\
+IC-CMA-ES & Train & All basins & CN - TGD & 531 & 0.010 & [0.007, 0.015] & 0.750 \\
+IC-CMA-ES & Train & All basins & CN - Base & 531 & 0.022 & [0.017, 0.032] & 0.829 \\
+IC-CMA-ES & Train & S1 (0–0.05) & TGD - Base & 165 & 0.002 & [0.001, 0.003] & 0.630 \\
+IC-CMA-ES & Train & S1 (0–0.05) & CN - TGD & 165 & 0.000 & [-0.001, 0.001] & 0.503 \\
+IC-CMA-ES & Train & S1 (0–0.05) & CN - Base & 165 & 0.001 & [0.000, 0.002] & 0.588 \\
+IC-CMA-ES & Train & S2 (0.05–0.15) & TGD - Base & 156 & 0.011 & [0.009, 0.013] & 0.814 \\
+IC-CMA-ES & Train & S2 (0.05–0.15) & CN - TGD & 156 & 0.007 & [0.006, 0.010] & 0.763 \\
+IC-CMA-ES & Train & S2 (0.05–0.15) & CN - Base & 156 & 0.019 & [0.014, 0.022] & 0.897 \\
+IC-CMA-ES & Train & S3 (0.15–0.30) & TGD - Base & 121 & 0.047 & [0.038, 0.061] & 0.992 \\
+IC-CMA-ES & Train & S3 (0.15–0.30) & CN - TGD & 121 & 0.100 & [0.087, 0.111] & 0.934 \\
+IC-CMA-ES & Train & S3 (0.15–0.30) & CN - Base & 121 & 0.157 & [0.141, 0.173] & 0.950 \\
+IC-CMA-ES & Train & S4 (0.30–0.50) & TGD - Base & 34 & 0.103 & [0.033, 0.318] & 0.941 \\
+IC-CMA-ES & Train & S4 (0.30–0.50) & CN - TGD & 34 & 0.093 & [0.053, 0.108] & 0.853 \\
+IC-CMA-ES & Train & S4 (0.30–0.50) & CN - Base & 34 & 0.241 & [0.127, 0.374] & 0.971 \\
+IC-CMA-ES & Train & S5 (0.50–1.00) & TGD - Base & 55 & 0.559 & [0.458, 0.637] & 1.000 \\
+IC-CMA-ES & Train & S5 (0.50–1.00) & CN - TGD & 55 & 0.183 & [0.128, 0.241] & 0.982 \\
+IC-CMA-ES & Train & S5 (0.50–1.00) & CN - Base & 55 & 0.765 & [0.651, 0.807] & 1.000 \\
+IC-CMA-ES & Test & All basins & TGD - Base & 531 & 0.015 & [0.011, 0.019] & 0.723 \\
+IC-CMA-ES & Test & All basins & CN - TGD & 531 & 0.010 & [0.006, 0.013] & 0.637 \\
+IC-CMA-ES & Test & All basins & CN - Base & 531 & 0.024 & [0.016, 0.037] & 0.731 \\
+IC-CMA-ES & Test & S1 (0–0.05) & TGD - Base & 165 & 0.000 & [-0.000, 0.003] & 0.527 \\
+IC-CMA-ES & Test & S1 (0–0.05) & CN - TGD & 165 & -0.002 & [-0.004, -0.000] & 0.406 \\
+IC-CMA-ES & Test & S1 (0–0.05) & CN - Base & 165 & 0.000 & [-0.003, 0.002] & 0.509 \\
+IC-CMA-ES & Test & S2 (0.05–0.15) & TGD - Base & 156 & 0.010 & [0.006, 0.014] & 0.724 \\
+IC-CMA-ES & Test & S2 (0.05–0.15) & CN - TGD & 156 & 0.005 & [0.002, 0.010] & 0.609 \\
+IC-CMA-ES & Test & S2 (0.05–0.15) & CN - Base & 156 & 0.013 & [0.008, 0.019] & 0.718 \\
+IC-CMA-ES & Test & S3 (0.15–0.30) & TGD - Base & 121 & 0.036 & [0.026, 0.046] & 0.851 \\
+IC-CMA-ES & Test & S3 (0.15–0.30) & CN - TGD & 121 & 0.067 & [0.055, 0.080] & 0.826 \\
+IC-CMA-ES & Test & S3 (0.15–0.30) & CN - Base & 121 & 0.112 & [0.094, 0.129] & 0.893 \\
+IC-CMA-ES & Test & S4 (0.30–0.50) & TGD - Base & 34 & 0.046 & [0.026, 0.266] & 0.882 \\
+IC-CMA-ES & Test & S4 (0.30–0.50) & CN - TGD & 34 & 0.091 & [0.012, 0.132] & 0.735 \\
+IC-CMA-ES & Test & S4 (0.30–0.50) & CN - Base & 34 & 0.188 & [0.128, 0.327] & 0.882 \\
+IC-CMA-ES & Test & S5 (0.50–1.00) & TGD - Base & 55 & 0.491 & [0.414, 0.600] & 0.927 \\
+IC-CMA-ES & Test & S5 (0.50–1.00) & CN - TGD & 55 & 0.163 & [0.106, 0.212] & 0.927 \\
+IC-CMA-ES & Test & S5 (0.50–1.00) & CN - Base & 55 & 0.670 & [0.566, 0.755] & 0.982 \\
+dPL-MLP & Train & All basins & TGD - Base & 531 & 0.019 & [0.016, 0.021] & 0.834 \\
+dPL-MLP & Train & All basins & CN - TGD & 531 & 0.010 & [0.007, 0.013] & 0.689 \\
+dPL-MLP & Train & All basins & CN - Base & 531 & 0.029 & [0.023, 0.036] & 0.821 \\
+dPL-MLP & Train & S1 (0–0.05) & TGD - Base & 165 & 0.006 & [0.004, 0.008] & 0.758 \\
+dPL-MLP & Train & S1 (0–0.05) & CN - TGD & 165 & 0.000 & [-0.001, 0.002] & 0.503 \\
+dPL-MLP & Train & S1 (0–0.05) & CN - Base & 165 & 0.006 & [0.005, 0.008] & 0.691 \\
+dPL-MLP & Train & S2 (0.05–0.15) & TGD - Base & 156 & 0.011 & [0.009, 0.014] & 0.801 \\
+dPL-MLP & Train & S2 (0.05–0.15) & CN - TGD & 156 & 0.005 & [0.003, 0.009] & 0.660 \\
+dPL-MLP & Train & S2 (0.05–0.15) & CN - Base & 156 & 0.018 & [0.012, 0.023] & 0.808 \\
+dPL-MLP & Train & S3 (0.15–0.30) & TGD - Base & 121 & 0.037 & [0.030, 0.048] & 0.893 \\
+dPL-MLP & Train & S3 (0.15–0.30) & CN - TGD & 121 & 0.100 & [0.075, 0.114] & 0.876 \\
+dPL-MLP & Train & S3 (0.15–0.30) & CN - Base & 121 & 0.148 & [0.124, 0.176] & 0.926 \\
+dPL-MLP & Train & S4 (0.30–0.50) & TGD - Base & 34 & 0.149 & [0.037, 0.375] & 0.882 \\
+dPL-MLP & Train & S4 (0.30–0.50) & CN - TGD & 34 & 0.075 & [0.035, 0.094] & 0.824 \\
+dPL-MLP & Train & S4 (0.30–0.50) & CN - Base & 34 & 0.267 & [0.141, 0.402] & 0.853 \\
+dPL-MLP & Train & S5 (0.50–1.00) & TGD - Base & 55 & 0.571 & [0.466, 0.617] & 1.000 \\
+dPL-MLP & Train & S5 (0.50–1.00) & CN - TGD & 55 & 0.135 & [0.046, 0.189] & 0.836 \\
+dPL-MLP & Train & S5 (0.50–1.00) & CN - Base & 55 & 0.655 & [0.603, 0.720] & 1.000 \\
+dPL-MLP & Test & All basins & TGD - Base & 531 & 0.011 & [0.007, 0.015] & 0.687 \\
+dPL-MLP & Test & All basins & CN - TGD & 531 & 0.008 & [0.005, 0.012] & 0.606 \\
+dPL-MLP & Test & All basins & CN - Base & 531 & 0.016 & [0.011, 0.023] & 0.657 \\
+dPL-MLP & Test & S1 (0–0.05) & TGD - Base & 165 & 0.000 & [-0.002, 0.002] & 0.503 \\
+dPL-MLP & Test & S1 (0–0.05) & CN - TGD & 165 & -0.001 & [-0.005, 0.001] & 0.461 \\
+dPL-MLP & Test & S1 (0–0.05) & CN - Base & 165 & -0.003 & [-0.006, -0.000] & 0.418 \\
+dPL-MLP & Test & S2 (0.05–0.15) & TGD - Base & 156 & 0.005 & [0.003, 0.010] & 0.647 \\
+dPL-MLP & Test & S2 (0.05–0.15) & CN - TGD & 156 & 0.003 & [-0.002, 0.007] & 0.545 \\
+dPL-MLP & Test & S2 (0.05–0.15) & CN - Base & 156 & 0.006 & [0.001, 0.013] & 0.603 \\
+dPL-MLP & Test & S3 (0.15–0.30) & TGD - Base & 121 & 0.031 & [0.024, 0.037] & 0.810 \\
+dPL-MLP & Test & S3 (0.15–0.30) & CN - TGD & 121 & 0.035 & [0.022, 0.046] & 0.727 \\
+dPL-MLP & Test & S3 (0.15–0.30) & CN - Base & 121 & 0.080 & [0.065, 0.097] & 0.835 \\
+dPL-MLP & Test & S4 (0.30–0.50) & TGD - Base & 34 & 0.038 & [0.031, 0.165] & 0.882 \\
+dPL-MLP & Test & S4 (0.30–0.50) & CN - TGD & 34 & 0.103 & [0.043, 0.129] & 0.824 \\
+dPL-MLP & Test & S4 (0.30–0.50) & CN - Base & 34 & 0.195 & [0.158, 0.227] & 0.882 \\
+dPL-MLP & Test & S5 (0.50–1.00) & TGD - Base & 55 & 0.531 & [0.425, 0.587] & 0.964 \\
+dPL-MLP & Test & S5 (0.50–1.00) & CN - TGD & 55 & 0.145 & [0.113, 0.211] & 0.818 \\
+dPL-MLP & Test & S5 (0.50–1.00) & CN - Base & 55 & 0.642 & [0.586, 0.734] & 1.000 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\small
+\item Note: Summary statistics represent basin-wise paired structural differences evaluated across $n = 531$ matched CAMELS basins and five snow-fraction strata. Positive fraction denotes the proportion of basins with $\Delta\text{KGE} > 0$.
+\end{tablenotes}
+\end{threeparttable}
+\end{table*}

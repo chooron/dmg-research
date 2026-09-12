@@ -1054,6 +1054,11 @@ def main() -> None:
             history_path = output_dir / "epoch_history.csv"
             if history_path.exists():
                 history = pd.read_csv(history_path).to_dict("records")
+                # A stopped run can have log rows after its newest periodic checkpoint;
+                # discard those rows so resume produces one continuous epoch history.
+                history = [
+                    row for row in history if int(row.get("epoch", 0)) <= checkpoint_epoch
+                ]
 
             best_checkpoint_path = output_dir / "best_checkpoint.pt"
             best_checkpoint = checkpoint

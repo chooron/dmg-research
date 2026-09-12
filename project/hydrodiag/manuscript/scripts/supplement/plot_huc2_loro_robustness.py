@@ -35,8 +35,8 @@ from r1_plot_style import (  # noqa: E402
 )
 
 
-REGIONS = [f"HUC_{i:02d}" for i in range(11, 19)]
-DISPLAY_REGION_LABELS = [f"HUC_{i:02d}" for i in range(1, 9)]
+REGIONS = [f"Region_{i:02d}" for i in range(1, 8)]
+DISPLAY_REGION_LABELS = [f"Region {i:02d}" for i in range(1, 8)]
 
 
 def _load(name: str) -> pd.DataFrame:
@@ -62,8 +62,8 @@ def _plot_panel(ax: plt.Axes, frame: pd.DataFrame, value_column: str, x_label: s
             raise ValueError(f"Missing regions for {paradigm} in {value_column}")
         vals = sub[value_column].to_numpy(dtype=float) * unit_scale
         all_plotted_values.extend(vals.tolist())
-        ax.scatter(vals, y, color=color, marker=marker, s=29, zorder=3, label=f"{paradigm} (omit HUC)")
-        full_paradigm = frame.loc[(~frame["region_removed"].astype(str).str.startswith("HUC_")) & frame["paradigm"].eq(paradigm)]
+        ax.scatter(vals, y, color=color, marker=marker, s=29, zorder=3, label=f"{paradigm} (omit region)")
+        full_paradigm = frame.loc[frame["region_removed"].astype(str).str.startswith("None") & frame["paradigm"].eq(paradigm)]
         if len(full_paradigm) != 1:
             raise ValueError(f"Expected one full row for {paradigm}")
         ref = float(full_paradigm.iloc[0][value_column]) * unit_scale
@@ -93,8 +93,8 @@ def build_figure(out_path: Path) -> Path:
     _plot_panel(axes[1], r3, "Delta_F_median", r"Paired Recovery Contrast $\Delta F = F_{\mathrm{TGD}}^* - F_{\mathrm{close}}$", "(b) R3: TGD vs. Base Gap Recovery", 1.0)
     _plot_panel(axes[2], r5, "P_majority_positive", r"Majority Host Agreement $P(A \geq 2)$ in S5 (%)", "(c) R5: High-Snow Cross-Host Coherence", 100.0)
     handles = [
-        Line2D([0], [0], marker="o", color=COLOR_CN, markerfacecolor=COLOR_CN, lw=0, markersize=5.4, label="IC (omit HUC)"),
-        Line2D([0], [0], marker="^", color=COLOR_BASE, markerfacecolor=COLOR_BASE, lw=0, markersize=5.4, label="dPL (omit HUC)"),
+        Line2D([0], [0], marker="o", color=COLOR_CN, markerfacecolor=COLOR_CN, lw=0, markersize=5.4, label="IC (omit region)"),
+        Line2D([0], [0], marker="^", color=COLOR_BASE, markerfacecolor=COLOR_BASE, lw=0, markersize=5.4, label="dPL (omit region)"),
         Line2D([0], [0], color=COLOR_CN, lw=1.3, ls="--", label="Full IC"),
         Line2D([0], [0], color=COLOR_BASE, lw=1.3, ls=":", label="Full dPL"),
     ]

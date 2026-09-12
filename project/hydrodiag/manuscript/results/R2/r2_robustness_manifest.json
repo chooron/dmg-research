@@ -1,0 +1,43 @@
+{
+  "checks": {
+    "basins_per_paradigm": {
+      "IC": 531,
+      "dPL": 531
+    },
+    "bootstrap_n": 10000,
+    "bootstrap_seed": 20260730,
+    "finite_required_fields": true,
+    "full_gradient_max_abs_difference": 4.440892098500626e-16,
+    "full_gradient_reproduction": true,
+    "paired_rows": 15930,
+    "parameters_per_key": 15,
+    "subset_sizes": {
+      "exclude_S5": 476,
+      "full_531": 531,
+      "loo_S1": 366,
+      "loo_S2": 375,
+      "loo_S3": 410,
+      "loo_S4": 497,
+      "loo_S5": 476
+    }
+  },
+  "classifications": {
+    "GLOBAL_PARAMETER_REORGANIZATION": "STRONG",
+    "IC_ZERO_MEDIAN_INTERPRETATION": "MIXED",
+    "SNOW_GRADIENT_ROBUSTNESS": "PARTIAL"
+  },
+  "inputs": [
+    "/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/manuscript/results/R2/r2_paired_shifts_basin_level.csv",
+    "/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/manuscript/results/R2/r2_snow_gradients_summary.csv",
+    "/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/manuscript/results/R2/r2_primary_shift_summary.csv"
+  ],
+  "outputs": [
+    "r2_snow_gradient_robustness.csv",
+    "r2_snow_gradient_direction_summary.csv",
+    "r2_15d_distance_basin_level.csv",
+    "r2_15d_distance_summary.csv",
+    "r2_ic_signed_median_diagnostic.csv",
+    "r2_ic_abs_shift_by_regime.csv",
+    "r2_robustness_report.md"
+  ]
+}

@@ -131,3 +131,12 @@ backup/
 *.log
 *.bak
 *.orig
+project/hydrodiag/manuscript/results/**/*.parquet
+project/hydrodiag/manuscript/results/**/*.zip
+
+# Binary / large cache artifacts inside manuscript results & supplement
+project/hydrodiag/manuscript/results/**/*.parquet
+project/hydrodiag/manuscript/results/**/epoch100_partitions/
+project/hydrodiag/manuscript/results/**/*.zip
+project/hydrodiag/manuscript/supplement/**/*.zip
+project/hydrodiag/manuscript/supplement/_backup_*/

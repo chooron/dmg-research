@@ -1,0 +1,16 @@
+check,passed,detail
+canonical_basin_count,True,531
+canonical_basin_unique,True,531
+snow_merge_no_loss,True,531
+public_parameter_count,True,15
+canonical_key_unique,True,47790
+base_cn_pair_complete,True,15930
+physical_values_finite,True,0
+normalized_values_finite,True,0
+normalized_outside_bounds,True,0
+parameter_name_alignment,True,[]
+frac_snow_merge_no_loss,True,0
+regime_counts_fixed,True,"{'S1': 165, 'S2': 156, 'S3': 121, 'S5': 55, 'S4': 34}"
+no_duplicate_canonical_keys,True,"{'IC_Base': 531, 'dPL_Base': 531, 'IC_CN': 531, 'dPL_CN': 531, 'IC_GD': 531, 'dPL_GD': 531}"
+joint_ki_kg_constraint_audited,True,"pre-runtime KI+KG>=1 basin counts: {('IC', 'Base'): 55, ('IC', 'CN'): 83, ('IC', 'GD'): 88, ('dPL', 'Base'): 9, ('dPL', 'CN'): 37, ('dPL', 'GD'): 21}"
+effective_joint_values_within_bounds,True,0

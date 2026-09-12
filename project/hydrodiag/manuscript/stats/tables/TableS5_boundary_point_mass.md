@@ -1,0 +1,44 @@
+# Table S5: Boundary and Point-Mass Characteristics of Parameters Highlighted in Figure 4
+
+| Parameter | Regime | Snow regime | n | $\Delta z = 0$ | $|\Delta z| = 1$ | $|\Delta z| \ge 0.95$ |
+| :--- | :--- | :--- | :---: | :---: | :---: | :---: |
+| $u_m$ | IC | S1 (0–0.05) | 165 | 0.479 | 0.109 | 0.127 |
+| $u_m$ | IC | S2 (0.05–0.15) | 156 | 0.513 | 0.122 | 0.128 |
+| $u_m$ | IC | S3 (0.15–0.30) | 121 | 0.636 | 0.099 | 0.099 |
+| $u_m$ | IC | S4 (0.30–0.50) | 34 | 0.471 | 0.206 | 0.206 |
+| $u_m$ | IC | S5 (0.50–1.00) | 55 | 0.455 | 0.255 | 0.255 |
+| $u_m$ | dPL | S1 (0–0.05) | 165 | 0.000 | 0.000 | 0.030 |
+| $u_m$ | dPL | S2 (0.05–0.15) | 156 | 0.000 | 0.000 | 0.032 |
+| $u_m$ | dPL | S3 (0.15–0.30) | 121 | 0.000 | 0.000 | 0.017 |
+| $u_m$ | dPL | S4 (0.30–0.50) | 34 | 0.000 | 0.000 | 0.176 |
+| $u_m$ | dPL | S5 (0.50–1.00) | 55 | 0.000 | 0.000 | 0.382 |
+| $k_i$ | IC | S1 (0–0.05) | 165 | 0.127 | 0.042 | 0.055 |
+| $k_i$ | IC | S2 (0.05–0.15) | 156 | 0.173 | 0.058 | 0.058 |
+| $k_i$ | IC | S3 (0.15–0.30) | 121 | 0.116 | 0.033 | 0.033 |
+| $k_i$ | IC | S4 (0.30–0.50) | 34 | 0.294 | 0.088 | 0.088 |
+| $k_i$ | IC | S5 (0.50–1.00) | 55 | 0.491 | 0.127 | 0.164 |
+| $k_i$ | dPL | S1 (0–0.05) | 165 | 0.000 | 0.000 | 0.000 |
+| $k_i$ | dPL | S2 (0.05–0.15) | 156 | 0.000 | 0.000 | 0.000 |
+| $k_i$ | dPL | S3 (0.15–0.30) | 121 | 0.000 | 0.000 | 0.000 |
+| $k_i$ | dPL | S4 (0.30–0.50) | 34 | 0.000 | 0.000 | 0.000 |
+| $k_i$ | dPL | S5 (0.50–1.00) | 55 | 0.000 | 0.000 | 0.000 |
+| $c_i$ | IC | S1 (0–0.05) | 165 | 0.121 | 0.006 | 0.024 |
+| $c_i$ | IC | S2 (0.05–0.15) | 156 | 0.122 | 0.019 | 0.026 |
+| $c_i$ | IC | S3 (0.15–0.30) | 121 | 0.058 | 0.025 | 0.041 |
+| $c_i$ | IC | S4 (0.30–0.50) | 34 | 0.147 | 0.059 | 0.059 |
+| $c_i$ | IC | S5 (0.50–1.00) | 55 | 0.200 | 0.091 | 0.127 |
+| $c_i$ | dPL | S1 (0–0.05) | 165 | 0.000 | 0.000 | 0.000 |
+| $c_i$ | dPL | S2 (0.05–0.15) | 156 | 0.000 | 0.000 | 0.000 |
+| $c_i$ | dPL | S3 (0.15–0.30) | 121 | 0.000 | 0.000 | 0.000 |
+| $c_i$ | dPL | S4 (0.30–0.50) | 34 | 0.000 | 0.000 | 0.000 |
+| $c_i$ | dPL | S5 (0.50–1.00) | 55 | 0.000 | 0.000 | 0.018 |
+
+*Note*: The paired shift is $\Delta z = z_{\mathrm{Base}} - z_{\mathrm{CN}}$
+(normalized parameters, $z \in [0,1]$). Reported fractions are basin counts over
+the regime sample size $n$. Snow regimes S1–S5 are the fixed strata by basin snow fraction: S1 $[0, 0.05)$ ($n=165$), S2 $[0.05, 0.15)$ ($n=156$), S3 $[0.15, 0.30)$ ($n=121$), S4 $[0.30, 0.50)$ ($n=34$), S5 $[0.50, 1.00]$ ($n=55$). Exact $\Delta z = 0$ marks basins where the two
+structures co-locate at identical normalized values (under IC, these are
+predominantly cases where both structures sit at a shared parameter bound);
+exact $|\Delta z| = 1$ marks basins where one structure sits at one bound and the
+other at the opposite bound (IC only; dPL reconstructed values are strictly
+interior). $|\Delta z| \ge 0.95$ is the near-boundary fraction at the audit's
+primary threshold.

@@ -12,10 +12,8 @@
 - R5 S5 majority-positive cross-host agreement, shown as percent.
 
 ## Sample
-- Eight retained source regions: HUC_11–HUC_18.
-- Submission-facing labels are HUC_01–HUC_08.
-- Source HUC_01–HUC_10 are excluded random ten-fold partitions.
-
+- Seven authoritative CAMELS regional partitions: Region 01–Region 07 (derived from data/basin_groups/group_11.npy through group_17.npy, summing to 531 catchments).
+- Group 0–9 are the 10-fold random cross-validation partitions and are excluded from regional omission.
 ## Symbols
 - IC: blue circle; dPL: orange triangle.
 - Dashed/dotted vertical lines: full-sample references.

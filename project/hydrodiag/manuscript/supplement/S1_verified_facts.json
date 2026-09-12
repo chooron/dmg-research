@@ -1,0 +1,272 @@
+[
+  {
+    "evidence": [
+      {
+        "line_or_symbol": "top-level basin_ids",
+        "note": "Runtime pickle inspection",
+        "path": "/home/jingxin/code/dmg-research/data/camels_forcing_v2.pkl"
+      }
+    ],
+    "fact_id": "S1.1.source_basin_count",
+    "generated_by": "manuscript/supplement/code/run_s1_audit.py",
+    "manuscript_implication": "Describe 671 source basins only as the source collection.",
+    "result_file": "results/s1_data_manifest.json",
+    "status": "VERIFIED",
+    "value": 671
+  },
+  {
+    "evidence": [
+      {
+        "line_or_symbol": "531 JSON IDs",
+        "note": "Runtime list length and active loader",
+        "path": "/home/jingxin/code/dmg-research/data/531sub_id.txt"
+      }
+    ],
+    "fact_id": "S1.1.study_basin_count",
+    "generated_by": "manuscript/supplement/code/run_s1_audit.py",
+    "manuscript_implication": "Use 531 study basins for the active 531 path.",
+    "result_file": "results/s1_catchment_manifest.csv",
+    "status": "VERIFIED",
+    "value": 531
+  },
+  {
+    "evidence": [
+      {
+        "line_or_symbol": "official DOI page",
+        "note": "HTTP 200 external literature verification",
+        "path": "https:/doi.org/10.5194/hess-21-5293-2017"
+      }
+    ],
+    "fact_id": "S1.1.CAMELS_reference",
+    "generated_by": "manuscript/supplement/code/run_s1_audit.py",
+    "manuscript_implication": "Cite the CAMELS-US source dataset using the verified literature reference.",
+    "result_file": "results/s1_references.md",
+    "status": "VERIFIED",
+    "value": "Addor et al. (2017), HESS 21, 5293-5313, DOI 10.5194/hess-21-5293-2017"
+  },
+  {
+    "evidence": [
+      {
+        "line_or_symbol": "forcing_names validation",
+        "note": "Active adapter requires P,T,PET",
+        "path": "/home/jingxin/orca/workspaces/dmg-research/hydrodiag-r2/project/hydrodiag/ablation/ic_core/data_adapter.py"
+      }
+    ],
+    "fact_id": "S1.1.forcing_order",
+    "generated_by": "manuscript/supplement/code/run_s1_audit.py",
+    "manuscript_implication": "Report P, T, PET in this order.",
+    "result_file": "results/s1_data_manifest.json",
+    "status": "VERIFIED",
+    "value": [
+      "P",
+      "T",
+      "PET"
+    ]
+  },
+  {
+    "evidence": [
+      {
+        "line_or_symbol": "forcing_names and dataset tuple",
+        "note": "Runtime loader evidence",
+        "path": "/home/jingxin/orca/workspaces/dmg-research/hydrodiag-r2/project/hydrodiag/ablation/ic_core/data_adapter.py"
+      }
+    ],
+    "fact_id": "S1.1.pet_method",
+    "generated_by": "manuscript/supplement/code/run_s1_audit.py",
+    "manuscript_implication": "Report PET as a precomputed field without assigning an unsupported named method.",
+    "result_file": "results/s1_pet_audit.json",
+    "status": "INFERRED",
+    "value": "precomputed PET field accepted as the active project input; generation formula is outside the S1 scope"
+  },
+  {
+    "evidence": [
+      {
+        "line_or_symbol": "official metadata",
+        "note": "Raster reference is outside the requested S1 statistics",
+        "path": "/home/jingxin/orca/workspaces/dmg-research/hydrodiag-r2/project/hydrodiag/manuscript/supplement/results/s1_swe_product_manifest.json"
+      }
+    ],
+    "fact_id": "S1.2.swe_reference",
+    "generated_by": "manuscript/supplement/code/run_s1_audit.py",
+    "manuscript_implication": "Describe the SWE product as a gridded reference only; do not call it truth.",
+    "result_file": "results/s1_swe_product_manifest.json",
+    "status": "VERIFIED",
+    "value": "external gridded process-state consistency reference; no S1 basin statistics"
+  },
+  {
+    "evidence": [
+      {
+        "line_or_symbol": "runtime JSON parse",
+        "note": "Preserved order",
+        "path": "/home/jingxin/code/dmg-research/data/531sub_id.txt"
+      }
+    ],
+    "fact_id": "S1.3.selection_list",
+    "generated_by": "manuscript/supplement/code/run_s1_audit.py",
+    "manuscript_implication": "Report list provenance, not reconstructed criteria.",
+    "result_file": "results/s1_catchment_manifest.csv",
+    "status": "VERIFIED",
+    "value": "data/531sub_id.txt, 531 unique eight-digit IDs"
+  },
+  {
+    "evidence": [
+      {
+        "line_or_symbol": "direct project list",
+        "note": "Runtime list and active 531 adapter",
+        "path": "/home/jingxin/code/dmg-research/data/531sub_id.txt"
+      }
+    ],
+    "fact_id": "S1.3.selection_criteria",
+    "generated_by": "manuscript/supplement/code/run_s1_audit.py",
+    "manuscript_implication": "Report the directly used 531 list without claiming a reconstructed filter cascade.",
+    "result_file": "results/s1_catchment_selection_cascade.csv",
+    "status": "INFERRED",
+    "value": "data/531sub_id.txt is the project source-of-truth study list; filter reconstruction is outside the S1 scope"
+  },
+  {
+    "evidence": [
+      {
+        "line_or_symbol": "convert_ft3s_to_mm_day",
+        "note": "Independent sample comparison",
+        "path": "/home/jingxin/orca/workspaces/dmg-research/hydrodiag-r2/project/hydrodiag/ablation/ic_core/units.py"
+      }
+    ],
+    "fact_id": "S1.4.flow_conversion",
+    "generated_by": "manuscript/supplement/code/run_s1_audit.py",
+    "manuscript_implication": "Give the code constant and formula; valid zero is retained.",
+    "result_file": "results/s1_streamflow_conversion_audit.json",
+    "status": "VERIFIED",
+    "value": 2.4465755455488005
+  },
+  {
+    "evidence": [
+      {
+        "line_or_symbol": "ATTRIBUTE_NAMES",
+        "note": "35 names and loader shape check",
+        "path": "/home/jingxin/orca/workspaces/dmg-research/hydrodiag-r2/project/hydrodiag/ablation/ic_core/data_adapter.py"
+      }
+    ],
+    "fact_id": "S1.5.attribute_order",
+    "generated_by": "manuscript/supplement/code/run_s1_audit.py",
+    "manuscript_implication": "Use generated order; keep categorical codes explicit.",
+    "result_file": "results/s1_attribute_manifest.csv",
+    "status": "VERIFIED",
+    "value": [
+      "p_mean",
+      "pet_mean",
+      "p_seasonality",
+      "frac_snow",
+      "aridity",
+      "high_prec_freq",
+      "high_prec_dur",
+      "low_prec_freq",
+      "low_prec_dur",
+      "elev_mean",
+      "slope_mean",
+      "area_gages2",
+      "frac_forest",
+      "lai_max",
+      "lai_diff",
+      "gvf_max",
+      "gvf_diff",
+      "dom_land_cover_frac",
+      "dom_land_cover",
+      "root_depth_50",
+      "soil_depth_pelletier",
+      "soil_depth_statsgo",
+      "soil_porosity",
+      "soil_conductivity",
+      "max_water_content",
+      "sand_frac",
+      "silt_frac",
+      "clay_frac",
+      "geol_1st_class",
+      "glim_1st_class_frac",
+      "geol_2nd_class",
+      "glim_2nd_class_frac",
+      "carbonate_rocks_frac",
+      "geol_porosity",
+      "geol_permeability"
+    ]
+  },
+  {
+    "evidence": [
+      {
+        "line_or_symbol": "robust_normalize",
+        "note": "Runtime source audit",
+        "path": "/home/jingxin/orca/workspaces/dmg-research/hydrodiag-r2/project/hydrodiag/training/dpl/run_dpl_model.py"
+      },
+      {
+        "line_or_symbol": "raw_attributes",
+        "note": "Runtime source audit",
+        "path": "/home/jingxin/orca/workspaces/dmg-research/hydrodiag-r2/project/hydrodiag/ablation/ic_core/data_adapter.py"
+      }
+    ],
+    "fact_id": "S1.5.attribute_normalization",
+    "generated_by": "manuscript/supplement/code/run_s1_audit.py",
+    "manuscript_implication": "Do not state that both routes use identical normalization.",
+    "result_file": "results/s1_attribute_preprocessing.json",
+    "status": "CONFLICT",
+    "value": "dPL median/IQR/clip5 over selected 531; IC raw attributes"
+  },
+  {
+    "evidence": [
+      {
+        "line_or_symbol": "ATTRIBUTE_NAMES",
+        "note": "Runtime attribute contract",
+        "path": "/home/jingxin/orca/workspaces/dmg-research/hydrodiag-r2/project/hydrodiag/ablation/ic_core/data_adapter.py"
+      }
+    ],
+    "fact_id": "S1.6.frac_snow_field",
+    "generated_by": "manuscript/supplement/code/run_s1_audit.py",
+    "manuscript_implication": "Report field and fixed boundaries; definition remains unresolved.",
+    "result_file": "results/s1_frac_snow_metadata.json",
+    "status": "VERIFIED",
+    "value": "attribute index 3, unstandardized for fixed bins"
+  },
+  {
+    "evidence": [
+      {
+        "line_or_symbol": "attributes[:,3] after 531 alignment",
+        "note": "Runtime extraction",
+        "path": "/home/jingxin/code/dmg-research/data/camels_dataset"
+      }
+    ],
+    "fact_id": "S1.6.frac_snow_definition",
+    "generated_by": "manuscript/supplement/code/run_s1_audit.py",
+    "manuscript_implication": "Use raw stored frac_snow values for all S1 statistics.",
+    "result_file": "results/s1_frac_snow_metadata.json",
+    "status": "VERIFIED",
+    "value": "raw camels_dataset attribute position 3 mapped to frac_snow by the active 35-field contract"
+  },
+  {
+    "evidence": [
+      {
+        "line_or_symbol": "generated rule",
+        "note": "Transparent S1 description rule",
+        "path": "/home/jingxin/orca/workspaces/dmg-research/hydrodiag-r2/project/hydrodiag/manuscript/supplement/results/s1_annual_aggregation_protocol.json"
+      }
+    ],
+    "fact_id": "S1.7.primary_annual_protocol",
+    "generated_by": "manuscript/supplement/code/run_s1_audit.py",
+    "manuscript_implication": "Label this as the S1 descriptive rule, not an experimental hyperparameter.",
+    "result_file": "results/s1_annual_aggregation_protocol.json",
+    "status": "VERIFIED",
+    "value": "calendar years in active calibration/test union, 90% daily validity"
+  },
+  {
+    "evidence": [
+      {
+        "line_or_symbol": "runtime result scan",
+        "note": "Coverage is reported without performance claims",
+        "path": "/home/jingxin/orca/workspaces/dmg-research/hydrodiag-r2/project/hydrodiag/manuscript/supplement/results/s1_design_completion_matrix.csv"
+      }
+    ],
+    "fact_id": "S1.design_completion",
+    "generated_by": "manuscript/supplement/code/run_s1_audit.py",
+    "manuscript_implication": "Do not use S1 to claim every experiment cell is complete.",
+    "result_file": "results/s1_design_completion_matrix.csv",
+    "status": "VERIFIED",
+    "value": "active 531 design-coverage matrix generated; experiment completion is outside the S1 data scope"
+  }
+]

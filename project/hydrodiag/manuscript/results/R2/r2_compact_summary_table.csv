@@ -1,0 +1,31 @@
+paradigm,parameter_display,function_group,n,median_shift,q25,q75,ci95_low,ci95_high
+IC,a (UH shape),routing timing,531,0,-0.0232056,0.0303702,0,0
+IC,b,production / free-water storage,531,0,-0.0679954,0.0376203,0,0
+IC,c,ET / tension-water storage,531,0,-0.151507,0.260197,0,0
+IC,cg,routing / recession,531,0,-0.14763,0.212911,0,0
+IC,ci,routing / recession,531,0,-0.294676,0.100271,-0.0153635,0
+IC,dm,ET / tension-water storage,531,0,-0.182508,0.0310249,0,0
+IC,ex,production / free-water storage,531,0,-0.142371,0.0614399,0,0
+IC,im,production / free-water storage,531,0,0,0,0,0
+IC,k,ET / tension-water storage,531,-0.00307437,-0.0420284,0.00327442,-0.00629641,-0.000222873
+IC,kg,routing / recession,531,0,-0.169739,0.011143,0,0
+IC,ki,routing / recession,531,0,-0.232366,0.0485145,-0.00226134,0
+IC,lm,ET / tension-water storage,531,0,0,0.337677,0,2.8489e-05
+IC,sm,production / free-water storage,531,0,-0.0688,0.0574136,-2.36929e-05,0
+IC,theta (UH scale),routing timing,531,0,-0.0175446,0,0,0
+IC,um,ET / tension-water storage,531,0,0,0.113131,0,0
+dPL,a (UH shape),routing timing,531,-0.000979325,-0.0538684,0.046556,-0.00708876,0.00311999
+dPL,b,production / free-water storage,531,0.00350162,-0.0230551,0.0951587,-6.81375e-05,0.00982851
+dPL,c,ET / tension-water storage,531,0.0119212,-0.000446796,0.100088,0.00793219,0.0182686
+dPL,cg,routing / recession,531,-0.0840247,-0.257181,0.000199378,-0.112578,-0.0656021
+dPL,ci,routing / recession,531,-0.0482802,-0.229295,0.0305055,-0.0658831,-0.0345876
+dPL,dm,ET / tension-water storage,531,-0.00301721,-0.0192716,0.000528627,-0.00466015,-0.00193199
+dPL,ex,production / free-water storage,531,-0.0151678,-0.111353,0.077485,-0.0236434,-0.0067851
+dPL,im,production / free-water storage,531,-0.00162717,-0.0178103,3.11554e-06,-0.00254432,-0.000883729
+dPL,k,ET / tension-water storage,531,0.00216476,-0.0103968,0.0174701,0.000677864,0.00432086
+dPL,kg,routing / recession,531,-0.0310082,-0.189714,0.0123902,-0.0448022,-0.0202626
+dPL,ki,routing / recession,531,-0.0945621,-0.359792,0.0251006,-0.124968,-0.0642852
+dPL,lm,ET / tension-water storage,531,0.029486,-0.0104973,0.115883,0.0222533,0.0375745
+dPL,sm,production / free-water storage,531,-0.000171621,-0.0450997,0.0790512,-0.00303914,0.00385746
+dPL,theta (UH scale),routing timing,531,0.000875338,-0.00197092,0.00703963,0.000418997,0.00142307
+dPL,um,ET / tension-water storage,531,0.0107307,-0.00516972,0.164192,0.00803519,0.01554

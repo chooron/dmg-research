@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
-"""Render final Figure S1 from frozen HUC-2 LORO CSVs.
-
-The source labels HUC_11-HUC_18 are intentionally displayed as HUC_01-HUC_08;
-source HUC_01-HUC_10 are the random ten-fold partitions and are excluded.
-"""
+"""Render final Figure S1 from authoritative 7-region LORO CSVs."""
 from __future__ import annotations
 
 import importlib.util
@@ -20,10 +16,10 @@ def main() -> None:
         raise ImportError(f"Cannot load {SOURCE_SCRIPT}")
     renderer = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(renderer)
-    expected = [f"HUC_{i:02d}" for i in range(11, 19)]
-    displayed = [f"HUC_{i:02d}" for i in range(1, 9)]
+    expected = [f"Region_{i:02d}" for i in range(1, 8)]
+    displayed = [f"Region {i:02d}" for i in range(1, 8)]
     if renderer.REGIONS != expected or renderer.DISPLAY_REGION_LABELS != displayed:
-        raise ValueError("HUC-2 source/display mapping is not the frozen HUC_11-HUC_18 to HUC_01-HUC_08 mapping")
+        raise ValueError("Regional source/display mapping is not the authoritative 7 regions Region_01 to Region_07")
     renderer.build_figure(OUT)
     print(f"Saved {OUT}")
 

@@ -1,0 +1,13 @@
+{
+  "basin_count": 531,
+  "epoch": 100,
+  "merged_daily_files": [
+    "/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/manuscript/results/R1/r1_daily_simulations_dpl_xaj_tgd2_seed_42.parquet",
+    "/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/manuscript/results/R1/r1_daily_simulations_dpl_xaj_tgd2_seed_123.parquet",
+    "/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/manuscript/results/R1/r1_daily_simulations_dpl_xaj_tgd2_seed_2026.parquet"
+  ],
+  "metric_rows": 3186,
+  "partition_count": 5,
+  "partition_root": "/home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/manuscript/results/R1/epoch100_partitions",
+  "signature_year_rows": 46197
+}

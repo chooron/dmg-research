@@ -1,0 +1,9 @@
+paradigm,parameter,parameter_display,full_slope_direction,loo_regime_count,direction_matches_full,direction_fraction
+IC,xaj_um,um,positive,5,5,1
+IC,xaj_ki,ki,negative,5,5,1
+IC,xaj_ci,ci,negative,5,5,1
+IC,xaj_im,im,negative,5,5,1
+dPL,xaj_um,um,positive,5,5,1
+dPL,xaj_ki,ki,negative,5,5,1
+dPL,xaj_ci,ci,negative,5,5,1
+dPL,xaj_im,im,negative,5,5,1

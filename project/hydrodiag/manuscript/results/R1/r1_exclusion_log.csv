@@ -1,0 +1,16 @@
+item,status,reason
+AMJJ primary threshold,documented,Primary basin-level AMJJ requires at least five complete water years; three-year sensitivity is retained in valid_years metadata.
+IC restart signature robustness,unavailable,Restart-level tables contain KGE records but no non-selected-restart daily CT/AMJJ series; no signature restart estimate was fabricated.
+SPO,excluded_from_R1_incomplete_prespecified_definition,"SPO is excluded from active R1 because the project does not prespecify cumulative start date, search window, reference discharge, no-pulse handling, incomplete-year handling, tied-minimum handling, or date encoding. Daily simulation data are available; the limitation is definition and reproducibility."
+daily inference,complete,Existing daily simulations and online partition summaries were reused; this extension launched no inference.
+inventory_note,audit_note,historical XNES path discovered and excluded from main R1: /home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/results/archive/ic_xnes_full
+inventory_note,audit_note,historical XNES path discovered and excluded from main R1: /home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/results/archive/ic_xnes_full_8start
+inventory_note,audit_note,historical XNES path discovered and excluded from main R1: /home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/results/archive/ic_xnes_minimal
+inventory_note,audit_note,historical XNES path discovered and excluded from main R1: /home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/results/archive/ic_xnes_minimal/summary_xnes_xaj.csv
+inventory_note,audit_note,historical XNES path discovered and excluded from main R1: /home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/results/archive/legacy_archive_results_20260730/xnes_vram_probe
+inventory_note,audit_note,historical XNES path discovered and excluded from main R1: /home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/results/archive/legacy_outputs_20260730/ic_ablation/stage1_preflight/xnes
+inventory_note,audit_note,historical XNES path discovered and excluded from main R1: /home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/results/archive/legacy_outputs_20260730/ic_ablation/stage1_screening/v1/xnes
+inventory_note,audit_note,historical XNES path discovered and excluded from main R1: /home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/results/archive/legacy_outputs_20260730/ic_ablation/stage1_screening/v1/xnes_audit
+inventory_note,audit_note,historical XNES path discovered and excluded from main R1: /home/jingxin/code/dmg-research/project/hydro_structure_diagnosis/results/archive/legacy_outputs_20260730/xnes_vs_cmaes_ablation_report.md
+inventory_note,audit_note,"obsolete GD design, historical XAJ_TGD, and XNES results are excluded from main outputs"
+region block bootstrap,available,group_11..group_17 are the seven LORO regions documented by project/flexmopex/run_model.py
