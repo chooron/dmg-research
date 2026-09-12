@@ -1,0 +1,34 @@
+{
+  "batching_lifecycle_analysis": {
+    "evaluations_at_c1_count": 40,
+    "evaluations_at_c1_fraction": 0.12195121951219512,
+    "evaluations_at_c_gt1_count": 288,
+    "evaluations_at_c_gt1_fraction": 0.8780487804878049,
+    "key_lifecycle_finding": "In realistic multi-round SCE evolution, after the initial population batch (~31-37 candidates @ C=16 in ~32s), the subsequent simplex evolution operates at C=1 (~26s per candidate). In a 50-evaluation preflight, C=1 represents ~26-38% of evaluations but consumes ~70-80% of the optimization wall-clock time! In full 10,000-eval runs, C=1 will account for >99% of evaluations and wall-clock.",
+    "median_c1_candidate_fraction_per_case": 0.11428571428571428,
+    "median_c_gt1_candidate_fraction_per_case": 0.8857142857142857,
+    "overall_average_effective_batch_size": 5.412698412698413,
+    "total_evaluations_across_preflight": 328
+  },
+  "generated_at_utc": "2026-09-07T07:13:51.880442+00:00",
+  "hardware_and_resource_utilization": {
+    "device": "cuda",
+    "device_name": "NVIDIA GeForce RTX 3060",
+    "gpu_peak_allocated_mb": 48.541015625,
+    "gpu_peak_reserved_mb": 70.0,
+    "host_peak_rss_mb": 1989.36328125
+  },
+  "protocol_id": "formal-experiment-protocol-v1-db53091e6e222066",
+  "schema_version": "formal-sce-realistic-preflight-performance-v1",
+  "status": "completed",
+  "throughput_and_timing_statistics": {
+    "candidate_days_per_second_median": 703.6930176763959,
+    "max_case_wall_clock_seconds": 355.8232971179532,
+    "median_case_wall_clock_seconds": 257.56890216248576,
+    "median_wall_clock_per_evaluation_seconds": 6.23556327929402,
+    "min_case_wall_clock_seconds": 182.14522133598803,
+    "p25_case_wall_clock_seconds": 227.43526560324244,
+    "p75_case_wall_clock_seconds": 285.5335420467745,
+    "wall_clock_seconds_per_100_evaluations": 623.556327929402
+  }
+}

@@ -1,0 +1,114 @@
+{
+  "schema_version": "shared-parameter-gradient-probe-protocol-v1",
+  "status": "PRE_REGISTERED_FROZEN",
+  "created_at_utc": "2026-09-09T08:19:36.849746+00:00",
+  "provenance": {
+    "git_sha": "3caca37a4243ae0a95ebe9cc4f22998672ddf464",
+    "kernel_hashes": {
+      "kernel.py": "4a79b4caa8d93881c849476e2ffe5aa304c8033cf271bd7e11073d7f7227faff",
+      "runtime.py": "f6b9f066489929479ccabb2035e50bed146e536af24a641cae68e11c37e9ad13",
+      "batched.py": "c4d17cb9e91a2358c415b3d43665a1f4e5534a1a3c37b5545eda7fd20a331fe5",
+      "structures_78.json": "457b232b71c870fd3cb698fd9bb517e58844c5e9bba5f0c4ac4ad0bcc971d6fc"
+    },
+    "structure_manifest_hash": "457b232b71c870fd3cb698fd9bb517e58844c5e9bba5f0c4ac4ad0bcc971d6fc",
+    "landscape_manifest_hash": "f90bce9d0e9d5f261ebf5e472ce4e766f3177804b42a0369d4982030f468cd1f",
+    "parameter_ownership_hash": "3962c923ef72b1aac8b853d4f244a27fa1f1e0e1d4442168cf87dfc7ad3345ec"
+  },
+  "hypothesis_and_architecture": {
+    "model_type": "PureSharedParameterizer",
+    "formulation": "theta_c = g_phi(X_c) -> active mask m_s -> active theta -> Torch-FUSE Lite",
+    "structure_conditioned": false,
+    "structure_id_input_to_parameterizer": false,
+    "delta_s_correction": false,
+    "local_option_conditioning": false,
+    "dtype": "float64",
+    "execution_mode": "Lite"
+  },
+  "experimental_scope": {
+    "catchment_count": 12,
+    "catchment_ids": [
+      "USA_02082950",
+      "USA_02472000",
+      "USA_03285000",
+      "USA_07167500",
+      "USA_09306242",
+      "USA_09447800",
+      "USA_11473900",
+      "USA_11528700",
+      "USA_12010000",
+      "USA_13240000",
+      "USA_13338500",
+      "USA_14138900"
+    ],
+    "structure_count": 78,
+    "batch_size": 100,
+    "window_total_days": 730,
+    "window_warmup_days": 365,
+    "window_scored_days": 365,
+    "calibration_period": [
+      "1989-01-01",
+      "1998-12-31"
+    ],
+    "evaluation_period": [
+      "1999-01-01",
+      "2009-12-31"
+    ]
+  },
+  "training_specification": {
+    "cycles": 5,
+    "steps_per_cycle": 78,
+    "total_optimization_steps": 390,
+    "optimizer": "Adam",
+    "learning_rate": 0.001,
+    "max_grad_norm": 1.0,
+    "loss": "1.0 - kgecomp_batched(q_scored, target_scored).mean()",
+    "seed": 20260901,
+    "structure_sampling": "Shuffled legal 78-structure permutation per cycle, exactly once per structure per cycle",
+    "basin_sampling": "GlobalBasinSampler over 12 target basins with B=100 windows"
+  },
+  "diagnostic_sweeps": {
+    "checkpoints": [
+      "D0",
+      "D1",
+      "D3",
+      "D5"
+    ],
+    "D0": "before any training (step 0)",
+    "D1": "after cycle 1 (step 78)",
+    "D3": "after cycle 3 (step 234)",
+    "D5": "after cycle 5 (step 390)",
+    "no_update_invariant": "Zero optimizer steps during diagnostic sweeps; parameters verified bitwise unchanged",
+    "diagnostic_batch": {
+      "path": "project/autofuse/docs/shared_parameter_gradient_probe_diagnostic_batch.json",
+      "batch_size": 100,
+      "window_days": 730,
+      "selection_rule": "Stratified deterministic hydrologically diverse forcing windows across all 12 basins covering dry/wet/snow-active regimes"
+    }
+  },
+  "conflict_metrics_and_thresholds": {
+    "gradient_target": "partial L_s / partial u_{b,j} (normalized pre-transform coordinate space)",
+    "noise_floor_formula": "epsilon_grad = max(1e-12, 10 * max_inactive_gradient_magnitude)",
+    "signal_support_threshold": 0.25,
+    "sign_conflict_formula": "C_{b,j} = 2 * min(P_{b,j}, N_{b,j}) / (P_{b,j} + N_{b,j}) where P=sum(max(g,0)), N=sum(max(-g,0))",
+    "sign_conflict_threshold": 0.3,
+    "structure_dominance_formula": "N_eff = (sum |g_s|)^2 / sum(g_s^2), normalized as N_eff / N_active",
+    "normalized_N_eff_threshold": 0.2,
+    "persistent_conflict_definition": "A parameter is PERSISTENT_STRONG_CONFLICT if at D1, D3, D5: signal_support >= 0.25, median C >= 0.30, and normalized N_eff >= 0.20"
+  },
+  "gate_decision_rules": {
+    "metric": "conflict_fraction = N_persistent_strong_conflict / N_evaluable_shared_parameters",
+    "Gate_A": "conflict_fraction <= 0.10 -> Pure sharing supported for next stage; keep pure shared + active mask",
+    "Gate_B": "0.10 < conflict_fraction <= 0.30 -> Localized conflict; investigate flagged parameters for process-option interactions",
+    "Gate_C": "conflict_fraction > 0.30 -> Broad conflict; discuss structure-conditioned parameterization",
+    "Inconclusive_Rule": "If > 30% of canonical shared parameters have signal_support < 0.25 -> INCONCLUSIVE_LOW_SIGNAL"
+  },
+  "output_paths": {
+    "protocol": "project/autofuse/docs/shared_parameter_gradient_probe_protocol.json",
+    "parameter_ownership_json": "project/autofuse/docs/fuse_parameter_ownership_78.json",
+    "parameter_ownership_csv": "project/autofuse/docs/fuse_parameter_ownership_78.csv",
+    "diagnostic_batch": "project/autofuse/docs/shared_parameter_gradient_probe_diagnostic_batch.json",
+    "summary_json": "project/autofuse/docs/shared_parameter_gradient_probe_summary.json",
+    "effective_signal_csv": "project/autofuse/docs/shared_parameter_effective_signal.csv",
+    "run_dir": "project/autofuse/runs/shared_parameter_gradient_probe"
+  }
+}

@@ -1,0 +1,64 @@
+schema_version: "autofuse-phase0-config-v1"
+run_id: "phase0_local_smoke"
+output_dir: "project/autofuse/runs/phase0_local_smoke"
+cache_dir: "project/autofuse/.cache/torch-fuse-phase0-smoke"
+
+seed: 20260901
+device: "cuda"
+dtype: "float32"
+
+data:
+  manifest_path: "project/autofuse/docs/landscape_12catchment_manifest.json"
+  inputs_dir: "project/autofuse/docs/landscape_inputs"
+  target_basin_count: 2
+  periods:
+    forcing: ["1987-01-01", "2009-12-31"]
+    warmup: ["1987-01-01", "1988-12-31"]
+    calibration: ["1989-01-01", "1998-12-31"]
+    evaluation: ["1999-01-01", "2009-12-31"]
+
+time_window:
+  total_days: 730
+  warmup_days: 365
+  scored_days: 365
+
+model:
+  attribute_dim: 35
+  hidden_dim: 64
+  learning_rate: 0.001
+  max_grad_norm: 1.0
+
+registry:
+  path: "dfuse/specs/structures_78.json"
+  name: "structures_78"
+  anchors: [2, 8]
+
+stages:
+  p0_a:
+    enabled: true
+  p0_b_throughput:
+    enabled: true
+    batch_size: 2
+    warmup_steps: 1
+    measured_steps: 2
+    structures: [2]
+  p0_c_compile:
+    enabled: true
+    batch_size: 2
+    structures: [2]
+    test_eager: true
+    test_compile: true
+  p0_d_validation:
+    enabled: true
+    structures: [2]
+    eval_period: "evaluation"
+    eval_days: 3652
+    batch_size: 2
+    candidate_eval_intervals: [50, 100]
+  p0_e_pilot:
+    enabled: true
+    batch_size: 2
+    cycles: 1
+    structures: [2, 8]
+  p0_f_synthesis:
+    enabled: true

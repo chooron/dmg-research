@@ -1,0 +1,38 @@
+{
+  "cases": [
+    {
+      "c1_best_score": 4.740068069426399,
+      "c2_best_score": 4.740068069426399,
+      "model_id": 2,
+      "parameters_match": true,
+      "pass": true,
+      "score_diff": 0.0,
+      "trajectory_match": true
+    },
+    {
+      "c1_best_score": 3.536245312317727,
+      "c2_best_score": 3.536245312317727,
+      "model_id": 8,
+      "parameters_match": true,
+      "pass": true,
+      "score_diff": 0.0,
+      "trajectory_match": true
+    }
+  ],
+  "generated_at_utc": "2026-09-07T03:56:12.899828+00:00",
+  "protocol_id": "formal-experiment-protocol-v1-db53091e6e222066",
+  "schema_version": "sce-candidate-batching-validation-v1",
+  "status": "passed",
+  "summary": {
+    "all_passed": true,
+    "candidate_batching_supported_stages": [
+      "Initial population evaluation (all 2*P+1 candidates evaluated in 1 batch)"
+    ],
+    "models_tested": [
+      2,
+      8
+    ],
+    "rng_sequence_preserved": true,
+    "simplex_evolution_semantics_preserved": true
+  }
+}

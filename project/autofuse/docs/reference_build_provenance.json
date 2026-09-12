@@ -1,0 +1,60 @@
+{
+  "status": "built",
+  "source_repository": "vendor/upstream/cyrilthebault-fuse",
+  "source_ref": "v1.0_MMpaper",
+  "source_commit": "e6e23a4fc4ff4019bcab55f14537ea43b9525967",
+  "build_recipe": "project/autofuse/build_reference.sh",
+  "build_mode": "rootless extracted Debian packages; vendor source read-only",
+  "compiler": {
+    "fc": "gfortran-14",
+    "version": "GNU Fortran (Debian 14.2.0-19) 14.2.0",
+    "flags": [
+      "-O0",
+      "-ffree-line-length-none",
+      "-fmax-errors=0",
+      "-cpp",
+      "-Wl,-rpath-link,<toolchain>/lib",
+      "-Wl,-rpath-link,<toolchain>/lib/hdf5/serial",
+      "-Wl,-rpath,<toolchain>/lib:<toolchain>/lib/hdf5/serial"
+    ],
+    "fixed_form_flags": ["-O2", "-c", "-ffixed-form"]
+  },
+  "link_libraries": [
+    "netcdff",
+    "netcdf",
+    "hdf5_hl",
+    "hdf5",
+    "libcurl-gnutls.so.4",
+    "libxml2.so.2",
+    "libsz.so.2",
+    "libaec.so.0",
+    "libcrypto.so.3",
+    "libz.so.1",
+    "libgnutls.so.30"
+  ],
+  "dependency_packages": {
+    "gfortran-14": "14.2.0-19",
+    "gfortran-14-x86-64-linux-gnu": "14.2.0-19",
+    "gcc-14-x86-64-linux-gnu": "14.2.0-19",
+    "libgfortran-14-dev": "14.2.0-19",
+    "libnetcdff-dev": "4.6.0+really4.5.4+ds-3+b4",
+    "libnetcdf-dev": "1:4.9.3-1",
+    "libhdf5-dev": "1.14.5+repack-3",
+    "libcurl3t64-gnutls": "8.14.1-2+deb13u4",
+    "libxml2": "2.12.7+dfsg+really2.9.14-2.1+deb13u3",
+    "libsz2": "1.1.3-1+b1",
+    "libaec0": "1.1.3-1+b1",
+    "libssl3t64": "3.5.6-1~deb13u2",
+    "zlib1g": "1:1.3.dfsg+really1.3.1-1+b1"
+  },
+  "executable": {
+    "path_at_validation": "/tmp/autofuse-reference-toolchain/repro-build/bin/fuse.exe",
+    "sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+    "elf": "ELF64 x86-64 PIE",
+    "runner_probe": "STOP 1st command-line argument is missing (fileManager)"
+  },
+  "notes": [
+    "The binary is intentionally not committed; rebuild with the recipe and verify the hash in the target environment.",
+    "The upstream Makefile is invoked from a temporary object directory, so no generated files are written under vendor/upstream."
+  ]
+}

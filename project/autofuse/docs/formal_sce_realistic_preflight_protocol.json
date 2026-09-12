@@ -1,0 +1,77 @@
+{
+  "schema_version": "formal-sce-realistic-preflight-protocol-v1",
+  "status": "frozen",
+  "protocol_id": "formal-experiment-protocol-v1-db53091e6e222066",
+  "execution_layer_version": "1.1",
+  "numerical_core_version": "1.0",
+  "generated_at_utc": "2026-09-07T00:00:00+00:00",
+  "provenance": {
+    "formal_protocol_artifact": {
+      "path": "project/autofuse/docs/formal_experiment_protocol_v1.json",
+      "sha256": "472ae6a3a41b18d22ef148f4e24ee8d546aa86497f62b08fa1ff65d75cb450a8",
+      "protocol_id": "formal-experiment-protocol-v1-db53091e6e222066"
+    },
+    "execution_layer_provenance_artifact": {
+      "path": "project/autofuse/docs/torch_fuse_execution_layer_v1_1.json",
+      "sha256": "fc189679c50e181ee79f323a74a1f81cfef8bb40fec7d6a546d84a7e78d10332"
+    },
+    "numerical_core_freeze_artifact": {
+      "path": "project/autofuse/docs/torch_fuse_v1_freeze.json",
+      "sha256": "327c193c933a744d7837ec1590eae4f2454e303ce563559d355982b7bece2753"
+    }
+  },
+  "preflight_scope": {
+    "catchments": [
+      "USA_09447800",
+      "USA_14138900"
+    ],
+    "structures": [
+      2,
+      8,
+      190,
+      214
+    ],
+    "case_count": 8,
+    "scope_selection_rationale": "The preflight executes across the 2 prepared and verified diagnostic catchments (USA_09447800, USA_14138900) across all 4 diagnostic FUSE structures (2, 8, 190, 214). Catchments USA_07167500 and USA_13240000 are not present in the prepared diagnostic cache and remain reserved for subsequent full landscape stages."
+  },
+  "sce_configuration": {
+    "formal_settings_inherited": {
+      "algorithm": "SCE-UA (Duan et al. 1992, 1993)",
+      "population_size_rule": "2 * n_active_parameters + 1 (e.g., 37 for P=18, 31 for P=15)",
+      "number_of_complexes": 2,
+      "simplex_probability_distribution": "Triangular probability: P_i = 2*(m+1-i)/(m*(m+1))",
+      "simplex_reflection_factor": 1.0,
+      "simplex_contraction_factor": 0.5,
+      "shuffling_schedule": "Reshuffle all complexes after each complete cycle of complex evolutions",
+      "kstop": 3,
+      "pcento": 0.001,
+      "seed_assignment": "20260901 + case_index (deterministic per case)",
+      "candidate_batch_size": 16,
+      "optimization_simulation_mode": "q_only",
+      "optimization_forcing_horizon": "warmup + calibration (1987-01-01 .. 1998-12-31, 4383 days)",
+      "device": "cuda",
+      "dtype": "torch.float64"
+    },
+    "preflight_evaluation_cap": {
+      "max_evaluations": 50,
+      "cap_reason": "With popsize=37 (P=18) or 31 (P=15), a budget of 50 evaluations guarantees that all cases complete initial population batching AND execute 13–19 sequential simplex evaluations across 3–9 complete shuffle cycles, providing realistic lifecycle and sequential C=1 performance data without excessive compute.",
+      "minimum_required_shuffle_cycles": 2
+    }
+  },
+  "post_optimization_evaluation": {
+    "simulation_mode": "single_final_full_forward",
+    "forcing_horizon": "full 8401 days (1987-01-01 .. 2009-12-31)",
+    "output_mode": "full",
+    "metrics": {
+      "train_metric": "KGECOMP on calibration period (1989-01-01 .. 1998-12-31)",
+      "test_metric": "KGECOMP on evaluation period (1999-01-01 .. 2009-12-31)",
+      "epsilon": "mean(Qobs on calibration period) / 100"
+    }
+  },
+  "checkpointing_and_resume": {
+    "level": "case_level_restart_and_skip",
+    "case_artifact_policy": "Atomic temporary file write with SHA256 integrity verification",
+    "completed_case_skip": true,
+    "interrupted_case_restart": "Deterministic restart from same case seed without artifact corruption"
+  }
+}

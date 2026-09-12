@@ -1,0 +1,111 @@
+{
+  "comparison_elevation_protocol": "same CAMELS elevation-band area/mean-elevation metadata passed to Fortran; S3 uses frozen lumped-state kernel and identical basin-mean P/Tmean/PET forcing",
+  "data_path": "/mnt/f/python/generic_deltamodel/data/camels_dataset",
+  "data_sha256": "2c4666e2ca5ece74028d5d2aa898754abf25e9a877701b218826547cb4e7a264",
+  "forcing_start": "1987-01-01",
+  "input_root": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/landscape_inputs",
+  "inputs_sha256": "e2904503de89d5e68d023bed3f8e15ab46d2c7ce21743c66eced2dac3c521989",
+  "manifest": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/landscape_12catchment_manifest.json",
+  "manifest_sha256": "f90bce9d0e9d5f261ebf5e472ce4e766f3177804b42a0369d4982030f468cd1f",
+  "rows": [
+    {
+      "basin_id": "USA_02082950",
+      "elevation_band_count": 2,
+      "hru_id": 2082950,
+      "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/landscape_inputs/02082950.npz",
+      "sha256": "687d18b7a04a5634fee7842e06a374441693bee0e4a1d06fbe38c5d37c04ff86",
+      "steps": 8401
+    },
+    {
+      "basin_id": "USA_02472000",
+      "elevation_band_count": 2,
+      "hru_id": 2472000,
+      "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/landscape_inputs/02472000.npz",
+      "sha256": "9943544c0125aa77ddf339bc1741df906195b3f1c399e22a22f1b08173118b17",
+      "steps": 8401
+    },
+    {
+      "basin_id": "USA_03285000",
+      "elevation_band_count": 3,
+      "hru_id": 3285000,
+      "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/landscape_inputs/03285000.npz",
+      "sha256": "7df731c2cd99e3b5ab7f0d516b92b1d2e050ae6bfc55d1f02298e2241adfb95b",
+      "steps": 8401
+    },
+    {
+      "basin_id": "USA_07167500",
+      "elevation_band_count": 4,
+      "hru_id": 7167500,
+      "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/landscape_inputs/07167500.npz",
+      "sha256": "7e5696db81323e42779d719eb0ebac8ed66f717e8bdfb1d5b536f6dd844e560e",
+      "steps": 8401
+    },
+    {
+      "basin_id": "USA_09306242",
+      "elevation_band_count": 8,
+      "hru_id": 9306242,
+      "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/landscape_inputs/09306242.npz",
+      "sha256": "15bfe8e7a10dd0dccb673dcabdf0d49ac27dbd907c9d94add870cf5fc6cd4937",
+      "steps": 8401
+    },
+    {
+      "basin_id": "USA_09447800",
+      "elevation_band_count": 13,
+      "hru_id": 9447800,
+      "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/landscape_inputs/09447800.npz",
+      "sha256": "70be3414a8f6299f3ef65999022308e3f55e8feb3e12a36547299c7b7f2186ca",
+      "steps": 8401
+    },
+    {
+      "basin_id": "USA_11473900",
+      "elevation_band_count": 22,
+      "hru_id": 11473900,
+      "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/landscape_inputs/11473900.npz",
+      "sha256": "e08c25698ff13d59a48ded63354986e2ac1ac5813a2f8507ca02ac823851b0f1",
+      "steps": 8401
+    },
+    {
+      "basin_id": "USA_11528700",
+      "elevation_band_count": 21,
+      "hru_id": 11528700,
+      "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/landscape_inputs/11528700.npz",
+      "sha256": "e8239bd883780ba89867aee702f465fc85d133dfca2d1c1486422647a9d8246c",
+      "steps": 8401
+    },
+    {
+      "basin_id": "USA_12010000",
+      "elevation_band_count": 9,
+      "hru_id": 12010000,
+      "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/landscape_inputs/12010000.npz",
+      "sha256": "a017735063457c4e127c6824dd69b6d12b770193042cd5d64c440e06833ee153",
+      "steps": 8401
+    },
+    {
+      "basin_id": "USA_13240000",
+      "elevation_band_count": 13,
+      "hru_id": 13240000,
+      "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/landscape_inputs/13240000.npz",
+      "sha256": "0c166664afa2a10187d7498f655e4dc97ad2386c0cf5799b58f099dd61b7e948",
+      "steps": 8401
+    },
+    {
+      "basin_id": "USA_13338500",
+      "elevation_band_count": 24,
+      "hru_id": 13338500,
+      "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/landscape_inputs/13338500.npz",
+      "sha256": "2f5bafb75e7cb6f9f64242477f0895fd79a4821f91a548b7e5330581f2c3ab4e",
+      "steps": 8401
+    },
+    {
+      "basin_id": "USA_14138900",
+      "elevation_band_count": 9,
+      "hru_id": 14138900,
+      "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/landscape_inputs/14138900.npz",
+      "sha256": "e2dfe024fc727da9b873521a03b10c6ec7bc19552097f2d0568b9658aeaf99f0",
+      "steps": 8401
+    }
+  ],
+  "schema_version": "landscape-inputs-v1",
+  "simulation_end": "2009-12-31",
+  "status": "prepared"
+}

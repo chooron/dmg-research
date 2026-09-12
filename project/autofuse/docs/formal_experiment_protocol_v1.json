@@ -1,0 +1,962 @@
+{
+  "artifacts": {
+    "case_directory": "project/autofuse/docs/formal_sce_pilot_cases",
+    "case_filename": "{basin_id}_model_{model_id}.json",
+    "case_schema_version": "formal-sce-pilot-case-v1",
+    "required_case_fields": [
+      "protocol_id",
+      "torch_fuse_freeze_id",
+      "catchment",
+      "structure",
+      "seed",
+      "optimizer",
+      "best_theta",
+      "best_objective",
+      "train_metric",
+      "test_metric",
+      "termination_reason",
+      "evaluation_count",
+      "runtime",
+      "resource",
+      "recomputation",
+      "leakage",
+      "path_audit",
+      "artifact_sha256",
+      "git_sha"
+    ],
+    "summary_path": "project/autofuse/docs/formal_sce_pilot_2x4.json",
+    "summary_schema_version": "formal-sce-pilot-2x4-v1"
+  },
+  "evaluation": {
+    "best_theta_recompute": "rerun objective at saved best theta on the exact calibration mask and rerun full trajectory for saved train/test metrics",
+    "catchment_batch_policy": "B=1 per independent calibration case; frozen batched executor is still used, no synchronized multi-catchment optimization",
+    "initial_state": "frozen Torch-FUSE v1 initial_fraction=0.25",
+    "leakage_check": "calibration and evaluation masks are disjoint; evaluation observations are not passed to SCE objective",
+    "per_case": "load one frozen basin, simulate full forcing window on CUDA, calibrate on 1989-01-01..1998-12-31, evaluate on 1999-01-01..2009-12-31"
+  },
+  "execution": {
+    "batch_policy_source": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/torch_fuse_v1_freeze.json",
+    "compile_backend": "inductor",
+    "compile_fullgraph": true,
+    "cpu_interop_threads": 1,
+    "cpu_threads": 1,
+    "device": "cuda",
+    "dtype": "torch.float64",
+    "entrypoint": "UnifiedEvaluator.score_batched -> simulate_coupled_rk2_batched",
+    "fallback_policy": "any CPU fallback, graph break, unexpected recompilation, or frozen-kernel hash mismatch is a STOP condition",
+    "forbidden_paths": [
+      "dfuse.simulate",
+      "legacy sequential simulate",
+      "legacy Fortran run_pre",
+      "disabled/stub objective"
+    ],
+    "safe_default_basin_batch_size": 2
+  },
+  "objective": {
+    "definition": "[KGE(Q) + KGE(1/(epsilon+Q))]/2",
+    "epsilon": "mean(Qobs on calibration period)/100; calibration epsilon is reused for held-out evaluation",
+    "implementation": "kgecomp_batched",
+    "metric": "KGECOMP",
+    "name": "1 - mean(per-basin KGECOMP)",
+    "optimizer_direction": "minimize",
+    "test_evaluation": "same saved best theta and full forcing trajectory; only evaluation dates scored",
+    "training_mask": "only calibration dates; warmup, test, and missing observations excluded"
+  },
+  "parameters": {
+    "active_by_structure": {
+      "190": [
+        "RFERR_MLT",
+        "FRCHZNE",
+        "FRACTEN",
+        "MAXWATR_1",
+        "FRACLOWZ",
+        "MAXWATR_2",
+        "BASERTE",
+        "QB_POWR",
+        "SACPMLT",
+        "SACPEXP",
+        "SAREAMAX",
+        "TIMEDELAY",
+        "MBASE",
+        "MFMAX",
+        "MFMIN",
+        "PXTEMP",
+        "OPG",
+        "LAPSE"
+      ],
+      "2": [
+        "RFERR_MLT",
+        "FRACTEN",
+        "MAXWATR_1",
+        "PERCFRAC",
+        "FPRIMQB",
+        "MAXWATR_2",
+        "QBRATE_2A",
+        "QBRATE_2B",
+        "PERCRTE",
+        "PERCEXP",
+        "AXV_BEXP",
+        "TIMEDELAY",
+        "MBASE",
+        "MFMAX",
+        "MFMIN",
+        "PXTEMP",
+        "OPG",
+        "LAPSE"
+      ],
+      "214": [
+        "RFERR_MLT",
+        "FRCHZNE",
+        "FRACTEN",
+        "MAXWATR_1",
+        "FRACLOWZ",
+        "MAXWATR_2",
+        "BASERTE",
+        "QB_POWR",
+        "SACPMLT",
+        "SACPEXP",
+        "LOGLAMB",
+        "TISHAPE",
+        "TIMEDELAY",
+        "MBASE",
+        "MFMAX",
+        "MFMIN",
+        "PXTEMP",
+        "OPG",
+        "LAPSE"
+      ],
+      "8": [
+        "RFERR_MLT",
+        "FRACTEN",
+        "MAXWATR_1",
+        "MAXWATR_2",
+        "QB_PRMS",
+        "PERCRTE",
+        "PERCEXP",
+        "AXV_BEXP",
+        "TIMEDELAY",
+        "MBASE",
+        "MFMAX",
+        "MFMIN",
+        "PXTEMP",
+        "OPG",
+        "LAPSE"
+      ]
+    },
+    "bounds_by_structure": {
+      "190": {
+        "BASERTE": {
+          "fit": true,
+          "lower": 0.001,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 1000.0
+        },
+        "FRACLOWZ": {
+          "fit": true,
+          "lower": 0.05,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 0.95
+        },
+        "FRACTEN": {
+          "fit": true,
+          "lower": 0.05,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 0.95
+        },
+        "FRCHZNE": {
+          "fit": true,
+          "lower": 0.05,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 0.95
+        },
+        "LAPSE": {
+          "fit": true,
+          "lower": -7.0,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": -4.0
+        },
+        "MAXWATR_1": {
+          "fit": true,
+          "lower": 25.0,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 500.0
+        },
+        "MAXWATR_2": {
+          "fit": true,
+          "lower": 50.0,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 5000.0
+        },
+        "MBASE": {
+          "fit": true,
+          "lower": 0.0,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 3.0
+        },
+        "MFMAX": {
+          "fit": true,
+          "lower": 2.0,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 8.0
+        },
+        "MFMIN": {
+          "fit": true,
+          "lower": 0.4,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 6.0
+        },
+        "OPG": {
+          "fit": true,
+          "lower": 0.0,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 2.5
+        },
+        "PXTEMP": {
+          "fit": true,
+          "lower": -1.0,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 5.0
+        },
+        "QB_POWR": {
+          "fit": true,
+          "lower": 1.0,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 10.0
+        },
+        "RFERR_MLT": {
+          "fit": true,
+          "lower": 1.0,
+          "pre_transform": 1,
+          "transform_method": 0,
+          "upper": 1.001
+        },
+        "SACPEXP": {
+          "fit": true,
+          "lower": 1.0,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 5.0
+        },
+        "SACPMLT": {
+          "fit": true,
+          "lower": 1.0,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 250.0
+        },
+        "SAREAMAX": {
+          "fit": true,
+          "lower": 0.001,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 1.0
+        },
+        "TIMEDELAY": {
+          "fit": true,
+          "lower": 0.01,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 5.0
+        }
+      },
+      "2": {
+        "AXV_BEXP": {
+          "fit": true,
+          "lower": 0.001,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 3.0
+        },
+        "FPRIMQB": {
+          "fit": true,
+          "lower": 0.05,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 0.95
+        },
+        "FRACTEN": {
+          "fit": true,
+          "lower": 0.05,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 0.95
+        },
+        "LAPSE": {
+          "fit": true,
+          "lower": -7.0,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": -4.0
+        },
+        "MAXWATR_1": {
+          "fit": true,
+          "lower": 25.0,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 500.0
+        },
+        "MAXWATR_2": {
+          "fit": true,
+          "lower": 50.0,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 5000.0
+        },
+        "MBASE": {
+          "fit": true,
+          "lower": 0.0,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 3.0
+        },
+        "MFMAX": {
+          "fit": true,
+          "lower": 2.0,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 8.0
+        },
+        "MFMIN": {
+          "fit": true,
+          "lower": 0.4,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 6.0
+        },
+        "OPG": {
+          "fit": true,
+          "lower": 0.0,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 2.5
+        },
+        "PERCEXP": {
+          "fit": true,
+          "lower": 1.0,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 20.0
+        },
+        "PERCFRAC": {
+          "fit": true,
+          "lower": 0.05,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 0.95
+        },
+        "PERCRTE": {
+          "fit": true,
+          "lower": 0.1,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 1000.0
+        },
+        "PXTEMP": {
+          "fit": true,
+          "lower": -1.0,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 5.0
+        },
+        "QBRATE_2A": {
+          "fit": true,
+          "lower": 0.001,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 0.25
+        },
+        "QBRATE_2B": {
+          "fit": true,
+          "lower": 0.001,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 0.25
+        },
+        "RFERR_MLT": {
+          "fit": true,
+          "lower": 1.0,
+          "pre_transform": 1,
+          "transform_method": 0,
+          "upper": 1.001
+        },
+        "TIMEDELAY": {
+          "fit": true,
+          "lower": 0.01,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 5.0
+        }
+      },
+      "214": {
+        "BASERTE": {
+          "fit": true,
+          "lower": 0.001,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 1000.0
+        },
+        "FRACLOWZ": {
+          "fit": true,
+          "lower": 0.05,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 0.95
+        },
+        "FRACTEN": {
+          "fit": true,
+          "lower": 0.05,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 0.95
+        },
+        "FRCHZNE": {
+          "fit": true,
+          "lower": 0.05,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 0.95
+        },
+        "LAPSE": {
+          "fit": true,
+          "lower": -7.0,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": -4.0
+        },
+        "LOGLAMB": {
+          "fit": true,
+          "lower": 5.0,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 10.0
+        },
+        "MAXWATR_1": {
+          "fit": true,
+          "lower": 25.0,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 500.0
+        },
+        "MAXWATR_2": {
+          "fit": true,
+          "lower": 50.0,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 5000.0
+        },
+        "MBASE": {
+          "fit": true,
+          "lower": 0.0,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 3.0
+        },
+        "MFMAX": {
+          "fit": true,
+          "lower": 2.0,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 8.0
+        },
+        "MFMIN": {
+          "fit": true,
+          "lower": 0.4,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 6.0
+        },
+        "OPG": {
+          "fit": true,
+          "lower": 0.0,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 2.5
+        },
+        "PXTEMP": {
+          "fit": true,
+          "lower": -1.0,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 5.0
+        },
+        "QB_POWR": {
+          "fit": true,
+          "lower": 1.0,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 10.0
+        },
+        "RFERR_MLT": {
+          "fit": true,
+          "lower": 1.0,
+          "pre_transform": 1,
+          "transform_method": 0,
+          "upper": 1.001
+        },
+        "SACPEXP": {
+          "fit": true,
+          "lower": 1.0,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 5.0
+        },
+        "SACPMLT": {
+          "fit": true,
+          "lower": 1.0,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 250.0
+        },
+        "TIMEDELAY": {
+          "fit": true,
+          "lower": 0.01,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 5.0
+        },
+        "TISHAPE": {
+          "fit": true,
+          "lower": 2.0,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 5.0
+        }
+      },
+      "8": {
+        "AXV_BEXP": {
+          "fit": true,
+          "lower": 0.001,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 3.0
+        },
+        "FRACTEN": {
+          "fit": true,
+          "lower": 0.05,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 0.95
+        },
+        "LAPSE": {
+          "fit": true,
+          "lower": -7.0,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": -4.0
+        },
+        "MAXWATR_1": {
+          "fit": true,
+          "lower": 25.0,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 500.0
+        },
+        "MAXWATR_2": {
+          "fit": true,
+          "lower": 50.0,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 5000.0
+        },
+        "MBASE": {
+          "fit": true,
+          "lower": 0.0,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 3.0
+        },
+        "MFMAX": {
+          "fit": true,
+          "lower": 2.0,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 8.0
+        },
+        "MFMIN": {
+          "fit": true,
+          "lower": 0.4,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 6.0
+        },
+        "OPG": {
+          "fit": true,
+          "lower": 0.0,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 2.5
+        },
+        "PERCEXP": {
+          "fit": true,
+          "lower": 1.0,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 20.0
+        },
+        "PERCRTE": {
+          "fit": true,
+          "lower": 0.1,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 1000.0
+        },
+        "PXTEMP": {
+          "fit": true,
+          "lower": -1.0,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 5.0
+        },
+        "QB_PRMS": {
+          "fit": true,
+          "lower": 0.001,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 0.25
+        },
+        "RFERR_MLT": {
+          "fit": true,
+          "lower": 1.0,
+          "pre_transform": 1,
+          "transform_method": 0,
+          "upper": 1.001
+        },
+        "TIMEDELAY": {
+          "fit": true,
+          "lower": 0.01,
+          "pre_transform": 0,
+          "transform_method": 0,
+          "upper": 5.0
+        }
+      }
+    },
+    "inactive_by_structure": {
+      "190": [
+        "RFERR_ADD",
+        "RFH1_MEAN",
+        "RFH2_SDEV",
+        "RH1P_MEAN",
+        "RH1P_SDEV",
+        "RH2P_MEAN",
+        "RH2P_SDEV",
+        "FPRIMQB",
+        "RTFRAC1",
+        "PERCRTE",
+        "PERCEXP",
+        "PERCFRAC",
+        "IFLWRTE",
+        "QB_PRMS",
+        "QBRATE_2A",
+        "QBRATE_2B",
+        "AXV_BEXP",
+        "LOGLAMB",
+        "TISHAPE"
+      ],
+      "2": [
+        "RFERR_ADD",
+        "RFH1_MEAN",
+        "RFH2_SDEV",
+        "RH1P_MEAN",
+        "RH1P_SDEV",
+        "RH2P_MEAN",
+        "RH2P_SDEV",
+        "FRCHZNE",
+        "RTFRAC1",
+        "SACPMLT",
+        "SACPEXP",
+        "FRACLOWZ",
+        "IFLWRTE",
+        "BASERTE",
+        "QB_POWR",
+        "QB_PRMS",
+        "SAREAMAX",
+        "LOGLAMB",
+        "TISHAPE"
+      ],
+      "214": [
+        "RFERR_ADD",
+        "RFH1_MEAN",
+        "RFH2_SDEV",
+        "RH1P_MEAN",
+        "RH1P_SDEV",
+        "RH2P_MEAN",
+        "RH2P_SDEV",
+        "FPRIMQB",
+        "RTFRAC1",
+        "PERCRTE",
+        "PERCEXP",
+        "PERCFRAC",
+        "IFLWRTE",
+        "QB_PRMS",
+        "QBRATE_2A",
+        "QBRATE_2B",
+        "SAREAMAX",
+        "AXV_BEXP"
+      ],
+      "8": [
+        "RFERR_ADD",
+        "RFH1_MEAN",
+        "RFH2_SDEV",
+        "RH1P_MEAN",
+        "RH1P_SDEV",
+        "RH2P_MEAN",
+        "RH2P_SDEV",
+        "FRCHZNE",
+        "FPRIMQB",
+        "RTFRAC1",
+        "SACPMLT",
+        "SACPEXP",
+        "PERCFRAC",
+        "FRACLOWZ",
+        "IFLWRTE",
+        "BASERTE",
+        "QB_POWR",
+        "QBRATE_2A",
+        "QBRATE_2B",
+        "SAREAMAX",
+        "LOGLAMB",
+        "TISHAPE"
+      ]
+    },
+    "inactive_contract": "inactive union coordinates are fixed to dfuse.spec.default_parameters() and are never sampled or overwritten by SCE",
+    "mapping_contract": "active structure parameter_names map candidate coordinates into the 37-coordinate union vector in PARAMETER_NAMES order",
+    "transform_contract": {
+      "method": "native parameter values; no log/sigmoid transform; SCE samples uniformly in native legal interval; initial/default values are clamped to legal interval",
+      "pilot_active_pre_transform_values": [
+        0,
+        1
+      ],
+      "pilot_active_transform_method_values": [
+        0
+      ],
+      "source": "dfuse/specs/parameter_catalog.json"
+    },
+    "union_names": [
+      "RFERR_ADD",
+      "RFERR_MLT",
+      "RFH1_MEAN",
+      "RFH2_SDEV",
+      "RH1P_MEAN",
+      "RH1P_SDEV",
+      "RH2P_MEAN",
+      "RH2P_SDEV",
+      "MAXWATR_1",
+      "MAXWATR_2",
+      "FRACTEN",
+      "FRCHZNE",
+      "FPRIMQB",
+      "RTFRAC1",
+      "PERCRTE",
+      "PERCEXP",
+      "SACPMLT",
+      "SACPEXP",
+      "PERCFRAC",
+      "FRACLOWZ",
+      "IFLWRTE",
+      "BASERTE",
+      "QB_POWR",
+      "QB_PRMS",
+      "QBRATE_2A",
+      "QBRATE_2B",
+      "SAREAMAX",
+      "AXV_BEXP",
+      "LOGLAMB",
+      "TISHAPE",
+      "TIMEDELAY",
+      "MBASE",
+      "MFMAX",
+      "MFMIN",
+      "PXTEMP",
+      "OPG",
+      "LAPSE"
+    ]
+  },
+  "periods": {
+    "calibration": [
+      "1989-01-01",
+      "1998-12-31"
+    ],
+    "date_semantics": "inclusive daily endpoints; warmup is simulated but excluded from objective",
+    "evaluation": [
+      "1999-01-01",
+      "2009-12-31"
+    ],
+    "forcing": [
+      "1987-01-01",
+      "2009-12-31"
+    ],
+    "simulation": [
+      "1989-01-01",
+      "2009-12-31"
+    ],
+    "warmup": [
+      "1987-01-01",
+      "1988-12-31"
+    ]
+  },
+  "pilot_scope": {
+    "case_count": 8,
+    "case_definition": "one independent SCE calibration case per catchment x structure",
+    "catchments": [
+      "USA_09447800",
+      "USA_14138900"
+    ],
+    "larger_scales_prohibited": [
+      "4x12",
+      "12x78",
+      "544x78"
+    ],
+    "structures": [
+      2,
+      8,
+      190,
+      214
+    ]
+  },
+  "protocol_id": "formal-experiment-protocol-v1-db53091e6e222066",
+  "purpose": "minimal formal SCE pipeline pilot; no scientific comparison or campaign",
+  "reproducibility": {
+    "different_seed": 20260909,
+    "required": "same config/seed identical trajectory, best theta, best objective; different seed trajectory differs",
+    "same_seed": 20260901,
+    "same_seed_runs": 2,
+    "selected_case": {
+      "catchment": "USA_09447800",
+      "structure": 2
+    },
+    "trace": "SCE trajectory evaluation records and best-objective trace are saved; wall-clock/resource fields excluded from equality comparison"
+  },
+  "sce": {
+    "algorithm": "SCE-UA",
+    "best_theta_rule": "minimum finite objective among evaluated candidates; return full 37-coordinate theta with inactive defaults",
+    "implementation": "SCEBaseline.run",
+    "objective_entry": "SCEBaseline.objective_batched",
+    "rng": "torch.Generator(device=cpu).manual_seed(SCEConfig.seed); no global RNG for candidate generation",
+    "setting_provenance": "SCEConfig/SCEBaseline implementation contract; max_evaluations=2 is an explicit minimal pilot-only budget, not a formal campaign default",
+    "settings": {
+      "kstop": 3,
+      "max_evaluations": 2,
+      "n_complexes": 2,
+      "pcento": 0.0,
+      "pilot_seeds": [
+        20260901,
+        20260902,
+        20260903,
+        20260904,
+        20260905,
+        20260906,
+        20260907,
+        20260908
+      ],
+      "population_size": "min(max_evaluations, 2*n_active_parameters+1)",
+      "seed_assignment": "case order: catchment-major then structure order; seed=20260901+i"
+    }
+  },
+  "schema_version": "formal-experiment-protocol-v1",
+  "sources": {
+    "attributes": {
+      "dpl_attributes_used": false,
+      "index_sha256": "d67f4aefc4ca56a7014ea056042aff621dd618a3c9afd9870ecd27989a065ccc",
+      "relevant": true,
+      "source": "frozen landscape input archives",
+      "used_fields": [
+        "area_frac",
+        "mean_elev"
+      ]
+    },
+    "catchment_manifest": {
+      "manifest_sha256": "fe8475b2dcbdcc7341611108dc8ac8e5678ec922ddf3daa00e7c454200eff7f9",
+      "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/landscape_12catchment_manifest.json",
+      "schema_version": "landscape-12-catchment-manifest-v1",
+      "selected_basin_ids": [
+        "USA_09447800",
+        "USA_14138900"
+      ],
+      "selection_source": "existing frozen 12-catchment landscape manifest",
+      "sha256": "f90bce9d0e9d5f261ebf5e472ce4e766f3177804b42a0369d4982030f468cd1f",
+      "status": "frozen before solver comparison"
+    },
+    "evaluator_implementation": {
+      "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/evaluator.py",
+      "sha256": "a060319a824bd9ce821e27596b52db70f2e93701bf7fd7908ddc3593da6f92f2"
+    },
+    "forcing": {
+      "end": "2009-12-31",
+      "forcing_product": "frozen landscape input archives; ppt, pet, temp",
+      "index_path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/landscape_inputs/index.json",
+      "index_schema_version": "landscape-inputs-v1",
+      "index_sha256": "d67f4aefc4ca56a7014ea056042aff621dd618a3c9afd9870ecd27989a065ccc",
+      "inputs_sha256": "e2904503de89d5e68d023bed3f8e15ab46d2c7ce21743c66eced2dac3c521989",
+      "source_data_sha256": "2c4666e2ca5ece74028d5d2aa898754abf25e9a877701b218826547cb4e7a264",
+      "start": "1987-01-01"
+    },
+    "metric_implementation": {
+      "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/metrics.py",
+      "sha256": "435f50669992e6a2bdb71001457717f05c154599e177ea65692384e2ffda066b"
+    },
+    "optimizer_implementation": {
+      "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/sce.py",
+      "sha256": "4861036ec66c75eb4d21876ad4f4d270995f270208bd7a5db7cfe8fd9b6c2959"
+    },
+    "parameter_catalog": {
+      "parameter_count": 37,
+      "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/dfuse/specs/parameter_catalog.json",
+      "schema_version": "1.0",
+      "sha256": "711a09dec32f39bb32a667030fc476b224c5f5aa3a600df71baec75eead4cdf9"
+    },
+    "structure_manifest": {
+      "catalogue_count": 78,
+      "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/dfuse/specs/structures_78.json",
+      "schema_version": "1.0",
+      "selected_structure_ids": [
+        2,
+        8,
+        190,
+        214
+      ],
+      "sha256": "457b232b71c870fd3cb698fd9bb517e58844c5e9bba5f0c4ac4ad0bcc971d6fc",
+      "source": "vendor/upstream/fuse-mmcomparison-paper/01_FUSEscripts/fuse_template/settings/list_decision_78.txt"
+    },
+    "theta_archive": {
+      "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/reference_calibration_12x78.json",
+      "schema_version": "reference-calibration-12x78-v1",
+      "sha256": "c032cf8548f9efce9bd4c8800ef85fea53852994dc20b33938c9f8f0999cbdb6",
+      "used_as_optimizer_initial_theta": false,
+      "used_for_observations": false
+    },
+    "torch_fuse_freeze": {
+      "freeze_schema_version": "torch-fuse-v1-freeze-v1",
+      "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/torch_fuse_v1_freeze.json",
+      "sha256": "327c193c933a744d7837ec1590eae4f2454e303ce563559d355982b7bece2753",
+      "status": "frozen"
+    }
+  },
+  "status": "frozen",
+  "stop_conditions": [
+    "wrong simulation entrypoint",
+    "objective/best-theta mismatch",
+    "bound or inactive-mask violation",
+    "train/test leakage",
+    "NaN/Inf",
+    "seed non-reproducibility",
+    "artifact mismatch",
+    "CPU fallback",
+    "graph break",
+    "unexpected recompilation",
+    "frozen Torch-FUSE hash mismatch"
+  ],
+  "unresolved": []
+}

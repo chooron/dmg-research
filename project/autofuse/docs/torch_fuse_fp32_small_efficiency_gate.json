@@ -1,0 +1,1168 @@
+{
+  "aggregate": {
+    "benefit_classification": "FP32 speed benefit is small",
+    "decision": "FP32 performance benefit insufficient \u2014 keep FP64",
+    "mean_step_speedup": 0.9141990435003058,
+    "median_step_speedup": 0.9141990435003058,
+    "short_optimizer_trajectory_worthwhile": false
+  },
+  "batch_hashes": {
+    "2": {
+      "hash_basis": "same FP64 generated forcing/attributes/observed/default initial-theta tensors; each dtype is a cast of this fixed batch",
+      "model_initialization_seed": 20261003,
+      "seed": 20261633,
+      "sha256": "c8d7cd2ca19565b2d8b89906283c1dec0775a8e5c77c23be4fe52ca569c578c6"
+    },
+    "8": {
+      "hash_basis": "same FP64 generated forcing/attributes/observed/default initial-theta tensors; each dtype is a cast of this fixed batch",
+      "model_initialization_seed": 20261009,
+      "seed": 20261639,
+      "sha256": "dd543b1cc8f436fc0da93de2bd780b7a9879800aabb6796dcf1f9cb7db8d5a98"
+    }
+  },
+  "environment": {
+    "cuda_runtime": "12.8",
+    "device": "cuda",
+    "gpu": "NVIDIA GeForce RTX 3060",
+    "gpu_memory_bytes": 12884377600,
+    "torch": "2.9.1+cu128"
+  },
+  "generated_at_utc": "2026-09-08T10:02:22.689815+00:00",
+  "protocol": {
+    "batch_size": 100,
+    "compile_and_cuda_warmup_excluded_from_steady_state": true,
+    "cuda_synchronized_timing": true,
+    "excluded": [
+      "long_horizon_precision",
+      "78_structure_smoke",
+      "optimizer_trajectory",
+      "temporal_compile",
+      "chunked_compile",
+      "AMP",
+      "TF32",
+      "FP16",
+      "BF16",
+      "TBPTT",
+      "formal_dPL_training"
+    ],
+    "initial_fraction": 0.25,
+    "mode": "Lite",
+    "only_dtype_changed": true,
+    "optimizer": "Adam lr=1e-3",
+    "same_frozen_input_generator": true,
+    "scored_days": 365,
+    "steady_state_repeats": 3,
+    "structures": [
+      2,
+      8
+    ],
+    "warmup_days": 365,
+    "window_days": 730
+  },
+  "reference": {
+    "dtype_reference": "float64",
+    "execution_layer_reference_id": "torch-fuse-execution-layer-v1-2-v1",
+    "git_sha": "3caca37a4243ae0a95ebe9cc4f22998672ddf464",
+    "temporal_execution": "one-step compiled kernel + Python loop",
+    "training_mode": "Lite"
+  },
+  "schema_version": "torch-fuse-fp32-small-efficiency-gate-v1",
+  "scope_note": "Efficiency-only gate; no new precision, long-horizon, 78-structure, or trajectory claims are made.",
+  "status": "completed",
+  "structures": [
+    {
+      "batch_hash": "c8d7cd2ca19565b2d8b89906283c1dec0775a8e5c77c23be4fe52ca569c578c6",
+      "comparison": {
+        "allocated_memory_reduction": {
+          "bytes": 210613760,
+          "fraction": 0.44748298638911127,
+          "mb": 200.85693359375
+        },
+        "backward_speedup": 0.7845977447375161,
+        "forward_speedup": 0.9106154561021796,
+        "fp32_steps_per_hour": 354.9871804454533,
+        "fp64_steps_per_hour": 392.87072597371656,
+        "reserved_memory_reduction": {
+          "bytes": 209715200,
+          "fraction": 0.4424778761061947,
+          "mb": 200.0
+        },
+        "step_speedup": 0.9035724908381243
+      },
+      "fp32": {
+        "backward_median_seconds": 2.4228947709780186,
+        "compile_cache": "project/autofuse/.cache/torch-fuse-fp32-audit/small-gate-structure-2-float32",
+        "compile_diagnostics": {
+          "compile_success": true,
+          "compile_time_seconds": 30.91921434889082,
+          "records": [
+            {
+              "backend": "inductor",
+              "batch_size": 100,
+              "calls": 730,
+              "cold_compile_seconds": [
+                30.91921434889082
+              ],
+              "compile_attempts": 1,
+              "compile_successes": 1,
+              "dynamo_counters": {
+                "aot_autograd": {
+                  "autograd_cache_miss": 1,
+                  "autograd_cache_saved": 1,
+                  "ok": 1,
+                  "total": 1
+                },
+                "inductor": {
+                  "async_compile_cache_hit": 105,
+                  "async_compile_cache_miss": 210,
+                  "benchmarking.InductorBenchmarker.benchmark_gpu": 168,
+                  "fxgraph_cache_miss": 2,
+                  "pattern_matcher_count": 189,
+                  "pattern_matcher_nodes": 189,
+                  "triton_bundler_save_kernel": 216,
+                  "triton_bundler_save_static_autotuner": 2
+                },
+                "stats": {
+                  "calls_captured": 1887,
+                  "unique_graphs": 1
+                }
+              },
+              "failures": [],
+              "fallbacks": 0,
+              "forward_unique_graphs": 1,
+              "fullgraph": true,
+              "graph_breaks": 0,
+              "graph_signature": {
+                "decisions": {
+                  "ARCH1": "tension1_1",
+                  "ARCH2": "tens2pll_2",
+                  "ESOIL": "sequential",
+                  "QINTF": "intflwnone",
+                  "QPERC": "perc_f2sat",
+                  "QSURF": "arno_x_vic",
+                  "Q_TDH": "rout_gamma",
+                  "RFERR": "multiplc_e",
+                  "SNOWM": "temp_index"
+                },
+                "execution_mode": "coupled_rk2",
+                "n_substeps": 1,
+                "parameter_names": [
+                  "RFERR_MLT",
+                  "FRACTEN",
+                  "MAXWATR_1",
+                  "PERCFRAC",
+                  "FPRIMQB",
+                  "MAXWATR_2",
+                  "QBRATE_2A",
+                  "QBRATE_2B",
+                  "PERCRTE",
+                  "PERCEXP",
+                  "AXV_BEXP",
+                  "TIMEDELAY",
+                  "MBASE",
+                  "MFMAX",
+                  "MFMIN",
+                  "PXTEMP",
+                  "OPG",
+                  "LAPSE"
+                ],
+                "sequential_order": [
+                  "coupled_rhs"
+                ],
+                "state_names": [
+                  "TENS_1",
+                  "FREE_1",
+                  "TENS_2",
+                  "FREE_2A",
+                  "FREE_2B"
+                ],
+                "topology": [
+                  [
+                    "lower",
+                    [
+                      [
+                        "FREE_2A",
+                        [
+                          [
+                            "OFLOW_2A",
+                            -1
+                          ],
+                          [
+                            "QBASE_2A",
+                            -1
+                          ],
+                          [
+                            "QPERC_12*PERCFRAC/2",
+                            1
+                          ],
+                          [
+                            "TENS2FREE_2/2",
+                            1
+                          ]
+                        ]
+                      ],
+                      [
+                        "FREE_2B",
+                        [
+                          [
+                            "OFLOW_2B",
+                            -1
+                          ],
+                          [
+                            "QBASE_2B",
+                            -1
+                          ],
+                          [
+                            "QPERC_12*PERCFRAC/2",
+                            1
+                          ],
+                          [
+                            "TENS2FREE_2/2",
+                            1
+                          ]
+                        ]
+                      ],
+                      [
+                        "TENS_2",
+                        [
+                          [
+                            "EVAP_2",
+                            -1
+                          ],
+                          [
+                            "QPERC_12*(1-PERCFRAC)",
+                            1
+                          ],
+                          [
+                            "TENS2FREE_2",
+                            -1
+                          ]
+                        ]
+                      ]
+                    ]
+                  ],
+                  [
+                    "upper",
+                    [
+                      [
+                        "FREE_1",
+                        [
+                          [
+                            "OFLOW_1",
+                            -1
+                          ],
+                          [
+                            "QINTF_1",
+                            -1
+                          ],
+                          [
+                            "QPERC_12",
+                            -1
+                          ],
+                          [
+                            "TENS2FREE_1",
+                            1
+                          ]
+                        ]
+                      ],
+                      [
+                        "TENS_1",
+                        [
+                          [
+                            "EFF_PPT",
+                            1
+                          ],
+                          [
+                            "EVAP_1",
+                            -1
+                          ],
+                          [
+                            "QSURF",
+                            -1
+                          ],
+                          [
+                            "TENS2FREE_1",
+                            -1
+                          ]
+                        ]
+                      ]
+                    ]
+                  ]
+                ]
+              },
+              "graph_signature_digest": "71c2d011de746521",
+              "model_id": 2,
+              "recompilations": 0
+            }
+          ]
+        },
+        "compile_time_seconds": 30.91921434889082,
+        "dtype": "float32",
+        "forward_median_seconds": 7.961860966053791,
+        "host_peak_rss_kb": 1953072,
+        "loss_median_seconds": 0.0007284099701792002,
+        "optimizer_median_seconds": 0.0027199930045753717,
+        "peak_allocated_bytes": 260049408,
+        "peak_allocated_mb": 248.00244140625,
+        "peak_reserved_bytes": 264241152,
+        "peak_reserved_mb": 252.0,
+        "samples": [
+          {
+            "backward_seconds": 2.4228947709780186,
+            "forward_seconds": 6.0743202400626615,
+            "gradients_finite": true,
+            "loss_finite": true,
+            "loss_seconds": 0.0003698359942063689,
+            "no_nan_inf": true,
+            "optimizer_seconds": 0.0029365200316533446,
+            "path_dtype_correct": true,
+            "peak_allocated_bytes": 260049408,
+            "peak_reserved_bytes": 264241152,
+            "repeat": 1,
+            "steps_per_hour": 419.644013299749,
+            "total_step_seconds": 8.578699769102968
+          },
+          {
+            "backward_seconds": 2.654681756044738,
+            "forward_seconds": 8.142384473932907,
+            "gradients_finite": true,
+            "loss_finite": true,
+            "loss_seconds": 0.006984612089581788,
+            "no_nan_inf": true,
+            "optimizer_seconds": 0.0027199930045753717,
+            "path_dtype_correct": true,
+            "peak_allocated_bytes": 260049408,
+            "peak_reserved_bytes": 264241152,
+            "repeat": 2,
+            "steps_per_hour": 329.0553951381004,
+            "total_step_seconds": 10.940407156944275
+          },
+          {
+            "backward_seconds": 2.1354007810587063,
+            "forward_seconds": 7.961860966053791,
+            "gradients_finite": true,
+            "loss_finite": true,
+            "loss_seconds": 0.0007284099701792002,
+            "no_nan_inf": true,
+            "optimizer_seconds": 0.0022537229815497994,
+            "path_dtype_correct": true,
+            "peak_allocated_bytes": 260049408,
+            "peak_reserved_bytes": 264241152,
+            "repeat": 3,
+            "steps_per_hour": 354.9871804454533,
+            "total_step_seconds": 10.14121128397528
+          }
+        ],
+        "sanity_checks": {
+          "gradients_finite": true,
+          "loss_finite": true,
+          "no_nan_inf": true,
+          "path_dtype_correct": true,
+          "warmup": {
+            "gradients_finite": true,
+            "loss_dtype": "float32",
+            "loss_finite": true,
+            "no_nan_inf": true,
+            "path_dtype_correct": true,
+            "physics_q_dtype": "float32",
+            "theta_dtype": "float32"
+          }
+        },
+        "steady_state_repeats": 3,
+        "steps_per_hour": 354.9871804454533,
+        "total_step_median_seconds": 10.14121128397528,
+        "warmup_wall_seconds": 137.9263880479848
+      },
+      "fp64": {
+        "backward_median_seconds": 1.900997773045674,
+        "compile_cache": "project/autofuse/.cache/torch-fuse-fp32-audit/small-gate-structure-2-float64",
+        "compile_diagnostics": {
+          "compile_success": true,
+          "compile_time_seconds": 44.27901929395739,
+          "records": [
+            {
+              "backend": "inductor",
+              "batch_size": 100,
+              "calls": 730,
+              "cold_compile_seconds": [
+                44.27901929395739
+              ],
+              "compile_attempts": 1,
+              "compile_successes": 1,
+              "dynamo_counters": {
+                "aot_autograd": {
+                  "autograd_cache_miss": 1,
+                  "autograd_cache_saved": 1,
+                  "ok": 1,
+                  "total": 1
+                },
+                "inductor": {
+                  "async_compile_cache_hit": 108,
+                  "async_compile_cache_miss": 216,
+                  "benchmarking.InductorBenchmarker.benchmark_gpu": 155,
+                  "fxgraph_cache_miss": 2,
+                  "pattern_matcher_count": 189,
+                  "pattern_matcher_nodes": 189,
+                  "triton_bundler_save_kernel": 1848,
+                  "triton_bundler_save_static_autotuner": 2
+                },
+                "stats": {
+                  "calls_captured": 1887,
+                  "unique_graphs": 1
+                }
+              },
+              "failures": [],
+              "fallbacks": 0,
+              "forward_unique_graphs": 1,
+              "fullgraph": true,
+              "graph_breaks": 0,
+              "graph_signature": {
+                "decisions": {
+                  "ARCH1": "tension1_1",
+                  "ARCH2": "tens2pll_2",
+                  "ESOIL": "sequential",
+                  "QINTF": "intflwnone",
+                  "QPERC": "perc_f2sat",
+                  "QSURF": "arno_x_vic",
+                  "Q_TDH": "rout_gamma",
+                  "RFERR": "multiplc_e",
+                  "SNOWM": "temp_index"
+                },
+                "execution_mode": "coupled_rk2",
+                "n_substeps": 1,
+                "parameter_names": [
+                  "RFERR_MLT",
+                  "FRACTEN",
+                  "MAXWATR_1",
+                  "PERCFRAC",
+                  "FPRIMQB",
+                  "MAXWATR_2",
+                  "QBRATE_2A",
+                  "QBRATE_2B",
+                  "PERCRTE",
+                  "PERCEXP",
+                  "AXV_BEXP",
+                  "TIMEDELAY",
+                  "MBASE",
+                  "MFMAX",
+                  "MFMIN",
+                  "PXTEMP",
+                  "OPG",
+                  "LAPSE"
+                ],
+                "sequential_order": [
+                  "coupled_rhs"
+                ],
+                "state_names": [
+                  "TENS_1",
+                  "FREE_1",
+                  "TENS_2",
+                  "FREE_2A",
+                  "FREE_2B"
+                ],
+                "topology": [
+                  [
+                    "lower",
+                    [
+                      [
+                        "FREE_2A",
+                        [
+                          [
+                            "OFLOW_2A",
+                            -1
+                          ],
+                          [
+                            "QBASE_2A",
+                            -1
+                          ],
+                          [
+                            "QPERC_12*PERCFRAC/2",
+                            1
+                          ],
+                          [
+                            "TENS2FREE_2/2",
+                            1
+                          ]
+                        ]
+                      ],
+                      [
+                        "FREE_2B",
+                        [
+                          [
+                            "OFLOW_2B",
+                            -1
+                          ],
+                          [
+                            "QBASE_2B",
+                            -1
+                          ],
+                          [
+                            "QPERC_12*PERCFRAC/2",
+                            1
+                          ],
+                          [
+                            "TENS2FREE_2/2",
+                            1
+                          ]
+                        ]
+                      ],
+                      [
+                        "TENS_2",
+                        [
+                          [
+                            "EVAP_2",
+                            -1
+                          ],
+                          [
+                            "QPERC_12*(1-PERCFRAC)",
+                            1
+                          ],
+                          [
+                            "TENS2FREE_2",
+                            -1
+                          ]
+                        ]
+                      ]
+                    ]
+                  ],
+                  [
+                    "upper",
+                    [
+                      [
+                        "FREE_1",
+                        [
+                          [
+                            "OFLOW_1",
+                            -1
+                          ],
+                          [
+                            "QINTF_1",
+                            -1
+                          ],
+                          [
+                            "QPERC_12",
+                            -1
+                          ],
+                          [
+                            "TENS2FREE_1",
+                            1
+                          ]
+                        ]
+                      ],
+                      [
+                        "TENS_1",
+                        [
+                          [
+                            "EFF_PPT",
+                            1
+                          ],
+                          [
+                            "EVAP_1",
+                            -1
+                          ],
+                          [
+                            "QSURF",
+                            -1
+                          ],
+                          [
+                            "TENS2FREE_1",
+                            -1
+                          ]
+                        ]
+                      ]
+                    ]
+                  ]
+                ]
+              },
+              "graph_signature_digest": "71c2d011de746521",
+              "model_id": 2,
+              "recompilations": 0
+            }
+          ]
+        },
+        "compile_time_seconds": 44.27901929395739,
+        "dtype": "float64",
+        "forward_median_seconds": 7.250193655025214,
+        "host_peak_rss_kb": 1816044,
+        "loss_median_seconds": 0.00033415399957448244,
+        "optimizer_median_seconds": 0.0013231519842520356,
+        "peak_allocated_bytes": 470663168,
+        "peak_allocated_mb": 448.859375,
+        "peak_reserved_bytes": 473956352,
+        "peak_reserved_mb": 452.0,
+        "samples": [
+          {
+            "backward_seconds": 2.045919382944703,
+            "forward_seconds": 9.22944403195288,
+            "gradients_finite": true,
+            "loss_finite": true,
+            "loss_seconds": 0.0011063959682360291,
+            "no_nan_inf": true,
+            "optimizer_seconds": 0.0026578500401228666,
+            "path_dtype_correct": true,
+            "peak_allocated_bytes": 470663168,
+            "peak_reserved_bytes": 473956352,
+            "repeat": 1,
+            "steps_per_hour": 313.4997058781635,
+            "total_step_seconds": 11.483264361973852
+          },
+          {
+            "backward_seconds": 1.900997773045674,
+            "forward_seconds": 7.250193655025214,
+            "gradients_finite": true,
+            "loss_finite": true,
+            "loss_seconds": 0.00033415399957448244,
+            "no_nan_inf": true,
+            "optimizer_seconds": 0.0013231519842520356,
+            "path_dtype_correct": true,
+            "peak_allocated_bytes": 470663168,
+            "peak_reserved_bytes": 473956352,
+            "repeat": 2,
+            "steps_per_hour": 392.87072597371656,
+            "total_step_seconds": 9.163319539977238
+          },
+          {
+            "backward_seconds": 1.6215432370081544,
+            "forward_seconds": 4.205700507038273,
+            "gradients_finite": true,
+            "loss_finite": true,
+            "loss_seconds": 0.00021665205713361502,
+            "no_nan_inf": true,
+            "optimizer_seconds": 0.0011713039129972458,
+            "path_dtype_correct": true,
+            "peak_allocated_bytes": 470663168,
+            "peak_reserved_bytes": 473956352,
+            "repeat": 3,
+            "steps_per_hour": 616.4577260173328,
+            "total_step_seconds": 5.839816500083543
+          }
+        ],
+        "sanity_checks": {
+          "gradients_finite": true,
+          "loss_finite": true,
+          "no_nan_inf": true,
+          "path_dtype_correct": true,
+          "warmup": {
+            "gradients_finite": true,
+            "loss_dtype": "float64",
+            "loss_finite": true,
+            "no_nan_inf": true,
+            "path_dtype_correct": true,
+            "physics_q_dtype": "float64",
+            "theta_dtype": "float64"
+          }
+        },
+        "steady_state_repeats": 3,
+        "steps_per_hour": 392.87072597371656,
+        "total_step_median_seconds": 9.163319539977238,
+        "warmup_wall_seconds": 167.54001691902522
+      },
+      "model_id": 2,
+      "status": "completed"
+    },
+    {
+      "batch_hash": "dd543b1cc8f436fc0da93de2bd780b7a9879800aabb6796dcf1f9cb7db8d5a98",
+      "comparison": {
+        "allocated_memory_reduction": {
+          "bytes": 173604864,
+          "fraction": 0.4521695529139407,
+          "mb": 165.5625
+        },
+        "backward_speedup": 0.9000306834619047,
+        "forward_speedup": 0.9434027800163695,
+        "fp32_steps_per_hour": 721.2737314826468,
+        "fp64_steps_per_hour": 779.9024318482667,
+        "reserved_memory_reduction": {
+          "bytes": 174063616,
+          "fraction": 0.4486486486486487,
+          "mb": 166.0
+        },
+        "step_speedup": 0.9248255961624872
+      },
+      "fp32": {
+        "backward_median_seconds": 1.1802722689462826,
+        "compile_cache": "project/autofuse/.cache/torch-fuse-fp32-audit/small-gate-structure-8-float32",
+        "compile_diagnostics": {
+          "compile_success": true,
+          "compile_time_seconds": 21.311024383059703,
+          "records": [
+            {
+              "backend": "inductor",
+              "batch_size": 100,
+              "calls": 730,
+              "cold_compile_seconds": [
+                21.311024383059703
+              ],
+              "compile_attempts": 1,
+              "compile_successes": 1,
+              "dynamo_counters": {
+                "aot_autograd": {
+                  "autograd_cache_miss": 1,
+                  "autograd_cache_saved": 1,
+                  "ok": 1,
+                  "total": 1
+                },
+                "inductor": {
+                  "async_compile_cache_hit": 84,
+                  "async_compile_cache_miss": 168,
+                  "benchmarking.InductorBenchmarker.benchmark_gpu": 126,
+                  "fxgraph_cache_miss": 2,
+                  "pattern_matcher_count": 93,
+                  "pattern_matcher_nodes": 93,
+                  "triton_bundler_save_kernel": 167,
+                  "triton_bundler_save_static_autotuner": 2
+                },
+                "stats": {
+                  "calls_captured": 1165,
+                  "unique_graphs": 1
+                }
+              },
+              "failures": [],
+              "fallbacks": 0,
+              "forward_unique_graphs": 1,
+              "fullgraph": true,
+              "graph_breaks": 0,
+              "graph_signature": {
+                "decisions": {
+                  "ARCH1": "tension1_1",
+                  "ARCH2": "unlimfrc_2",
+                  "ESOIL": "sequential",
+                  "QINTF": "intflwnone",
+                  "QPERC": "perc_f2sat",
+                  "QSURF": "arno_x_vic",
+                  "Q_TDH": "rout_gamma",
+                  "RFERR": "multiplc_e",
+                  "SNOWM": "temp_index"
+                },
+                "execution_mode": "coupled_rk2",
+                "n_substeps": 1,
+                "parameter_names": [
+                  "RFERR_MLT",
+                  "FRACTEN",
+                  "MAXWATR_1",
+                  "MAXWATR_2",
+                  "QB_PRMS",
+                  "PERCRTE",
+                  "PERCEXP",
+                  "AXV_BEXP",
+                  "TIMEDELAY",
+                  "MBASE",
+                  "MFMAX",
+                  "MFMIN",
+                  "PXTEMP",
+                  "OPG",
+                  "LAPSE"
+                ],
+                "sequential_order": [
+                  "coupled_rhs"
+                ],
+                "state_names": [
+                  "TENS_1",
+                  "FREE_1",
+                  "WATR_2"
+                ],
+                "topology": [
+                  [
+                    "lower",
+                    [
+                      [
+                        "WATR_2",
+                        [
+                          [
+                            "EVAP_2",
+                            -1
+                          ],
+                          [
+                            "OFLOW_2",
+                            -1
+                          ],
+                          [
+                            "QBASE_2",
+                            -1
+                          ],
+                          [
+                            "QPERC_12",
+                            1
+                          ]
+                        ]
+                      ]
+                    ]
+                  ],
+                  [
+                    "upper",
+                    [
+                      [
+                        "FREE_1",
+                        [
+                          [
+                            "OFLOW_1",
+                            -1
+                          ],
+                          [
+                            "QINTF_1",
+                            -1
+                          ],
+                          [
+                            "QPERC_12",
+                            -1
+                          ],
+                          [
+                            "TENS2FREE_1",
+                            1
+                          ]
+                        ]
+                      ],
+                      [
+                        "TENS_1",
+                        [
+                          [
+                            "EFF_PPT",
+                            1
+                          ],
+                          [
+                            "EVAP_1",
+                            -1
+                          ],
+                          [
+                            "QSURF",
+                            -1
+                          ],
+                          [
+                            "TENS2FREE_1",
+                            -1
+                          ]
+                        ]
+                      ]
+                    ]
+                  ]
+                ]
+              },
+              "graph_signature_digest": "251e95e0421ee495",
+              "model_id": 8,
+              "recompilations": 0
+            }
+          ]
+        },
+        "compile_time_seconds": 21.311024383059703,
+        "dtype": "float32",
+        "forward_median_seconds": 3.7778970079962164,
+        "host_peak_rss_kb": 1954824,
+        "loss_median_seconds": 0.0003514110576361418,
+        "optimizer_median_seconds": 0.0014474280178546906,
+        "peak_allocated_bytes": 210332672,
+        "peak_allocated_mb": 200.5888671875,
+        "peak_reserved_bytes": 213909504,
+        "peak_reserved_mb": 204.0,
+        "samples": [
+          {
+            "backward_seconds": 1.104279016959481,
+            "forward_seconds": 3.644731220905669,
+            "gradients_finite": true,
+            "loss_finite": true,
+            "loss_seconds": 0.0003514110576361418,
+            "no_nan_inf": true,
+            "optimizer_seconds": 0.0010280100395902991,
+            "path_dtype_correct": true,
+            "peak_allocated_bytes": 210332672,
+            "peak_reserved_bytes": 213909504,
+            "repeat": 1,
+            "steps_per_hour": 756.5144998770061,
+            "total_step_seconds": 4.758666225941852
+          },
+          {
+            "backward_seconds": 1.1802722689462826,
+            "forward_seconds": 4.405318761011586,
+            "gradients_finite": true,
+            "loss_finite": true,
+            "loss_seconds": 0.0002604289911687374,
+            "no_nan_inf": true,
+            "optimizer_seconds": 0.0021980589954182506,
+            "path_dtype_correct": true,
+            "peak_allocated_bytes": 210332672,
+            "peak_reserved_bytes": 213909504,
+            "repeat": 2,
+            "steps_per_hour": 643.1574103174996,
+            "total_step_seconds": 5.597385557950474
+          },
+          {
+            "backward_seconds": 1.2027433390030637,
+            "forward_seconds": 3.7778970079962164,
+            "gradients_finite": true,
+            "loss_finite": true,
+            "loss_seconds": 0.0004077770281583071,
+            "no_nan_inf": true,
+            "optimizer_seconds": 0.0014474280178546906,
+            "path_dtype_correct": true,
+            "peak_allocated_bytes": 210332672,
+            "peak_reserved_bytes": 213909504,
+            "repeat": 3,
+            "steps_per_hour": 721.2737314826468,
+            "total_step_seconds": 4.991170262917876
+          }
+        ],
+        "sanity_checks": {
+          "gradients_finite": true,
+          "loss_finite": true,
+          "no_nan_inf": true,
+          "path_dtype_correct": true,
+          "warmup": {
+            "gradients_finite": true,
+            "loss_dtype": "float32",
+            "loss_finite": true,
+            "no_nan_inf": true,
+            "path_dtype_correct": true,
+            "physics_q_dtype": "float32",
+            "theta_dtype": "float32"
+          }
+        },
+        "steady_state_repeats": 3,
+        "steps_per_hour": 721.2737314826468,
+        "total_step_median_seconds": 4.991170262917876,
+        "warmup_wall_seconds": 62.74292558594607
+      },
+      "fp64": {
+        "backward_median_seconds": 1.0622812568908557,
+        "compile_cache": "project/autofuse/.cache/torch-fuse-fp32-audit/small-gate-structure-8-float64",
+        "compile_diagnostics": {
+          "compile_success": true,
+          "compile_time_seconds": 24.015750389895402,
+          "records": [
+            {
+              "backend": "inductor",
+              "batch_size": 100,
+              "calls": 730,
+              "cold_compile_seconds": [
+                24.015750389895402
+              ],
+              "compile_attempts": 1,
+              "compile_successes": 1,
+              "dynamo_counters": {
+                "aot_autograd": {
+                  "autograd_cache_miss": 1,
+                  "autograd_cache_saved": 1,
+                  "ok": 1,
+                  "total": 1
+                },
+                "inductor": {
+                  "async_compile_cache_hit": 87,
+                  "async_compile_cache_miss": 174,
+                  "benchmarking.InductorBenchmarker.benchmark_gpu": 116,
+                  "fxgraph_cache_miss": 2,
+                  "pattern_matcher_count": 93,
+                  "pattern_matcher_nodes": 93,
+                  "triton_bundler_save_kernel": 167,
+                  "triton_bundler_save_static_autotuner": 2
+                },
+                "stats": {
+                  "calls_captured": 1165,
+                  "unique_graphs": 1
+                }
+              },
+              "failures": [],
+              "fallbacks": 0,
+              "forward_unique_graphs": 1,
+              "fullgraph": true,
+              "graph_breaks": 0,
+              "graph_signature": {
+                "decisions": {
+                  "ARCH1": "tension1_1",
+                  "ARCH2": "unlimfrc_2",
+                  "ESOIL": "sequential",
+                  "QINTF": "intflwnone",
+                  "QPERC": "perc_f2sat",
+                  "QSURF": "arno_x_vic",
+                  "Q_TDH": "rout_gamma",
+                  "RFERR": "multiplc_e",
+                  "SNOWM": "temp_index"
+                },
+                "execution_mode": "coupled_rk2",
+                "n_substeps": 1,
+                "parameter_names": [
+                  "RFERR_MLT",
+                  "FRACTEN",
+                  "MAXWATR_1",
+                  "MAXWATR_2",
+                  "QB_PRMS",
+                  "PERCRTE",
+                  "PERCEXP",
+                  "AXV_BEXP",
+                  "TIMEDELAY",
+                  "MBASE",
+                  "MFMAX",
+                  "MFMIN",
+                  "PXTEMP",
+                  "OPG",
+                  "LAPSE"
+                ],
+                "sequential_order": [
+                  "coupled_rhs"
+                ],
+                "state_names": [
+                  "TENS_1",
+                  "FREE_1",
+                  "WATR_2"
+                ],
+                "topology": [
+                  [
+                    "lower",
+                    [
+                      [
+                        "WATR_2",
+                        [
+                          [
+                            "EVAP_2",
+                            -1
+                          ],
+                          [
+                            "OFLOW_2",
+                            -1
+                          ],
+                          [
+                            "QBASE_2",
+                            -1
+                          ],
+                          [
+                            "QPERC_12",
+                            1
+                          ]
+                        ]
+                      ]
+                    ]
+                  ],
+                  [
+                    "upper",
+                    [
+                      [
+                        "FREE_1",
+                        [
+                          [
+                            "OFLOW_1",
+                            -1
+                          ],
+                          [
+                            "QINTF_1",
+                            -1
+                          ],
+                          [
+                            "QPERC_12",
+                            -1
+                          ],
+                          [
+                            "TENS2FREE_1",
+                            1
+                          ]
+                        ]
+                      ],
+                      [
+                        "TENS_1",
+                        [
+                          [
+                            "EFF_PPT",
+                            1
+                          ],
+                          [
+                            "EVAP_1",
+                            -1
+                          ],
+                          [
+                            "QSURF",
+                            -1
+                          ],
+                          [
+                            "TENS2FREE_1",
+                            -1
+                          ]
+                        ]
+                      ]
+                    ]
+                  ]
+                ]
+              },
+              "graph_signature_digest": "251e95e0421ee495",
+              "model_id": 8,
+              "recompilations": 0
+            }
+          ]
+        },
+        "compile_time_seconds": 24.015750389895402,
+        "dtype": "float64",
+        "forward_median_seconds": 3.564078539959155,
+        "host_peak_rss_kb": 1953072,
+        "loss_median_seconds": 0.0012424259912222624,
+        "optimizer_median_seconds": 0.0012683169916272163,
+        "peak_allocated_bytes": 383937536,
+        "peak_allocated_mb": 366.1513671875,
+        "peak_reserved_bytes": 387973120,
+        "peak_reserved_mb": 370.0,
+        "samples": [
+          {
+            "backward_seconds": 1.3566036379197612,
+            "forward_seconds": 5.8671899570617825,
+            "gradients_finite": true,
+            "loss_finite": true,
+            "loss_seconds": 0.0012424259912222624,
+            "no_nan_inf": true,
+            "optimizer_seconds": 0.0012701689265668392,
+            "path_dtype_correct": true,
+            "peak_allocated_bytes": 383937536,
+            "peak_reserved_bytes": 387973120,
+            "repeat": 1,
+            "steps_per_hour": 497.6392330734842,
+            "total_step_seconds": 7.234156313934363
+          },
+          {
+            "backward_seconds": 1.0622812568908557,
+            "forward_seconds": 3.4416683019371703,
+            "gradients_finite": true,
+            "loss_finite": true,
+            "loss_seconds": 0.0010253259679302573,
+            "no_nan_inf": true,
+            "optimizer_seconds": 0.0012683169916272163,
+            "path_dtype_correct": true,
+            "peak_allocated_bytes": 383937536,
+            "peak_reserved_bytes": 387973120,
+            "repeat": 2,
+            "steps_per_hour": 797.1164757683764,
+            "total_step_seconds": 4.516278498107567
+          },
+          {
+            "backward_seconds": 1.0330751470755786,
+            "forward_seconds": 3.564078539959155,
+            "gradients_finite": true,
+            "loss_finite": true,
+            "loss_seconds": 0.0012558280723169446,
+            "no_nan_inf": true,
+            "optimizer_seconds": 0.0011338699841871858,
+            "path_dtype_correct": true,
+            "peak_allocated_bytes": 383937536,
+            "peak_reserved_bytes": 387973120,
+            "repeat": 3,
+            "steps_per_hour": 779.9024318482667,
+            "total_step_seconds": 4.615962013951503
+          }
+        ],
+        "sanity_checks": {
+          "gradients_finite": true,
+          "loss_finite": true,
+          "no_nan_inf": true,
+          "path_dtype_correct": true,
+          "warmup": {
+            "gradients_finite": true,
+            "loss_dtype": "float64",
+            "loss_finite": true,
+            "no_nan_inf": true,
+            "path_dtype_correct": true,
+            "physics_q_dtype": "float64",
+            "theta_dtype": "float64"
+          }
+        },
+        "steady_state_repeats": 3,
+        "steps_per_hour": 779.9024318482667,
+        "total_step_median_seconds": 4.615962013951503,
+        "warmup_wall_seconds": 66.99964182602707
+      },
+      "model_id": 8,
+      "status": "completed"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "attempt_status": "short-window attempt stopped before aggregate completion at the user-requested bounded limit",
+  "checker_failed_structure_ids": null,
+  "compile_pass_count": null,
+  "failed_structure_ids": null,
+  "failures": [],
+  "finite_pass_count": null,
+  "generated_at_utc": "2026-09-08T09:12:08.620286+00:00",
+  "protocol": {
+    "8401_day_full_rollout": "not run",
+    "dtype": "torch.float32",
+    "requested_horizon_days": 8,
+    "scope_decision": "not run / scope-reduced",
+    "structure_catalogue": "dfuse/specs/structures_78.json",
+    "structure_count_expected": 78
+  },
+  "reason": "The 78-structure short FP32 smoke was not worth further wall time after the bounded run did not finish; no result is presented as pass.",
+  "records": [],
+  "schema_version": "torch-fuse-fp32-78-structure-smoke-v1",
+  "scope_reduced": true,
+  "smoke_pass_count": null,
+  "snow_balance_checker_pass_count": null,
+  "status": "not_run / scope-reduced",
+  "structure_count": 78,
+  "water_balance_checker_pass_count": null
+}

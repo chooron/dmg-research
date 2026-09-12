@@ -1,0 +1,2833 @@
+{
+  "configuration": {
+    "perturb_fraction_of_bound_width": 0.01,
+    "threads": 1
+  },
+  "failure": null,
+  "rows": [
+    {
+      "base_value": 1.0004445314407349,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": -12.830143542995456,
+        "kge_q": -27.856470302439973,
+        "kgecomp": -20.343306922717716
+      },
+      "delta_plus": {
+        "kge_inv_q": -12.829905886541331,
+        "kge_q": -27.85732531038561,
+        "kgecomp": -20.343615598463472
+      },
+      "derivative_kge_inv_q": 11.882822706177222,
+      "derivative_kge_q": -42.750397281640915,
+      "derivative_kgecomp": -15.433787287731846,
+      "hru_id": 9447800,
+      "minus_value": 1.0004345314407348,
+      "model_id": 164,
+      "parameter": "RFERR_MLT",
+      "plus_value": 1.000454531440735,
+      "step": 2.0000000000131024e-05,
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 0.06668825447559357,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": -12.095010056688505,
+        "kge_q": -30.289557191371433,
+        "kgecomp": -21.19228362402997
+      },
+      "delta_plus": {
+        "kge_inv_q": -13.698915981067918,
+        "kge_q": -26.66853650141709,
+        "kgecomp": -20.183726241242503
+      },
+      "derivative_kge_inv_q": -89.1058846877452,
+      "derivative_kge_q": 201.1678161085746,
+      "derivative_kgecomp": 56.03096571041476,
+      "hru_id": 9447800,
+      "minus_value": 0.057688254475593566,
+      "model_id": 164,
+      "parameter": "FRACTEN",
+      "plus_value": 0.07568825447559356,
+      "step": 0.017999999999999995,
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 92.99018096923828,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": -12.959348440512144,
+        "kge_q": -28.347085934160184,
+        "kgecomp": -20.653217187336164
+      },
+      "delta_plus": {
+        "kge_inv_q": -12.6793299874139,
+        "kge_q": -27.43144570491785,
+        "kgecomp": -20.055387846165875
+      },
+      "derivative_kge_inv_q": 0.029475626641920553,
+      "derivative_kge_q": 0.09638318202550895,
+      "derivative_kgecomp": 0.06292940433371466,
+      "hru_id": 9447800,
+      "minus_value": 88.24018096923828,
+      "model_id": 164,
+      "parameter": "MAXWATR_1",
+      "plus_value": 97.74018096923828,
+      "step": 9.5,
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 4716.564453125,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": -12.985714053277988,
+        "kge_q": -27.897167365007004,
+        "kgecomp": -20.441440709142494
+      },
+      "delta_plus": {
+        "kge_inv_q": -12.688223625488376,
+        "kge_q": -27.91726502048661,
+        "kgecomp": -20.302744322987493
+      },
+      "derivative_kge_inv_q": 0.003004953816056682,
+      "derivative_kge_q": -0.00020300662100612528,
+      "derivative_kgecomp": 0.0014009735975252606,
+      "hru_id": 9447800,
+      "minus_value": 4667.064453125,
+      "model_id": 164,
+      "parameter": "MAXWATR_2",
+      "plus_value": 4766.064453125,
+      "step": 99.0,
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 27.770652770996094,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": -12.744888414540712,
+        "kge_q": -28.608370823828416,
+        "kgecomp": -20.676629619184567
+      },
+      "delta_plus": {
+        "kge_inv_q": -13.15211778354159,
+        "kge_q": -27.22064349831823,
+        "kgecomp": -20.186380640929908
+      },
+      "derivative_kge_inv_q": -0.020361488811532664,
+      "derivative_kge_q": 0.06938643566194505,
+      "derivative_kgecomp": 0.02451247342520637,
+      "hru_id": 9447800,
+      "minus_value": 17.770662770996093,
+      "model_id": 164,
+      "parameter": "BASERTE",
+      "plus_value": 37.77064277099609,
+      "step": 19.999979999999997,
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 1.3977631330490112,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": -13.12070722960446,
+        "kge_q": -27.03197524265743,
+        "kgecomp": -20.076341236130943
+      },
+      "delta_plus": {
+        "kge_inv_q": -12.337997402691835,
+        "kge_q": -28.558640597157357,
+        "kgecomp": -20.4483189999246
+      },
+      "derivative_kge_inv_q": 4.348387927292353,
+      "derivative_kge_q": -8.481474191666248,
+      "derivative_kgecomp": -2.0665431321869714,
+      "hru_id": 9447800,
+      "minus_value": 1.3077631330490112,
+      "model_id": 164,
+      "parameter": "QB_POWR",
+      "plus_value": 1.4877631330490113,
+      "step": 0.18000000000000016,
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 42.87805938720703,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": -12.829578649896613,
+        "kge_q": -27.848645271478446,
+        "kgecomp": -20.33911196068753
+      },
+      "delta_plus": {
+        "kge_inv_q": -12.830498815634861,
+        "kge_q": -27.864296927894376,
+        "kgecomp": -20.347397871764617
+      },
+      "derivative_kge_inv_q": -0.0001847722365961269,
+      "derivative_kge_q": -0.003142902894764996,
+      "derivative_kgecomp": -0.0016638375656803832,
+      "hru_id": 9447800,
+      "minus_value": 40.38805938720703,
+      "model_id": 164,
+      "parameter": "SACPMLT",
+      "plus_value": 45.36805938720703,
+      "step": 4.980000000000004,
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 2.226405143737793,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": -12.830065451204117,
+        "kge_q": -27.85697446433682,
+        "kgecomp": -20.343519957770468
+      },
+      "delta_plus": {
+        "kge_inv_q": -12.830061144453623,
+        "kge_q": -27.856830731608888,
+        "kgecomp": -20.343445938031252
+      },
+      "derivative_kge_inv_q": 5.38343811751218e-05,
+      "derivative_kge_q": 0.0017966590991402838,
+      "derivative_kgecomp": 0.0009252467402021116,
+      "hru_id": 9447800,
+      "minus_value": 2.186405143737793,
+      "model_id": 164,
+      "parameter": "SACPEXP",
+      "plus_value": 2.266405143737793,
+      "step": 0.08000000000000007,
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 0.3399009704589844,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": 0.011298018798105991,
+        "kge_q": 3.5810248227278625,
+        "kgecomp": 1.7961614207629841
+      },
+      "delta_plus": {
+        "kge_inv_q": 0.000718297839826687,
+        "kge_q": 3.7318661604831376,
+        "kgecomp": 1.8662922291614823
+      },
+      "derivative_kge_inv_q": -0.5877622754599608,
+      "derivative_kge_q": 8.380074319737497,
+      "derivative_kgecomp": 3.8961560221387836,
+      "hru_id": 9447800,
+      "minus_value": 0.33090097045898437,
+      "model_id": 166,
+      "parameter": "FRCHZNE",
+      "plus_value": 0.3489009704589844,
+      "step": 0.018000000000000016,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 496.0188293457031,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": 0.010420531831513813,
+        "kge_q": 3.7073587526254514,
+        "kgecomp": 1.8588896422284829
+      },
+      "delta_plus": {
+        "kge_inv_q": 0.007602938574835183,
+        "kge_q": 3.646011500553859,
+        "kgecomp": 1.8268072195643472
+      },
+      "derivative_kge_inv_q": -0.0003227050951400207,
+      "derivative_kge_q": -0.007026234453612664,
+      "derivative_kgecomp": -0.0036744697743763487,
+      "hru_id": 9447800,
+      "minus_value": 491.2688293457031,
+      "model_id": 166,
+      "parameter": "MAXWATR_1",
+      "plus_value": 500.0,
+      "step": 8.731170654296875,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 0.44651445746421814,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": 0.009081576714918937,
+        "kge_q": 3.6695108531610305,
+        "kgecomp": 1.8392962149379748
+      },
+      "delta_plus": {
+        "kge_inv_q": 0.009081576714918937,
+        "kge_q": 3.6695108531610305,
+        "kgecomp": 1.8392962149379748
+      },
+      "derivative_kge_inv_q": 0.0,
+      "derivative_kge_q": 0.0,
+      "derivative_kgecomp": 0.0,
+      "hru_id": 9447800,
+      "minus_value": 0.43751445746421813,
+      "model_id": 166,
+      "parameter": "FRACLOWZ",
+      "plus_value": 0.45551445746421815,
+      "step": 0.018000000000000016,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 2561.3408203125,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": 0.0091681441447784,
+        "kge_q": 3.6656262041577437,
+        "kgecomp": 1.8373971741512611
+      },
+      "delta_plus": {
+        "kge_inv_q": 0.008948620706781263,
+        "kge_q": 3.673281040407948,
+        "kgecomp": 1.8411148305573646
+      },
+      "derivative_kge_inv_q": -2.2174084646175534e-06,
+      "derivative_kge_q": 7.732157828489135e-05,
+      "derivative_kgecomp": 3.755208491013578e-05,
+      "hru_id": 9447800,
+      "minus_value": 2511.8408203125,
+      "model_id": 166,
+      "parameter": "MAXWATR_2",
+      "plus_value": 2610.8408203125,
+      "step": 99.0,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 380.25933837890625,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": 0.004041379670962075,
+        "kge_q": 3.6621894215654507,
+        "kgecomp": 1.8331154006182064
+      },
+      "delta_plus": {
+        "kge_inv_q": 0.013873274950373493,
+        "kge_q": 3.6766012845568397,
+        "kgecomp": 1.8452372797536065
+      },
+      "derivative_kge_inv_q": 0.0004915952555658252,
+      "derivative_kge_q": 0.0007205938701633168,
+      "derivative_kgecomp": 0.0006060945628645655,
+      "hru_id": 9447800,
+      "minus_value": 370.2593483789062,
+      "model_id": 166,
+      "parameter": "BASERTE",
+      "plus_value": 390.2593283789063,
+      "step": 19.99998000000005,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 175.82972717285156,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": 0.008969755546774816,
+        "kge_q": 3.669374619867307,
+        "kgecomp": 1.839172187707041
+      },
+      "delta_plus": {
+        "kge_inv_q": 0.009193505791995848,
+        "kge_q": 3.6696471371494237,
+        "kgecomp": 1.8394203214707097
+      },
+      "derivative_kge_inv_q": 4.492976811667307e-05,
+      "derivative_kge_q": 5.472234580653082e-05,
+      "derivative_kgecomp": 4.9826056961568505e-05,
+      "hru_id": 9447800,
+      "minus_value": 173.33972717285155,
+      "model_id": 166,
+      "parameter": "SACPMLT",
+      "plus_value": 178.31972717285157,
+      "step": 4.980000000000018,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 1.7365739345550537,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": 0.009169213402853149,
+        "kge_q": 3.669619631027758,
+        "kgecomp": 1.8393944222153056
+      },
+      "delta_plus": {
+        "kge_inv_q": 0.008994974711217352,
+        "kge_q": 3.6694033147304097,
+        "kgecomp": 1.8391991447208136
+      },
+      "derivative_kge_inv_q": -0.002177983645447466,
+      "derivative_kge_q": -0.0027039537168538326,
+      "derivative_kgecomp": -0.0024409686811499554,
+      "hru_id": 9447800,
+      "minus_value": 1.6965739345550537,
+      "model_id": 166,
+      "parameter": "SACPEXP",
+      "plus_value": 1.7765739345550537,
+      "step": 0.08000000000000007,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 231.4119873046875,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": -2.456386044219114,
+        "kge_q": 0.21853288039955032,
+        "kgecomp": -1.1189265819097818
+      },
+      "delta_plus": {
+        "kge_inv_q": -2.5435911156308606,
+        "kge_q": 0.20605950453987676,
+        "kgecomp": -1.1687658055454921
+      },
+      "derivative_kge_inv_q": -0.009179481201236496,
+      "derivative_kge_q": -0.0013129869325972173,
+      "derivative_kgecomp": -0.00524623406691688,
+      "hru_id": 9447800,
+      "minus_value": 226.6619873046875,
+      "model_id": 188,
+      "parameter": "MAXWATR_1",
+      "plus_value": 236.1619873046875,
+      "step": 9.5,
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 4901.28662109375,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": -2.5232308853061642,
+        "kge_q": 0.21194341747574685,
+        "kgecomp": -1.155643733915209
+      },
+      "delta_plus": {
+        "kge_inv_q": -2.4913954640004796,
+        "kge_q": 0.2123202956041893,
+        "kgecomp": -1.1395375841981457
+      },
+      "derivative_kge_inv_q": 0.0003215699121786325,
+      "derivative_kge_q": 3.806849782246952e-06,
+      "derivative_kgecomp": 0.00016268838098043806,
+      "hru_id": 9447800,
+      "minus_value": 4851.78662109375,
+      "model_id": 188,
+      "parameter": "MAXWATR_2",
+      "plus_value": 4950.78662109375,
+      "step": 99.0,
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 50.95006561279297,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": -2.514569969042048,
+        "kge_q": 0.2114217477818492,
+        "kgecomp": -1.1515741106300994
+      },
+      "delta_plus": {
+        "kge_inv_q": -2.5057382781429123,
+        "kge_q": 0.21277517548342917,
+        "kgecomp": -1.1464815513297415
+      },
+      "derivative_kge_inv_q": 0.00044158498654178345,
+      "derivative_kge_q": 6.767145275045172e-05,
+      "derivative_kgecomp": 0.0002546282196461148,
+      "hru_id": 9447800,
+      "minus_value": 40.95007561279297,
+      "model_id": 188,
+      "parameter": "BASERTE",
+      "plus_value": 60.950055612792966,
+      "step": 19.999979999999994,
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 20.35785675048828,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": -2.507367936533786,
+        "kge_q": 0.21212734227158603,
+        "kgecomp": -1.1476202971310996
+      },
+      "delta_plus": {
+        "kge_inv_q": -2.5074465187498145,
+        "kge_q": 0.21212772040740835,
+        "kgecomp": -1.1476593991712027
+      },
+      "derivative_kge_inv_q": -1.5779561451510452e-05,
+      "derivative_kge_q": 7.593088801625199e-08,
+      "derivative_kgecomp": -7.851815281758247e-06,
+      "hru_id": 9447800,
+      "minus_value": 17.86785675048828,
+      "model_id": 188,
+      "parameter": "SACPMLT",
+      "plus_value": 22.847856750488283,
+      "step": 4.980000000000004,
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 2.327836036682129,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": -2.50741159293322,
+        "kge_q": 0.21212755122138893,
+        "kgecomp": -1.1476420208559155
+      },
+      "delta_plus": {
+        "kge_inv_q": -2.507411409773832,
+        "kge_q": 0.21212755033495656,
+        "kgecomp": -1.1476419297194376
+      },
+      "derivative_kge_inv_q": 2.2894923512595234e-06,
+      "derivative_kge_q": -1.1080404649366206e-08,
+      "derivative_kgecomp": 1.139205973998968e-06,
+      "hru_id": 9447800,
+      "minus_value": 2.287836036682129,
+      "model_id": 188,
+      "parameter": "SACPEXP",
+      "plus_value": 2.367836036682129,
+      "step": 0.08000000000000007,
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 0.24803373217582703,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": -0.24304580752291538,
+        "kge_q": -3.88248206221427,
+        "kgecomp": -2.0627639348685927
+      },
+      "delta_plus": {
+        "kge_inv_q": -0.24606446841390406,
+        "kge_q": -2.886238307132243,
+        "kgecomp": -1.5661513877730733
+      },
+      "derivative_kge_inv_q": -0.1677033828327042,
+      "derivative_kge_q": 55.3468752823348,
+      "derivative_kgecomp": 27.58958594975105,
+      "hru_id": 9447800,
+      "minus_value": 0.23903373217582702,
+      "model_id": 190,
+      "parameter": "FRCHZNE",
+      "plus_value": 0.25703373217582703,
+      "step": 0.018000000000000016,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 480.9922180175781,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": -0.239854949568453,
+        "kge_q": -3.5131752702578285,
+        "kgecomp": -1.876515109913141
+      },
+      "delta_plus": {
+        "kge_inv_q": -0.24290752450193542,
+        "kge_q": -3.2384535206415643,
+        "kgecomp": -1.7406805225717499
+      },
+      "derivative_kge_inv_q": -0.0003213236772086771,
+      "derivative_kge_q": 0.028918078906975175,
+      "derivative_kgecomp": 0.014298377614883272,
+      "hru_id": 9447800,
+      "minus_value": 476.2422180175781,
+      "model_id": 190,
+      "parameter": "MAXWATR_1",
+      "plus_value": 485.7422180175781,
+      "step": 9.5,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 0.06740617007017136,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": -0.24031012692471743,
+        "kge_q": -3.376109174731056,
+        "kgecomp": -1.8082096508278866
+      },
+      "delta_plus": {
+        "kge_inv_q": -0.24031012692471743,
+        "kge_q": -3.376109174731056,
+        "kgecomp": -1.8082096508278866
+      },
+      "derivative_kge_inv_q": 0.0,
+      "derivative_kge_q": 0.0,
+      "derivative_kgecomp": 0.0,
+      "hru_id": 9447800,
+      "minus_value": 0.058406170070171355,
+      "model_id": 190,
+      "parameter": "FRACLOWZ",
+      "plus_value": 0.07640617007017135,
+      "step": 0.017999999999999995,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 1130.174072265625,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": -0.26779671097241664,
+        "kge_q": -3.378798384555471,
+        "kgecomp": -1.823297547763944
+      },
+      "delta_plus": {
+        "kge_inv_q": -0.21457868354172605,
+        "kge_q": -3.3732825980688466,
+        "kgecomp": -1.7939306408052862
+      },
+      "derivative_kge_inv_q": 0.0005375558326332383,
+      "derivative_kge_q": 5.5715015016410625e-05,
+      "derivative_kgecomp": 0.0002966354238248256,
+      "hru_id": 9447800,
+      "minus_value": 1080.674072265625,
+      "model_id": 190,
+      "parameter": "MAXWATR_2",
+      "plus_value": 1179.674072265625,
+      "step": 99.0,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 439.97003173828125,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": -0.23422387988724147,
+        "kge_q": -3.3760680728444936,
+        "kgecomp": -1.8051459763658677
+      },
+      "delta_plus": {
+        "kge_inv_q": -0.2464314340095981,
+        "kge_q": -3.376139462232097,
+        "kgecomp": -1.8112854481208476
+      },
+      "derivative_kge_inv_q": -0.0006103783164961466,
+      "derivative_kge_q": -3.569472949633169e-06,
+      "derivative_kgecomp": -0.00030697389472288713,
+      "hru_id": 9447800,
+      "minus_value": 429.9700417382812,
+      "model_id": 190,
+      "parameter": "BASERTE",
+      "plus_value": 449.9700217382813,
+      "step": 19.99998000000005,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 159.0006866455078,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": -0.23841730729130584,
+        "kge_q": -3.3762974778213417,
+        "kgecomp": -1.8073573925563238
+      },
+      "delta_plus": {
+        "kge_inv_q": -0.24219451575111028,
+        "kge_q": -3.3759206849107724,
+        "kgecomp": -1.8090576003309415
+      },
+      "derivative_kge_inv_q": -0.00075847559433824,
+      "derivative_kge_q": 7.566122702195892e-05,
+      "derivative_kgecomp": -0.0003414071836581851,
+      "hru_id": 9447800,
+      "minus_value": 156.5106866455078,
+      "model_id": 190,
+      "parameter": "SACPMLT",
+      "plus_value": 161.49068664550782,
+      "step": 4.980000000000018,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 3.3376340866088867,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": -0.2406729531697962,
+        "kge_q": -3.3760721461859466,
+        "kgecomp": -1.8083725496778713
+      },
+      "delta_plus": {
+        "kge_inv_q": -0.23994814942296694,
+        "kge_q": -3.376146084337125,
+        "kgecomp": -1.808047116880046
+      },
+      "derivative_kge_inv_q": 0.009060046835365756,
+      "derivative_kge_q": -0.0009242268897313713,
+      "derivative_kgecomp": 0.004067909972815805,
+      "hru_id": 9447800,
+      "minus_value": 3.2976340866088867,
+      "model_id": 190,
+      "parameter": "SACPEXP",
+      "plus_value": 3.3776340866088868,
+      "step": 0.08000000000000007,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 90.98917388916016,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": -1.3167672560896182,
+        "kge_q": -1.696407951988705,
+        "kgecomp": -1.5065876040391615
+      },
+      "delta_plus": {
+        "kge_inv_q": -1.4255434320539804,
+        "kge_q": -1.357432070171534,
+        "kgecomp": -1.3914877511127572
+      },
+      "derivative_kge_inv_q": -0.011450123785722334,
+      "derivative_kge_q": 0.03568167177022851,
+      "derivative_kgecomp": 0.012115773992253076,
+      "hru_id": 9447800,
+      "minus_value": 86.23917388916016,
+      "model_id": 212,
+      "parameter": "MAXWATR_1",
+      "plus_value": 95.73917388916016,
+      "step": 9.5,
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 3032.979736328125,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": -1.6480367510466243,
+        "kge_q": -1.4317301031155383,
+        "kgecomp": -1.5398834270810813
+      },
+      "delta_plus": {
+        "kge_inv_q": -1.589266782721229,
+        "kge_q": -1.4392236290784983,
+        "kgecomp": -1.5142452058998637
+      },
+      "derivative_kge_inv_q": 0.0005936360436908613,
+      "derivative_kge_q": -7.569218144404087e-05,
+      "derivative_kgecomp": 0.00025897193112341024,
+      "hru_id": 9447800,
+      "minus_value": 2983.479736328125,
+      "model_id": 212,
+      "parameter": "MAXWATR_2",
+      "plus_value": 3082.479736328125,
+      "step": 99.0,
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 947.9307861328125,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": -1.620715708227485,
+        "kge_q": -1.4393759075703576,
+        "kgecomp": -1.5300458078989214
+      },
+      "delta_plus": {
+        "kge_inv_q": -1.617440847048338,
+        "kge_q": -1.431794926505729,
+        "kgecomp": -1.5246178867770335
+      },
+      "derivative_kge_inv_q": 0.00016374322270057748,
+      "derivative_kge_q": 0.00037904943228085966,
+      "derivative_kgecomp": 0.00027139632749072413,
+      "hru_id": 9447800,
+      "minus_value": 937.9307961328125,
+      "model_id": 212,
+      "parameter": "BASERTE",
+      "plus_value": 957.9307761328125,
+      "step": 19.99998000000005,
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 81.58415985107422,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": -1.6129745507476927,
+        "kge_q": -1.4364283574948118,
+        "kgecomp": -1.5247014541212525
+      },
+      "delta_plus": {
+        "kge_inv_q": -1.6250404656474178,
+        "kge_q": -1.4347014967676919,
+        "kgecomp": -1.529870981207555
+      },
+      "derivative_kge_inv_q": -0.0024228744778564473,
+      "derivative_kge_q": 0.0003467591821525944,
+      "derivative_kgecomp": -0.0010380576478519264,
+      "hru_id": 9447800,
+      "minus_value": 79.09415985107422,
+      "model_id": 212,
+      "parameter": "SACPMLT",
+      "plus_value": 84.07415985107421,
+      "step": 4.97999999999999,
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 3.733793258666992,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": -1.6190527033368995,
+        "kge_q": -1.435554020645239,
+        "kgecomp": -1.5273033619910694
+      },
+      "delta_plus": {
+        "kge_inv_q": -1.618988741332676,
+        "kge_q": -1.435575937943141,
+        "kgecomp": -1.5272823396379087
+      },
+      "derivative_kge_inv_q": 0.0007995250527942358,
+      "derivative_kge_q": -0.00027396622377384694,
+      "derivative_kgecomp": 0.0002627794145088067,
+      "hru_id": 9447800,
+      "minus_value": 3.693793258666992,
+      "model_id": 212,
+      "parameter": "SACPEXP",
+      "plus_value": 3.7737932586669922,
+      "step": 0.08000000000000007,
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 7.964072227478027,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": -1.6192505900793595,
+        "kge_q": -1.4354421581236876,
+        "kgecomp": -1.5273463741015232
+      },
+      "delta_plus": {
+        "kge_inv_q": -1.6187670581107043,
+        "kge_q": -1.4357040228517244,
+        "kgecomp": -1.5272355404812143
+      },
+      "derivative_kge_inv_q": 0.00483531968655135,
+      "derivative_kge_q": -0.0026186472803679667,
+      "derivative_kgecomp": 0.0011083362030883611,
+      "hru_id": 9447800,
+      "minus_value": 7.9140722274780275,
+      "model_id": 212,
+      "parameter": "LOGLAMB",
+      "plus_value": 8.014072227478028,
+      "step": 0.10000000000000053,
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 2.7227680683135986,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": -1.6187378299217006,
+        "kge_q": -1.4357292611396457,
+        "kgecomp": -1.5272335455306731
+      },
+      "delta_plus": {
+        "kge_inv_q": -1.619278640488765,
+        "kge_q": -1.435417108669958,
+        "kgecomp": -1.5273478745793616
+      },
+      "derivative_kge_inv_q": -0.009013509451072436,
+      "derivative_kge_q": 0.005202541161460569,
+      "derivative_kgecomp": -0.0019054841448077836,
+      "hru_id": 9447800,
+      "minus_value": 2.692768068313599,
+      "model_id": 212,
+      "parameter": "TISHAPE",
+      "plus_value": 2.7527680683135984,
+      "step": 0.05999999999999961,
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 0.4598813056945801,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": -0.24498756163034374,
+        "kge_q": -0.16321160397662315,
+        "kgecomp": -0.20409958280348345
+      },
+      "delta_plus": {
+        "kge_inv_q": -0.22189589219975459,
+        "kge_q": -0.18588524163555453,
+        "kgecomp": -0.20389056691765456
+      },
+      "derivative_kge_inv_q": 1.2828705239216187,
+      "derivative_kge_q": -1.2596465366072978,
+      "derivative_kgecomp": 0.011611993657160506,
+      "hru_id": 9447800,
+      "minus_value": 0.45088130569458007,
+      "model_id": 214,
+      "parameter": "FRCHZNE",
+      "plus_value": 0.4688813056945801,
+      "step": 0.018000000000000016,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 293.5545959472656,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": -0.20269789842428543,
+        "kge_q": -0.16216095244594486,
+        "kgecomp": -0.18242942543511514
+      },
+      "delta_plus": {
+        "kge_inv_q": -0.2656132340492886,
+        "kge_q": -0.14165191125010912,
+        "kgecomp": -0.20363257264969886
+      },
+      "derivative_kge_inv_q": -0.006622666907895071,
+      "derivative_kge_q": 0.0021588464416669203,
+      "derivative_kgecomp": -0.0022319102331140755,
+      "hru_id": 9447800,
+      "minus_value": 288.8045959472656,
+      "model_id": 214,
+      "parameter": "MAXWATR_1",
+      "plus_value": 298.3045959472656,
+      "step": 9.5,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 0.6230536699295044,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": -0.23255814510832984,
+        "kge_q": -0.17213581405869127,
+        "kgecomp": -0.20234697958351056
+      },
+      "delta_plus": {
+        "kge_inv_q": -0.23255814510832984,
+        "kge_q": -0.17213581405869127,
+        "kgecomp": -0.20234697958351056
+      },
+      "derivative_kge_inv_q": 0.0,
+      "derivative_kge_q": 0.0,
+      "derivative_kgecomp": 0.0,
+      "hru_id": 9447800,
+      "minus_value": 0.6140536699295044,
+      "model_id": 214,
+      "parameter": "FRACLOWZ",
+      "plus_value": 0.6320536699295044,
+      "step": 0.018000000000000016,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 425.62078857421875,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": -0.4107513343760224,
+        "kge_q": -0.14103020968754332,
+        "kgecomp": -0.27589077203178286
+      },
+      "delta_plus": {
+        "kge_inv_q": -0.09362067255487139,
+        "kge_q": -0.2004789444481243,
+        "kgecomp": -0.14704980850149785
+      },
+      "derivative_kge_inv_q": 0.0032033400183954647,
+      "derivative_kge_q": -0.0006004922703088988,
+      "derivative_kgecomp": 0.001301423874043283,
+      "hru_id": 9447800,
+      "minus_value": 376.12078857421875,
+      "model_id": 214,
+      "parameter": "MAXWATR_2",
+      "plus_value": 475.12078857421875,
+      "step": 99.0,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 201.31922912597656,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": -0.2271673937274833,
+        "kge_q": -0.1766993638881793,
+        "kgecomp": -0.2019333788078313
+      },
+      "delta_plus": {
+        "kge_inv_q": -0.237759696917913,
+        "kge_q": -0.1678189539880761,
+        "kgecomp": -0.20278932545299455
+      },
+      "derivative_kge_inv_q": -0.0005296156891371742,
+      "derivative_kge_q": 0.0004440209390260988,
+      "derivative_kgecomp": -4.279737505553769e-05,
+      "hru_id": 9447800,
+      "minus_value": 191.31923912597657,
+      "model_id": 214,
+      "parameter": "BASERTE",
+      "plus_value": 211.31921912597656,
+      "step": 19.999979999999994,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 66.13705444335938,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": -0.23256133472730822,
+        "kge_q": -0.17213238381518403,
+        "kgecomp": -0.20234685927124613
+      },
+      "delta_plus": {
+        "kge_inv_q": -0.23255516059079118,
+        "kge_q": -0.1721390150832398,
+        "kgecomp": -0.2023470878370155
+      },
+      "derivative_kge_inv_q": 1.2397864492058939e-06,
+      "derivative_kge_q": -1.3315799308793101e-06,
+      "derivative_kgecomp": -4.589674083670814e-08,
+      "hru_id": 9447800,
+      "minus_value": 63.64705444335937,
+      "model_id": 214,
+      "parameter": "SACPMLT",
+      "plus_value": 68.62705444335937,
+      "step": 4.979999999999997,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 4.310977935791016,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": -0.23255701733202683,
+        "kge_q": -0.1721369424057957,
+        "kgecomp": -0.20234697986891126
+      },
+      "delta_plus": {
+        "kge_inv_q": -0.23255928195125752,
+        "kge_q": -0.1721346759362914,
+        "kgecomp": -0.20234697894377446
+      },
+      "derivative_kge_inv_q": -2.830774038370396e-05,
+      "derivative_kge_q": 2.8330868803716468e-05,
+      "derivative_kgecomp": 1.1564210006254062e-08,
+      "hru_id": 9447800,
+      "minus_value": 4.270977935791016,
+      "model_id": 214,
+      "parameter": "SACPEXP",
+      "plus_value": 4.350977935791016,
+      "step": 0.08000000000000007,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 9.156749725341797,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": -0.22968650181349737,
+        "kge_q": -0.16727406160252722,
+        "kgecomp": -0.1984802817080123
+      },
+      "delta_plus": {
+        "kge_inv_q": -0.23529888682966604,
+        "kge_q": -0.1770235687873427,
+        "kgecomp": -0.20616122780850438
+      },
+      "derivative_kge_inv_q": -0.05612385016168595,
+      "derivative_kge_q": -0.09749507184815348,
+      "derivative_kgecomp": -0.07680946100491971,
+      "hru_id": 9447800,
+      "minus_value": 9.106749725341796,
+      "model_id": 214,
+      "parameter": "LOGLAMB",
+      "plus_value": 9.206749725341798,
+      "step": 0.10000000000000142,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 4.9135284423828125,
+      "basin_id": "USA_09447800",
+      "delta_minus": {
+        "kge_inv_q": -0.2339122544988791,
+        "kge_q": -0.17452121518362373,
+        "kgecomp": -0.2042167348412514
+      },
+      "delta_plus": {
+        "kge_inv_q": -0.231185808566027,
+        "kge_q": -0.16977865760884092,
+        "kgecomp": -0.20048223308743396
+      },
+      "derivative_kge_inv_q": 0.04544076554753454,
+      "derivative_kge_q": 0.07904262624637956,
+      "derivative_kgecomp": 0.06224169589695705,
+      "hru_id": 9447800,
+      "minus_value": 4.883528442382812,
+      "model_id": 214,
+      "parameter": "TISHAPE",
+      "plus_value": 4.943528442382813,
+      "step": 0.0600000000000005,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 257.55828857421875,
+      "basin_id": "USA_14138900",
+      "delta_minus": {
+        "kge_inv_q": -0.001757848576738108,
+        "kge_q": 0.22854957767034567,
+        "kgecomp": 0.11339586454680373
+      },
+      "delta_plus": {
+        "kge_inv_q": -0.00020052904515166503,
+        "kge_q": 0.22691187670285184,
+        "kgecomp": 0.11335567382885003
+      },
+      "derivative_kge_inv_q": 0.00016392837174594136,
+      "derivative_kge_q": -0.000172389575525666,
+      "derivative_kgecomp": -4.230601889862316e-06,
+      "hru_id": 14138900,
+      "minus_value": 252.80828857421875,
+      "model_id": 164,
+      "parameter": "MAXWATR_1",
+      "plus_value": 262.30828857421875,
+      "step": 9.5,
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 3986.0537109375,
+      "basin_id": "USA_14138900",
+      "delta_minus": {
+        "kge_inv_q": -0.01788098274608141,
+        "kge_q": 0.2266210944740883,
+        "kgecomp": 0.10437005586400339
+      },
+      "delta_plus": {
+        "kge_inv_q": 0.01560328899861163,
+        "kge_q": 0.22862266113130536,
+        "kgecomp": 0.12211297506495844
+      },
+      "derivative_kge_inv_q": 0.0003382249671181115,
+      "derivative_kge_q": 2.0217845022394634e-05,
+      "derivative_kgecomp": 0.00017922140607025308,
+      "hru_id": 14138900,
+      "minus_value": 3936.5537109375,
+      "model_id": 164,
+      "parameter": "MAXWATR_2",
+      "plus_value": 4035.5537109375,
+      "step": 99.0,
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 533.3848266601562,
+      "basin_id": "USA_14138900",
+      "delta_minus": {
+        "kge_inv_q": 0.006709828944783225,
+        "kge_q": 0.2281402950146365,
+        "kgecomp": 0.11742506197970981
+      },
+      "delta_plus": {
+        "kge_inv_q": -0.00838450804868196,
+        "kge_q": 0.22712722116456618,
+        "kgecomp": 0.10937135655794206
+      },
+      "derivative_kge_inv_q": -0.0007547176043908617,
+      "derivative_kge_q": -5.065374315725918e-05,
+      "derivative_kgecomp": -0.0004026856737740605,
+      "hru_id": 14138900,
+      "minus_value": 523.3848366601562,
+      "model_id": 164,
+      "parameter": "BASERTE",
+      "plus_value": 543.3848166601563,
+      "step": 19.99998000000005,
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 131.9422607421875,
+      "basin_id": "USA_14138900",
+      "delta_minus": {
+        "kge_inv_q": -0.000878557911942135,
+        "kge_q": 0.22762743565107624,
+        "kgecomp": 0.113374438869567
+      },
+      "delta_plus": {
+        "kge_inv_q": -0.0008742991661168098,
+        "kge_q": 0.2276314793395855,
+        "kgecomp": 0.11337859008673434
+      },
+      "derivative_kge_inv_q": 8.551698444427981e-07,
+      "derivative_kge_q": 8.119856444294622e-07,
+      "derivative_kgecomp": 8.335777444472769e-07,
+      "hru_id": 14138900,
+      "minus_value": 129.4522607421875,
+      "model_id": 164,
+      "parameter": "SACPMLT",
+      "plus_value": 134.4322607421875,
+      "step": 4.980000000000018,
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 2.069650173187256,
+      "basin_id": "USA_14138900",
+      "delta_minus": {
+        "kge_inv_q": -0.0008756026297715991,
+        "kge_q": 0.22763057862642944,
+        "kgecomp": 0.11337748799832892
+      },
+      "delta_plus": {
+        "kge_inv_q": -0.0008772388937167142,
+        "kge_q": 0.22762840604688306,
+        "kgecomp": 0.11337558357658306
+      },
+      "derivative_kge_inv_q": -2.045329931393834e-05,
+      "derivative_kge_q": -2.7157244329722972e-05,
+      "derivative_kgecomp": -2.3805271823218434e-05,
+      "hru_id": 14138900,
+      "minus_value": 2.029650173187256,
+      "model_id": 164,
+      "parameter": "SACPEXP",
+      "plus_value": 2.109650173187256,
+      "step": 0.08000000000000007,
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 0.8760437965393066,
+      "basin_id": "USA_14138900",
+      "delta_minus": {
+        "kge_inv_q": -0.525629601992304,
+        "kge_q": 0.2042208021583528,
+        "kgecomp": -0.1607043999169756
+      },
+      "delta_plus": {
+        "kge_inv_q": -0.535712043900599,
+        "kge_q": 0.20556534013756833,
+        "kgecomp": -0.1650733518815154
+      },
+      "derivative_kge_inv_q": -0.5601356615719435,
+      "derivative_kge_q": 0.07469655440086222,
+      "derivative_kgecomp": -0.24271955358554373,
+      "hru_id": 14138900,
+      "minus_value": 0.8670437965393066,
+      "model_id": 166,
+      "parameter": "FRCHZNE",
+      "plus_value": 0.8850437965393066,
+      "step": 0.018000000000000016,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 103.56392669677734,
+      "basin_id": "USA_14138900",
+      "delta_minus": {
+        "kge_inv_q": -0.5483313607409778,
+        "kge_q": 0.20493643766055825,
+        "kgecomp": -0.17169746154020982
+      },
+      "delta_plus": {
+        "kge_inv_q": -0.5152953943880646,
+        "kge_q": 0.20494349199102768,
+        "kgecomp": -0.15517595119851846
+      },
+      "derivative_kge_inv_q": 0.003477470142411913,
+      "derivative_kge_q": 7.425611020458876e-07,
+      "derivative_kgecomp": 0.0017391063517569851,
+      "hru_id": 14138900,
+      "minus_value": 98.81392669677734,
+      "model_id": 166,
+      "parameter": "MAXWATR_1",
+      "plus_value": 108.31392669677734,
+      "step": 9.5,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 0.9094043374061584,
+      "basin_id": "USA_14138900",
+      "delta_minus": {
+        "kge_inv_q": -0.5307402376558303,
+        "kge_q": 0.20428281511616897,
+        "kgecomp": -0.16322871126983074
+      },
+      "delta_plus": {
+        "kge_inv_q": -0.5307402376558303,
+        "kge_q": 0.20428281511616897,
+        "kgecomp": -0.16322871126983074
+      },
+      "derivative_kge_inv_q": 0.0,
+      "derivative_kge_q": 0.0,
+      "derivative_kgecomp": 0.0,
+      "hru_id": 14138900,
+      "minus_value": 0.9004043374061584,
+      "model_id": 166,
+      "parameter": "FRACLOWZ",
+      "plus_value": 0.9184043374061585,
+      "step": 0.018000000000000016,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 2869.80517578125,
+      "basin_id": "USA_14138900",
+      "delta_minus": {
+        "kge_inv_q": -0.546085607479239,
+        "kge_q": 0.2026290417582508,
+        "kgecomp": -0.17172828286049413
+      },
+      "delta_plus": {
+        "kge_inv_q": -0.513026218448953,
+        "kge_q": 0.20590487760066545,
+        "kgecomp": -0.15356067042414379
+      },
+      "derivative_kge_inv_q": 0.00033393322252814073,
+      "derivative_kge_q": 3.308925093348124e-05,
+      "derivative_kgecomp": 0.00018351123673081155,
+      "hru_id": 14138900,
+      "minus_value": 2820.30517578125,
+      "model_id": 166,
+      "parameter": "MAXWATR_2",
+      "plus_value": 2919.30517578125,
+      "step": 99.0,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 442.7267761230469,
+      "basin_id": "USA_14138900",
+      "delta_minus": {
+        "kge_inv_q": -0.5284062304194387,
+        "kge_q": 0.2045586207205885,
+        "kgecomp": -0.16192380484942515
+      },
+      "delta_plus": {
+        "kge_inv_q": -0.5329744430968115,
+        "kge_q": 0.20401311051254412,
+        "kgecomp": -0.16448066629213376
+      },
+      "derivative_kge_inv_q": -0.00022841086227950373,
+      "derivative_kge_q": -2.7275537677756924e-05,
+      "derivative_kgecomp": -0.00012784319997863032,
+      "hru_id": 14138900,
+      "minus_value": 432.72678612304685,
+      "model_id": 166,
+      "parameter": "BASERTE",
+      "plus_value": 452.7267661230469,
+      "step": 19.99998000000005,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 220.92697143554688,
+      "basin_id": "USA_14138900",
+      "delta_minus": {
+        "kge_inv_q": -0.5307483292253175,
+        "kge_q": 0.2042889771397728,
+        "kgecomp": -0.16322967604277228
+      },
+      "delta_plus": {
+        "kge_inv_q": -0.5307308926174291,
+        "kge_q": 0.20426968682965485,
+        "kgecomp": -0.16323060289388713
+      },
+      "derivative_kge_inv_q": 3.50132688520733e-06,
+      "derivative_kge_q": -3.873556248581607e-06,
+      "derivative_kgecomp": -1.861146816982851e-07,
+      "hru_id": 14138900,
+      "minus_value": 218.43697143554687,
+      "model_id": 166,
+      "parameter": "SACPMLT",
+      "plus_value": 223.41697143554688,
+      "step": 4.980000000000018,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 3.2943084239959717,
+      "basin_id": "USA_14138900",
+      "delta_minus": {
+        "kge_inv_q": -0.5307032096880447,
+        "kge_q": 0.20423390053523427,
+        "kgecomp": -0.1632346545764053
+      },
+      "delta_plus": {
+        "kge_inv_q": -0.5307651583577587,
+        "kge_q": 0.20434664088755394,
+        "kgecomp": -0.1632092587351024
+      },
+      "derivative_kge_inv_q": -0.0007743583714248097,
+      "derivative_kge_q": 0.0014092544039959174,
+      "derivative_kgecomp": 0.0003174480162862478,
+      "hru_id": 14138900,
+      "minus_value": 3.2543084239959716,
+      "model_id": 166,
+      "parameter": "SACPEXP",
+      "plus_value": 3.3343084239959717,
+      "step": 0.08000000000000007,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 215.6185760498047,
+      "basin_id": "USA_14138900",
+      "delta_minus": {
+        "kge_inv_q": -0.5362088996615003,
+        "kge_q": 0.1624510846758429,
+        "kgecomp": -0.1868789074928287
+      },
+      "delta_plus": {
+        "kge_inv_q": -0.525624668583205,
+        "kge_q": 0.16413937977426785,
+        "kgecomp": -0.18074264440446852
+      },
+      "derivative_kge_inv_q": 0.0011141295871889805,
+      "derivative_kge_q": 0.00017771527351841487,
+      "derivative_kgecomp": 0.0006459224303537035,
+      "hru_id": 14138900,
+      "minus_value": 210.8685760498047,
+      "model_id": 188,
+      "parameter": "MAXWATR_1",
+      "plus_value": 220.3685760498047,
+      "step": 9.5,
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 4704.3095703125,
+      "basin_id": "USA_14138900",
+      "delta_minus": {
+        "kge_inv_q": -0.544777584695553,
+        "kge_q": 0.16291669427977773,
+        "kgecomp": -0.19093044520788766
+      },
+      "delta_plus": {
+        "kge_inv_q": -0.5149675950345811,
+        "kge_q": 0.16351599324975652,
+        "kgecomp": -0.1757258008924123
+      },
+      "derivative_kge_inv_q": 0.0003011110066764841,
+      "derivative_kge_q": 6.053524949280705e-06,
+      "derivative_kgecomp": 0.0001535822658128824,
+      "hru_id": 14138900,
+      "minus_value": 4654.8095703125,
+      "model_id": 188,
+      "parameter": "MAXWATR_2",
+      "plus_value": 4753.8095703125,
+      "step": 99.0,
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 994.6195068359375,
+      "basin_id": "USA_14138900",
+      "delta_minus": {
+        "kge_inv_q": -0.5294699057667503,
+        "kge_q": 0.16322387862705934,
+        "kgecomp": -0.18312301356984556
+      },
+      "delta_plus": {
+        "kge_inv_q": -0.530169918859777,
+        "kge_q": 0.1632163666930545,
+        "kgecomp": -0.18347677608336127
+      },
+      "derivative_kge_inv_q": -4.551307560105275e-05,
+      "derivative_kge_q": -4.884068936394424e-07,
+      "derivative_kgecomp": -2.3000741247342488e-05,
+      "hru_id": 14138900,
+      "minus_value": 984.6195168359375,
+      "model_id": 188,
+      "parameter": "BASERTE",
+      "plus_value": 1000.0,
+      "step": 15.380483164062525,
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 78.73703002929688,
+      "basin_id": "USA_14138900",
+      "delta_minus": {
+        "kge_inv_q": -0.5299256083223118,
+        "kge_q": 0.16322180864116997,
+        "kgecomp": -0.18335189984057088
+      },
+      "delta_plus": {
+        "kge_inv_q": -0.5299266163303693,
+        "kge_q": 0.16321631518942126,
+        "kgecomp": -0.18335515057047402
+      },
+      "derivative_kge_inv_q": -2.0241125651970845e-07,
+      "derivative_kge_q": -1.1031027607865628e-06,
+      "derivative_kgecomp": -6.527570086642823e-07,
+      "hru_id": 14138900,
+      "minus_value": 76.24703002929688,
+      "model_id": 188,
+      "parameter": "SACPMLT",
+      "plus_value": 81.22703002929687,
+      "step": 4.97999999999999,
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 4.820869445800781,
+      "basin_id": "USA_14138900",
+      "delta_minus": {
+        "kge_inv_q": -0.5299265983932029,
+        "kge_q": 0.16321660812772254,
+        "kgecomp": -0.18335499513274012
+      },
+      "delta_plus": {
+        "kge_inv_q": -0.5299256435996796,
+        "kge_q": 0.16322141854659067,
+        "kgecomp": -0.1833521125265445
+      },
+      "derivative_kge_inv_q": 1.1934919040557091e-05,
+      "derivative_kge_q": 6.013023585160754e-05,
+      "derivative_kgecomp": 3.6032577445388425e-05,
+      "hru_id": 14138900,
+      "minus_value": 4.780869445800781,
+      "model_id": 188,
+      "parameter": "SACPEXP",
+      "plus_value": 4.860869445800781,
+      "step": 0.08000000000000007,
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 0.604142427444458,
+      "basin_id": "USA_14138900",
+      "delta_minus": {
+        "kge_inv_q": -2.5063913940437526,
+        "kge_q": 0.08921605088563911,
+        "kgecomp": -1.2085876715790569
+      },
+      "delta_plus": {
+        "kge_inv_q": -2.4598157476995297,
+        "kge_q": 0.08704903194485258,
+        "kgecomp": -1.1863833578773386
+      },
+      "derivative_kge_inv_q": 2.5875359080123777,
+      "derivative_kge_q": -0.12038994115480682,
+      "derivative_kgecomp": 1.2335729834287916,
+      "hru_id": 14138900,
+      "minus_value": 0.595142427444458,
+      "model_id": 190,
+      "parameter": "FRCHZNE",
+      "plus_value": 0.613142427444458,
+      "step": 0.018000000000000016,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 102.73191833496094,
+      "basin_id": "USA_14138900",
+      "delta_minus": {
+        "kge_inv_q": -2.626613072775418,
+        "kge_q": 0.09173677351827692,
+        "kgecomp": -1.2674381496285707
+      },
+      "delta_plus": {
+        "kge_inv_q": -2.3648848146657677,
+        "kge_q": 0.08440155769901736,
+        "kgecomp": -1.1402416284833752
+      },
+      "derivative_kge_inv_q": 0.027550342958910557,
+      "derivative_kge_q": -0.00077212798097469,
+      "derivative_kgecomp": 0.01338910748896795,
+      "hru_id": 14138900,
+      "minus_value": 97.98191833496094,
+      "model_id": 190,
+      "parameter": "MAXWATR_1",
+      "plus_value": 107.48191833496094,
+      "step": 9.5,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 0.5486306548118591,
+      "basin_id": "USA_14138900",
+      "delta_minus": {
+        "kge_inv_q": -2.460166869846854,
+        "kge_q": 0.08814736001496482,
+        "kgecomp": -1.1860097549159447
+      },
+      "delta_plus": {
+        "kge_inv_q": -2.460166869846854,
+        "kge_q": 0.08814736001496482,
+        "kgecomp": -1.1860097549159447
+      },
+      "derivative_kge_inv_q": 0.0,
+      "derivative_kge_q": 0.0,
+      "derivative_kgecomp": 0.0,
+      "hru_id": 14138900,
+      "minus_value": 0.5396306548118591,
+      "model_id": 190,
+      "parameter": "FRACLOWZ",
+      "plus_value": 0.5576306548118591,
+      "step": 0.018000000000000016,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 3292.124267578125,
+      "basin_id": "USA_14138900",
+      "delta_minus": {
+        "kge_inv_q": -2.4849345029875973,
+        "kge_q": 0.0875336325658218,
+        "kgecomp": -1.1987004352108876
+      },
+      "delta_plus": {
+        "kge_inv_q": -2.436038391659041,
+        "kge_q": 0.08874267958673876,
+        "kgecomp": -1.1736478560361512
+      },
+      "derivative_kge_inv_q": 0.0004939001144298606,
+      "derivative_kge_q": 1.2212596170878317e-05,
+      "derivative_kgecomp": 0.0002530563553003684,
+      "hru_id": 14138900,
+      "minus_value": 3242.624267578125,
+      "model_id": 190,
+      "parameter": "MAXWATR_2",
+      "plus_value": 3341.624267578125,
+      "step": 99.0,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 328.2620849609375,
+      "basin_id": "USA_14138900",
+      "delta_minus": {
+        "kge_inv_q": -2.4394608196350833,
+        "kge_q": 0.08865365625987676,
+        "kgecomp": -1.1754035816876032
+      },
+      "delta_plus": {
+        "kge_inv_q": -2.480792303240173,
+        "kge_q": 0.08765879336796156,
+        "kgecomp": -1.1965667549361059
+      },
+      "derivative_kge_inv_q": -0.0020665762468307296,
+      "derivative_kge_q": -4.9743194338953893e-05,
+      "derivative_kgecomp": -0.0010581597205848528,
+      "hru_id": 14138900,
+      "minus_value": 318.2620949609375,
+      "model_id": 190,
+      "parameter": "BASERTE",
+      "plus_value": 338.2620749609375,
+      "step": 19.99998000000005,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 135.00689697265625,
+      "basin_id": "USA_14138900",
+      "delta_minus": {
+        "kge_inv_q": -2.4611980414000136,
+        "kge_q": 0.08815245162167284,
+        "kgecomp": -1.1865227948891703
+      },
+      "delta_plus": {
+        "kge_inv_q": -2.4601672277078075,
+        "kge_q": 0.08814634369108831,
+        "kgecomp": -1.1860104420083597
+      },
+      "derivative_kge_inv_q": 0.0002069907012462131,
+      "derivative_kge_q": -1.2264920852472436e-06,
+      "derivative_kgecomp": 0.00010288210458044949,
+      "hru_id": 14138900,
+      "minus_value": 132.51689697265624,
+      "model_id": 190,
+      "parameter": "SACPMLT",
+      "plus_value": 137.49689697265626,
+      "step": 4.980000000000018,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 1.9537216424942017,
+      "basin_id": "USA_14138900",
+      "delta_minus": {
+        "kge_inv_q": -2.4601678345770837,
+        "kge_q": 0.08814706628677471,
+        "kgecomp": -1.1860103841451544
+      },
+      "delta_plus": {
+        "kge_inv_q": -2.4611983617524804,
+        "kge_q": 0.08815200539519219,
+        "kgecomp": -1.186523178178644
+      },
+      "derivative_kge_inv_q": -0.012881589692459438,
+      "derivative_kge_q": 6.173885521848494e-05,
+      "derivative_kgecomp": -0.00640992541862117,
+      "hru_id": 14138900,
+      "minus_value": 1.9137216424942016,
+      "model_id": 190,
+      "parameter": "SACPEXP",
+      "plus_value": 1.9937216424942017,
+      "step": 0.08000000000000007,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 151.11712646484375,
+      "basin_id": "USA_14138900",
+      "delta_minus": {
+        "kge_inv_q": -0.9448538129596753,
+        "kge_q": -0.021486669591145424,
+        "kgecomp": -0.4831702412754103
+      },
+      "delta_plus": {
+        "kge_inv_q": -0.8282274830391513,
+        "kge_q": -0.003011560227017651,
+        "kgecomp": -0.41561952163308447
+      },
+      "derivative_kge_inv_q": 0.012276455781107792,
+      "derivative_kge_q": 0.001944748354118713,
+      "derivative_kgecomp": 0.007110602067613246,
+      "hru_id": 14138900,
+      "minus_value": 146.36712646484375,
+      "model_id": 212,
+      "parameter": "MAXWATR_1",
+      "plus_value": 155.86712646484375,
+      "step": 9.5,
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 3671.632568359375,
+      "basin_id": "USA_14138900",
+      "delta_minus": {
+        "kge_inv_q": -0.914075570981874,
+        "kge_q": -0.01635220831546602,
+        "kgecomp": -0.46521388964867
+      },
+      "delta_plus": {
+        "kge_inv_q": -0.8596451139100885,
+        "kge_q": -0.008859626178015723,
+        "kgecomp": -0.43425237004405204
+      },
+      "derivative_kge_inv_q": 0.0005498025966847021,
+      "derivative_kge_q": 7.568264785303332e-05,
+      "derivative_kgecomp": 0.0003127426222688683,
+      "hru_id": 14138900,
+      "minus_value": 3622.132568359375,
+      "model_id": 212,
+      "parameter": "MAXWATR_2",
+      "plus_value": 3721.132568359375,
+      "step": 99.0,
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 707.7484130859375,
+      "basin_id": "USA_14138900",
+      "delta_minus": {
+        "kge_inv_q": -0.8857364082091849,
+        "kge_q": -0.012444603247324992,
+        "kgecomp": -0.44909050572825493
+      },
+      "delta_plus": {
+        "kge_inv_q": -0.8884133999871627,
+        "kge_q": -0.012740286723837757,
+        "kgecomp": -0.45057684335550025
+      },
+      "derivative_kge_inv_q": -0.00013384972274861572,
+      "derivative_kge_q": -1.4784188609826809e-05,
+      "derivative_kgecomp": -7.431695567922126e-05,
+      "hru_id": 14138900,
+      "minus_value": 697.7484230859375,
+      "model_id": 212,
+      "parameter": "BASERTE",
+      "plus_value": 717.7484030859375,
+      "step": 19.99998000000005,
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 148.8277130126953,
+      "basin_id": "USA_14138900",
+      "delta_minus": {
+        "kge_inv_q": -0.887084863656595,
+        "kge_q": -0.012590327958264647,
+        "kgecomp": -0.4498375958074299
+      },
+      "delta_plus": {
+        "kge_inv_q": -0.8870855994687973,
+        "kge_q": -0.012594671483787345,
+        "kgecomp": -0.4498401354762923
+      },
+      "derivative_kge_inv_q": -1.4775345427296377e-07,
+      "derivative_kge_q": -8.721938800599721e-07,
+      "derivative_kgecomp": -5.099736671553211e-07,
+      "hru_id": 14138900,
+      "minus_value": 146.3377130126953,
+      "model_id": 212,
+      "parameter": "SACPMLT",
+      "plus_value": 151.31771301269532,
+      "step": 4.980000000000018,
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 3.292418956756592,
+      "basin_id": "USA_14138900",
+      "delta_minus": {
+        "kge_inv_q": -0.8870861799792004,
+        "kge_q": -0.012598149533148195,
+        "kgecomp": -0.4498421647561742
+      },
+      "delta_plus": {
+        "kge_inv_q": -0.8870842603615546,
+        "kge_q": -0.012586760062564317,
+        "kgecomp": -0.4498355102120595
+      },
+      "derivative_kge_inv_q": 2.3995220571615385e-05,
+      "derivative_kge_q": 0.00014236838229847435,
+      "derivative_kgecomp": 8.318180143435099e-05,
+      "hru_id": 14138900,
+      "minus_value": 3.2524189567565918,
+      "model_id": 212,
+      "parameter": "SACPEXP",
+      "plus_value": 3.332418956756592,
+      "step": 0.08000000000000007,
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 7.9657816886901855,
+      "basin_id": "USA_14138900",
+      "delta_minus": {
+        "kge_inv_q": -0.8878595553395761,
+        "kge_q": -0.012016830125652245,
+        "kgecomp": -0.44993819273261415
+      },
+      "delta_plus": {
+        "kge_inv_q": -0.8859043000436693,
+        "kge_q": -0.013130210032366585,
+        "kgecomp": -0.44951725503801787
+      },
+      "derivative_kge_inv_q": 0.019552552959067777,
+      "derivative_kge_q": -0.011133799067143343,
+      "derivative_kgecomp": 0.0042093769459627724,
+      "hru_id": 14138900,
+      "minus_value": 7.915781688690186,
+      "model_id": 212,
+      "parameter": "LOGLAMB",
+      "plus_value": 8.015781688690186,
+      "step": 0.10000000000000053,
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 3.9094231128692627,
+      "basin_id": "USA_14138900",
+      "delta_minus": {
+        "kge_inv_q": -0.886698971600159,
+        "kge_q": -0.012816386516242728,
+        "kgecomp": -0.44975767905820085
+      },
+      "delta_plus": {
+        "kge_inv_q": -0.8874677482174396,
+        "kge_q": -0.012369373560636499,
+        "kgecomp": -0.44991856088903803
+      },
+      "derivative_kge_inv_q": -0.012812943621343192,
+      "derivative_kge_q": 0.007450215926770543,
+      "derivative_kgecomp": -0.002681363847286325,
+      "hru_id": 14138900,
+      "minus_value": 3.879423112869263,
+      "model_id": 212,
+      "parameter": "TISHAPE",
+      "plus_value": 3.9394231128692625,
+      "step": 0.05999999999999961,
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 0.6574550867080688,
+      "basin_id": "USA_14138900",
+      "delta_minus": {
+        "kge_inv_q": -24.84600675099858,
+        "kge_q": 0.11310799391778503,
+        "kgecomp": -12.366449378540397
+      },
+      "delta_plus": {
+        "kge_inv_q": -24.787074394147112,
+        "kge_q": 0.11479130608335031,
+        "kgecomp": -12.336141544031882
+      },
+      "derivative_kge_inv_q": 3.274019825081548,
+      "derivative_kge_q": 0.09351734253140415,
+      "derivative_kgecomp": 1.6837685838063527,
+      "hru_id": 14138900,
+      "minus_value": 0.6484550867080688,
+      "model_id": 214,
+      "parameter": "FRCHZNE",
+      "plus_value": 0.6664550867080689,
+      "step": 0.018000000000000016,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 38.377952575683594,
+      "basin_id": "USA_14138900",
+      "delta_minus": {
+        "kge_inv_q": -24.72424710870033,
+        "kge_q": 0.11408579330269242,
+        "kgecomp": -12.30508065769882
+      },
+      "delta_plus": {
+        "kge_inv_q": -24.69915800875339,
+        "kge_q": 0.11311456110137819,
+        "kgecomp": -12.293021723826007
+      },
+      "derivative_kge_inv_q": 0.0026409578891514827,
+      "derivative_kge_q": -0.0001022349685593928,
+      "derivative_kgecomp": 0.0012693614602961503,
+      "hru_id": 14138900,
+      "minus_value": 33.627952575683594,
+      "model_id": 214,
+      "parameter": "MAXWATR_1",
+      "plus_value": 43.127952575683594,
+      "step": 9.5,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 0.6510687470436096,
+      "basin_id": "USA_14138900",
+      "delta_minus": {
+        "kge_inv_q": -24.798153475076504,
+        "kge_q": 0.11273021682002593,
+        "kgecomp": -12.342711629128239
+      },
+      "delta_plus": {
+        "kge_inv_q": -24.798153475076504,
+        "kge_q": 0.11273021682002593,
+        "kgecomp": -12.342711629128239
+      },
+      "derivative_kge_inv_q": 0.0,
+      "derivative_kge_q": 0.0,
+      "derivative_kgecomp": 0.0,
+      "hru_id": 14138900,
+      "minus_value": 0.6420687470436096,
+      "model_id": 214,
+      "parameter": "FRACLOWZ",
+      "plus_value": 0.6600687470436096,
+      "step": 0.018000000000000016,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 1255.658447265625,
+      "basin_id": "USA_14138900",
+      "delta_minus": {
+        "kge_inv_q": -24.829325310750892,
+        "kge_q": 0.10654709034833043,
+        "kgecomp": -12.36138911020128
+      },
+      "delta_plus": {
+        "kge_inv_q": -24.7613430244089,
+        "kge_q": 0.1212847764637821,
+        "kgecomp": -12.32002912397256
+      },
+      "derivative_kge_inv_q": 0.0006866897610302099,
+      "derivative_kge_q": 0.00014886551631769368,
+      "derivative_kgecomp": 0.00041777763867393886,
+      "hru_id": 14138900,
+      "minus_value": 1206.158447265625,
+      "model_id": 214,
+      "parameter": "MAXWATR_2",
+      "plus_value": 1305.158447265625,
+      "step": 99.0,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 833.8551025390625,
+      "basin_id": "USA_14138900",
+      "delta_minus": {
+        "kge_inv_q": -24.799707156055778,
+        "kge_q": 0.11370400018290527,
+        "kgecomp": -12.343001577936437
+      },
+      "delta_plus": {
+        "kge_inv_q": -24.796155595135016,
+        "kge_q": 0.11336845239223514,
+        "kgecomp": -12.34139357137139
+      },
+      "derivative_kge_inv_q": 0.00017757822361633027,
+      "derivative_kge_q": -1.6777406310912872e-05,
+      "derivative_kgecomp": 8.040040865281417e-05,
+      "hru_id": 14138900,
+      "minus_value": 823.8551125390625,
+      "model_id": 214,
+      "parameter": "BASERTE",
+      "plus_value": 843.8550925390625,
+      "step": 19.99998000000005,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 4.893354415893555,
+      "basin_id": "USA_14138900",
+      "delta_minus": {
+        "kge_inv_q": -24.797865476233156,
+        "kge_q": 0.11563226291545647,
+        "kgecomp": -12.341116606658849
+      },
+      "delta_plus": {
+        "kge_inv_q": -24.797427913590877,
+        "kge_q": 0.11515255152338344,
+        "kgecomp": -12.341137681033745
+      },
+      "derivative_kge_inv_q": 8.786398439342013e-05,
+      "derivative_kge_q": -9.632758876968564e-05,
+      "derivative_kgecomp": -4.231802187920964e-06,
+      "hru_id": 14138900,
+      "minus_value": 2.4033544158935545,
+      "model_id": 214,
+      "parameter": "SACPMLT",
+      "plus_value": 7.383354415893555,
+      "step": 4.98,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 1.9636688232421875,
+      "basin_id": "USA_14138900",
+      "delta_minus": {
+        "kge_inv_q": -24.79805997771165,
+        "kge_q": 0.11239179449288272,
+        "kgecomp": -12.342834091609383
+      },
+      "delta_plus": {
+        "kge_inv_q": -24.797968935325233,
+        "kge_q": 0.11377396540974893,
+        "kgecomp": -12.342097484957742
+      },
+      "derivative_kge_inv_q": 0.001138029830194397,
+      "derivative_kge_q": 0.01727713646082761,
+      "derivative_kgecomp": 0.009207583145509615,
+      "hru_id": 14138900,
+      "minus_value": 1.9236688232421875,
+      "model_id": 214,
+      "parameter": "SACPEXP",
+      "plus_value": 2.0036688232421875,
+      "step": 0.08000000000000007,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 6.901469707489014,
+      "basin_id": "USA_14138900",
+      "delta_minus": {
+        "kge_inv_q": -24.797775440868474,
+        "kge_q": 0.11382713263362132,
+        "kgecomp": -12.341974154117425
+      },
+      "delta_plus": {
+        "kge_inv_q": -24.797967802250625,
+        "kge_q": 0.11379840132866681,
+        "kgecomp": -12.34208470046098
+      },
+      "derivative_kge_inv_q": -0.001923613821510635,
+      "derivative_kge_q": -0.00028731304954510254,
+      "derivative_kgecomp": -0.0011054634355467424,
+      "hru_id": 14138900,
+      "minus_value": 6.851469707489014,
+      "model_id": 214,
+      "parameter": "LOGLAMB",
+      "plus_value": 6.9514697074890135,
+      "step": 0.09999999999999964,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "base_value": 2.932877540588379,
+      "basin_id": "USA_14138900",
+      "delta_minus": {
+        "kge_inv_q": -24.797981807813656,
+        "kge_q": 0.11479826409495952,
+        "kgecomp": -12.341591771859349
+      },
+      "delta_plus": {
+        "kge_inv_q": -24.797764683556682,
+        "kge_q": 0.11521364917067045,
+        "kgecomp": -12.341275517193006
+      },
+      "derivative_kge_inv_q": 0.0036187376162289077,
+      "derivative_kge_q": 0.0069230845951821765,
+      "derivative_kgecomp": 0.005270911105714794,
+      "hru_id": 14138900,
+      "minus_value": 2.902877540588379,
+      "model_id": 214,
+      "parameter": "TISHAPE",
+      "plus_value": 2.9628775405883787,
+      "step": 0.05999999999999961,
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    }
+  ],
+  "schema_version": "landscape-parameter-sensitivity-v1",
+  "status": "partial"
+}

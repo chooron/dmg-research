@@ -1,0 +1,770 @@
+{
+  "completed_model_count": 6,
+  "reports": [
+    {
+      "active_gradient_finite": true,
+      "active_parameter_names": [
+        "RFERR_MLT",
+        "FRACTEN",
+        "MAXWATR_1",
+        "PERCFRAC",
+        "FPRIMQB",
+        "MAXWATR_2",
+        "QBRATE_2A",
+        "QBRATE_2B",
+        "PERCRTE",
+        "PERCEXP",
+        "AXV_BEXP",
+        "TIMEDELAY",
+        "MBASE",
+        "MFMAX",
+        "MFMIN",
+        "PXTEMP",
+        "OPG",
+        "LAPSE"
+      ],
+      "backward_finite": true,
+      "compile": {
+        "cold_compile_seconds": [
+          6.145589318010025
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "eager_vs_compiled_parity": {
+        "active_gradient_max_abs": 4.547473508864641e-13,
+        "flux_max_abs": 0.0,
+        "q_instantaneous_max_abs": 0.0,
+        "q_max_abs": 7.105427357601002e-15,
+        "snow_balance_max_abs": 0.0,
+        "states_max_abs": 0.0,
+        "water_balance_max_abs": 1.1368683772161603e-13
+      },
+      "forward_finite": true,
+      "inactive_gradient_max_abs": 0.0,
+      "inactive_gradients_zero_or_none": true,
+      "model_id": 2,
+      "monitoring": {
+        "actual_steps": 8,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "completed_full_period": true,
+        "monitor_chunk_size": 8,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          0.0,
+          3.552713678800501e-15
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          9.237055564881302e-14,
+          1.5276668818842154e-13
+        ]
+      },
+      "passed": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 2159104,
+        "gpu_peak_reserved_bytes": 4194304,
+        "host_rss_kb": 1407332
+      },
+      "serial_vs_batched_parity": {
+        "basins": [
+          {
+            "flux_max_abs": 0.0,
+            "q_instantaneous_max_abs": 0.0,
+            "q_max_abs": 0.0,
+            "snow_balance_max_abs": 0.0,
+            "states_max_abs": 0.0,
+            "water_balance_max_abs": 0.0
+          },
+          {
+            "flux_max_abs": 0.0,
+            "q_instantaneous_max_abs": 0.0,
+            "q_max_abs": 0.0,
+            "snow_balance_max_abs": 0.0,
+            "states_max_abs": 0.0,
+            "water_balance_max_abs": 0.0
+          }
+        ],
+        "max_abs": 0.0
+      },
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "tens2pll_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "active_gradient_finite": true,
+      "active_parameter_names": [
+        "RFERR_MLT",
+        "FRCHZNE",
+        "FRACTEN",
+        "MAXWATR_1",
+        "FRACLOWZ",
+        "MAXWATR_2",
+        "QB_PRMS",
+        "PERCRTE",
+        "PERCEXP",
+        "AXV_BEXP",
+        "TIMEDELAY",
+        "MBASE",
+        "MFMAX",
+        "MFMIN",
+        "PXTEMP",
+        "OPG",
+        "LAPSE"
+      ],
+      "backward_finite": true,
+      "compile": {
+        "cold_compile_seconds": [
+          5.111014071968384
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "eager_vs_compiled_parity": {
+        "active_gradient_max_abs": 4.163336342344337e-17,
+        "flux_max_abs": 0.0,
+        "q_instantaneous_max_abs": 0.0,
+        "q_max_abs": 7.105427357601002e-15,
+        "snow_balance_max_abs": 0.0,
+        "states_max_abs": 0.0,
+        "water_balance_max_abs": 1.1368683772161603e-13
+      },
+      "forward_finite": true,
+      "inactive_gradient_max_abs": 0.0,
+      "inactive_gradients_zero_or_none": true,
+      "model_id": 10,
+      "monitoring": {
+        "actual_steps": 8,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "completed_full_period": true,
+        "monitor_chunk_size": 8,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          0.0,
+          5.329070518200751e-15
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          1.4210854715202004e-13,
+          4.796163466380676e-14
+        ]
+      },
+      "passed": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 1683968,
+        "gpu_peak_reserved_bytes": 2097152,
+        "host_rss_kb": 1315488
+      },
+      "serial_vs_batched_parity": {
+        "basins": [
+          {
+            "flux_max_abs": 0.0,
+            "q_instantaneous_max_abs": 0.0,
+            "q_max_abs": 0.0,
+            "snow_balance_max_abs": 0.0,
+            "states_max_abs": 0.0,
+            "water_balance_max_abs": 0.0
+          },
+          {
+            "flux_max_abs": 0.0,
+            "q_instantaneous_max_abs": 0.0,
+            "q_max_abs": 0.0,
+            "snow_balance_max_abs": 0.0,
+            "states_max_abs": 0.0,
+            "water_balance_max_abs": 0.0
+          }
+        ],
+        "max_abs": 0.0
+      },
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "unlimfrc_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "active_gradient_finite": true,
+      "active_parameter_names": [
+        "RFERR_MLT",
+        "FRACTEN",
+        "MAXWATR_1",
+        "MAXWATR_2",
+        "BASERTE",
+        "QB_POWR",
+        "PERCRTE",
+        "PERCEXP",
+        "AXV_BEXP",
+        "TIMEDELAY",
+        "MBASE",
+        "MFMAX",
+        "MFMIN",
+        "PXTEMP",
+        "OPG",
+        "LAPSE"
+      ],
+      "backward_finite": true,
+      "compile": {
+        "cold_compile_seconds": [
+          4.7605436210287735
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "eager_vs_compiled_parity": {
+        "active_gradient_max_abs": 7.105427357601002e-15,
+        "flux_max_abs": 0.0,
+        "q_instantaneous_max_abs": 0.0,
+        "q_max_abs": 1.4210854715202004e-14,
+        "snow_balance_max_abs": 0.0,
+        "states_max_abs": 0.0,
+        "water_balance_max_abs": 1.1368683772161603e-13
+      },
+      "forward_finite": true,
+      "inactive_gradient_max_abs": 0.0,
+      "inactive_gradients_zero_or_none": true,
+      "model_id": 20,
+      "monitoring": {
+        "actual_steps": 8,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "completed_full_period": true,
+        "monitor_chunk_size": 8,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          0.0,
+          3.552713678800501e-15
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          5.684341886080802e-14,
+          8.704148513061227e-14
+        ]
+      },
+      "passed": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 1578496,
+        "gpu_peak_reserved_bytes": 2097152,
+        "host_rss_kb": 1375072
+      },
+      "serial_vs_batched_parity": {
+        "basins": [
+          {
+            "flux_max_abs": 0.0,
+            "q_instantaneous_max_abs": 0.0,
+            "q_max_abs": 0.0,
+            "snow_balance_max_abs": 0.0,
+            "states_max_abs": 0.0,
+            "water_balance_max_abs": 0.0
+          },
+          {
+            "flux_max_abs": 0.0,
+            "q_instantaneous_max_abs": 0.0,
+            "q_max_abs": 0.0,
+            "snow_balance_max_abs": 0.0,
+            "states_max_abs": 0.0,
+            "water_balance_max_abs": 0.0
+          }
+        ],
+        "max_abs": 0.0
+      },
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "active_gradient_finite": true,
+      "active_parameter_names": [
+        "RFERR_MLT",
+        "FRACTEN",
+        "MAXWATR_1",
+        "PERCFRAC",
+        "FPRIMQB",
+        "MAXWATR_2",
+        "QBRATE_2A",
+        "QBRATE_2B",
+        "PERCRTE",
+        "PERCEXP",
+        "SAREAMAX",
+        "TIMEDELAY",
+        "MBASE",
+        "MFMAX",
+        "MFMIN",
+        "PXTEMP",
+        "OPG",
+        "LAPSE"
+      ],
+      "backward_finite": true,
+      "compile": {
+        "cold_compile_seconds": [
+          4.3072356019984
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "eager_vs_compiled_parity": {
+        "active_gradient_max_abs": 4.547473508864641e-13,
+        "flux_max_abs": 1.6940658945086007e-21,
+        "q_instantaneous_max_abs": 0.0,
+        "q_max_abs": 1.4210854715202004e-14,
+        "snow_balance_max_abs": 0.0,
+        "states_max_abs": 0.0,
+        "water_balance_max_abs": 2.2737367544323206e-13
+      },
+      "forward_finite": true,
+      "inactive_gradient_max_abs": 0.0,
+      "inactive_gradients_zero_or_none": true,
+      "model_id": 26,
+      "monitoring": {
+        "actual_steps": 8,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "completed_full_period": true,
+        "monitor_chunk_size": 8,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          0.0,
+          3.552713678800501e-15
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          8.526512829121202e-14,
+          8.526512829121202e-14
+        ]
+      },
+      "passed": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 2109952,
+        "gpu_peak_reserved_bytes": 4194304,
+        "host_rss_kb": 1403256
+      },
+      "serial_vs_batched_parity": {
+        "basins": [
+          {
+            "flux_max_abs": 0.0,
+            "q_instantaneous_max_abs": 0.0,
+            "q_max_abs": 0.0,
+            "snow_balance_max_abs": 0.0,
+            "states_max_abs": 0.0,
+            "water_balance_max_abs": 0.0
+          },
+          {
+            "flux_max_abs": 0.0,
+            "q_instantaneous_max_abs": 0.0,
+            "q_max_abs": 0.0,
+            "snow_balance_max_abs": 0.0,
+            "states_max_abs": 0.0,
+            "water_balance_max_abs": 0.0
+          }
+        ],
+        "max_abs": 0.0
+      },
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "tens2pll_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "active_gradient_finite": true,
+      "active_parameter_names": [
+        "RFERR_MLT",
+        "FRACTEN",
+        "MAXWATR_1",
+        "PERCFRAC",
+        "FPRIMQB",
+        "MAXWATR_2",
+        "QBRATE_2A",
+        "QBRATE_2B",
+        "PERCRTE",
+        "PERCEXP",
+        "LOGLAMB",
+        "TISHAPE",
+        "QB_POWR",
+        "TIMEDELAY",
+        "MBASE",
+        "MFMAX",
+        "MFMIN",
+        "PXTEMP",
+        "OPG",
+        "LAPSE"
+      ],
+      "backward_finite": true,
+      "compile": {
+        "cold_compile_seconds": [
+          4.456496616010554
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "eager_vs_compiled_parity": {
+        "active_gradient_max_abs": 2.2737367544323206e-13,
+        "flux_max_abs": 0.0,
+        "q_instantaneous_max_abs": 0.0,
+        "q_max_abs": 4.440892098500626e-16,
+        "snow_balance_max_abs": 0.0,
+        "states_max_abs": 0.0,
+        "water_balance_max_abs": 1.1368683772161603e-13
+      },
+      "forward_finite": true,
+      "inactive_gradient_max_abs": 0.0,
+      "inactive_gradients_zero_or_none": true,
+      "model_id": 50,
+      "monitoring": {
+        "actual_steps": 8,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "completed_full_period": true,
+        "monitor_chunk_size": 8,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          0.0,
+          5.329070518200751e-15
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          7.815970093361102e-14,
+          3.419486915845482e-14
+        ]
+      },
+      "passed": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 2508288,
+        "gpu_peak_reserved_bytes": 4194304,
+        "host_rss_kb": 1412488
+      },
+      "serial_vs_batched_parity": {
+        "basins": [
+          {
+            "flux_max_abs": 0.0,
+            "q_instantaneous_max_abs": 0.0,
+            "q_max_abs": 0.0,
+            "snow_balance_max_abs": 0.0,
+            "states_max_abs": 0.0,
+            "water_balance_max_abs": 0.0
+          },
+          {
+            "flux_max_abs": 0.0,
+            "q_instantaneous_max_abs": 0.0,
+            "q_max_abs": 0.0,
+            "snow_balance_max_abs": 0.0,
+            "states_max_abs": 0.0,
+            "water_balance_max_abs": 0.0
+          }
+        ],
+        "max_abs": 0.0
+      },
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "tens2pll_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "active_gradient_finite": true,
+      "active_parameter_names": [
+        "RFERR_MLT",
+        "FRACTEN",
+        "MAXWATR_1",
+        "PERCFRAC",
+        "FPRIMQB",
+        "MAXWATR_2",
+        "QBRATE_2A",
+        "QBRATE_2B",
+        "SACPMLT",
+        "SACPEXP",
+        "AXV_BEXP",
+        "TIMEDELAY",
+        "MBASE",
+        "MFMAX",
+        "MFMIN",
+        "PXTEMP",
+        "OPG",
+        "LAPSE"
+      ],
+      "backward_finite": true,
+      "compile": {
+        "cold_compile_seconds": [
+          23.477608269953635
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "eager_vs_compiled_parity": {
+        "active_gradient_max_abs": 2.842170943040401e-14,
+        "flux_max_abs": 8.881784197001252e-16,
+        "q_instantaneous_max_abs": 1.1102230246251565e-16,
+        "q_max_abs": 4.440892098500626e-16,
+        "snow_balance_max_abs": 0.0,
+        "states_max_abs": 3.552713678800501e-15,
+        "water_balance_max_abs": 5.684341886080802e-14
+      },
+      "forward_finite": true,
+      "inactive_gradient_max_abs": 0.0,
+      "inactive_gradients_zero_or_none": true,
+      "model_id": 146,
+      "monitoring": {
+        "actual_steps": 8,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "completed_full_period": true,
+        "monitor_chunk_size": 8,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          0.0,
+          5.329070518200751e-15
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          2.2870594307278225e-14,
+          7.105427357601002e-14
+        ]
+      },
+      "passed": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 3627520,
+        "gpu_peak_reserved_bytes": 25165824,
+        "host_rss_kb": 1588284
+      },
+      "serial_vs_batched_parity": {
+        "basins": [
+          {
+            "flux_max_abs": 0.0,
+            "q_instantaneous_max_abs": 0.0,
+            "q_max_abs": 0.0,
+            "snow_balance_max_abs": 0.0,
+            "states_max_abs": 0.0,
+            "water_balance_max_abs": 0.0
+          },
+          {
+            "flux_max_abs": 0.0,
+            "q_instantaneous_max_abs": 0.0,
+            "q_max_abs": 0.0,
+            "snow_balance_max_abs": 0.0,
+            "states_max_abs": 0.0,
+            "water_balance_max_abs": 0.0
+          }
+        ],
+        "max_abs": 0.0
+      },
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "tens2pll_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    }
+  ],
+  "schema_version": "torch-fuse-topology-gradient-smoke-v1",
+  "selection": {
+    "catchments": [
+      "USA_09447800",
+      "USA_14138900"
+    ],
+    "model_ids": [
+      2,
+      10,
+      20,
+      26,
+      50,
+      146
+    ]
+  },
+  "status": "partial"
+}

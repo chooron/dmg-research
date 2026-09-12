@@ -1,0 +1,63 @@
+{
+  "schema_version": "probe-final-verification-v1",
+  "verified_at_utc": "2026-09-10T06:32:06.350476+00:00",
+  "status": "NOT_VERIFIED",
+  "status_reason": "RESUME_PROVENANCE_FAILED: Step 56 migration started remote optimization from model_D0 initial weights instead of post-step-56 model checkpoint. Although raw gradient recomputation on the completed run yields Gate A (3.57% conflict), strict formal verification requires a clean remote rerun from Step 0.",
+  "strict_resume_verified": false,
+  "raw_gate_recomputed": true,
+  "same_seed_replay_passed": true,
+  "diagnostic_no_update_passed": true,
+  "same_batch_passed": true,
+  "preclip_gradient_verified": true,
+  "cross_environment_parity_passed": true,
+  "gate": "A",
+  "conflict_fraction": 0.03571428571428571,
+  "persistent_conflict_parameters": [
+    "PERCRTE"
+  ],
+  "insufficient_signal_parameters": [
+    "FRACLOWZ",
+    "PXTEMP",
+    "OPG",
+    "LAPSE"
+  ],
+  "remaining_blockers": [
+    "A clean remote rerun from Step 0 is required to obtain uninterrupted optimizer momentum and RNG progression before sealing Gate A as VERIFIED."
+  ],
+  "git": {
+    "sha": "3caca37a4243ae0a95ebe9cc4f22998672ddf464",
+    "working_tree_diff_hash": "d2889e9e166e89b78d72e22b51a95b7e7acc2e3a8dbf696a6b09a004358e69d0"
+  },
+  "local_environment": {
+    "device": "NVIDIA GeForce RTX 4080 (12GB VRAM)",
+    "cuda": "12.4",
+    "pytorch": "2.6.0+cu124",
+    "dtype": "torch.float64"
+  },
+  "remote_environment": {
+    "ssh_target": "root@connect.westb.seetacloud.com:12478",
+    "hostname": "autodl-container-efaf408b83-13348839",
+    "device": "NVIDIA GeForce RTX 3080 Ti (12GB VRAM)",
+    "cuda": "12.8",
+    "pytorch": "2.8.0+cu128",
+    "dtype": "torch.float64"
+  },
+  "artifact_hashes": {
+    "protocol.json": "ca16bf9d6c4517c48fb52ccea8a4842a1f60798faf093287a1507529c88fb6d0",
+    "diagnostic_batch.json": "2a2614be915f53c4635f691f187adadaebe4cf55f6c17e3b25497cc2bc5f56ed",
+    "ownership_78.json": "3962c923ef72b1aac8b853d4f244a27fa1f1e0e1d4442168cf87dfc7ad3345ec",
+    "ownership_78.csv": "ab6eee65306042f4fca11a719dbc63c744e7bb6d9a69db06cb2f605a1fc10e40",
+    "summary.json": "28453ee20169e6ca3c2e14a02eae32fa43765ca2ecf5363e26b8afdc94beca07",
+    "effective_signal.csv": "6df77f5a3fd6c34867fd02c44d910c2d4dcbf9356baac23152f54a768e63bdd9",
+    "migration_manifest.json": "a64a71a9d7a6e8b26e9dba5f5ad65550448733d96dcbc324b917dd8cc81840e3",
+    "recomputed_gate.json": "7a75fbfbe2e1de784b234e006475f805371d4675aa43bb8fce5eefbf2ebb8d4e",
+    "same_seed_replay.json": "e83d43796ad0adf390598bed061ea25171a825cf28bfa5ca4614c84ee88985fd",
+    "cross_env_parity.json": "95093582605a0d0dffe04919d52418b12825415c01ad16d47562b803ac9d25ce",
+    "gradients_D0.pt": "2e1f7645c70daf58b89300eca8e219dd31ef32c383192295e68706ba003df6d3",
+    "gradients_D1.pt": "8a31f4e485f49dc5ebcc3a4c4020ea98f006ad6a27a536591c697ef6acb9c725",
+    "gradients_D3.pt": "e01ce18b7c7ed68b979581cbcf5e3b7c01b6f1e06950960ea68a8a4a6e097478",
+    "gradients_D5.pt": "7f6d55ed61396be1c0ccb9697da02c0d20071bbe31c5137d968f89f4569d8176",
+    "training_steps.jsonl": "1c0cb672cd59244592045e2142baad4e673bfddbe859f6600a8bdd9121ab21df",
+    "diagnostic_sweeps.jsonl": "2854fa4c50dcf99956575ddfde1a0a2aa1c190189787822597e40fefa6cc52c6"
+  }
+}

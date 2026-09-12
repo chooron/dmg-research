@@ -1,0 +1,38 @@
+{
+  "schema_version": "reference-calibration-budget-v1",
+  "status": "bounded calibration complete with one Option-A early-stopped case; landscape gate complete",
+  "expected_cases": 936,
+  "paper_protocol": {
+    "maxn": 10000,
+    "kstop": 3,
+    "pcento": 0.001,
+    "estimated_serial_hours_from_20_trial_smoke": 214.1,
+    "decision": "too heavy for this gate under one-worker/one-thread resource policy"
+  },
+  "smoke_measurements": {
+    "catchment": "USA_01013500",
+    "models": [2, 108, 178, 210],
+    "maxn": 20,
+    "mean_calib_seconds": 1.6466088402521564,
+    "estimated_seconds_per_trial": 0.08233044201260782,
+    "peak_child_rss_kb": 798172
+  },
+  "one_case_500_trial_measurement": {
+    "catchment": "USA_02082950",
+    "model_id": 164,
+    "maxn": 500,
+    "calib_seconds": 47.98948977497639,
+    "run_best_seconds": 0.554782334016636,
+    "peak_child_rss_kb": 797732
+  },
+  "bounded_protocol": {
+    "maxn": 100,
+    "kstop": 3,
+    "pcento": 0.001,
+    "estimated_serial_hours": 2.5,
+    "reason": "minimal bounded local-Fortran SCE budget after measured 500-trial cost; retains original KSTOP/PCENTO and uses one serial worker; this is not a reproduction of the 10000-trial paper budget"
+  },
+  "interrupted_500_trial_probe": {"completed_cases_before_stop": 43, "archive": "project/autofuse/docs/reference_calibration_12x78.maxn500.interrupted.partial.json", "reason": "measured serial cost was too high for the original bounded run window; no resource safety failure"},
+  "maxn100_run": {"completed_cases": 936, "failure_case": "USA_12010000/206", "resolution": "Option A finite best-so-far early-stop; 935 normal plus 1 early-stopped case", "observed_child_runtime_seconds_at_termination": 7970, "reason": "SCE trajectory entered a pathological model-206 parameter region; finite best archive was recovered and run_best passed; remaining calibration resumed without rerunning prior cases"},
+  "resume_plan": "write one case result immediately after each successful calib_sce/run_best pair; validate executable/data/manifest/config hashes before reuse; stop safely with partial artifact on failure or resource anomaly"
+}

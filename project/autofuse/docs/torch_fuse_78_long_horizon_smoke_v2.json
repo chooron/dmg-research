@@ -1,0 +1,6745 @@
+{
+  "compile": {
+    "all_fullgraph_clean": true,
+    "build_success_count": 78,
+    "compile_attempts": 78,
+    "compile_successes": 78,
+    "fallbacks": 0,
+    "fullgraph_compile_success_count": 78,
+    "graph_breaks": 0,
+    "recompilations": 0
+  },
+  "coverage": {
+    "build_success_count": 78,
+    "catalogue_structure_count": 78,
+    "hidden_fallback_count": 0,
+    "unsupported_branch_count": 0
+  },
+  "gate": "78 structures x 2 catchments GPU-batched coupled-RK2 long-horizon smoke",
+  "gate_decision": {
+    "build_compile_pass": true,
+    "gradient_smoke_pass": false,
+    "long_horizon_pass": true,
+    "next_stage_allowed": false,
+    "passed": false,
+    "reason": "gradient smoke is intentionally a separate post-gate stage"
+  },
+  "gradient_smoke": {
+    "selected_model_ids": [
+      2,
+      10,
+      20,
+      26,
+      50,
+      146
+    ],
+    "selection_frozen_before_execution": true,
+    "selection_rule": "one catalogue structure covering each requested process/topology family; no result-dependent selection",
+    "status": "pending"
+  },
+  "long_horizon": {
+    "all_finite": true,
+    "all_full_period": true,
+    "all_monitor_first_failure_none": true,
+    "all_quality_checks_pass": true,
+    "capacity_violation_total": 0,
+    "completed_logical_runs": 156,
+    "completed_structures": 78,
+    "expected_logical_runs": 156,
+    "expected_structures": 78,
+    "max_snow_balance_abs": 1.8118839761882555e-13,
+    "max_water_balance_abs": 1.1254996934439987e-11,
+    "negative_active_state_total": 0
+  },
+  "protocol": {
+    "basin_execution": "GPU leading-dimension batch",
+    "batch_size": 2,
+    "cpu_interop_threads": 1,
+    "cpu_threads": 1,
+    "device": "cuda",
+    "dt_days": 1.0,
+    "dtype": "torch.float64",
+    "forcing_start": "1987-01-01",
+    "full_daily_trace_persisted": false,
+    "initial_fraction": 0.25,
+    "monitor_chunk_size": 64,
+    "monitor_overhead": "not separately isolated; chunked GPU checks are included in elapsed time",
+    "n_steps": 8401,
+    "partial_write": "atomic os.replace",
+    "simulation_end": "2009-12-31",
+    "structure_execution": "one isolated worker process at a time"
+  },
+  "reports": [
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          4.236529496032745
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 38.504028354014736,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 2,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          3.552713678800501e-15,
+          5.684341886080802e-14
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          9.769962616701378e-14,
+          4.476419235288631e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87833600,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1378552
+      },
+      "snow_balance_max_abs": 5.684341886080802e-14,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "tens2pll_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 4.476419235288631e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          3.3691454169456847
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 34.4388960559736,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 6,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          5.329070518200751e-15,
+          1.1368683772161603e-13
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          8.348877145181177e-14,
+          3.739231146937527e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87693312,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1374656
+      },
+      "snow_balance_max_abs": 1.1368683772161603e-13,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "tens2pll_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 3.739231146937527e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          2.7261017140117474
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 30.674565611989237,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 8,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          6.217248937900877e-15,
+          1.1368683772161603e-13
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          9.237055564881302e-14,
+          2.540190280342358e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87542272,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1364220
+      },
+      "snow_balance_max_abs": 1.1368683772161603e-13,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "unlimfrc_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 2.540190280342358e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          3.040421982994303
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 31.966760688985232,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 10,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          1.7763568394002505e-15,
+          1.1368683772161603e-13
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          1.4210854715202004e-13,
+          2.327027459614328e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87683584,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1363092
+      },
+      "snow_balance_max_abs": 1.1368683772161603e-13,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "unlimfrc_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 2.327027459614328e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          2.9568608330446295
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 28.5168102599564,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 12,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          7.105427357601002e-15,
+          1.1013412404281553e-13
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          1.1368683772161603e-13,
+          3.304023721284466e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87401984,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1359312
+      },
+      "snow_balance_max_abs": 1.1013412404281553e-13,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "unlimfrc_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 3.304023721284466e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          2.664639485999942
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 29.628629726008512,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 14,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          3.552713678800501e-15,
+          5.861977570020827e-14
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          2.320088565710421e-13,
+          1.000088900582341e-12
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87542272,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1364440
+      },
+      "snow_balance_max_abs": 5.861977570020827e-14,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "unlimpow_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 1.000088900582341e-12
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          3.3163766019861214
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 31.39156269101659,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 16,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          7.105427357601002e-15,
+          1.1368683772161603e-13
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          1.2367884494324244e-13,
+          9.485745522397337e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87683584,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1368504
+      },
+      "snow_balance_max_abs": 1.1368683772161603e-13,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "unlimpow_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 9.485745522397337e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          2.5373462659772485
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 28.551738864043728,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 18,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          7.105427357601002e-15,
+          5.684341886080802e-14
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          1.9739765377835283e-13,
+          3.241851231905457e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87401984,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1359700
+      },
+      "snow_balance_max_abs": 5.684341886080802e-14,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "unlimpow_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 3.241851231905457e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          2.93123753904365
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 34.231667364016175,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 20,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          6.661338147750939e-16,
+          1.1368683772161603e-13
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          5.684341886080802e-14,
+          3.3217872896784684e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87543296,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1365416
+      },
+      "snow_balance_max_abs": 1.1368683772161603e-13,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 3.3217872896784684e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          3.6009795460267924
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 36.741818795970175,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 22,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          3.552713678800501e-15,
+          5.5067062021407764e-14
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          2.2737367544323206e-13,
+          4.884981308350689e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87684608,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1370308
+      },
+      "snow_balance_max_abs": 5.5067062021407764e-14,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 4.884981308350689e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          3.0013276709942147
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 28.120329864963423,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 24,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          3.552713678800501e-15,
+          5.5067062021407764e-14
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          1.056932319443149e-13,
+          3.241851231905457e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87403008,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1351444
+      },
+      "snow_balance_max_abs": 5.5067062021407764e-14,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 3.241851231905457e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          3.2647983870119788
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 35.904811329965014,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 26,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          3.552713678800501e-15,
+          5.684341886080802e-14
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          8.526512829121202e-14,
+          4.867217739956686e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87833600,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1377964
+      },
+      "snow_balance_max_abs": 5.684341886080802e-14,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "tens2pll_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 4.867217739956686e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          3.3104027330409735
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 36.44101813505404,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 30,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          1.7763568394002505e-15,
+          5.684341886080802e-14
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          7.815970093361102e-14,
+          4.334310688136611e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87693312,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1373484
+      },
+      "snow_balance_max_abs": 5.684341886080802e-14,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "tens2pll_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 4.334310688136611e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          2.650537069013808
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 32.065681823994964,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 32,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          5.329070518200751e-15,
+          5.3290705182007514e-14
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          5.1514348342607263e-14,
+          2.3092638912203256e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87542272,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1363780
+      },
+      "snow_balance_max_abs": 5.3290705182007514e-14,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "unlimfrc_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 2.3092638912203256e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          3.475695663015358
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 37.61176946305204,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 34,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          3.552713678800501e-15,
+          1.1013412404281553e-13
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          5.417888360170764e-14,
+          2.0605739337042905e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87683584,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1367044
+      },
+      "snow_balance_max_abs": 1.1013412404281553e-13,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "unlimfrc_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 2.0605739337042905e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          2.6667420630110428
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 28.039763082982972,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 36,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          3.552713678800501e-15,
+          1.1368683772161603e-13
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          1.4210854715202004e-13,
+          1.5276668818842154e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87401984,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1358744
+      },
+      "snow_balance_max_abs": 1.1368683772161603e-13,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "unlimfrc_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 1.5276668818842154e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          2.724560055998154
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 32.616138555982616,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 38,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          3.552713678800501e-15,
+          5.684341886080802e-14
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          2.0605739337042905e-13,
+          1.0080825063596421e-12
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87542272,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1364672
+      },
+      "snow_balance_max_abs": 5.684341886080802e-14,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "unlimpow_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 1.0080825063596421e-12
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          3.2593050790019333
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 36.68448741000611,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 40,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          3.552713678800501e-15,
+          5.5067062021407764e-14
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          2.1715962361668062e-13,
+          1.000532989792191e-12
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87683584,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1367528
+      },
+      "snow_balance_max_abs": 5.5067062021407764e-14,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "unlimpow_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 1.000532989792191e-12
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          2.927913411986083
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 31.600015603005886,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 42,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          3.552713678800501e-15,
+          5.684341886080802e-14
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          2.9176661087149114e-13,
+          5.329070518200751e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87401984,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1351320
+      },
+      "snow_balance_max_abs": 5.684341886080802e-14,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "unlimpow_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 5.329070518200751e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          2.8901882090140134
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 33.49110747402301,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 44,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          3.552713678800501e-15,
+          5.684341886080802e-14
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          1.9162449405030202e-13,
+          9.734435479913373e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87543296,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1365176
+      },
+      "snow_balance_max_abs": 5.684341886080802e-14,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 9.734435479913373e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          2.900966604007408
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 36.863860110985115,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 46,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          3.552713678800501e-15,
+          5.684341886080802e-14
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          5.073719222536965e-13,
+          1.0160761121369433e-12
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87684608,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1365528
+      },
+      "snow_balance_max_abs": 5.684341886080802e-14,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 1.0160761121369433e-12
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          3.0707484639715403
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 31.74503521202132,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 48,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          3.552713678800501e-15,
+          5.684341886080802e-14
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          2.873257187729905e-13,
+          3.1796787425264483e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87403008,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1360148
+      },
+      "snow_balance_max_abs": 5.684341886080802e-14,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 3.1796787425264483e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          20.595534667023458
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 60.54206012299983,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 50,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          5.329070518200751e-15,
+          1.1368683772161603e-13
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          8.171241461241152e-14,
+          3.161915174132446e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87833600,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1450964
+      },
+      "snow_balance_max_abs": 1.1368683772161603e-13,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "tens2pll_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 3.161915174132446e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          16.96638694597641
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 56.55882909800857,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 54,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          3.552713678800501e-15,
+          2.842170943040401e-14
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          1.936228954946273e-13,
+          9.201528428093297e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87693312,
+        "gpu_peak_reserved_bytes": 109051904,
+        "host_rss_kb": 1438892
+      },
+      "snow_balance_max_abs": 2.842170943040401e-14,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "tens2pll_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 9.201528428093297e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          13.973873544018716
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 47.298467457003426,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 56,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          3.552713678800501e-15,
+          1.1723955140041653e-13
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          1.7053025658242404e-13,
+          1.7408297026122455e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87542272,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1419724
+      },
+      "snow_balance_max_abs": 1.1723955140041653e-13,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "unlimfrc_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 1.7408297026122455e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          17.0111844560015
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 48.6186247440055,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 58,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          7.105427357601002e-15,
+          1.1546319456101628e-13
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          9.636735853746359e-14,
+          3.019806626980426e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87683584,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1430388
+      },
+      "snow_balance_max_abs": 1.1546319456101628e-13,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "unlimfrc_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 3.019806626980426e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          11.754369450034574
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 39.83851687295828,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 60,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          7.105427357601002e-15,
+          1.1368683772161603e-13
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          1.4588330543574557e-13,
+          3.126388037344441e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87401984,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1408632
+      },
+      "snow_balance_max_abs": 1.1368683772161603e-13,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "unlimfrc_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 3.126388037344441e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          13.697572658013087
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 49.099201675038785,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 62,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          3.552713678800501e-15,
+          5.684341886080802e-14
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          4.5341508325691393e-13,
+          1.0089706847793423e-12
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87542272,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1420872
+      },
+      "snow_balance_max_abs": 5.684341886080802e-14,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "unlimpow_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 1.0089706847793423e-12
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          15.08658922399627
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 53.31976461596787,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 64,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          3.552713678800501e-15,
+          1.1368683772161603e-13
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          2.7111646261346323e-13,
+          9.745537710159624e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87683584,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1431548
+      },
+      "snow_balance_max_abs": 1.1368683772161603e-13,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "unlimpow_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 9.745537710159624e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          13.289901393989567
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 44.46389996999642,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 66,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          5.329070518200751e-15,
+          2.842170943040401e-14
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          6.480926906249351e-13,
+          6.536993168992922e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87401984,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1409616
+      },
+      "snow_balance_max_abs": 2.842170943040401e-14,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "unlimpow_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 6.536993168992922e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          14.780188476026524
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 53.69570613198448,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 68,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          2.6645352591003757e-15,
+          2.842170943040401e-14
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          9.414691248821327e-14,
+          4.547473508864641e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87543296,
+        "gpu_peak_reserved_bytes": 109051904,
+        "host_rss_kb": 1422520
+      },
+      "snow_balance_max_abs": 2.842170943040401e-14,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 4.547473508864641e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          16.906093589030206
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 53.86273273604456,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 70,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          3.552713678800501e-15,
+          1.1368683772161603e-13
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          5.062616992290714e-14,
+          5.46229728115577e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87684608,
+        "gpu_peak_reserved_bytes": 109051904,
+        "host_rss_kb": 1434116
+      },
+      "snow_balance_max_abs": 1.1368683772161603e-13,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 5.46229728115577e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          13.368542395008262
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 47.15142425597878,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 72,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          3.552713678800501e-15,
+          5.684341886080802e-14
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          8.526512829121202e-14,
+          6.750155989720952e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87403008,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1410904
+      },
+      "snow_balance_max_abs": 5.684341886080802e-14,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 6.750155989720952e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          3.7145212690229528
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 39.774699833011255,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 78,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          2.6645352591003757e-15,
+          1.1368683772161603e-13
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          5.5067062021407764e-14,
+          2.948752353404416e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87693312,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1373764
+      },
+      "snow_balance_max_abs": 1.1368683772161603e-13,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "tens2pll_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_w2sat",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 2.948752353404416e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          2.7725275339907967
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 32.218592151999474,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 84,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          2.6645352591003757e-15,
+          1.8118839761882555e-13
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          3.6415315207705135e-14,
+          1.6697754290362354e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87401984,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1359572
+      },
+      "snow_balance_max_abs": 1.8118839761882555e-13,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "unlimfrc_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_w2sat",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 1.6697754290362354e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          2.5892033299896866
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 27.86775887903059,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 90,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          7.105427357601002e-15,
+          3.552713678800501e-14
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          3.2507330161024584e-13,
+          6.603606550470431e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87401984,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1360472
+      },
+      "snow_balance_max_abs": 3.552713678800501e-14,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "unlimpow_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_w2sat",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 6.603606550470431e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          2.603528108971659
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 27.476177927979734,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 96,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          3.552713678800501e-15,
+          5.684341886080802e-14
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          1.412203687323199e-13,
+          6.572520305780927e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87403008,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1361136
+      },
+      "snow_balance_max_abs": 5.684341886080802e-14,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_w2sat",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 6.572520305780927e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          3.244437713001389
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 35.04704148799647,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 102,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          3.552713678800501e-15,
+          1.1368683772161603e-13
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          1.234568003383174e-13,
+          2.824407374646398e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87693312,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1372320
+      },
+      "snow_balance_max_abs": 1.1368683772161603e-13,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "tens2pll_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_w2sat",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 2.824407374646398e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          2.484218403988052
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 27.251880546973553,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 108,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          3.552713678800501e-15,
+          1.1368683772161603e-13
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          1.2256862191861728e-13,
+          1.616484723854228e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87401984,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1358752
+      },
+      "snow_balance_max_abs": 1.1368683772161603e-13,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "unlimfrc_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_w2sat",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 1.616484723854228e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          2.5656694230274297
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 28.050807691004593,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 114,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          1.7763568394002505e-15,
+          5.240252676230739e-14
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          2.2682827838238495e-12,
+          6.288303211476887e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87401984,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1359628
+      },
+      "snow_balance_max_abs": 5.240252676230739e-14,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "unlimpow_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_w2sat",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 2.2682827838238495e-12
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          2.6179571300162934
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 27.740117490000557,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 120,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          3.552713678800501e-15,
+          1.1191048088221578e-13
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          2.48245868306185e-13,
+          6.252776074688882e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87403008,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1359960
+      },
+      "snow_balance_max_abs": 1.1191048088221578e-13,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_w2sat",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 6.252776074688882e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          15.953057951002847
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 51.259835912962444,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 126,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          2.6645352591003757e-15,
+          1.1368683772161603e-13
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          4.973799150320701e-14,
+          3.0020430585864233e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87693312,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1438020
+      },
+      "snow_balance_max_abs": 1.1368683772161603e-13,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "tens2pll_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_w2sat",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 3.0020430585864233e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          12.050026112992782
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 39.05825637798989,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 132,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          2.6645352591003757e-15,
+          5.684341886080802e-14
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          3.419486915845482e-14,
+          1.3500311979441904e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87401984,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1408456
+      },
+      "snow_balance_max_abs": 5.684341886080802e-14,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "unlimfrc_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_w2sat",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 1.3500311979441904e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          11.741140614030883
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 38.558235411997885,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 138,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          3.552713678800501e-15,
+          1.1013412404281553e-13
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          3.2785579806571263e-13,
+          6.545874953189923e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87401984,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1409636
+      },
+      "snow_balance_max_abs": 1.1013412404281553e-13,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "unlimpow_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_w2sat",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 6.545874953189923e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          12.03343660599785
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 39.86560947401449,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 144,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          2.886579864025407e-15,
+          1.1368683772161603e-13
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          2.4158453015843406e-13,
+          6.767919558114954e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87403008,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1410880
+      },
+      "snow_balance_max_abs": 1.1368683772161603e-13,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_w2sat",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 6.767919558114954e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          4.018369486031588
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 40.48822004604153,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 146,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          2.6645352591003757e-15,
+          1.1368683772161603e-13
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          5.3734794391857577e-14,
+          2.5934809855243657e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87833600,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1380372
+      },
+      "snow_balance_max_abs": 1.1368683772161603e-13,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "tens2pll_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 2.5934809855243657e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          3.2053929569665343
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 34.69913161499426,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 150,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          3.552713678800501e-15,
+          1.1368683772161603e-13
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          3.595346242946107e-12,
+          2.5579538487363607e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87693312,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1374984
+      },
+      "snow_balance_max_abs": 1.1368683772161603e-13,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "tens2pll_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 3.595346242946107e-12
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          2.7233604810317047
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 31.399896548013203,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 152,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          5.329070518200751e-15,
+          1.1368683772161603e-13
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          9.681144774731365e-14,
+          2.2737367544323206e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87542272,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1364248
+      },
+      "snow_balance_max_abs": 1.1368683772161603e-13,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "unlimfrc_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 2.2737367544323206e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          2.9633595700142905
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 33.987956664990634,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 154,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          3.552713678800501e-15,
+          1.1368683772161603e-13
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          1.056932319443149e-13,
+          2.3447910280083306e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87683584,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1368036
+      },
+      "snow_balance_max_abs": 1.1368683772161603e-13,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "unlimfrc_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 2.3447910280083306e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          2.746320788981393
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 29.573043447977398,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 156,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          5.329070518200751e-15,
+          1.1368683772161603e-13
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          8.215650382226158e-14,
+          1.6342482922482304e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87401984,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1359300
+      },
+      "snow_balance_max_abs": 1.1368683772161603e-13,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "unlimfrc_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 1.6342482922482304e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          2.723152616992593
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 31.69103925296804,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 158,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          3.552713678800501e-15,
+          6.039613253960852e-14
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          4.726774527341604e-13,
+          9.681144774731365e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87542272,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1364840
+      },
+      "snow_balance_max_abs": 6.039613253960852e-14,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "unlimpow_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 9.681144774731365e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          3.089096007985063
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 35.60282549401745,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 160,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          7.105427357601002e-15,
+          1.1368683772161603e-13
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          1.1812772982011666e-13,
+          1.659117287999834e-12
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87683584,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1370332
+      },
+      "snow_balance_max_abs": 1.1368683772161603e-13,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "unlimpow_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 1.659117287999834e-12
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          3.221103078976739
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 33.92776587000117,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 162,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          7.105427357601002e-15,
+          1.1368683772161603e-13
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          1.616484723854228e-13,
+          6.536993168992922e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87401984,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1360620
+      },
+      "snow_balance_max_abs": 1.1368683772161603e-13,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "unlimpow_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 6.536993168992922e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          2.6591293180244975
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 31.72812816099031,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 164,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          7.105427357601002e-15,
+          5.684341886080802e-14
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          2.8954616482224083e-13,
+          4.760636329592671e-12
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87543296,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1365484
+      },
+      "snow_balance_max_abs": 5.684341886080802e-14,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 4.760636329592671e-12
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          3.101297824003268
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 33.828630471020006,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 166,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          2.6645352591003757e-15,
+          4.440892098500626e-14
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          2.4802382370125997e-13,
+          1.4921397450962104e-12
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87684608,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1369668
+      },
+      "snow_balance_max_abs": 4.440892098500626e-14,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 1.4921397450962104e-12
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          2.6479098059935495
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 29.894280479988083,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 168,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          3.552713678800501e-15,
+          4.263256414560601e-14
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          6.359357485052897e-13,
+          2.6432189770275727e-12
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87403008,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1361544
+      },
+      "snow_balance_max_abs": 4.263256414560601e-14,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 2.6432189770275727e-12
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          3.4984466519672424
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 39.89341376599623,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 170,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          3.552713678800501e-15,
+          1.1368683772161603e-13
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          2.859934511434403e-13,
+          2.8421709430404007e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87833600,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1379044
+      },
+      "snow_balance_max_abs": 1.1368683772161603e-13,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "tens2pll_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 2.859934511434403e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          3.638248142960947
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 38.780220924003515,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 174,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          2.6645352591003757e-15,
+          1.1368683772161603e-13
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          4.8263615326504805e-12,
+          2.7355895326763857e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87693312,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1374240
+      },
+      "snow_balance_max_abs": 1.1368683772161603e-13,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "tens2pll_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 4.8263615326504805e-12
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          2.919398211000953
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 35.01667414099211,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 176,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          7.105427357601002e-15,
+          2.842170943040401e-14
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          5.0182080713057076e-14,
+          4.978240042419202e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87542272,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1364288
+      },
+      "snow_balance_max_abs": 2.842170943040401e-14,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "unlimfrc_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 4.978240042419202e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          2.9264283810043707
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 32.43043744901661,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 178,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          3.0531133177191805e-15,
+          1.1368683772161603e-13
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          2.1795898419441073e-12,
+          2.362554596402333e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87683584,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1367016
+      },
+      "snow_balance_max_abs": 1.1368683772161603e-13,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "unlimfrc_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 2.1795898419441073e-12
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          2.5696782339946367
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 27.649799033009913,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 180,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          2.886579864025407e-15,
+          1.1368683772161603e-13
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          1.5054624213917123e-13,
+          1.5276668818842154e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87401984,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1358144
+      },
+      "snow_balance_max_abs": 1.1368683772161603e-13,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "unlimfrc_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 1.5276668818842154e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          3.0082881419803016
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 33.130610050982796,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 182,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          3.552713678800501e-15,
+          5.684341886080802e-14
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          4.292122213200855e-13,
+          1.715960706860642e-12
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87542272,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1364464
+      },
+      "snow_balance_max_abs": 5.684341886080802e-14,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "unlimpow_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 1.715960706860642e-12
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          3.438466214982327
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 37.48507164098555,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 184,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          3.552713678800501e-15,
+          1.1368683772161603e-13
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          2.3636648194269583e-13,
+          9.876544027065393e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87683584,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1369900
+      },
+      "snow_balance_max_abs": 1.1368683772161603e-13,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "unlimpow_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 9.876544027065393e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          2.655135385983158
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 28.893077900982462,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 186,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          2.886579864025407e-15,
+          1.1368683772161603e-13
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          1.6880941089425505e-13,
+          5.471179065352771e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87401984,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1358672
+      },
+      "snow_balance_max_abs": 1.1368683772161603e-13,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "unlimpow_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 5.471179065352771e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          2.7557059440296143
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 34.41878323099809,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 188,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          3.552713678800501e-15,
+          1.1368683772161603e-13
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          2.984279490192421e-13,
+          8.100187187665142e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87543296,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1365552
+      },
+      "snow_balance_max_abs": 1.1368683772161603e-13,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 8.100187187665142e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          3.3713465569890104
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 38.453099761973135,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 190,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          5.329070518200751e-15,
+          5.684341886080802e-14
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          9.769962616701378e-14,
+          1.2079226507921703e-12
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87684608,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1369304
+      },
+      "snow_balance_max_abs": 5.684341886080802e-14,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 1.2079226507921703e-12
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          2.801414769026451
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 31.602676267037168,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 192,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          3.552713678800501e-15,
+          2.842170943040401e-14
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          6.394884621840902e-13,
+          3.268496584496461e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87403008,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1360392
+      },
+      "snow_balance_max_abs": 2.842170943040401e-14,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 6.394884621840902e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          19.74252421798883
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 63.33766687801108,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 194,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          3.552713678800501e-15,
+          1.1368683772161603e-13
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          5.826450433232822e-13,
+          2.6645352591003757e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87833600,
+        "gpu_peak_reserved_bytes": 109051904,
+        "host_rss_kb": 1453216
+      },
+      "snow_balance_max_abs": 1.1368683772161603e-13,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "tens2pll_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 5.826450433232822e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          5.548221413977444
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 41.38961965200724,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 198,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          2.6645352591003757e-15,
+          2.842170943040401e-14
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          1.55964130499342e-12,
+          4.3876013933186186e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87693312,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1373636
+      },
+      "snow_balance_max_abs": 2.842170943040401e-14,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "tens2pll_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 1.55964130499342e-12
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          14.559652424009982
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 53.268272219982464,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 200,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          3.552713678800501e-15,
+          5.684341886080802e-14
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          2.113864638886298e-13,
+          1.1590728377086634e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87542272,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1419980
+      },
+      "snow_balance_max_abs": 5.684341886080802e-14,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "unlimfrc_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 2.113864638886298e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          18.209970962954685
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 56.653157328022644,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 202,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          1.7763568394002505e-15,
+          5.684341886080802e-14
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          1.0080825063596421e-13,
+          4.973799150320701e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87683584,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1430764
+      },
+      "snow_balance_max_abs": 5.684341886080802e-14,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "unlimfrc_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 4.973799150320701e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          12.54855345300166
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 41.93358505499782,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 204,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          1.7763568394002505e-15,
+          1.1368683772161603e-13
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          2.9110047705671604e-13,
+          1.6697754290362354e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87401984,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1408580
+      },
+      "snow_balance_max_abs": 1.1368683772161603e-13,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "unlimfrc_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 2.9110047705671604e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          15.005038007977419
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 47.63176923798164,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 206,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          5.329070518200751e-15,
+          5.684341886080802e-14
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          3.6970426720017713e-13,
+          5.098144129078719e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87542272,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1422620
+      },
+      "snow_balance_max_abs": 5.684341886080802e-14,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "unlimpow_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 5.098144129078719e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          16.65705447999062
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 53.14639468101086,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 208,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          1.7763568394002505e-15,
+          1.1368683772161603e-13
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          2.3780977187470853e-13,
+          9.36806188178707e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87683584,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1433400
+      },
+      "snow_balance_max_abs": 1.1368683772161603e-13,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "unlimpow_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 9.36806188178707e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          12.691087356011849
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 44.90017669898225,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 210,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          7.105427357601002e-15,
+          1.1368683772161603e-13
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          1.7408297026122455e-13,
+          6.501466032204917e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87401984,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1409688
+      },
+      "snow_balance_max_abs": 1.1368683772161603e-13,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "unlimpow_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 6.501466032204917e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          14.162412423989736
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 46.423483131977264,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 212,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          1.5543122344752192e-15,
+          1.1368683772161603e-13
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          1.1254996934439987e-11,
+          4.297007194509206e-12
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87543296,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1422428
+      },
+      "snow_balance_max_abs": 1.1368683772161603e-13,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 1.1254996934439987e-11
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          16.73499298200477
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 54.10931692097802,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 214,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          3.552713678800501e-15,
+          9.947598300641403e-14
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          9.237055564881302e-14,
+          3.126388037344441e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87684608,
+        "gpu_peak_reserved_bytes": 109051904,
+        "host_rss_kb": 1434464
+      },
+      "snow_balance_max_abs": 9.947598300641403e-14,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 3.126388037344441e-13
+    },
+    {
+      "capacity_violation_count": 0,
+      "compile": {
+        "cold_compile_seconds": [
+          12.84611657098867
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "compile_pass": true,
+      "completed_full_period": true,
+      "elapsed_seconds": 41.214586918998975,
+      "finite": true,
+      "flux_finite": true,
+      "gpu_device": "cuda",
+      "logical_run_count": 2,
+      "model_id": 216,
+      "monitoring": {
+        "actual_steps": 8401,
+        "capacity_violation_count": [
+          0,
+          0
+        ],
+        "chunk_size": 64,
+        "negative_active_state_count": [
+          0,
+          0
+        ],
+        "nonfinite_count": [
+          0,
+          0
+        ],
+        "per_basin": [
+          {
+            "basin_id": "USA_09447800",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          },
+          {
+            "basin_id": "USA_14138900",
+            "failure_trace": null,
+            "first_failure_category": null,
+            "first_failure_index": null
+          }
+        ],
+        "snow_balance_max_abs": [
+          7.105427357601002e-15,
+          5.684341886080802e-14
+        ],
+        "stopped_on_failure": false,
+        "water_balance_max_abs": [
+          4.8547832420808845e-12,
+          6.390443729742401e-13
+        ]
+      },
+      "negative_active_state_count": 0,
+      "q_finite": true,
+      "quality_pass": true,
+      "resource": {
+        "gpu_peak_allocated_bytes": 87403008,
+        "gpu_peak_reserved_bytes": 88080384,
+        "host_rss_kb": 1411444
+      },
+      "snow_balance_max_abs": 5.684341886080802e-14,
+      "states_finite": true,
+      "status": "passed",
+      "topology": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "water_balance_max_abs": 4.8547832420808845e-12
+    }
+  ],
+  "resource": {
+    "cache": {
+      "bytes": 1366937091,
+      "files": 13052
+    },
+    "gpu_peak_allocated_bytes": 87833600,
+    "gpu_peak_reserved_bytes": 109051904,
+    "host_peak_rss_kb": 1453216,
+    "rss_stop_kb": 3500000,
+    "wall_clock_seconds": 512.6516389040044
+  },
+  "resume": {
+    "resumed_from_structure_count": 68,
+    "source_partial": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/torch_fuse_78_long_horizon_smoke_v2.partial.json"
+  },
+  "schema_version": "torch-fuse-78-long-horizon-smoke-v2",
+  "selection": {
+    "catchments": [
+      "USA_09447800",
+      "USA_14138900"
+    ],
+    "logical_run_count_expected": 156,
+    "model_ids": [
+      2,
+      6,
+      8,
+      10,
+      12,
+      14,
+      16,
+      18,
+      20,
+      22,
+      24,
+      26,
+      30,
+      32,
+      34,
+      36,
+      38,
+      40,
+      42,
+      44,
+      46,
+      48,
+      50,
+      54,
+      56,
+      58,
+      60,
+      62,
+      64,
+      66,
+      68,
+      70,
+      72,
+      78,
+      84,
+      90,
+      96,
+      102,
+      108,
+      114,
+      120,
+      126,
+      132,
+      138,
+      144,
+      146,
+      150,
+      152,
+      154,
+      156,
+      158,
+      160,
+      162,
+      164,
+      166,
+      168,
+      170,
+      174,
+      176,
+      178,
+      180,
+      182,
+      184,
+      186,
+      188,
+      190,
+      192,
+      194,
+      198,
+      200,
+      202,
+      204,
+      206,
+      208,
+      210,
+      212,
+      214,
+      216
+    ],
+    "structure_count": 78,
+    "structure_order": "catalogue order, serial"
+  },
+  "source": {
+    "batched_source": "/home/jingxin/orca/workspaces/dmg-research/autofuse/dfuse/batched.py",
+    "batched_source_sha256": "2a536aef8ab3e536765428a6c152f441f5066776da244c82bb69a67f2b529160",
+    "calibration_archive": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/reference_calibration_12x78.json",
+    "catalogue": "/home/jingxin/orca/workspaces/dmg-research/autofuse/dfuse/specs/structures_78.json",
+    "catalogue_sha256": "457b232b71c870fd3cb698fd9bb517e58844c5e9bba5f0c4ac4ad0bcc971d6fc",
+    "input_index": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/landscape_inputs/index.json",
+    "kernel": "/home/jingxin/orca/workspaces/dmg-research/autofuse/dfuse/kernel.py",
+    "kernel_sha256": "4a79b4caa8d93881c849476e2ffe5aa304c8033cf271bd7e11073d7f7227faff",
+    "manifest": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/landscape_12catchment_manifest.json",
+    "runtime": "/home/jingxin/orca/workspaces/dmg-research/autofuse/dfuse/runtime.py",
+    "runtime_sha256": "f6b9f066489929479ccabb2035e50bed146e536af24a641cae68e11c37e9ad13"
+  },
+  "status": "passed"
+}

@@ -1,0 +1,33 @@
+{
+  "schema_version": "s4-diagnostic-structures-v1",
+  "status": "frozen_before_s4_results",
+  "selection_basis": {
+    "source_catalogue": "dfuse/specs/structures_78.json",
+    "source_catalogue_sha256": "457b232b71c870fd3cb698fd9bb517e58844c5e9bba5f0c4ac4ad0bcc971d6fc",
+    "count": 12,
+    "required_qperc_lower_models": [164, 166, 178, 188, 190, 210, 212, 214],
+    "normal_topology_controls": [2, 6, 8, 14],
+    "selection_frozen_before_s4_results": true
+  },
+  "structures": [
+    {"model_id": 2, "role": "normal_topology_control", "decisions": {"ARCH1": "tension1_1", "ARCH2": "tens2pll_2", "QSURF": "arno_x_vic", "QPERC": "perc_f2sat"}},
+    {"model_id": 6, "role": "normal_topology_control", "decisions": {"ARCH1": "onestate_1", "ARCH2": "tens2pll_2", "QSURF": "arno_x_vic", "QPERC": "perc_f2sat"}},
+    {"model_id": 8, "role": "normal_topology_control", "decisions": {"ARCH1": "tension1_1", "ARCH2": "unlimfrc_2", "QSURF": "arno_x_vic", "QPERC": "perc_f2sat"}},
+    {"model_id": 14, "role": "normal_topology_control", "decisions": {"ARCH1": "tension1_1", "ARCH2": "unlimpow_2", "QSURF": "arno_x_vic", "QPERC": "perc_f2sat"}},
+    {"model_id": 164, "role": "sensitive_qperc_lower", "decisions": {"ARCH1": "tension1_1", "ARCH2": "fixedsiz_2", "QSURF": "arno_x_vic", "QPERC": "perc_lower"}},
+    {"model_id": 166, "role": "sensitive_qperc_lower", "decisions": {"ARCH1": "tension2_1", "ARCH2": "fixedsiz_2", "QSURF": "arno_x_vic", "QPERC": "perc_lower"}},
+    {"model_id": 178, "role": "sensitive_qperc_lower", "decisions": {"ARCH1": "tension2_1", "ARCH2": "unlimfrc_2", "QSURF": "prms_varnt", "QPERC": "perc_lower"}},
+    {"model_id": 188, "role": "sensitive_qperc_lower", "decisions": {"ARCH1": "tension1_1", "ARCH2": "fixedsiz_2", "QSURF": "prms_varnt", "QPERC": "perc_lower"}},
+    {"model_id": 190, "role": "sensitive_qperc_lower", "decisions": {"ARCH1": "tension2_1", "ARCH2": "fixedsiz_2", "QSURF": "prms_varnt", "QPERC": "perc_lower"}},
+    {"model_id": 210, "role": "sensitive_qperc_lower", "decisions": {"ARCH1": "onestate_1", "ARCH2": "unlimpow_2", "QSURF": "tmdl_param", "QPERC": "perc_lower"}},
+    {"model_id": 212, "role": "sensitive_qperc_lower", "decisions": {"ARCH1": "tension1_1", "ARCH2": "fixedsiz_2", "QSURF": "tmdl_param", "QPERC": "perc_lower"}},
+    {"model_id": 214, "role": "sensitive_qperc_lower", "decisions": {"ARCH1": "tension2_1", "ARCH2": "fixedsiz_2", "QSURF": "tmdl_param", "QPERC": "perc_lower"}}
+  ],
+  "protocol": {
+    "same_fixed_reference_theta": true,
+    "same_forcing_qobs_evaluation": true,
+    "s3_outputs_reused": true,
+    "no_calibration": true,
+    "no_full_12x78_gate": true
+  }
+}

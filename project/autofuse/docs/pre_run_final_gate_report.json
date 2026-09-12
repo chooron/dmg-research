@@ -1,0 +1,96 @@
+{
+  "schema_version": "pre-run-final-gate-report-v1",
+  "status": "PASS",
+  "ready_for_phase_0": "YES",
+  "full_registry_validated": "NO",
+  "ssh_required": "NO",
+  "ssh_reason": "All hard verification gates G1-G7 and diagnostic D2 completed successfully on the local RTX 4080 GPU with zero errors, finite gradients, stable VRAM plateau (<474MB peak), and exact resume parity.",
+  "hardware_environment": {
+    "device": "NVIDIA GeForce RTX 4080 (12GB VRAM)",
+    "backend": "CUDA / PyTorch 2.6.0+cu124",
+    "dtype": "torch.float32",
+    "omp_num_threads": 1
+  },
+  "generated_at_utc": "2026-09-08T12:42:06.988694+00:00",
+  "hard_gates": {
+    "G1_PHASE_LOCKING": "PASS",
+    "G2_LONG_RUN_SAMPLER_STRESS": "PASS",
+    "G3_FULL_78_OPTIMIZER_CONTRACT": "PASS",
+    "G4_REAL_DATA_ONE_CYCLE": "PASS",
+    "G5_PRODUCTION_SHAPE_MEMORY": "PASS",
+    "G6_REAL_DATA_RESUME": "PASS",
+    "G7_TIME_BOUNDARY_LEAKAGE": "PASS"
+  },
+  "non_blocking_diagnostics": {
+    "D1_COMPILE_PARITY": "PASS",
+    "D2_TINY_LEARNING_SANITY": "PASS"
+  },
+  "gate_summaries": {
+    "g1_phase_locking": {
+      "status": "PASS",
+      "cycles_tested": 50,
+      "structures_tested": [
+        5,
+        3,
+        78
+      ]
+    },
+    "g2_long_run_sampler_stress": {
+      "status": "PASS",
+      "steps_evaluated": 20000,
+      "marginal_exposure_discrepancy": 1,
+      "within_batch_duplicates": 0
+    },
+    "g3_full_78_optimizer_contract": {
+      "status": "PASS",
+      "structures_covered": 78,
+      "inactive_grad_is_none": true,
+      "inactive_param_delta_zero": true
+    },
+    "g4_real_data_one_cycle": {
+      "status": "PASS",
+      "structures_covered": 78,
+      "wall_clock_seconds": 272.17251063599997,
+      "median_loss": 4.878303219237253,
+      "all_states_finite": true
+    },
+    "g5_production_shape_memory": {
+      "status": "PASS",
+      "batch_size": 100,
+      "window_days": 730,
+      "peak_vram_allocated_mb": 451.64208984375,
+      "peak_vram_reserved_mb": 474.0,
+      "median_warm_step_seconds": 5.494389991999924,
+      "memory_plateau_stable": true
+    },
+    "g6_real_data_resume": {
+      "status": "PASS",
+      "steps_checked": 10,
+      "checkpoint_step": 4,
+      "max_loss_difference": 0.0,
+      "max_parameter_difference": 0.0
+    },
+    "g7_time_boundary_leakage": {
+      "status": "PASS",
+      "windows_audited": 10000,
+      "leakage_detected": false,
+      "calibration_period": [
+        "1989-01-01",
+        "1998-12-31"
+      ],
+      "evaluation_period": [
+        "1999-01-01",
+        "2009-12-31"
+      ]
+    },
+    "d2_tiny_learning_sanity": {
+      "status": "PASS",
+      "initial_loss": 24.65755780118566,
+      "final_loss": 0.9604642445142452,
+      "best_loss": 0.9462339122564054,
+      "trunk_delta": 106.06143415009161,
+      "active_head_delta": 30.864037263727568,
+      "inactive_head_delta": 0.0
+    }
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "schema_version": "torch-fuse-execution-layer-v1-1-v1",
+  "status": "frozen",
+  "protocol_id": "formal-experiment-protocol-v1-db53091e6e222066",
+  "generated_at_utc": "2026-09-07T00:00:00+00:00",
+  "provenance": {
+    "git_head": "3caca37a4243ae0a95ebe9cc4f22998672ddf464",
+    "working_tree": "dirty/uncommitted project state preserved; no commit or remote mutation",
+    "numerical_core_freeze": {
+      "path": "project/autofuse/docs/torch_fuse_v1_freeze.json",
+      "sha256": "327c193c933a744d7837ec1590eae4f2454e303ce563559d355982b7bece2753",
+      "status": "frozen"
+    },
+    "formal_protocol": {
+      "path": "project/autofuse/docs/formal_experiment_protocol_v1.json",
+      "sha256": "472ae6a3a41b18d22ef148f4e24ee8d546aa86497f62b08fa1ff65d75cb450a8",
+      "protocol_id": "formal-experiment-protocol-v1-db53091e6e222066"
+    },
+    "performance_optimization_master": {
+      "path": "project/autofuse/docs/formal_sce_performance_optimization_v1.json",
+      "sha256": "e30cae41a1eb26639536c4b26715ca2f3333390c95a02e646244f77c28a8d11c"
+    }
+  },
+  "frozen_numerical_core_boundary": {
+    "description": "The hydrological physics equations, coupled RHS, explicit RK2/Heun integrator, FIX_STATES boundary correction, WATR_2 correction, snow semantics, and 78-structure catalogue are strictly frozen and unmodified.",
+    "files": {
+      "catalogue": {
+        "path": "dfuse/specs/structures_78.json",
+        "sha256": "457b232b71c870fd3cb698fd9bb517e58844c5e9bba5f0c4ac4ad0bcc971d6fc",
+        "matches_v1_freeze": true
+      },
+      "kernel": {
+        "path": "dfuse/kernel.py",
+        "sha256": "4a79b4caa8d93881c849476e2ffe5aa304c8033cf271bd7e11073d7f7227faff",
+        "matches_v1_freeze": true
+      },
+      "runtime": {
+        "path": "dfuse/runtime.py",
+        "sha256": "f6b9f066489929479ccabb2035e50bed146e536af24a641cae68e11c37e9ad13",
+        "matches_v1_freeze": true
+      }
+    }
+  },
+  "execution_layer_v1_1_modifications": [
+    {
+      "component": "dfuse/batched.py",
+      "sha256": "4a3cf5354972d3f94747db5d9297a731efc1b8a53e66050b1dbe188ec982b6be",
+      "modification": "Added output_mode='q_only' option to simulate_coupled_rk2_batched; skips 37 intermediate list appends and stacks during optimization while executing the exact same numerical state integration."
+    },
+    {
+      "component": "project/autofuse/sce.py",
+      "sha256": "fa6b1e600570b1fb1847e62d4e8c1873130c2423cf9e9a4fba7c4e5140b08044",
+      "modification": "Added candidate_batch_size parameter to SCEBaseline.run; evaluates initial population in parallel on GPU leading batch dimension [C, time, 3] while preserving exact RNG sequence and simplex evolution logic."
+    },
+    {
+      "component": "project/autofuse/evaluator.py",
+      "sha256": "0228229b448f2b1c41fb742917711d95ee2d245dae858db14b7264ae6c05d7b5",
+      "modification": "Supported 2D parameter tensor [1, 37] expansion across multi-basin batches in _batched_params."
+    },
+    {
+      "component": "project/autofuse/formal_sce_pilot.py",
+      "sha256": "5bbba052737ce75bbec71ca53a5c2d1b8c2c8f85f524458df35ae6dc034e3a8a",
+      "modification": "Integrated calibration-period horizon truncation (4383 days) and single final post-optimization forward pass for train/test metric computation."
+    }
+  ],
+  "validation_and_parity_proofs": {
+    "all_parity_gates_passed": true,
+    "calibration_truncation_max_error": 0.0,
+    "q_only_mode_max_error": 0.0,
+    "candidate_batching_max_error": 0.0,
+    "same_seed_trajectory_identical": true,
+    "single_final_forward_train_test_max_error": 0.0,
+    "pilot_2x4_all_8_cases_exact_match": true,
+    "measured_speedup": 3.804055131958485,
+    "validation_artifacts": {
+      "sce_calibration_horizon_validation": "project/autofuse/docs/sce_calibration_horizon_validation.json",
+      "q_only_calibration_mode_validation": "project/autofuse/docs/q_only_calibration_mode_validation.json",
+      "sce_candidate_batching_validation": "project/autofuse/docs/sce_candidate_batching_validation.json",
+      "sce_single_final_forward_validation": "project/autofuse/docs/sce_single_final_forward_validation.json",
+      "sce_candidate_batch_scaling": "project/autofuse/docs/sce_candidate_batch_scaling.json",
+      "formal_sce_pilot_2x4_optimized": "project/autofuse/docs/formal_sce_pilot_2x4_optimized.json",
+      "formal_sce_performance_optimization_v1": "project/autofuse/docs/formal_sce_performance_optimization_v1.json"
+    }
+  }
+}

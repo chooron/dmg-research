@@ -1,0 +1,3559 @@
+{
+  "completed_structure_count": 3,
+  "failure": {
+    "compile_audit": {
+      "autograd_recompilations": 0,
+      "compile_attempts": 1,
+      "compile_successes": 1,
+      "fallbacks": 0,
+      "graph_breaks": 0,
+      "recompilations": 0,
+      "record_count": 1,
+      "records": [
+        {
+          "autograd_recompilations": 0,
+          "autograd_unique_graphs": 0,
+          "calls": 16803,
+          "code_object_id": 131335042236096,
+          "code_object_name": "generated_step_251e95e0421ee495",
+          "cold_compile_seconds": [
+            2.3112912899814546
+          ],
+          "compile_attempts": 1,
+          "compile_successes": 1,
+          "dynamo_counters": {
+            "aot_autograd": {
+              "autograd_cache_hit": 1,
+              "ok": 1,
+              "total": 1
+            },
+            "inductor": {
+              "async_compile_cache_hit": 98,
+              "async_compile_cache_miss": 147,
+              "fxgraph_cache_hit": 1,
+              "triton_bundler_load_static_autotuner": 49
+            },
+            "stats": {
+              "calls_captured": 1148,
+              "unique_graphs": 1
+            }
+          },
+          "failures": [],
+          "fallbacks": 0,
+          "forward_unique_graphs": 1,
+          "graph_breaks": 0,
+          "graph_signature": {
+            "decisions": {
+              "ARCH1": "tension1_1",
+              "ARCH2": "unlimfrc_2",
+              "ESOIL": "sequential",
+              "QINTF": "intflwnone",
+              "QPERC": "perc_f2sat",
+              "QSURF": "arno_x_vic",
+              "Q_TDH": "rout_gamma",
+              "RFERR": "multiplc_e",
+              "SNOWM": "temp_index"
+            },
+            "execution_mode": "coupled_rk2",
+            "n_substeps": 1,
+            "parameter_names": [
+              "RFERR_MLT",
+              "FRACTEN",
+              "MAXWATR_1",
+              "MAXWATR_2",
+              "QB_PRMS",
+              "PERCRTE",
+              "PERCEXP",
+              "AXV_BEXP",
+              "TIMEDELAY",
+              "MBASE",
+              "MFMAX",
+              "MFMIN",
+              "PXTEMP",
+              "OPG",
+              "LAPSE"
+            ],
+            "sequential_order": [
+              "coupled_rhs"
+            ],
+            "state_names": [
+              "TENS_1",
+              "FREE_1",
+              "WATR_2"
+            ],
+            "topology": [
+              [
+                "lower",
+                [
+                  [
+                    "WATR_2",
+                    [
+                      [
+                        "EVAP_2",
+                        -1
+                      ],
+                      [
+                        "OFLOW_2",
+                        -1
+                      ],
+                      [
+                        "QBASE_2",
+                        -1
+                      ],
+                      [
+                        "QPERC_12",
+                        1
+                      ]
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "upper",
+                [
+                  [
+                    "FREE_1",
+                    [
+                      [
+                        "OFLOW_1",
+                        -1
+                      ],
+                      [
+                        "QINTF_1",
+                        -1
+                      ],
+                      [
+                        "QPERC_12",
+                        -1
+                      ],
+                      [
+                        "TENS2FREE_1",
+                        1
+                      ]
+                    ]
+                  ],
+                  [
+                    "TENS_1",
+                    [
+                      [
+                        "EFF_PPT",
+                        1
+                      ],
+                      [
+                        "EVAP_1",
+                        -1
+                      ],
+                      [
+                        "QSURF",
+                        -1
+                      ],
+                      [
+                        "TENS2FREE_1",
+                        -1
+                      ]
+                    ]
+                  ]
+                ]
+              ]
+            ]
+          },
+          "guard_failure_reasons": {},
+          "key": {
+            "backend": "inductor",
+            "device": "cuda:0",
+            "dtype": "torch.float64",
+            "fullgraph": true,
+            "graph_signature": {
+              "decisions": {
+                "ARCH1": "tension1_1",
+                "ARCH2": "unlimfrc_2",
+                "ESOIL": "sequential",
+                "QINTF": "intflwnone",
+                "QPERC": "perc_f2sat",
+                "QSURF": "arno_x_vic",
+                "Q_TDH": "rout_gamma",
+                "RFERR": "multiplc_e",
+                "SNOWM": "temp_index"
+              },
+              "execution_mode": "coupled_rk2",
+              "n_substeps": 1,
+              "parameter_names": [
+                "RFERR_MLT",
+                "FRACTEN",
+                "MAXWATR_1",
+                "MAXWATR_2",
+                "QB_PRMS",
+                "PERCRTE",
+                "PERCEXP",
+                "AXV_BEXP",
+                "TIMEDELAY",
+                "MBASE",
+                "MFMAX",
+                "MFMIN",
+                "PXTEMP",
+                "OPG",
+                "LAPSE"
+              ],
+              "sequential_order": [
+                "coupled_rhs"
+              ],
+              "state_names": [
+                "TENS_1",
+                "FREE_1",
+                "WATR_2"
+              ],
+              "topology": [
+                [
+                  "lower",
+                  [
+                    [
+                      "WATR_2",
+                      [
+                        [
+                          "EVAP_2",
+                          -1
+                        ],
+                        [
+                          "OFLOW_2",
+                          -1
+                        ],
+                        [
+                          "QBASE_2",
+                          -1
+                        ],
+                        [
+                          "QPERC_12",
+                          1
+                        ]
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "upper",
+                  [
+                    [
+                      "FREE_1",
+                      [
+                        [
+                          "OFLOW_1",
+                          -1
+                        ],
+                        [
+                          "QINTF_1",
+                          -1
+                        ],
+                        [
+                          "QPERC_12",
+                          -1
+                        ],
+                        [
+                          "TENS2FREE_1",
+                          1
+                        ]
+                      ]
+                    ],
+                    [
+                      "TENS_1",
+                      [
+                        [
+                          "EFF_PPT",
+                          1
+                        ],
+                        [
+                          "EVAP_1",
+                          -1
+                        ],
+                        [
+                          "QSURF",
+                          -1
+                        ],
+                        [
+                          "TENS2FREE_1",
+                          -1
+                        ]
+                      ]
+                    ]
+                  ]
+                ]
+              ]
+            },
+            "input_shapes": [
+              [
+                510
+              ],
+              [
+                6
+              ],
+              [
+                37
+              ],
+              [],
+              [],
+              [
+                500
+              ]
+            ]
+          },
+          "recompilations": 0,
+          "unique_graphs": 1
+        }
+      ]
+    },
+    "error_type": "gate_failure",
+    "failure_detail": {
+      "date": "1991-07-20",
+      "index": 1661,
+      "involved_fluxes": {
+        "EFF_PPT": 0.0,
+        "EVAP_1": 0.22713686049555798,
+        "EVAP_2": 0.0,
+        "OFLOW_1": 0.0,
+        "OFLOW_2": 0.0,
+        "QBASE_2": 1.7205689307826648e-06,
+        "QINTF_1": 0.0,
+        "QPERC_12": 3.6230198899929405e-08,
+        "QSURF": 0.0
+      },
+      "kind": "water_balance",
+      "residual": 1.5994791870421743e-06,
+      "state_names": [
+        "TENS_1",
+        "FREE_1",
+        "WATR_2"
+      ],
+      "state_next": [
+        1.1437055002447514,
+        9.63811937917235,
+        1.6978680419921876e-06
+      ],
+      "state_start": [
+        1.3708423607403093,
+        9.63811941540255,
+        1.7827275868632043e-06
+      ],
+      "threshold": 1e-08
+    },
+    "model_id": 8,
+    "report_status": "failed",
+    "runs": [
+      {
+        "basin_id": "USA_09447800",
+        "bounded_state_names": [
+          "TENS_1",
+          "FREE_1"
+        ],
+        "capacity_violation_count": 0,
+        "capacity_violations": {},
+        "completed_full_period": true,
+        "elapsed_seconds": 38.905679501011036,
+        "finite": true,
+        "first_snow_balance_violation": null,
+        "first_water_balance_violation": {
+          "date": "1991-07-20",
+          "index": 1661,
+          "involved_fluxes": {
+            "EFF_PPT": 0.0,
+            "EVAP_1": 0.22713686049555798,
+            "EVAP_2": 0.0,
+            "OFLOW_1": 0.0,
+            "OFLOW_2": 0.0,
+            "QBASE_2": 1.7205689307826648e-06,
+            "QINTF_1": 0.0,
+            "QPERC_12": 3.6230198899929405e-08,
+            "QSURF": 0.0
+          },
+          "kind": "water_balance",
+          "residual": 1.5994791870421743e-06,
+          "state_names": [
+            "TENS_1",
+            "FREE_1",
+            "WATR_2"
+          ],
+          "state_next": [
+            1.1437055002447514,
+            9.63811937917235,
+            1.6978680419921876e-06
+          ],
+          "state_start": [
+            1.3708423607403093,
+            9.63811941540255,
+            1.7827275868632043e-06
+          ],
+          "threshold": 1e-08
+        },
+        "hru_id": 9447800,
+        "min_active_state": 6.402049734788307e-08,
+        "model_id": 8,
+        "negative_active_state_count": 0,
+        "nonfinite_count": 0,
+        "output_shapes": {
+          "fluxes": {
+            "EFF_PPT": [
+              8401
+            ],
+            "EVAP_1": [
+              8401
+            ],
+            "EVAP_1A": [
+              8401
+            ],
+            "EVAP_1B": [
+              8401
+            ],
+            "EVAP_2": [
+              8401
+            ],
+            "OFLOW_1": [
+              8401
+            ],
+            "OFLOW_2": [
+              8401
+            ],
+            "OFLOW_2A": [
+              8401
+            ],
+            "OFLOW_2B": [
+              8401
+            ],
+            "QBASE_2": [
+              8401
+            ],
+            "QBASE_2A": [
+              8401
+            ],
+            "QBASE_2B": [
+              8401
+            ],
+            "QINTF_1": [
+              8401
+            ],
+            "QPERC_12": [
+              8401
+            ],
+            "QSURF": [
+              8401
+            ],
+            "RCHR2EXCS": [
+              8401
+            ],
+            "SATAREA": [
+              8401
+            ],
+            "TENS2FREE_1": [
+              8401
+            ],
+            "TENS2FREE_2": [
+              8401
+            ]
+          },
+          "q": [
+            8401
+          ],
+          "q_instantaneous": [
+            8401
+          ],
+          "states": [
+            8402,
+            3
+          ]
+        },
+        "quality_pass": false,
+        "snow_balance_max_abs": 6.217248937900877e-15,
+        "unbounded_by_design_state_names": [
+          "WATR_2"
+        ],
+        "water_balance_max_abs": 1.5994791913026551e-06
+      },
+      {
+        "basin_id": "USA_14138900",
+        "bounded_state_names": [
+          "TENS_1",
+          "FREE_1"
+        ],
+        "capacity_violation_count": 0,
+        "capacity_violations": {},
+        "completed_full_period": true,
+        "elapsed_seconds": 36.899462789006066,
+        "finite": true,
+        "first_snow_balance_violation": {
+          "date": "1989-01-21",
+          "index": 751,
+          "kind": "snow_balance",
+          "residual": 15.45,
+          "snow_next": 775.0226770276034,
+          "snow_start": 775.0226770276034,
+          "state_names": [
+            "TENS_1",
+            "FREE_1",
+            "WATR_2"
+          ],
+          "state_next": [
+            48.195344350242,
+            24.242570090568307,
+            388.0562330514424
+          ],
+          "state_start": [
+            48.682223883763534,
+            27.837419991569007,
+            388.3522341665498
+          ],
+          "threshold": 1e-08
+        },
+        "first_water_balance_violation": null,
+        "hru_id": 14138900,
+        "min_active_state": 4.999999703159119e-08,
+        "model_id": 8,
+        "negative_active_state_count": 0,
+        "nonfinite_count": 0,
+        "output_shapes": {
+          "fluxes": {
+            "EFF_PPT": [
+              8401
+            ],
+            "EVAP_1": [
+              8401
+            ],
+            "EVAP_1A": [
+              8401
+            ],
+            "EVAP_1B": [
+              8401
+            ],
+            "EVAP_2": [
+              8401
+            ],
+            "OFLOW_1": [
+              8401
+            ],
+            "OFLOW_2": [
+              8401
+            ],
+            "OFLOW_2A": [
+              8401
+            ],
+            "OFLOW_2B": [
+              8401
+            ],
+            "QBASE_2": [
+              8401
+            ],
+            "QBASE_2A": [
+              8401
+            ],
+            "QBASE_2B": [
+              8401
+            ],
+            "QINTF_1": [
+              8401
+            ],
+            "QPERC_12": [
+              8401
+            ],
+            "QSURF": [
+              8401
+            ],
+            "RCHR2EXCS": [
+              8401
+            ],
+            "SATAREA": [
+              8401
+            ],
+            "TENS2FREE_1": [
+              8401
+            ],
+            "TENS2FREE_2": [
+              8401
+            ]
+          },
+          "q": [
+            8401
+          ],
+          "q_instantaneous": [
+            8401
+          ],
+          "states": [
+            8402,
+            3
+          ]
+        },
+        "quality_pass": true,
+        "snow_balance_max_abs": 45.61,
+        "unbounded_by_design_state_names": [
+          "WATR_2"
+        ],
+        "water_balance_max_abs": 2.540190280342358e-13
+      }
+    ],
+    "topology": {
+      "ARCH1": "tension1_1",
+      "ARCH2": "unlimfrc_2",
+      "ESOIL": "sequential",
+      "QINTF": "intflwnone",
+      "QPERC": "perc_f2sat",
+      "QSURF": "arno_x_vic",
+      "Q_TDH": "rout_gamma",
+      "RFERR": "multiplc_e",
+      "SNOWM": "temp_index"
+    }
+  },
+  "failures": [
+    {
+      "compile_audit": {
+        "autograd_recompilations": 0,
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "graph_breaks": 0,
+        "recompilations": 0,
+        "record_count": 1,
+        "records": [
+          {
+            "autograd_recompilations": 0,
+            "autograd_unique_graphs": 0,
+            "calls": 16803,
+            "code_object_id": 131335042236096,
+            "code_object_name": "generated_step_251e95e0421ee495",
+            "cold_compile_seconds": [
+              2.3112912899814546
+            ],
+            "compile_attempts": 1,
+            "compile_successes": 1,
+            "dynamo_counters": {
+              "aot_autograd": {
+                "autograd_cache_hit": 1,
+                "ok": 1,
+                "total": 1
+              },
+              "inductor": {
+                "async_compile_cache_hit": 98,
+                "async_compile_cache_miss": 147,
+                "fxgraph_cache_hit": 1,
+                "triton_bundler_load_static_autotuner": 49
+              },
+              "stats": {
+                "calls_captured": 1148,
+                "unique_graphs": 1
+              }
+            },
+            "failures": [],
+            "fallbacks": 0,
+            "forward_unique_graphs": 1,
+            "graph_breaks": 0,
+            "graph_signature": {
+              "decisions": {
+                "ARCH1": "tension1_1",
+                "ARCH2": "unlimfrc_2",
+                "ESOIL": "sequential",
+                "QINTF": "intflwnone",
+                "QPERC": "perc_f2sat",
+                "QSURF": "arno_x_vic",
+                "Q_TDH": "rout_gamma",
+                "RFERR": "multiplc_e",
+                "SNOWM": "temp_index"
+              },
+              "execution_mode": "coupled_rk2",
+              "n_substeps": 1,
+              "parameter_names": [
+                "RFERR_MLT",
+                "FRACTEN",
+                "MAXWATR_1",
+                "MAXWATR_2",
+                "QB_PRMS",
+                "PERCRTE",
+                "PERCEXP",
+                "AXV_BEXP",
+                "TIMEDELAY",
+                "MBASE",
+                "MFMAX",
+                "MFMIN",
+                "PXTEMP",
+                "OPG",
+                "LAPSE"
+              ],
+              "sequential_order": [
+                "coupled_rhs"
+              ],
+              "state_names": [
+                "TENS_1",
+                "FREE_1",
+                "WATR_2"
+              ],
+              "topology": [
+                [
+                  "lower",
+                  [
+                    [
+                      "WATR_2",
+                      [
+                        [
+                          "EVAP_2",
+                          -1
+                        ],
+                        [
+                          "OFLOW_2",
+                          -1
+                        ],
+                        [
+                          "QBASE_2",
+                          -1
+                        ],
+                        [
+                          "QPERC_12",
+                          1
+                        ]
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "upper",
+                  [
+                    [
+                      "FREE_1",
+                      [
+                        [
+                          "OFLOW_1",
+                          -1
+                        ],
+                        [
+                          "QINTF_1",
+                          -1
+                        ],
+                        [
+                          "QPERC_12",
+                          -1
+                        ],
+                        [
+                          "TENS2FREE_1",
+                          1
+                        ]
+                      ]
+                    ],
+                    [
+                      "TENS_1",
+                      [
+                        [
+                          "EFF_PPT",
+                          1
+                        ],
+                        [
+                          "EVAP_1",
+                          -1
+                        ],
+                        [
+                          "QSURF",
+                          -1
+                        ],
+                        [
+                          "TENS2FREE_1",
+                          -1
+                        ]
+                      ]
+                    ]
+                  ]
+                ]
+              ]
+            },
+            "guard_failure_reasons": {},
+            "key": {
+              "backend": "inductor",
+              "device": "cuda:0",
+              "dtype": "torch.float64",
+              "fullgraph": true,
+              "graph_signature": {
+                "decisions": {
+                  "ARCH1": "tension1_1",
+                  "ARCH2": "unlimfrc_2",
+                  "ESOIL": "sequential",
+                  "QINTF": "intflwnone",
+                  "QPERC": "perc_f2sat",
+                  "QSURF": "arno_x_vic",
+                  "Q_TDH": "rout_gamma",
+                  "RFERR": "multiplc_e",
+                  "SNOWM": "temp_index"
+                },
+                "execution_mode": "coupled_rk2",
+                "n_substeps": 1,
+                "parameter_names": [
+                  "RFERR_MLT",
+                  "FRACTEN",
+                  "MAXWATR_1",
+                  "MAXWATR_2",
+                  "QB_PRMS",
+                  "PERCRTE",
+                  "PERCEXP",
+                  "AXV_BEXP",
+                  "TIMEDELAY",
+                  "MBASE",
+                  "MFMAX",
+                  "MFMIN",
+                  "PXTEMP",
+                  "OPG",
+                  "LAPSE"
+                ],
+                "sequential_order": [
+                  "coupled_rhs"
+                ],
+                "state_names": [
+                  "TENS_1",
+                  "FREE_1",
+                  "WATR_2"
+                ],
+                "topology": [
+                  [
+                    "lower",
+                    [
+                      [
+                        "WATR_2",
+                        [
+                          [
+                            "EVAP_2",
+                            -1
+                          ],
+                          [
+                            "OFLOW_2",
+                            -1
+                          ],
+                          [
+                            "QBASE_2",
+                            -1
+                          ],
+                          [
+                            "QPERC_12",
+                            1
+                          ]
+                        ]
+                      ]
+                    ]
+                  ],
+                  [
+                    "upper",
+                    [
+                      [
+                        "FREE_1",
+                        [
+                          [
+                            "OFLOW_1",
+                            -1
+                          ],
+                          [
+                            "QINTF_1",
+                            -1
+                          ],
+                          [
+                            "QPERC_12",
+                            -1
+                          ],
+                          [
+                            "TENS2FREE_1",
+                            1
+                          ]
+                        ]
+                      ],
+                      [
+                        "TENS_1",
+                        [
+                          [
+                            "EFF_PPT",
+                            1
+                          ],
+                          [
+                            "EVAP_1",
+                            -1
+                          ],
+                          [
+                            "QSURF",
+                            -1
+                          ],
+                          [
+                            "TENS2FREE_1",
+                            -1
+                          ]
+                        ]
+                      ]
+                    ]
+                  ]
+                ]
+              },
+              "input_shapes": [
+                [
+                  510
+                ],
+                [
+                  6
+                ],
+                [
+                  37
+                ],
+                [],
+                [],
+                [
+                  500
+                ]
+              ]
+            },
+            "recompilations": 0,
+            "unique_graphs": 1
+          }
+        ]
+      },
+      "error_type": "gate_failure",
+      "failure_detail": {
+        "date": "1991-07-20",
+        "index": 1661,
+        "involved_fluxes": {
+          "EFF_PPT": 0.0,
+          "EVAP_1": 0.22713686049555798,
+          "EVAP_2": 0.0,
+          "OFLOW_1": 0.0,
+          "OFLOW_2": 0.0,
+          "QBASE_2": 1.7205689307826648e-06,
+          "QINTF_1": 0.0,
+          "QPERC_12": 3.6230198899929405e-08,
+          "QSURF": 0.0
+        },
+        "kind": "water_balance",
+        "residual": 1.5994791870421743e-06,
+        "state_names": [
+          "TENS_1",
+          "FREE_1",
+          "WATR_2"
+        ],
+        "state_next": [
+          1.1437055002447514,
+          9.63811937917235,
+          1.6978680419921876e-06
+        ],
+        "state_start": [
+          1.3708423607403093,
+          9.63811941540255,
+          1.7827275868632043e-06
+        ],
+        "threshold": 1e-08
+      },
+      "model_id": 8,
+      "report_status": "failed",
+      "runs": [
+        {
+          "basin_id": "USA_09447800",
+          "bounded_state_names": [
+            "TENS_1",
+            "FREE_1"
+          ],
+          "capacity_violation_count": 0,
+          "capacity_violations": {},
+          "completed_full_period": true,
+          "elapsed_seconds": 38.905679501011036,
+          "finite": true,
+          "first_snow_balance_violation": null,
+          "first_water_balance_violation": {
+            "date": "1991-07-20",
+            "index": 1661,
+            "involved_fluxes": {
+              "EFF_PPT": 0.0,
+              "EVAP_1": 0.22713686049555798,
+              "EVAP_2": 0.0,
+              "OFLOW_1": 0.0,
+              "OFLOW_2": 0.0,
+              "QBASE_2": 1.7205689307826648e-06,
+              "QINTF_1": 0.0,
+              "QPERC_12": 3.6230198899929405e-08,
+              "QSURF": 0.0
+            },
+            "kind": "water_balance",
+            "residual": 1.5994791870421743e-06,
+            "state_names": [
+              "TENS_1",
+              "FREE_1",
+              "WATR_2"
+            ],
+            "state_next": [
+              1.1437055002447514,
+              9.63811937917235,
+              1.6978680419921876e-06
+            ],
+            "state_start": [
+              1.3708423607403093,
+              9.63811941540255,
+              1.7827275868632043e-06
+            ],
+            "threshold": 1e-08
+          },
+          "hru_id": 9447800,
+          "min_active_state": 6.402049734788307e-08,
+          "model_id": 8,
+          "negative_active_state_count": 0,
+          "nonfinite_count": 0,
+          "output_shapes": {
+            "fluxes": {
+              "EFF_PPT": [
+                8401
+              ],
+              "EVAP_1": [
+                8401
+              ],
+              "EVAP_1A": [
+                8401
+              ],
+              "EVAP_1B": [
+                8401
+              ],
+              "EVAP_2": [
+                8401
+              ],
+              "OFLOW_1": [
+                8401
+              ],
+              "OFLOW_2": [
+                8401
+              ],
+              "OFLOW_2A": [
+                8401
+              ],
+              "OFLOW_2B": [
+                8401
+              ],
+              "QBASE_2": [
+                8401
+              ],
+              "QBASE_2A": [
+                8401
+              ],
+              "QBASE_2B": [
+                8401
+              ],
+              "QINTF_1": [
+                8401
+              ],
+              "QPERC_12": [
+                8401
+              ],
+              "QSURF": [
+                8401
+              ],
+              "RCHR2EXCS": [
+                8401
+              ],
+              "SATAREA": [
+                8401
+              ],
+              "TENS2FREE_1": [
+                8401
+              ],
+              "TENS2FREE_2": [
+                8401
+              ]
+            },
+            "q": [
+              8401
+            ],
+            "q_instantaneous": [
+              8401
+            ],
+            "states": [
+              8402,
+              3
+            ]
+          },
+          "quality_pass": false,
+          "snow_balance_max_abs": 6.217248937900877e-15,
+          "unbounded_by_design_state_names": [
+            "WATR_2"
+          ],
+          "water_balance_max_abs": 1.5994791913026551e-06
+        },
+        {
+          "basin_id": "USA_14138900",
+          "bounded_state_names": [
+            "TENS_1",
+            "FREE_1"
+          ],
+          "capacity_violation_count": 0,
+          "capacity_violations": {},
+          "completed_full_period": true,
+          "elapsed_seconds": 36.899462789006066,
+          "finite": true,
+          "first_snow_balance_violation": {
+            "date": "1989-01-21",
+            "index": 751,
+            "kind": "snow_balance",
+            "residual": 15.45,
+            "snow_next": 775.0226770276034,
+            "snow_start": 775.0226770276034,
+            "state_names": [
+              "TENS_1",
+              "FREE_1",
+              "WATR_2"
+            ],
+            "state_next": [
+              48.195344350242,
+              24.242570090568307,
+              388.0562330514424
+            ],
+            "state_start": [
+              48.682223883763534,
+              27.837419991569007,
+              388.3522341665498
+            ],
+            "threshold": 1e-08
+          },
+          "first_water_balance_violation": null,
+          "hru_id": 14138900,
+          "min_active_state": 4.999999703159119e-08,
+          "model_id": 8,
+          "negative_active_state_count": 0,
+          "nonfinite_count": 0,
+          "output_shapes": {
+            "fluxes": {
+              "EFF_PPT": [
+                8401
+              ],
+              "EVAP_1": [
+                8401
+              ],
+              "EVAP_1A": [
+                8401
+              ],
+              "EVAP_1B": [
+                8401
+              ],
+              "EVAP_2": [
+                8401
+              ],
+              "OFLOW_1": [
+                8401
+              ],
+              "OFLOW_2": [
+                8401
+              ],
+              "OFLOW_2A": [
+                8401
+              ],
+              "OFLOW_2B": [
+                8401
+              ],
+              "QBASE_2": [
+                8401
+              ],
+              "QBASE_2A": [
+                8401
+              ],
+              "QBASE_2B": [
+                8401
+              ],
+              "QINTF_1": [
+                8401
+              ],
+              "QPERC_12": [
+                8401
+              ],
+              "QSURF": [
+                8401
+              ],
+              "RCHR2EXCS": [
+                8401
+              ],
+              "SATAREA": [
+                8401
+              ],
+              "TENS2FREE_1": [
+                8401
+              ],
+              "TENS2FREE_2": [
+                8401
+              ]
+            },
+            "q": [
+              8401
+            ],
+            "q_instantaneous": [
+              8401
+            ],
+            "states": [
+              8402,
+              3
+            ]
+          },
+          "quality_pass": true,
+          "snow_balance_max_abs": 45.61,
+          "unbounded_by_design_state_names": [
+            "WATR_2"
+          ],
+          "water_balance_max_abs": 2.540190280342358e-13
+        }
+      ],
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "unlimfrc_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    }
+  ],
+  "reports": [
+    {
+      "compile_audit": {
+        "autograd_recompilations": 0,
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "graph_breaks": 0,
+        "recompilations": 0,
+        "record_count": 1,
+        "records": [
+          {
+            "autograd_recompilations": 0,
+            "autograd_unique_graphs": 0,
+            "calls": 16803,
+            "code_object_id": 130834446843584,
+            "code_object_name": "generated_step_71c2d011de746521",
+            "cold_compile_seconds": [
+              3.0464898620266467
+            ],
+            "compile_attempts": 1,
+            "compile_successes": 1,
+            "dynamo_counters": {
+              "aot_autograd": {
+                "autograd_cache_hit": 1,
+                "ok": 1,
+                "total": 1
+              },
+              "inductor": {
+                "async_compile_cache_hit": 152,
+                "async_compile_cache_miss": 228,
+                "fxgraph_cache_hit": 1,
+                "triton_bundler_load_static_autotuner": 76
+              },
+              "stats": {
+                "calls_captured": 1868,
+                "unique_graphs": 1
+              }
+            },
+            "failures": [],
+            "fallbacks": 0,
+            "forward_unique_graphs": 1,
+            "graph_breaks": 0,
+            "graph_signature": {
+              "decisions": {
+                "ARCH1": "tension1_1",
+                "ARCH2": "tens2pll_2",
+                "ESOIL": "sequential",
+                "QINTF": "intflwnone",
+                "QPERC": "perc_f2sat",
+                "QSURF": "arno_x_vic",
+                "Q_TDH": "rout_gamma",
+                "RFERR": "multiplc_e",
+                "SNOWM": "temp_index"
+              },
+              "execution_mode": "coupled_rk2",
+              "n_substeps": 1,
+              "parameter_names": [
+                "RFERR_MLT",
+                "FRACTEN",
+                "MAXWATR_1",
+                "PERCFRAC",
+                "FPRIMQB",
+                "MAXWATR_2",
+                "QBRATE_2A",
+                "QBRATE_2B",
+                "PERCRTE",
+                "PERCEXP",
+                "AXV_BEXP",
+                "TIMEDELAY",
+                "MBASE",
+                "MFMAX",
+                "MFMIN",
+                "PXTEMP",
+                "OPG",
+                "LAPSE"
+              ],
+              "sequential_order": [
+                "coupled_rhs"
+              ],
+              "state_names": [
+                "TENS_1",
+                "FREE_1",
+                "TENS_2",
+                "FREE_2A",
+                "FREE_2B"
+              ],
+              "topology": [
+                [
+                  "lower",
+                  [
+                    [
+                      "FREE_2A",
+                      [
+                        [
+                          "OFLOW_2A",
+                          -1
+                        ],
+                        [
+                          "QBASE_2A",
+                          -1
+                        ],
+                        [
+                          "QPERC_12*PERCFRAC/2",
+                          1
+                        ],
+                        [
+                          "TENS2FREE_2/2",
+                          1
+                        ]
+                      ]
+                    ],
+                    [
+                      "FREE_2B",
+                      [
+                        [
+                          "OFLOW_2B",
+                          -1
+                        ],
+                        [
+                          "QBASE_2B",
+                          -1
+                        ],
+                        [
+                          "QPERC_12*PERCFRAC/2",
+                          1
+                        ],
+                        [
+                          "TENS2FREE_2/2",
+                          1
+                        ]
+                      ]
+                    ],
+                    [
+                      "TENS_2",
+                      [
+                        [
+                          "EVAP_2",
+                          -1
+                        ],
+                        [
+                          "QPERC_12*(1-PERCFRAC)",
+                          1
+                        ],
+                        [
+                          "TENS2FREE_2",
+                          -1
+                        ]
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "upper",
+                  [
+                    [
+                      "FREE_1",
+                      [
+                        [
+                          "OFLOW_1",
+                          -1
+                        ],
+                        [
+                          "QINTF_1",
+                          -1
+                        ],
+                        [
+                          "QPERC_12",
+                          -1
+                        ],
+                        [
+                          "TENS2FREE_1",
+                          1
+                        ]
+                      ]
+                    ],
+                    [
+                      "TENS_1",
+                      [
+                        [
+                          "EFF_PPT",
+                          1
+                        ],
+                        [
+                          "EVAP_1",
+                          -1
+                        ],
+                        [
+                          "QSURF",
+                          -1
+                        ],
+                        [
+                          "TENS2FREE_1",
+                          -1
+                        ]
+                      ]
+                    ]
+                  ]
+                ]
+              ]
+            },
+            "guard_failure_reasons": {},
+            "key": {
+              "backend": "inductor",
+              "device": "cuda:0",
+              "dtype": "torch.float64",
+              "fullgraph": true,
+              "graph_signature": {
+                "decisions": {
+                  "ARCH1": "tension1_1",
+                  "ARCH2": "tens2pll_2",
+                  "ESOIL": "sequential",
+                  "QINTF": "intflwnone",
+                  "QPERC": "perc_f2sat",
+                  "QSURF": "arno_x_vic",
+                  "Q_TDH": "rout_gamma",
+                  "RFERR": "multiplc_e",
+                  "SNOWM": "temp_index"
+                },
+                "execution_mode": "coupled_rk2",
+                "n_substeps": 1,
+                "parameter_names": [
+                  "RFERR_MLT",
+                  "FRACTEN",
+                  "MAXWATR_1",
+                  "PERCFRAC",
+                  "FPRIMQB",
+                  "MAXWATR_2",
+                  "QBRATE_2A",
+                  "QBRATE_2B",
+                  "PERCRTE",
+                  "PERCEXP",
+                  "AXV_BEXP",
+                  "TIMEDELAY",
+                  "MBASE",
+                  "MFMAX",
+                  "MFMIN",
+                  "PXTEMP",
+                  "OPG",
+                  "LAPSE"
+                ],
+                "sequential_order": [
+                  "coupled_rhs"
+                ],
+                "state_names": [
+                  "TENS_1",
+                  "FREE_1",
+                  "TENS_2",
+                  "FREE_2A",
+                  "FREE_2B"
+                ],
+                "topology": [
+                  [
+                    "lower",
+                    [
+                      [
+                        "FREE_2A",
+                        [
+                          [
+                            "OFLOW_2A",
+                            -1
+                          ],
+                          [
+                            "QBASE_2A",
+                            -1
+                          ],
+                          [
+                            "QPERC_12*PERCFRAC/2",
+                            1
+                          ],
+                          [
+                            "TENS2FREE_2/2",
+                            1
+                          ]
+                        ]
+                      ],
+                      [
+                        "FREE_2B",
+                        [
+                          [
+                            "OFLOW_2B",
+                            -1
+                          ],
+                          [
+                            "QBASE_2B",
+                            -1
+                          ],
+                          [
+                            "QPERC_12*PERCFRAC/2",
+                            1
+                          ],
+                          [
+                            "TENS2FREE_2/2",
+                            1
+                          ]
+                        ]
+                      ],
+                      [
+                        "TENS_2",
+                        [
+                          [
+                            "EVAP_2",
+                            -1
+                          ],
+                          [
+                            "QPERC_12*(1-PERCFRAC)",
+                            1
+                          ],
+                          [
+                            "TENS2FREE_2",
+                            -1
+                          ]
+                        ]
+                      ]
+                    ]
+                  ],
+                  [
+                    "upper",
+                    [
+                      [
+                        "FREE_1",
+                        [
+                          [
+                            "OFLOW_1",
+                            -1
+                          ],
+                          [
+                            "QINTF_1",
+                            -1
+                          ],
+                          [
+                            "QPERC_12",
+                            -1
+                          ],
+                          [
+                            "TENS2FREE_1",
+                            1
+                          ]
+                        ]
+                      ],
+                      [
+                        "TENS_1",
+                        [
+                          [
+                            "EFF_PPT",
+                            1
+                          ],
+                          [
+                            "EVAP_1",
+                            -1
+                          ],
+                          [
+                            "QSURF",
+                            -1
+                          ],
+                          [
+                            "TENS2FREE_1",
+                            -1
+                          ]
+                        ]
+                      ]
+                    ]
+                  ]
+                ]
+              },
+              "input_shapes": [
+                [
+                  510
+                ],
+                [
+                  6
+                ],
+                [
+                  37
+                ],
+                [],
+                [],
+                [
+                  500
+                ]
+              ]
+            },
+            "recompilations": 0,
+            "unique_graphs": 1
+          }
+        ]
+      },
+      "compile_pass": true,
+      "compile_probe": {
+        "completed": true,
+        "finite": true
+      },
+      "generated_source_sha256": "ec4f4cb34a4d1f36fd3fcbccddf9d7c26b627a7fd1919d5d9faef8357986cdb7",
+      "graph_signature": {
+        "decisions": {
+          "ARCH1": "tension1_1",
+          "ARCH2": "tens2pll_2",
+          "ESOIL": "sequential",
+          "QINTF": "intflwnone",
+          "QPERC": "perc_f2sat",
+          "QSURF": "arno_x_vic",
+          "Q_TDH": "rout_gamma",
+          "RFERR": "multiplc_e",
+          "SNOWM": "temp_index"
+        },
+        "execution_mode": "coupled_rk2",
+        "n_substeps": 1,
+        "parameter_names": [
+          "RFERR_MLT",
+          "FRACTEN",
+          "MAXWATR_1",
+          "PERCFRAC",
+          "FPRIMQB",
+          "MAXWATR_2",
+          "QBRATE_2A",
+          "QBRATE_2B",
+          "PERCRTE",
+          "PERCEXP",
+          "AXV_BEXP",
+          "TIMEDELAY",
+          "MBASE",
+          "MFMAX",
+          "MFMIN",
+          "PXTEMP",
+          "OPG",
+          "LAPSE"
+        ],
+        "sequential_order": [
+          "coupled_rhs"
+        ],
+        "state_names": [
+          "TENS_1",
+          "FREE_1",
+          "TENS_2",
+          "FREE_2A",
+          "FREE_2B"
+        ],
+        "topology": [
+          [
+            "lower",
+            [
+              [
+                "FREE_2A",
+                [
+                  [
+                    "OFLOW_2A",
+                    -1
+                  ],
+                  [
+                    "QBASE_2A",
+                    -1
+                  ],
+                  [
+                    "QPERC_12*PERCFRAC/2",
+                    1
+                  ],
+                  [
+                    "TENS2FREE_2/2",
+                    1
+                  ]
+                ]
+              ],
+              [
+                "FREE_2B",
+                [
+                  [
+                    "OFLOW_2B",
+                    -1
+                  ],
+                  [
+                    "QBASE_2B",
+                    -1
+                  ],
+                  [
+                    "QPERC_12*PERCFRAC/2",
+                    1
+                  ],
+                  [
+                    "TENS2FREE_2/2",
+                    1
+                  ]
+                ]
+              ],
+              [
+                "TENS_2",
+                [
+                  [
+                    "EVAP_2",
+                    -1
+                  ],
+                  [
+                    "QPERC_12*(1-PERCFRAC)",
+                    1
+                  ],
+                  [
+                    "TENS2FREE_2",
+                    -1
+                  ]
+                ]
+              ]
+            ]
+          ],
+          [
+            "upper",
+            [
+              [
+                "FREE_1",
+                [
+                  [
+                    "OFLOW_1",
+                    -1
+                  ],
+                  [
+                    "QINTF_1",
+                    -1
+                  ],
+                  [
+                    "QPERC_12",
+                    -1
+                  ],
+                  [
+                    "TENS2FREE_1",
+                    1
+                  ]
+                ]
+              ],
+              [
+                "TENS_1",
+                [
+                  [
+                    "EFF_PPT",
+                    1
+                  ],
+                  [
+                    "EVAP_1",
+                    -1
+                  ],
+                  [
+                    "QSURF",
+                    -1
+                  ],
+                  [
+                    "TENS2FREE_1",
+                    -1
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ]
+      },
+      "graph_signature_digest": "71c2d011de746521",
+      "model_id": 2,
+      "protocol": {
+        "compile_backend": "inductor",
+        "compile_fullgraph": true,
+        "device": "cuda",
+        "dt_days": 1.0,
+        "dtype": "torch.float64",
+        "forcing_start": "1987-01-01",
+        "initial_fraction": 0.25,
+        "simulation_end": "2009-12-31"
+      },
+      "quality_pass": true,
+      "resource": {
+        "cache": {
+          "bytes": 43306137,
+          "files": 1712
+        },
+        "elapsed_seconds": 85.35914630501065,
+        "gpu_peak_allocated_bytes": 50845184,
+        "gpu_peak_reserved_bytes": 52428800,
+        "host_peak_rss_kb": 1259332,
+        "host_rss_current_kb": 1259772
+      },
+      "runs": [
+        {
+          "basin_id": "USA_09447800",
+          "bounded_state_names": [
+            "TENS_1",
+            "FREE_1",
+            "TENS_2",
+            "FREE_2A",
+            "FREE_2B"
+          ],
+          "capacity_violation_count": 0,
+          "capacity_violations": {},
+          "completed_full_period": true,
+          "elapsed_seconds": 41.23636895400705,
+          "finite": true,
+          "first_snow_balance_violation": null,
+          "first_water_balance_violation": null,
+          "hru_id": 9447800,
+          "min_active_state": 2.7674485764614477e-08,
+          "model_id": 2,
+          "negative_active_state_count": 0,
+          "nonfinite_count": 0,
+          "output_shapes": {
+            "fluxes": {
+              "EFF_PPT": [
+                8401
+              ],
+              "EVAP_1": [
+                8401
+              ],
+              "EVAP_1A": [
+                8401
+              ],
+              "EVAP_1B": [
+                8401
+              ],
+              "EVAP_2": [
+                8401
+              ],
+              "OFLOW_1": [
+                8401
+              ],
+              "OFLOW_2": [
+                8401
+              ],
+              "OFLOW_2A": [
+                8401
+              ],
+              "OFLOW_2B": [
+                8401
+              ],
+              "QBASE_2": [
+                8401
+              ],
+              "QBASE_2A": [
+                8401
+              ],
+              "QBASE_2B": [
+                8401
+              ],
+              "QINTF_1": [
+                8401
+              ],
+              "QPERC_12": [
+                8401
+              ],
+              "QSURF": [
+                8401
+              ],
+              "RCHR2EXCS": [
+                8401
+              ],
+              "SATAREA": [
+                8401
+              ],
+              "TENS2FREE_1": [
+                8401
+              ],
+              "TENS2FREE_2": [
+                8401
+              ]
+            },
+            "q": [
+              8401
+            ],
+            "q_instantaneous": [
+              8401
+            ],
+            "states": [
+              8402,
+              5
+            ]
+          },
+          "quality_pass": true,
+          "snow_balance_max_abs": 3.552713678800501e-15,
+          "unbounded_by_design_state_names": [],
+          "water_balance_max_abs": 9.769962616701378e-14
+        },
+        {
+          "basin_id": "USA_14138900",
+          "bounded_state_names": [
+            "TENS_1",
+            "FREE_1",
+            "TENS_2",
+            "FREE_2A",
+            "FREE_2B"
+          ],
+          "capacity_violation_count": 0,
+          "capacity_violations": {},
+          "completed_full_period": true,
+          "elapsed_seconds": 39.75990607001586,
+          "finite": true,
+          "first_snow_balance_violation": null,
+          "first_water_balance_violation": null,
+          "hru_id": 14138900,
+          "min_active_state": 0.006435265707629025,
+          "model_id": 2,
+          "negative_active_state_count": 0,
+          "nonfinite_count": 0,
+          "output_shapes": {
+            "fluxes": {
+              "EFF_PPT": [
+                8401
+              ],
+              "EVAP_1": [
+                8401
+              ],
+              "EVAP_1A": [
+                8401
+              ],
+              "EVAP_1B": [
+                8401
+              ],
+              "EVAP_2": [
+                8401
+              ],
+              "OFLOW_1": [
+                8401
+              ],
+              "OFLOW_2": [
+                8401
+              ],
+              "OFLOW_2A": [
+                8401
+              ],
+              "OFLOW_2B": [
+                8401
+              ],
+              "QBASE_2": [
+                8401
+              ],
+              "QBASE_2A": [
+                8401
+              ],
+              "QBASE_2B": [
+                8401
+              ],
+              "QINTF_1": [
+                8401
+              ],
+              "QPERC_12": [
+                8401
+              ],
+              "QSURF": [
+                8401
+              ],
+              "RCHR2EXCS": [
+                8401
+              ],
+              "SATAREA": [
+                8401
+              ],
+              "TENS2FREE_1": [
+                8401
+              ],
+              "TENS2FREE_2": [
+                8401
+              ]
+            },
+            "q": [
+              8401
+            ],
+            "q_instantaneous": [
+              8401
+            ],
+            "states": [
+              8402,
+              5
+            ]
+          },
+          "quality_pass": true,
+          "snow_balance_max_abs": 5.684341886080802e-14,
+          "unbounded_by_design_state_names": [],
+          "water_balance_max_abs": 4.476419235288631e-13
+        }
+      ],
+      "status": "passed",
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "tens2pll_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "compile_audit": {
+        "autograd_recompilations": 0,
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "graph_breaks": 0,
+        "recompilations": 0,
+        "record_count": 1,
+        "records": [
+          {
+            "autograd_recompilations": 0,
+            "autograd_unique_graphs": 0,
+            "calls": 16803,
+            "code_object_id": 127955484032704,
+            "code_object_name": "generated_step_a24da5db2b6a3816",
+            "cold_compile_seconds": [
+              3.408002538024448
+            ],
+            "compile_attempts": 1,
+            "compile_successes": 1,
+            "dynamo_counters": {
+              "aot_autograd": {
+                "autograd_cache_hit": 1,
+                "ok": 1,
+                "total": 1
+              },
+              "inductor": {
+                "async_compile_cache_hit": 131,
+                "async_compile_cache_miss": 198,
+                "fxgraph_cache_hit": 1,
+                "triton_bundler_load_static_autotuner": 65
+              },
+              "stats": {
+                "calls_captured": 1756,
+                "unique_graphs": 1
+              }
+            },
+            "failures": [],
+            "fallbacks": 0,
+            "forward_unique_graphs": 1,
+            "graph_breaks": 0,
+            "graph_signature": {
+              "decisions": {
+                "ARCH1": "onestate_1",
+                "ARCH2": "tens2pll_2",
+                "ESOIL": "sequential",
+                "QINTF": "intflwnone",
+                "QPERC": "perc_f2sat",
+                "QSURF": "arno_x_vic",
+                "Q_TDH": "rout_gamma",
+                "RFERR": "multiplc_e",
+                "SNOWM": "temp_index"
+              },
+              "execution_mode": "coupled_rk2",
+              "n_substeps": 1,
+              "parameter_names": [
+                "RFERR_MLT",
+                "FRACTEN",
+                "MAXWATR_1",
+                "PERCFRAC",
+                "FPRIMQB",
+                "MAXWATR_2",
+                "QBRATE_2A",
+                "QBRATE_2B",
+                "PERCRTE",
+                "PERCEXP",
+                "AXV_BEXP",
+                "TIMEDELAY",
+                "MBASE",
+                "MFMAX",
+                "MFMIN",
+                "PXTEMP",
+                "OPG",
+                "LAPSE"
+              ],
+              "sequential_order": [
+                "coupled_rhs"
+              ],
+              "state_names": [
+                "WATR_1",
+                "TENS_2",
+                "FREE_2A",
+                "FREE_2B"
+              ],
+              "topology": [
+                [
+                  "lower",
+                  [
+                    [
+                      "FREE_2A",
+                      [
+                        [
+                          "OFLOW_2A",
+                          -1
+                        ],
+                        [
+                          "QBASE_2A",
+                          -1
+                        ],
+                        [
+                          "QPERC_12*PERCFRAC/2",
+                          1
+                        ],
+                        [
+                          "TENS2FREE_2/2",
+                          1
+                        ]
+                      ]
+                    ],
+                    [
+                      "FREE_2B",
+                      [
+                        [
+                          "OFLOW_2B",
+                          -1
+                        ],
+                        [
+                          "QBASE_2B",
+                          -1
+                        ],
+                        [
+                          "QPERC_12*PERCFRAC/2",
+                          1
+                        ],
+                        [
+                          "TENS2FREE_2/2",
+                          1
+                        ]
+                      ]
+                    ],
+                    [
+                      "TENS_2",
+                      [
+                        [
+                          "EVAP_2",
+                          -1
+                        ],
+                        [
+                          "QPERC_12*(1-PERCFRAC)",
+                          1
+                        ],
+                        [
+                          "TENS2FREE_2",
+                          -1
+                        ]
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "upper",
+                  [
+                    [
+                      "WATR_1",
+                      [
+                        [
+                          "EFF_PPT",
+                          1
+                        ],
+                        [
+                          "EVAP_1",
+                          -1
+                        ],
+                        [
+                          "OFLOW_1",
+                          -1
+                        ],
+                        [
+                          "QINTF_1",
+                          -1
+                        ],
+                        [
+                          "QPERC_12",
+                          -1
+                        ],
+                        [
+                          "QSURF",
+                          -1
+                        ]
+                      ]
+                    ]
+                  ]
+                ]
+              ]
+            },
+            "guard_failure_reasons": {},
+            "key": {
+              "backend": "inductor",
+              "device": "cuda:0",
+              "dtype": "torch.float64",
+              "fullgraph": true,
+              "graph_signature": {
+                "decisions": {
+                  "ARCH1": "onestate_1",
+                  "ARCH2": "tens2pll_2",
+                  "ESOIL": "sequential",
+                  "QINTF": "intflwnone",
+                  "QPERC": "perc_f2sat",
+                  "QSURF": "arno_x_vic",
+                  "Q_TDH": "rout_gamma",
+                  "RFERR": "multiplc_e",
+                  "SNOWM": "temp_index"
+                },
+                "execution_mode": "coupled_rk2",
+                "n_substeps": 1,
+                "parameter_names": [
+                  "RFERR_MLT",
+                  "FRACTEN",
+                  "MAXWATR_1",
+                  "PERCFRAC",
+                  "FPRIMQB",
+                  "MAXWATR_2",
+                  "QBRATE_2A",
+                  "QBRATE_2B",
+                  "PERCRTE",
+                  "PERCEXP",
+                  "AXV_BEXP",
+                  "TIMEDELAY",
+                  "MBASE",
+                  "MFMAX",
+                  "MFMIN",
+                  "PXTEMP",
+                  "OPG",
+                  "LAPSE"
+                ],
+                "sequential_order": [
+                  "coupled_rhs"
+                ],
+                "state_names": [
+                  "WATR_1",
+                  "TENS_2",
+                  "FREE_2A",
+                  "FREE_2B"
+                ],
+                "topology": [
+                  [
+                    "lower",
+                    [
+                      [
+                        "FREE_2A",
+                        [
+                          [
+                            "OFLOW_2A",
+                            -1
+                          ],
+                          [
+                            "QBASE_2A",
+                            -1
+                          ],
+                          [
+                            "QPERC_12*PERCFRAC/2",
+                            1
+                          ],
+                          [
+                            "TENS2FREE_2/2",
+                            1
+                          ]
+                        ]
+                      ],
+                      [
+                        "FREE_2B",
+                        [
+                          [
+                            "OFLOW_2B",
+                            -1
+                          ],
+                          [
+                            "QBASE_2B",
+                            -1
+                          ],
+                          [
+                            "QPERC_12*PERCFRAC/2",
+                            1
+                          ],
+                          [
+                            "TENS2FREE_2/2",
+                            1
+                          ]
+                        ]
+                      ],
+                      [
+                        "TENS_2",
+                        [
+                          [
+                            "EVAP_2",
+                            -1
+                          ],
+                          [
+                            "QPERC_12*(1-PERCFRAC)",
+                            1
+                          ],
+                          [
+                            "TENS2FREE_2",
+                            -1
+                          ]
+                        ]
+                      ]
+                    ]
+                  ],
+                  [
+                    "upper",
+                    [
+                      [
+                        "WATR_1",
+                        [
+                          [
+                            "EFF_PPT",
+                            1
+                          ],
+                          [
+                            "EVAP_1",
+                            -1
+                          ],
+                          [
+                            "OFLOW_1",
+                            -1
+                          ],
+                          [
+                            "QINTF_1",
+                            -1
+                          ],
+                          [
+                            "QPERC_12",
+                            -1
+                          ],
+                          [
+                            "QSURF",
+                            -1
+                          ]
+                        ]
+                      ]
+                    ]
+                  ]
+                ]
+              },
+              "input_shapes": [
+                [
+                  510
+                ],
+                [
+                  6
+                ],
+                [
+                  37
+                ],
+                [],
+                [],
+                [
+                  500
+                ]
+              ]
+            },
+            "recompilations": 0,
+            "unique_graphs": 1
+          }
+        ]
+      },
+      "compile_pass": true,
+      "compile_probe": {
+        "completed": true,
+        "finite": true
+      },
+      "generated_source_sha256": "904138d9920a601621e8c6de27f70fd4bc138bce2a6d06142e0ca666c30a4607",
+      "graph_signature": {
+        "decisions": {
+          "ARCH1": "onestate_1",
+          "ARCH2": "tens2pll_2",
+          "ESOIL": "sequential",
+          "QINTF": "intflwnone",
+          "QPERC": "perc_f2sat",
+          "QSURF": "arno_x_vic",
+          "Q_TDH": "rout_gamma",
+          "RFERR": "multiplc_e",
+          "SNOWM": "temp_index"
+        },
+        "execution_mode": "coupled_rk2",
+        "n_substeps": 1,
+        "parameter_names": [
+          "RFERR_MLT",
+          "FRACTEN",
+          "MAXWATR_1",
+          "PERCFRAC",
+          "FPRIMQB",
+          "MAXWATR_2",
+          "QBRATE_2A",
+          "QBRATE_2B",
+          "PERCRTE",
+          "PERCEXP",
+          "AXV_BEXP",
+          "TIMEDELAY",
+          "MBASE",
+          "MFMAX",
+          "MFMIN",
+          "PXTEMP",
+          "OPG",
+          "LAPSE"
+        ],
+        "sequential_order": [
+          "coupled_rhs"
+        ],
+        "state_names": [
+          "WATR_1",
+          "TENS_2",
+          "FREE_2A",
+          "FREE_2B"
+        ],
+        "topology": [
+          [
+            "lower",
+            [
+              [
+                "FREE_2A",
+                [
+                  [
+                    "OFLOW_2A",
+                    -1
+                  ],
+                  [
+                    "QBASE_2A",
+                    -1
+                  ],
+                  [
+                    "QPERC_12*PERCFRAC/2",
+                    1
+                  ],
+                  [
+                    "TENS2FREE_2/2",
+                    1
+                  ]
+                ]
+              ],
+              [
+                "FREE_2B",
+                [
+                  [
+                    "OFLOW_2B",
+                    -1
+                  ],
+                  [
+                    "QBASE_2B",
+                    -1
+                  ],
+                  [
+                    "QPERC_12*PERCFRAC/2",
+                    1
+                  ],
+                  [
+                    "TENS2FREE_2/2",
+                    1
+                  ]
+                ]
+              ],
+              [
+                "TENS_2",
+                [
+                  [
+                    "EVAP_2",
+                    -1
+                  ],
+                  [
+                    "QPERC_12*(1-PERCFRAC)",
+                    1
+                  ],
+                  [
+                    "TENS2FREE_2",
+                    -1
+                  ]
+                ]
+              ]
+            ]
+          ],
+          [
+            "upper",
+            [
+              [
+                "WATR_1",
+                [
+                  [
+                    "EFF_PPT",
+                    1
+                  ],
+                  [
+                    "EVAP_1",
+                    -1
+                  ],
+                  [
+                    "OFLOW_1",
+                    -1
+                  ],
+                  [
+                    "QINTF_1",
+                    -1
+                  ],
+                  [
+                    "QPERC_12",
+                    -1
+                  ],
+                  [
+                    "QSURF",
+                    -1
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ]
+      },
+      "graph_signature_digest": "a24da5db2b6a3816",
+      "model_id": 6,
+      "protocol": {
+        "compile_backend": "inductor",
+        "compile_fullgraph": true,
+        "device": "cuda",
+        "dt_days": 1.0,
+        "dtype": "torch.float64",
+        "forcing_start": "1987-01-01",
+        "initial_fraction": 0.25,
+        "simulation_end": "2009-12-31"
+      },
+      "quality_pass": true,
+      "resource": {
+        "cache": {
+          "bytes": 43332081,
+          "files": 1713
+        },
+        "elapsed_seconds": 81.6725838209968,
+        "gpu_peak_allocated_bytes": 50771968,
+        "gpu_peak_reserved_bytes": 52428800,
+        "host_peak_rss_kb": 1257464,
+        "host_rss_current_kb": 1257840
+      },
+      "runs": [
+        {
+          "basin_id": "USA_09447800",
+          "bounded_state_names": [
+            "WATR_1",
+            "TENS_2",
+            "FREE_2A",
+            "FREE_2B"
+          ],
+          "capacity_violation_count": 0,
+          "capacity_violations": {},
+          "completed_full_period": true,
+          "elapsed_seconds": 39.95005848596338,
+          "finite": true,
+          "first_snow_balance_violation": null,
+          "first_water_balance_violation": null,
+          "hru_id": 9447800,
+          "min_active_state": 3.9102584281636155e-08,
+          "model_id": 6,
+          "negative_active_state_count": 0,
+          "nonfinite_count": 0,
+          "output_shapes": {
+            "fluxes": {
+              "EFF_PPT": [
+                8401
+              ],
+              "EVAP_1": [
+                8401
+              ],
+              "EVAP_1A": [
+                8401
+              ],
+              "EVAP_1B": [
+                8401
+              ],
+              "EVAP_2": [
+                8401
+              ],
+              "OFLOW_1": [
+                8401
+              ],
+              "OFLOW_2": [
+                8401
+              ],
+              "OFLOW_2A": [
+                8401
+              ],
+              "OFLOW_2B": [
+                8401
+              ],
+              "QBASE_2": [
+                8401
+              ],
+              "QBASE_2A": [
+                8401
+              ],
+              "QBASE_2B": [
+                8401
+              ],
+              "QINTF_1": [
+                8401
+              ],
+              "QPERC_12": [
+                8401
+              ],
+              "QSURF": [
+                8401
+              ],
+              "RCHR2EXCS": [
+                8401
+              ],
+              "SATAREA": [
+                8401
+              ],
+              "TENS2FREE_1": [
+                8401
+              ],
+              "TENS2FREE_2": [
+                8401
+              ]
+            },
+            "q": [
+              8401
+            ],
+            "q_instantaneous": [
+              8401
+            ],
+            "states": [
+              8402,
+              4
+            ]
+          },
+          "quality_pass": true,
+          "snow_balance_max_abs": 5.329070518200751e-15,
+          "unbounded_by_design_state_names": [],
+          "water_balance_max_abs": 8.348877145181177e-14
+        },
+        {
+          "basin_id": "USA_14138900",
+          "bounded_state_names": [
+            "WATR_1",
+            "TENS_2",
+            "FREE_2A",
+            "FREE_2B"
+          ],
+          "capacity_violation_count": 0,
+          "capacity_violations": {},
+          "completed_full_period": true,
+          "elapsed_seconds": 37.125309419992846,
+          "finite": true,
+          "first_snow_balance_violation": null,
+          "first_water_balance_violation": null,
+          "hru_id": 14138900,
+          "min_active_state": 2.0085262012599118e-07,
+          "model_id": 6,
+          "negative_active_state_count": 0,
+          "nonfinite_count": 0,
+          "output_shapes": {
+            "fluxes": {
+              "EFF_PPT": [
+                8401
+              ],
+              "EVAP_1": [
+                8401
+              ],
+              "EVAP_1A": [
+                8401
+              ],
+              "EVAP_1B": [
+                8401
+              ],
+              "EVAP_2": [
+                8401
+              ],
+              "OFLOW_1": [
+                8401
+              ],
+              "OFLOW_2": [
+                8401
+              ],
+              "OFLOW_2A": [
+                8401
+              ],
+              "OFLOW_2B": [
+                8401
+              ],
+              "QBASE_2": [
+                8401
+              ],
+              "QBASE_2A": [
+                8401
+              ],
+              "QBASE_2B": [
+                8401
+              ],
+              "QINTF_1": [
+                8401
+              ],
+              "QPERC_12": [
+                8401
+              ],
+              "QSURF": [
+                8401
+              ],
+              "RCHR2EXCS": [
+                8401
+              ],
+              "SATAREA": [
+                8401
+              ],
+              "TENS2FREE_1": [
+                8401
+              ],
+              "TENS2FREE_2": [
+                8401
+              ]
+            },
+            "q": [
+              8401
+            ],
+            "q_instantaneous": [
+              8401
+            ],
+            "states": [
+              8402,
+              4
+            ]
+          },
+          "quality_pass": true,
+          "snow_balance_max_abs": 1.1368683772161603e-13,
+          "unbounded_by_design_state_names": [],
+          "water_balance_max_abs": 3.739231146937527e-13
+        }
+      ],
+      "status": "passed",
+      "topology": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "tens2pll_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    },
+    {
+      "compile_audit": {
+        "autograd_recompilations": 0,
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "fallbacks": 0,
+        "graph_breaks": 0,
+        "recompilations": 0,
+        "record_count": 1,
+        "records": [
+          {
+            "autograd_recompilations": 0,
+            "autograd_unique_graphs": 0,
+            "calls": 16803,
+            "code_object_id": 131335042236096,
+            "code_object_name": "generated_step_251e95e0421ee495",
+            "cold_compile_seconds": [
+              2.3112912899814546
+            ],
+            "compile_attempts": 1,
+            "compile_successes": 1,
+            "dynamo_counters": {
+              "aot_autograd": {
+                "autograd_cache_hit": 1,
+                "ok": 1,
+                "total": 1
+              },
+              "inductor": {
+                "async_compile_cache_hit": 98,
+                "async_compile_cache_miss": 147,
+                "fxgraph_cache_hit": 1,
+                "triton_bundler_load_static_autotuner": 49
+              },
+              "stats": {
+                "calls_captured": 1148,
+                "unique_graphs": 1
+              }
+            },
+            "failures": [],
+            "fallbacks": 0,
+            "forward_unique_graphs": 1,
+            "graph_breaks": 0,
+            "graph_signature": {
+              "decisions": {
+                "ARCH1": "tension1_1",
+                "ARCH2": "unlimfrc_2",
+                "ESOIL": "sequential",
+                "QINTF": "intflwnone",
+                "QPERC": "perc_f2sat",
+                "QSURF": "arno_x_vic",
+                "Q_TDH": "rout_gamma",
+                "RFERR": "multiplc_e",
+                "SNOWM": "temp_index"
+              },
+              "execution_mode": "coupled_rk2",
+              "n_substeps": 1,
+              "parameter_names": [
+                "RFERR_MLT",
+                "FRACTEN",
+                "MAXWATR_1",
+                "MAXWATR_2",
+                "QB_PRMS",
+                "PERCRTE",
+                "PERCEXP",
+                "AXV_BEXP",
+                "TIMEDELAY",
+                "MBASE",
+                "MFMAX",
+                "MFMIN",
+                "PXTEMP",
+                "OPG",
+                "LAPSE"
+              ],
+              "sequential_order": [
+                "coupled_rhs"
+              ],
+              "state_names": [
+                "TENS_1",
+                "FREE_1",
+                "WATR_2"
+              ],
+              "topology": [
+                [
+                  "lower",
+                  [
+                    [
+                      "WATR_2",
+                      [
+                        [
+                          "EVAP_2",
+                          -1
+                        ],
+                        [
+                          "OFLOW_2",
+                          -1
+                        ],
+                        [
+                          "QBASE_2",
+                          -1
+                        ],
+                        [
+                          "QPERC_12",
+                          1
+                        ]
+                      ]
+                    ]
+                  ]
+                ],
+                [
+                  "upper",
+                  [
+                    [
+                      "FREE_1",
+                      [
+                        [
+                          "OFLOW_1",
+                          -1
+                        ],
+                        [
+                          "QINTF_1",
+                          -1
+                        ],
+                        [
+                          "QPERC_12",
+                          -1
+                        ],
+                        [
+                          "TENS2FREE_1",
+                          1
+                        ]
+                      ]
+                    ],
+                    [
+                      "TENS_1",
+                      [
+                        [
+                          "EFF_PPT",
+                          1
+                        ],
+                        [
+                          "EVAP_1",
+                          -1
+                        ],
+                        [
+                          "QSURF",
+                          -1
+                        ],
+                        [
+                          "TENS2FREE_1",
+                          -1
+                        ]
+                      ]
+                    ]
+                  ]
+                ]
+              ]
+            },
+            "guard_failure_reasons": {},
+            "key": {
+              "backend": "inductor",
+              "device": "cuda:0",
+              "dtype": "torch.float64",
+              "fullgraph": true,
+              "graph_signature": {
+                "decisions": {
+                  "ARCH1": "tension1_1",
+                  "ARCH2": "unlimfrc_2",
+                  "ESOIL": "sequential",
+                  "QINTF": "intflwnone",
+                  "QPERC": "perc_f2sat",
+                  "QSURF": "arno_x_vic",
+                  "Q_TDH": "rout_gamma",
+                  "RFERR": "multiplc_e",
+                  "SNOWM": "temp_index"
+                },
+                "execution_mode": "coupled_rk2",
+                "n_substeps": 1,
+                "parameter_names": [
+                  "RFERR_MLT",
+                  "FRACTEN",
+                  "MAXWATR_1",
+                  "MAXWATR_2",
+                  "QB_PRMS",
+                  "PERCRTE",
+                  "PERCEXP",
+                  "AXV_BEXP",
+                  "TIMEDELAY",
+                  "MBASE",
+                  "MFMAX",
+                  "MFMIN",
+                  "PXTEMP",
+                  "OPG",
+                  "LAPSE"
+                ],
+                "sequential_order": [
+                  "coupled_rhs"
+                ],
+                "state_names": [
+                  "TENS_1",
+                  "FREE_1",
+                  "WATR_2"
+                ],
+                "topology": [
+                  [
+                    "lower",
+                    [
+                      [
+                        "WATR_2",
+                        [
+                          [
+                            "EVAP_2",
+                            -1
+                          ],
+                          [
+                            "OFLOW_2",
+                            -1
+                          ],
+                          [
+                            "QBASE_2",
+                            -1
+                          ],
+                          [
+                            "QPERC_12",
+                            1
+                          ]
+                        ]
+                      ]
+                    ]
+                  ],
+                  [
+                    "upper",
+                    [
+                      [
+                        "FREE_1",
+                        [
+                          [
+                            "OFLOW_1",
+                            -1
+                          ],
+                          [
+                            "QINTF_1",
+                            -1
+                          ],
+                          [
+                            "QPERC_12",
+                            -1
+                          ],
+                          [
+                            "TENS2FREE_1",
+                            1
+                          ]
+                        ]
+                      ],
+                      [
+                        "TENS_1",
+                        [
+                          [
+                            "EFF_PPT",
+                            1
+                          ],
+                          [
+                            "EVAP_1",
+                            -1
+                          ],
+                          [
+                            "QSURF",
+                            -1
+                          ],
+                          [
+                            "TENS2FREE_1",
+                            -1
+                          ]
+                        ]
+                      ]
+                    ]
+                  ]
+                ]
+              },
+              "input_shapes": [
+                [
+                  510
+                ],
+                [
+                  6
+                ],
+                [
+                  37
+                ],
+                [],
+                [],
+                [
+                  500
+                ]
+              ]
+            },
+            "recompilations": 0,
+            "unique_graphs": 1
+          }
+        ]
+      },
+      "compile_pass": true,
+      "compile_probe": {
+        "completed": true,
+        "finite": true
+      },
+      "generated_source_sha256": "4f81979346314abcbf6c6f667521f6951bcb2fa0bc3d163dbc74e5008f8baa5d",
+      "graph_signature": {
+        "decisions": {
+          "ARCH1": "tension1_1",
+          "ARCH2": "unlimfrc_2",
+          "ESOIL": "sequential",
+          "QINTF": "intflwnone",
+          "QPERC": "perc_f2sat",
+          "QSURF": "arno_x_vic",
+          "Q_TDH": "rout_gamma",
+          "RFERR": "multiplc_e",
+          "SNOWM": "temp_index"
+        },
+        "execution_mode": "coupled_rk2",
+        "n_substeps": 1,
+        "parameter_names": [
+          "RFERR_MLT",
+          "FRACTEN",
+          "MAXWATR_1",
+          "MAXWATR_2",
+          "QB_PRMS",
+          "PERCRTE",
+          "PERCEXP",
+          "AXV_BEXP",
+          "TIMEDELAY",
+          "MBASE",
+          "MFMAX",
+          "MFMIN",
+          "PXTEMP",
+          "OPG",
+          "LAPSE"
+        ],
+        "sequential_order": [
+          "coupled_rhs"
+        ],
+        "state_names": [
+          "TENS_1",
+          "FREE_1",
+          "WATR_2"
+        ],
+        "topology": [
+          [
+            "lower",
+            [
+              [
+                "WATR_2",
+                [
+                  [
+                    "EVAP_2",
+                    -1
+                  ],
+                  [
+                    "OFLOW_2",
+                    -1
+                  ],
+                  [
+                    "QBASE_2",
+                    -1
+                  ],
+                  [
+                    "QPERC_12",
+                    1
+                  ]
+                ]
+              ]
+            ]
+          ],
+          [
+            "upper",
+            [
+              [
+                "FREE_1",
+                [
+                  [
+                    "OFLOW_1",
+                    -1
+                  ],
+                  [
+                    "QINTF_1",
+                    -1
+                  ],
+                  [
+                    "QPERC_12",
+                    -1
+                  ],
+                  [
+                    "TENS2FREE_1",
+                    1
+                  ]
+                ]
+              ],
+              [
+                "TENS_1",
+                [
+                  [
+                    "EFF_PPT",
+                    1
+                  ],
+                  [
+                    "EVAP_1",
+                    -1
+                  ],
+                  [
+                    "QSURF",
+                    -1
+                  ],
+                  [
+                    "TENS2FREE_1",
+                    -1
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ]
+      },
+      "graph_signature_digest": "251e95e0421ee495",
+      "model_id": 8,
+      "protocol": {
+        "compile_backend": "inductor",
+        "compile_fullgraph": true,
+        "device": "cuda",
+        "dt_days": 1.0,
+        "dtype": "torch.float64",
+        "forcing_start": "1987-01-01",
+        "initial_fraction": 0.25,
+        "simulation_end": "2009-12-31"
+      },
+      "quality_pass": false,
+      "resource": {
+        "cache": {
+          "bytes": 43332081,
+          "files": 1713
+        },
+        "elapsed_seconds": 79.26908828300657,
+        "gpu_peak_allocated_bytes": 50688000,
+        "gpu_peak_reserved_bytes": 52428800,
+        "host_peak_rss_kb": 1250016,
+        "host_rss_current_kb": 1250600
+      },
+      "runs": [
+        {
+          "basin_id": "USA_09447800",
+          "bounded_state_names": [
+            "TENS_1",
+            "FREE_1"
+          ],
+          "capacity_violation_count": 0,
+          "capacity_violations": {},
+          "completed_full_period": true,
+          "elapsed_seconds": 38.905679501011036,
+          "finite": true,
+          "first_snow_balance_violation": null,
+          "first_water_balance_violation": {
+            "date": "1991-07-20",
+            "index": 1661,
+            "involved_fluxes": {
+              "EFF_PPT": 0.0,
+              "EVAP_1": 0.22713686049555798,
+              "EVAP_2": 0.0,
+              "OFLOW_1": 0.0,
+              "OFLOW_2": 0.0,
+              "QBASE_2": 1.7205689307826648e-06,
+              "QINTF_1": 0.0,
+              "QPERC_12": 3.6230198899929405e-08,
+              "QSURF": 0.0
+            },
+            "kind": "water_balance",
+            "residual": 1.5994791870421743e-06,
+            "state_names": [
+              "TENS_1",
+              "FREE_1",
+              "WATR_2"
+            ],
+            "state_next": [
+              1.1437055002447514,
+              9.63811937917235,
+              1.6978680419921876e-06
+            ],
+            "state_start": [
+              1.3708423607403093,
+              9.63811941540255,
+              1.7827275868632043e-06
+            ],
+            "threshold": 1e-08
+          },
+          "hru_id": 9447800,
+          "min_active_state": 6.402049734788307e-08,
+          "model_id": 8,
+          "negative_active_state_count": 0,
+          "nonfinite_count": 0,
+          "output_shapes": {
+            "fluxes": {
+              "EFF_PPT": [
+                8401
+              ],
+              "EVAP_1": [
+                8401
+              ],
+              "EVAP_1A": [
+                8401
+              ],
+              "EVAP_1B": [
+                8401
+              ],
+              "EVAP_2": [
+                8401
+              ],
+              "OFLOW_1": [
+                8401
+              ],
+              "OFLOW_2": [
+                8401
+              ],
+              "OFLOW_2A": [
+                8401
+              ],
+              "OFLOW_2B": [
+                8401
+              ],
+              "QBASE_2": [
+                8401
+              ],
+              "QBASE_2A": [
+                8401
+              ],
+              "QBASE_2B": [
+                8401
+              ],
+              "QINTF_1": [
+                8401
+              ],
+              "QPERC_12": [
+                8401
+              ],
+              "QSURF": [
+                8401
+              ],
+              "RCHR2EXCS": [
+                8401
+              ],
+              "SATAREA": [
+                8401
+              ],
+              "TENS2FREE_1": [
+                8401
+              ],
+              "TENS2FREE_2": [
+                8401
+              ]
+            },
+            "q": [
+              8401
+            ],
+            "q_instantaneous": [
+              8401
+            ],
+            "states": [
+              8402,
+              3
+            ]
+          },
+          "quality_pass": false,
+          "snow_balance_max_abs": 6.217248937900877e-15,
+          "unbounded_by_design_state_names": [
+            "WATR_2"
+          ],
+          "water_balance_max_abs": 1.5994791913026551e-06
+        },
+        {
+          "basin_id": "USA_14138900",
+          "bounded_state_names": [
+            "TENS_1",
+            "FREE_1"
+          ],
+          "capacity_violation_count": 0,
+          "capacity_violations": {},
+          "completed_full_period": true,
+          "elapsed_seconds": 36.899462789006066,
+          "finite": true,
+          "first_snow_balance_violation": {
+            "date": "1989-01-21",
+            "index": 751,
+            "kind": "snow_balance",
+            "residual": 15.45,
+            "snow_next": 775.0226770276034,
+            "snow_start": 775.0226770276034,
+            "state_names": [
+              "TENS_1",
+              "FREE_1",
+              "WATR_2"
+            ],
+            "state_next": [
+              48.195344350242,
+              24.242570090568307,
+              388.0562330514424
+            ],
+            "state_start": [
+              48.682223883763534,
+              27.837419991569007,
+              388.3522341665498
+            ],
+            "threshold": 1e-08
+          },
+          "first_water_balance_violation": null,
+          "hru_id": 14138900,
+          "min_active_state": 4.999999703159119e-08,
+          "model_id": 8,
+          "negative_active_state_count": 0,
+          "nonfinite_count": 0,
+          "output_shapes": {
+            "fluxes": {
+              "EFF_PPT": [
+                8401
+              ],
+              "EVAP_1": [
+                8401
+              ],
+              "EVAP_1A": [
+                8401
+              ],
+              "EVAP_1B": [
+                8401
+              ],
+              "EVAP_2": [
+                8401
+              ],
+              "OFLOW_1": [
+                8401
+              ],
+              "OFLOW_2": [
+                8401
+              ],
+              "OFLOW_2A": [
+                8401
+              ],
+              "OFLOW_2B": [
+                8401
+              ],
+              "QBASE_2": [
+                8401
+              ],
+              "QBASE_2A": [
+                8401
+              ],
+              "QBASE_2B": [
+                8401
+              ],
+              "QINTF_1": [
+                8401
+              ],
+              "QPERC_12": [
+                8401
+              ],
+              "QSURF": [
+                8401
+              ],
+              "RCHR2EXCS": [
+                8401
+              ],
+              "SATAREA": [
+                8401
+              ],
+              "TENS2FREE_1": [
+                8401
+              ],
+              "TENS2FREE_2": [
+                8401
+              ]
+            },
+            "q": [
+              8401
+            ],
+            "q_instantaneous": [
+              8401
+            ],
+            "states": [
+              8402,
+              3
+            ]
+          },
+          "quality_pass": true,
+          "snow_balance_max_abs": 45.61,
+          "unbounded_by_design_state_names": [
+            "WATR_2"
+          ],
+          "water_balance_max_abs": 2.540190280342358e-13
+        }
+      ],
+      "status": "failed",
+      "topology": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "unlimfrc_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      }
+    }
+  ],
+  "schema_version": "torch-fuse-78-long-horizon-smoke-v1",
+  "selection": {
+    "catchments": [
+      "USA_09447800",
+      "USA_14138900"
+    ],
+    "gradient_model_ids": [
+      2,
+      6,
+      10,
+      14,
+      20,
+      26,
+      50,
+      84,
+      90,
+      96,
+      146,
+      214
+    ],
+    "gradient_selection_rule": "frozen before execution: cover every ARCH1, ARCH2, QPERC, and QSURF branch plus their requested sensitive combinations; no result-dependent selection",
+    "run_count_expected": 156,
+    "structure_count": 78,
+    "structure_ids": [
+      2,
+      6,
+      8,
+      10,
+      12,
+      14,
+      16,
+      18,
+      20,
+      22,
+      24,
+      26,
+      30,
+      32,
+      34,
+      36,
+      38,
+      40,
+      42,
+      44,
+      46,
+      48,
+      50,
+      54,
+      56,
+      58,
+      60,
+      62,
+      64,
+      66,
+      68,
+      70,
+      72,
+      78,
+      84,
+      90,
+      96,
+      102,
+      108,
+      114,
+      120,
+      126,
+      132,
+      138,
+      144,
+      146,
+      150,
+      152,
+      154,
+      156,
+      158,
+      160,
+      162,
+      164,
+      166,
+      168,
+      170,
+      174,
+      176,
+      178,
+      180,
+      182,
+      184,
+      186,
+      188,
+      190,
+      192,
+      194,
+      198,
+      200,
+      202,
+      204,
+      206,
+      208,
+      210,
+      212,
+      214,
+      216
+    ],
+    "topology_values": {
+      "ARCH1": [
+        "onestate_1",
+        "tension1_1",
+        "tension2_1"
+      ],
+      "ARCH2": [
+        "fixedsiz_2",
+        "tens2pll_2",
+        "unlimfrc_2",
+        "unlimpow_2"
+      ],
+      "QPERC": [
+        "perc_f2sat",
+        "perc_lower",
+        "perc_w2sat"
+      ],
+      "QSURF": [
+        "arno_x_vic",
+        "prms_varnt",
+        "tmdl_param"
+      ]
+    }
+  },
+  "status": "failed",
+  "stopped_after_failure": true
+}

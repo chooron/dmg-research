@@ -1,0 +1,61 @@
+{
+  "architecture": "StructureConditionedParameterizer with shared trunk + 37 independent coordinate heads",
+  "invariants_verified": {
+    "active_output_gradient_strictly_positive": true,
+    "inactive_optimizer_step_counter_frozen": true,
+    "inactive_output_gradient_is_none": true,
+    "inactive_output_parameter_delta_strictly_zero": true,
+    "optimizer_inactive_behavior_characterized": "Standard Adam updates inactive rows via decaying first moment when grad=0 unless gradient masking is applied."
+  },
+  "schema_version": "dpl-optimizer-inactive-gradient-audit-v1",
+  "status": "completed",
+  "step_by_step_measurements": [
+    {
+      "active_coordinate": "PERCRTE",
+      "active_grad_norm": 0.0008070508119607892,
+      "active_grad_state": "non-zero tensor",
+      "active_weight_delta": 0.07997990251007701,
+      "inactive_coordinate": "SACPMLT",
+      "inactive_grad_is_none": true,
+      "inactive_grad_state": "None",
+      "inactive_weight_delta": 0.0,
+      "step": 1,
+      "structure": 2
+    },
+    {
+      "active_coordinate": "SACPMLT",
+      "active_grad_norm": 7.412080387717293e-15,
+      "active_grad_state": "non-zero tensor",
+      "active_weight_delta": 7.412079544808534e-09,
+      "inactive_coordinate": "PERCRTE",
+      "inactive_grad_is_none": true,
+      "inactive_grad_state": "None",
+      "inactive_weight_delta": 0.0,
+      "optimizer_step_counter_advanced": false,
+      "step": 2,
+      "structure": 190
+    },
+    {
+      "active_coordinate": "PERCRTE",
+      "active_grad_norm": 2.623692144732858e-05,
+      "active_weight_delta": 0.05578566985636147,
+      "inactive_coordinate": "SACPMLT",
+      "reactivation_successful": true,
+      "step": 3,
+      "structure": 2
+    }
+  ],
+  "tested_optimizer": "torch.optim.Adam(lr=0.01, weight_decay=0.0)",
+  "tracked_coordinates": {
+    "PERCRTE": {
+      "active_in_model_190": false,
+      "active_in_model_2": true,
+      "index": 14
+    },
+    "SACPMLT": {
+      "active_in_model_190": true,
+      "active_in_model_2": false,
+      "index": 16
+    }
+  }
+}

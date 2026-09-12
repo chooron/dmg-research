@@ -1,0 +1,20 @@
+{
+  "schema_version": "dmg-window-training-semantics-v1",
+  "status": "completed",
+  "protocol_id": "formal-experiment-protocol-v1-db53091e6e222066",
+  "generated_at_utc": "2026-09-07T00:00:00+00:00",
+  "window_training_semantics": {
+    "1_window_sampling_mechanism": "Implemented in dmg.core.data.data.random_index and select_subset. Slices [warmup + rho, batch_size, features] tensor by choosing i_grid and i_t per batch item.",
+    "2_start_date_randomization": "True. i_t = np.random.randint(warmup, nt - rho, size=batch_size) chooses an independent random time index for each sample in the mini-batch.",
+    "3_basin_randomization": "True. i_grid = np.random.randint(0, ngrid, size=batch_size) chooses an independent random basin index for each sample in the mini-batch.",
+    "4_batch_organization": "Multiple independent (basin_k, time_window_k) pairs. Sample k has its own basin i_grid[k] and time slice [i_t[k] - warmup, i_t[k] + rho).",
+    "5_warmup_365_days_semantics": {
+      "mode_a_warmup_no_grad": "In hydrodl2.models.hbv.hbv_1_1p with warmup_states=True, the first warmup days (e.g. 365) are executed under with torch.no_grad(): to spin up physical storage states without retaining the autograd graph.",
+      "mode_b_full_graph_with_trim": "In dmg.models.model_handler.ModelHandler._trim, the model runs all 730 days in the autograd graph, and output[warmup:] / target[warmup:] are sliced before loss calculation.",
+      "loss_on_warmup": "False. In all modes, warmup period timesteps are excluded from loss computation."
+    },
+    "6_scored_365_days_loss_masking": "Loss is calculated solely on the scored period (last rho=365 days). Missing observations (NaNs) are filtered via torch.isnan / isfinite boolean masks inside the criterion classes (NseBatchLoss, KgeBatchLoss, MSELoss).",
+    "7_epoch_coverage_definition": "An epoch is defined by n_iter_ep = ceil(log(0.01) / log(1 - batch_size * rho / (n_samples * (n_t - warmup)))) random mini-batches, guaranteeing ~99% coverage of the (basin, time) space.",
+    "8_validation_test_semantics": "Inference and testing run on the complete continuous time series (eval mode with torch.no_grad()) across all evaluation basins, not random window sampling."
+  }
+}

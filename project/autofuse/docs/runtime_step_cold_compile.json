@@ -1,0 +1,110 @@
+{
+  "cache_dir": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/.cache/runtime-cold-record",
+  "cuda": "12.8",
+  "dtype": "torch.float64",
+  "gpu": "NVIDIA GeForce RTX 3060",
+  "models": [
+    {
+      "autograd_unique_graphs": 1,
+      "cold_compile_seconds": 15.161607465000998,
+      "forward_unique_graphs": 1,
+      "graph_breaks": 0,
+      "model_id": 2,
+      "parity": {
+        "diagnostics_max_abs": 0.0,
+        "finite": true,
+        "gradient": {
+          "active_gradient_max_abs": 0.0,
+          "finite": true,
+          "inactive_gradient_max_abs": 0.0,
+          "inactive_gradients_zero_or_none": true,
+          "model_id": 2
+        },
+        "model_id": 2,
+        "packed_max_abs": 1.734723475976807e-18,
+        "q_max_abs": 0.0,
+        "signature_digest": "8cfd636d4fcd11ad"
+      },
+      "process_elapsed_seconds": 48.30677039299917,
+      "recompilations": 0,
+      "signature_digest": "8cfd636d4fcd11ad"
+    },
+    {
+      "autograd_unique_graphs": 1,
+      "cold_compile_seconds": 8.365729104996717,
+      "forward_unique_graphs": 1,
+      "graph_breaks": 0,
+      "model_id": 108,
+      "parity": {
+        "diagnostics_max_abs": 0.0,
+        "finite": true,
+        "gradient": {
+          "active_gradient_max_abs": 0.0,
+          "finite": true,
+          "inactive_gradient_max_abs": 0.0,
+          "inactive_gradients_zero_or_none": true,
+          "model_id": 108
+        },
+        "model_id": 108,
+        "packed_max_abs": 1.1102230246251565e-16,
+        "q_max_abs": 0.0,
+        "signature_digest": "f343e482bf22468b"
+      },
+      "process_elapsed_seconds": 25.58183088399528,
+      "recompilations": 0,
+      "signature_digest": "f343e482bf22468b"
+    },
+    {
+      "autograd_unique_graphs": 1,
+      "cold_compile_seconds": 7.667263514995284,
+      "forward_unique_graphs": 1,
+      "graph_breaks": 0,
+      "model_id": 178,
+      "parity": {
+        "diagnostics_max_abs": 0.0,
+        "finite": true,
+        "gradient": {
+          "active_gradient_max_abs": 0.0,
+          "finite": true,
+          "inactive_gradient_max_abs": 0.0,
+          "inactive_gradients_zero_or_none": true,
+          "model_id": 178
+        },
+        "model_id": 178,
+        "packed_max_abs": 1.6940658945086007e-21,
+        "q_max_abs": 4.440892098500626e-16,
+        "signature_digest": "043505119dd17d5f"
+      },
+      "process_elapsed_seconds": 33.34917622600187,
+      "recompilations": 0,
+      "signature_digest": "043505119dd17d5f"
+    },
+    {
+      "autograd_unique_graphs": 1,
+      "cold_compile_seconds": 6.855889598999056,
+      "forward_unique_graphs": 1,
+      "graph_breaks": 0,
+      "model_id": 210,
+      "parity": {
+        "diagnostics_max_abs": 0.0,
+        "finite": true,
+        "gradient": {
+          "active_gradient_max_abs": 6.938893903907228e-18,
+          "finite": true,
+          "inactive_gradient_max_abs": 0.0,
+          "inactive_gradients_zero_or_none": true,
+          "model_id": 210
+        },
+        "model_id": 210,
+        "packed_max_abs": 0.0,
+        "q_max_abs": 0.0,
+        "signature_digest": "d0d65bec23a7a873"
+      },
+      "process_elapsed_seconds": 23.109838704003778,
+      "recompilations": 0,
+      "signature_digest": "d0d65bec23a7a873"
+    }
+  ],
+  "schema": "dfuse-runtime-step-cold-compile-v1",
+  "torch": "2.9.1+cu128"
+}

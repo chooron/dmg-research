@@ -1,0 +1,118 @@
+{
+  "chunk_sizes": [
+    7,
+    30,
+    60,
+    90
+  ],
+  "closeout_updated_at_utc": "2026-09-08T06:39:17.353207+00:00",
+  "decision": "A chunk is eligible only when forward/backward and parity pass; remainder chunks are separate compiled variants and count toward cache cost.",
+  "generated_at_utc": "2026-09-08T06:21:40.375063+00:00",
+  "method": "Python outer loop over chunks; each fixed K or remainder chunk is torch.compile(fullgraph=True); Lite outputs only",
+  "provenance": {
+    "data_status": "prior_probe_reused",
+    "final_source_checked_at_utc": "2026-09-08T06:39:17.352980+00:00",
+    "long_temporal_probe_rerun_in_closeout": false,
+    "numerical_core_hashes": {
+      "dfuse/kernel.py": "4a79b4caa8d93881c849476e2ffe5aa304c8033cf271bd7e11073d7f7227faff",
+      "dfuse/runtime.py": "f6b9f066489929479ccabb2035e50bed146e536af24a641cae68e11c37e9ad13",
+      "dfuse/spec.py": "0e7c569260e11acd49b8b61174934afbbccf9d1c0ec46c4a3bae561b2491d2bb"
+    },
+    "probe_original_generated_at_utc": "2026-09-08T06:21:40.375063+00:00",
+    "rerun": false,
+    "reuse_reason": "Closeout explicitly reuses the already executed bounded probe; no T>=30/full-730/chunk/wide compile was rerun.",
+    "source_git_sha": "3caca37a4243ae0a95ebe9cc4f22998672ddf464"
+  },
+  "records": [
+    {
+      "batch_size": 100,
+      "chunk_size": 7,
+      "model_id": 2,
+      "status": "timeout",
+      "stderr_tail": "",
+      "stdout_tail": "",
+      "steps": 730,
+      "strategy": "chunk",
+      "timeout_seconds": 120
+    },
+    {
+      "batch_size": 100,
+      "chunk_size": 30,
+      "model_id": 2,
+      "status": "timeout",
+      "stderr_tail": "",
+      "stdout_tail": "",
+      "steps": 730,
+      "strategy": "chunk",
+      "timeout_seconds": 120
+    },
+    {
+      "batch_size": 100,
+      "chunk_size": 60,
+      "model_id": 2,
+      "status": "timeout",
+      "stderr_tail": "",
+      "stdout_tail": "",
+      "steps": 730,
+      "strategy": "chunk",
+      "timeout_seconds": 120
+    },
+    {
+      "batch_size": 100,
+      "chunk_size": 90,
+      "model_id": 2,
+      "status": "timeout",
+      "stderr_tail": "",
+      "stdout_tail": "",
+      "steps": 730,
+      "strategy": "chunk",
+      "timeout_seconds": 120
+    },
+    {
+      "batch_size": 100,
+      "chunk_size": 7,
+      "model_id": 8,
+      "status": "timeout",
+      "stderr_tail": "",
+      "stdout_tail": "",
+      "steps": 730,
+      "strategy": "chunk",
+      "timeout_seconds": 120
+    },
+    {
+      "batch_size": 100,
+      "chunk_size": 30,
+      "model_id": 8,
+      "status": "timeout",
+      "stderr_tail": "",
+      "stdout_tail": "",
+      "steps": 730,
+      "strategy": "chunk",
+      "timeout_seconds": 120
+    },
+    {
+      "batch_size": 100,
+      "chunk_size": 60,
+      "model_id": 8,
+      "status": "timeout",
+      "stderr_tail": "",
+      "stdout_tail": "",
+      "steps": 730,
+      "strategy": "chunk",
+      "timeout_seconds": 120
+    },
+    {
+      "batch_size": 100,
+      "chunk_size": 90,
+      "model_id": 8,
+      "status": "timeout",
+      "stderr_tail": "",
+      "stdout_tail": "",
+      "steps": 730,
+      "strategy": "chunk",
+      "timeout_seconds": 120
+    }
+  ],
+  "schema_version": "torch-fuse-chunked-temporal-compile-probe-v1",
+  "status": "completed"
+}

@@ -1,0 +1,82 @@
+{
+  "schema_version": "s4-diagnostic-catchments-v1",
+  "status": "frozen_before_s4_results",
+  "selection_basis": {
+    "source_artifact": "project/autofuse/docs/landscape_validation.json",
+    "source_sha256": "1813b092c41f039efef28bb96230aebdc90ffa8086b92dee0a818654be43c38a",
+    "source_scope": "completed frozen S3 12-catchment x 78-structure gate; no S4 result was inspected",
+    "rules": [
+      "include the completed S3 best-ranking catchment",
+      "include the completed S3 worst-ranking catchment",
+      "include the largest absolute per-catchment low-flow Delta_KGE(1/Q) summary",
+      "include at least one high-S3-qperc-activation catchment",
+      "cover dry and wet aridity groups",
+      "cover low_snow and high_snow groups"
+    ]
+  },
+  "catchments": [
+    {
+      "basin_id": "USA_09447800",
+      "hru_id": 9447800,
+      "aridity_group": "dry",
+      "snow_group": "low_snow",
+      "selection_role": ["best_completed_s3_spearman", "dry", "low_snow"],
+      "predefined_s3_summary": {
+        "spearman_fortran_vs_s3": 0.508744420136825,
+        "s3_qperc_activation_median": 0.07159861921199857,
+        "fortran_qperc_activation_median": 1.0,
+        "delta_kge_inv_q_median_s3_minus_fortran": -0.037181162099103826,
+        "abs_delta_kge_inv_q_median": 0.1269091028042567
+      }
+    },
+    {
+      "basin_id": "USA_14138900",
+      "hru_id": 14138900,
+      "aridity_group": "wet",
+      "snow_group": "high_snow",
+      "selection_role": ["worst_completed_s3_spearman", "high_s3_qperc_activation", "wet", "high_snow"],
+      "predefined_s3_summary": {
+        "spearman_fortran_vs_s3": 0.04599198270084346,
+        "s3_qperc_activation_median": 0.758659683371027,
+        "fortran_qperc_activation_median": 1.0,
+        "delta_kge_inv_q_median_s3_minus_fortran": -0.24458767089950145,
+        "abs_delta_kge_inv_q_median": 0.26108824264533087
+      }
+    },
+    {
+      "basin_id": "USA_07167500",
+      "hru_id": 7167500,
+      "aridity_group": "intermediate",
+      "snow_group": "low_snow",
+      "selection_role": ["largest_absolute_low_flow_sensitivity", "low_snow"],
+      "predefined_s3_summary": {
+        "spearman_fortran_vs_s3": 0.1191087393619039,
+        "s3_qperc_activation_median": 0.2706225449351268,
+        "fortran_qperc_activation_median": 1.0,
+        "delta_kge_inv_q_median_s3_minus_fortran": -0.4914439684326292,
+        "abs_delta_kge_inv_q_median": 0.541133475674505
+      }
+    },
+    {
+      "basin_id": "USA_13240000",
+      "hru_id": 13240000,
+      "aridity_group": "wet",
+      "snow_group": "high_snow",
+      "selection_role": ["large_absolute_low_flow_sensitivity", "wet", "high_snow"],
+      "predefined_s3_summary": {
+        "spearman_fortran_vs_s3": 0.14892702234474386,
+        "s3_qperc_activation_median": 0.36317105106534936,
+        "fortran_qperc_activation_median": 1.0,
+        "delta_kge_inv_q_median_s3_minus_fortran": -0.4127864664866488,
+        "abs_delta_kge_inv_q_median": 0.4408357989633427
+      }
+    }
+  ],
+  "protocol": {
+    "selection_is_fixed": true,
+    "selection_frozen_before_s4_results": true,
+    "same_forcing_qobs_evaluation_theta": true,
+    "no_calibration": true,
+    "no_full_12x78_s3_rerun": true
+  }
+}

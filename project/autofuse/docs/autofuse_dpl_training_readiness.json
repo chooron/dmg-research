@@ -1,0 +1,51 @@
+{
+  "decision": "dmg window-training strategy reusable, engineering work remains",
+  "engineering_bottleneck_ranking": [
+    {
+      "bottleneck": "Forward simulation over 730 timesteps",
+      "classification": "confirmed bottleneck",
+      "impact": "Consumes 72.6% to 74.4% of steady-state training step time (3.47s / 2.63s). The 730-step Python iteration loop is the primary forward cost.",
+      "rank": 1
+    },
+    {
+      "bottleneck": "Backward BPTT over 730 timesteps",
+      "classification": "secondary",
+      "impact": "Consumes 25.3% to 26.8% of steady-state training step time (1.28s / 0.89s). Inductor autograd executes efficiently on CUDA at B=100 with Bwd/Fwd ratio of 0.34x to 0.37x.",
+      "rank": 2
+    },
+    {
+      "bottleneck": "Autograd graph memory / VRAM",
+      "classification": "not material at B=100",
+      "impact": "Peak allocated VRAM is only 469.0 MB on a 12GB GPU (>96% headroom). Memory is not a constraint at B=100.",
+      "rank": 3
+    },
+    {
+      "bottleneck": "Optimizer step and parameterizer forward",
+      "classification": "not material",
+      "impact": "Consumes < 0.002s (< 0.1% of step time).",
+      "rank": 4
+    }
+  ],
+  "executive_summary": {
+    "b100_feasibility": "Fully validated and stable. Peak VRAM is 469.0 MB (< 4% of 12GB GPU), zero OOM, finite gradients (norm ~32.8), and clean backward BPTT.",
+    "dmg_inheritance": "The 730d (365 warmup + 365 scored) random window sampling from dmg is directly reusable in Auto-FUSE, saving 5.0x wall-clock and 5.0x VRAM over full-period training.",
+    "speed_metrics": "B=100 steady-state training step takes 4.78s (Structure 2) and 3.53s (Structure 8), delivering 753.1 to 1019.1 steps/hour and 15,271 to 20,665 basin-days/s. Forward = 3.47s (Structure 2) / 2.63s (Structure 8), Backward = 1.28s (Structure 2) / 0.89s (Structure 8) with Bwd/Fwd ratio = 0.34x to 0.37x.",
+    "structure_batching_rule": "Fix structure s per mini-batch to preserve fullgraph vmap compilation across the 100 basin-time windows."
+  },
+  "generated_artifacts": [
+    "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/dmg_training_path_audit.json",
+    "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/dmg_window_training_semantics.json",
+    "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/dmg_autograd_memory_audit.json",
+    "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/autofuse_dpl_training_inheritance_audit.json",
+    "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/torch_fuse_dpl_b100_benchmark.json",
+    "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/torch_fuse_warmup_autograd_strategy_b100.json",
+    "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/window_vs_full_period_dpl_cost_b100.json",
+    "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/autofuse_dpl_resource_estimate_b100.json",
+    "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/autofuse_dpl_training_readiness.json"
+  ],
+  "generated_at_utc": "2026-09-07T09:50:22.763190+00:00",
+  "protocol_id": "formal-experiment-protocol-v1-db53091e6e222066",
+  "schema_version": "autofuse-dpl-training-readiness-v1",
+  "status": "completed",
+  "torch_fuse_freeze_id": "torch-fuse-v1-freeze-v1"
+}

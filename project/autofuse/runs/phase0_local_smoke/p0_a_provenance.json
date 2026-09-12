@@ -1,0 +1,161 @@
+{
+  "schema_version": "phase0-provenance-v1",
+  "stage": "P0-A",
+  "status": "PASS",
+  "captured_at_utc": "2026-09-08T14:33:25.509079+00:00",
+  "git": {
+    "commit": "3caca37a4243ae0a95ebe9cc4f22998672ddf464",
+    "is_dirty": true
+  },
+  "runtime_environment": {
+    "python_version": "3.10.20",
+    "torch_version": "2.9.1+cu128",
+    "cuda_available": true,
+    "cuda_runtime_version": "12.8",
+    "gpu_name": "NVIDIA GeForce RTX 3060",
+    "gpu_total_vram_mb": 12287.5,
+    "device": "cuda",
+    "dtype": "torch.float32",
+    "thread_policy": {
+      "OMP_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1"
+    }
+  },
+  "registry": {
+    "name": "structures_78",
+    "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/dfuse/specs/structures_78.json",
+    "structure_count": 78,
+    "sha256": "457b232b71c870fd3cb698fd9bb517e58844c5e9bba5f0c4ac4ad0bcc971d6fc"
+  },
+  "contracts": {
+    "time_window": {
+      "total_days": 730,
+      "warmup_days": 365,
+      "scored_days": 365
+    },
+    "data_periods": {
+      "forcing": [
+        "1987-01-01",
+        "2009-12-31"
+      ],
+      "warmup": [
+        "1987-01-01",
+        "1988-12-31"
+      ],
+      "calibration": [
+        "1989-01-01",
+        "1998-12-31"
+      ],
+      "evaluation": [
+        "1999-01-01",
+        "2009-12-31"
+      ]
+    }
+  },
+  "kernel_hashes": {
+    "kernel.py": "4a79b4caa8d93881c849476e2ffe5aa304c8033cf271bd7e11073d7f7227faff",
+    "runtime.py": "f6b9f066489929479ccabb2035e50bed146e536af24a641cae68e11c37e9ad13",
+    "batched.py": "c4d17cb9e91a2358c415b3d43665a1f4e5534a1a3c37b5545eda7fd20a331fe5",
+    "structures_78.json": "457b232b71c870fd3cb698fd9bb517e58844c5e9bba5f0c4ac4ad0bcc971d6fc"
+  },
+  "config_snapshot": {
+    "schema_version": "autofuse-phase0-config-v1",
+    "run_id": "phase0_local_smoke",
+    "output_dir": "project/autofuse/runs/phase0_local_smoke",
+    "cache_dir": "project/autofuse/.cache/torch-fuse-phase0-smoke",
+    "seed": 20260901,
+    "device": "cuda",
+    "dtype": "float32",
+    "data": {
+      "manifest_path": "project/autofuse/docs/landscape_12catchment_manifest.json",
+      "inputs_dir": "project/autofuse/docs/landscape_inputs",
+      "target_basin_count": 2,
+      "periods": {
+        "forcing": [
+          "1987-01-01",
+          "2009-12-31"
+        ],
+        "warmup": [
+          "1987-01-01",
+          "1988-12-31"
+        ],
+        "calibration": [
+          "1989-01-01",
+          "1998-12-31"
+        ],
+        "evaluation": [
+          "1999-01-01",
+          "2009-12-31"
+        ]
+      }
+    },
+    "time_window": {
+      "total_days": 730,
+      "warmup_days": 365,
+      "scored_days": 365
+    },
+    "model": {
+      "attribute_dim": 35,
+      "hidden_dim": 64,
+      "learning_rate": 0.001,
+      "max_grad_norm": 1.0
+    },
+    "registry": {
+      "path": "dfuse/specs/structures_78.json",
+      "name": "structures_78",
+      "anchors": [
+        2,
+        8
+      ]
+    },
+    "stages": {
+      "p0_a": {
+        "enabled": true
+      },
+      "p0_b_throughput": {
+        "enabled": true,
+        "batch_size": 2,
+        "warmup_steps": 1,
+        "measured_steps": 2,
+        "structures": [
+          2
+        ]
+      },
+      "p0_c_compile": {
+        "enabled": true,
+        "batch_size": 2,
+        "structures": [
+          2
+        ],
+        "test_eager": true,
+        "test_compile": true
+      },
+      "p0_d_validation": {
+        "enabled": true,
+        "structures": [
+          2
+        ],
+        "eval_period": "evaluation",
+        "eval_days": 3652,
+        "batch_size": 2,
+        "candidate_eval_intervals": [
+          50,
+          100
+        ]
+      },
+      "p0_e_pilot": {
+        "enabled": true,
+        "batch_size": 2,
+        "cycles": 1,
+        "structures": [
+          2,
+          8
+        ]
+      },
+      "p0_f_synthesis": {
+        "enabled": true
+      }
+    }
+  }
+}

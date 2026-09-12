@@ -1,0 +1,1065 @@
+{
+  "bounds": {
+    "corrected_error_reference_bound": 1.6978680419921876e-06,
+    "legacy_error_reference_bound": 9.838885498046876e-08,
+    "maxwatr_1": 98.38885498046875,
+    "maxwatr_2": 1697.8680419921875,
+    "watr2_lower_state_bound": 1.6978680419921876e-06,
+    "watr2_unbounded_upper_by_design": true,
+    "xmin": 1e-09
+  },
+  "case": {
+    "basin_id": "USA_09447800",
+    "date": "1991-07-20",
+    "flux_names": [
+      "EFF_PPT",
+      "SATAREA",
+      "EVAP_1A",
+      "EVAP_1B",
+      "EVAP_1",
+      "RCHR2EXCS",
+      "TENS2FREE_1",
+      "QPERC_12",
+      "QINTF_1",
+      "OFLOW_1",
+      "QSURF",
+      "EVAP_2",
+      "TENS2FREE_2",
+      "QBASE_2A",
+      "QBASE_2B",
+      "QBASE_2",
+      "OFLOW_2A",
+      "OFLOW_2B",
+      "OFLOW_2"
+    ],
+    "hru_id": 9447800,
+    "index": 1661,
+    "model_id": 8,
+    "state_names": [
+      "TENS_1",
+      "FREE_1",
+      "WATR_2"
+    ],
+    "topology": {
+      "ARCH1": "tension1_1",
+      "ARCH2": "unlimfrc_2",
+      "ESOIL": "sequential",
+      "QINTF": "intflwnone",
+      "QPERC": "perc_f2sat",
+      "QSURF": "arno_x_vic",
+      "Q_TDH": "rout_gamma",
+      "RFERR": "multiplc_e",
+      "SNOWM": "temp_index"
+    }
+  },
+  "conclusion": {
+    "decision": "Applied the source-grounded Torch-only MAXWATR_2 correction; accepted flux now conserves the corrected state transition",
+    "direct_cause": "MAXWATR_1 was used as the WATR_2 error reference while the state was corrected to MAXWATR_2",
+    "local_process_trace_parity": "Torch remains compared with the explicit-Heun Fortran wrapper for process and structure audit; the known legacy WATR_2 bookkeeping branch is intentionally not used as the Torch correctness target"
+  },
+  "correction": {
+    "affected_topologies": [
+      "ARCH2=unlimfrc_2",
+      "ARCH2=unlimpow_2",
+      "ARCH2=fixedsiz_2",
+      "ARCH2=topmdexp_2"
+    ],
+    "corrected_state_formula": "WATR_2_corrected = XMIN*MAXWATR_2",
+    "intentional_deviation_from_legacy": true,
+    "legacy_formula": "ERROR_LOSS = (WATR_2_raw - XMIN*MAXWATR_1)/DT",
+    "no_empirical_patch": true,
+    "source_evidence": "fix_states.f90 corrects ESTATE.WATR_2 to XMIN*MAXWATR_2 but computes ERR_WATR_2 with XMIN*MAXWATR_1; the same lower-bound mismatch is present in the prior Torch branch",
+    "tests_added": [
+      "dfuse/tests/test_runtime.py::test_watr2_lower_floor_uses_matching_capacity",
+      "project/autofuse/watr2_lower_floor_audit.py"
+    ],
+    "torch_corrected_formula": "ERROR_LOSS = (WATR_2_raw - XMIN*MAXWATR_2)/DT",
+    "unaffected_topology": "ARCH2=tens2pll_2",
+    "why_implementation_correction": "The corrected state and proportional correction flux must use one lower-layer capacity so storage transition and accepted flux have identical mass accounting. This changes only the known bookkeeping inconsistency, not a process equation or structure decision."
+  },
+  "correction_decomposition": {
+    "corrected_error_loss": -9.982292959676344e-08,
+    "corrected_flux_delta_from_mean": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -9.982292959676344e-08,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "fortran_final_state_correction": [
+      0.0,
+      0.0,
+      9.982292959676344e-08
+    ],
+    "legacy_error_loss": 1.4996562574149554e-06,
+    "legacy_flux_delta_from_mean": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      1.4996562574149554e-06,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "torch_final_state_correction": [
+      0.0,
+      0.0,
+      9.982292959676344e-08
+    ]
+  },
+  "forcing": {
+    "effective_precipitation": 0.0,
+    "jday": 201.0,
+    "pet": 6.2656894,
+    "ppt": 0.0,
+    "temp": 24.060000000000002
+  },
+  "protocol": {
+    "device": "cuda",
+    "dt_days": 1.0,
+    "dtype": "torch.float64",
+    "execution": "coupled-RK2 Torch kernel with source/trace Fortran process audit",
+    "initial_fraction": 0.25
+  },
+  "regression": {
+    "after_corrected_torch": {
+      "accepted_flux": [
+        0.0,
+        0.0019610481001651747,
+        0.0,
+        0.0,
+        0.22713686049555798,
+        0.0,
+        0.0,
+        3.6230198899929405e-08,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.2108974377094604e-07,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "accepted_watr2": 1.6978680419921876e-06,
+      "corrected_watr2": 1.6978680419921876e-06,
+      "formula": "MAXWATR_2 error reference",
+      "raw_final_watr2": 1.5980451123954241e-06,
+      "water_balance_terms": {
+        "effective_precipitation": 0.0,
+        "evap_1": 0.22713686049555798,
+        "evap_2": 0.0,
+        "external_net_input": -0.22713698158530174,
+        "instantaneous_outflow": 1.2108974377094604e-07,
+        "oflow_1": 0.0,
+        "oflow_2": 0.0,
+        "qbase_2": 1.2108974377094604e-07,
+        "qintf_1": 0.0,
+        "qperc_12": 3.6230198899929405e-08,
+        "qsurf": 0.0,
+        "residual": 2.7755575615628914e-17,
+        "storage_delta": -0.2271369815853017,
+        "storage_end": 10.781826577285143,
+        "storage_start": 11.008963558870445
+      }
+    },
+    "before_legacy_torch": {
+      "accepted_flux": [
+        0.0,
+        0.0019610481001651747,
+        0.0,
+        0.0,
+        0.22713686049555798,
+        0.0,
+        0.0,
+        3.6230198899929405e-08,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.7205689307826648e-06,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "accepted_watr2": 1.6978680419921876e-06,
+      "formula": "MAXWATR_1 error reference",
+      "raw_final_watr2": 1.5980451123954241e-06,
+      "water_balance_terms": {
+        "effective_precipitation": 0.0,
+        "evap_1": 0.22713686049555798,
+        "evap_2": 0.0,
+        "external_net_input": -0.22713858106448875,
+        "instantaneous_outflow": 1.7205689307826648e-06,
+        "oflow_1": 0.0,
+        "oflow_2": 0.0,
+        "qbase_2": 1.7205689307826648e-06,
+        "qintf_1": 0.0,
+        "qperc_12": 3.6230198899929405e-08,
+        "qsurf": 0.0,
+        "residual": 1.5994791870421743e-06,
+        "storage_delta": -0.2271369815853017,
+        "storage_end": 10.781826577285143,
+        "storage_start": 11.008963558870445
+      }
+    },
+    "finite": true,
+    "pass": true,
+    "residual_after": 2.7755575615628914e-17,
+    "residual_before": 1.5994791870421743e-06,
+    "state_bounds_clean": true
+  },
+  "schema_version": "watr2-lower-floor-torch-correction-v1",
+  "source": {
+    "fix_states": "/home/jingxin/orca/workspaces/dmg-research/autofuse/vendor/upstream/cyrilthebault-fuse/build/FUSE_SRC/FUSE_ENGINE/fix_states.f90",
+    "fix_states_sha256": "b0547541ed1d09df684871dbca40048263d9c3ad99ee6934f6e82f550b0f90ce",
+    "runtime": "/home/jingxin/orca/workspaces/dmg-research/autofuse/dfuse/runtime.py",
+    "runtime_sha256": "f6b9f066489929479ccabb2035e50bed146e536af24a641cae68e11c37e9ad13",
+    "wrapper_executable": "/tmp/autofuse-coupled-rhs-build-v5/coupled_rhs_fortran_v5.exe",
+    "wrapper_executable_sha256": "c50f2fda212bee3ff6eb8232f951d4ae7762d81f25ae9160736077af3cb56fd4",
+    "wrapper_source": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/coupled_rhs_fortran_wrapper.f90",
+    "wrapper_source_sha256": "e91d19a8e651b503ad7a44f269e02662de7b79d98bf06f8e721c534a8d29786d"
+  },
+  "status": "passed",
+  "torch_vs_fortran_wrapper": {
+    "accepted_flux": {
+      "fortran_wrapper": [
+        0.0,
+        0.0019610481001651747,
+        0.0,
+        0.0,
+        0.22713686049555798,
+        0.0,
+        0.0,
+        3.6230198899929405e-08,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.7205689307826648e-06,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "max_abs": 1.5994791870117188e-06,
+      "torch": [
+        0.0,
+        0.0019610481001651747,
+        0.0,
+        0.0,
+        0.22713686049555798,
+        0.0,
+        0.0,
+        3.6230198899929405e-08,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.2108974377094604e-07,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "accepted_state": {
+      "fortran_wrapper": [
+        1.1437055002447514,
+        9.63811937917235,
+        1.6978680419921876e-06
+      ],
+      "max_abs": 0.0,
+      "torch": [
+        1.1437055002447514,
+        9.63811937917235,
+        1.6978680419921876e-06
+      ]
+    },
+    "input_state": {
+      "fortran_wrapper": [
+        1.3708423607403093,
+        9.63811941540255,
+        1.7827275868632043e-06
+      ],
+      "max_abs": 0.0,
+      "torch": [
+        1.3708423607403093,
+        9.63811941540255,
+        1.7827275868632043e-06
+      ]
+    },
+    "mean_flux": {
+      "fortran_wrapper": [
+        0.0,
+        0.0019610481001651747,
+        0.0,
+        0.0,
+        0.22713686049555798,
+        0.0,
+        0.0,
+        3.6230198899929405e-08,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        2.209126733677095e-07,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "max_abs": 0.0,
+      "torch": [
+        0.0,
+        0.0019610481001651747,
+        0.0,
+        0.0,
+        0.22713686049555798,
+        0.0,
+        0.0,
+        3.6230198899929405e-08,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        2.209126733677095e-07,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "post_predictor_flux": {
+      "fortran_wrapper": [
+        0.0,
+        0.0019849121011973336,
+        0.0,
+        0.0,
+        0.24991813587302672,
+        0.0,
+        0.0,
+        3.623019975730472e-08,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.7205689316400403e-06,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "max_abs": 1.5994791870117188e-06,
+      "torch": [
+        0.0,
+        0.0019849121011973336,
+        0.0,
+        0.0,
+        0.24991813587302672,
+        0.0,
+        0.0,
+        3.623019975730472e-08,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.210897446283214e-07,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "post_predictor_state": {
+      "fortran_wrapper": [
+        1.1209242248672826,
+        9.63811937917235,
+        1.6978680419921876e-06
+      ],
+      "max_abs": 0.0,
+      "torch": [
+        1.1209242248672826,
+        9.63811937917235,
+        1.6978680419921876e-06
+      ]
+    },
+    "predictor_raw_state": {
+      "fortran_wrapper": [
+        1.1209242248672826,
+        9.63811937917235,
+        1.5926590957669394e-06
+      ],
+      "max_abs": 0.0,
+      "torch": [
+        1.1209242248672826,
+        9.63811937917235,
+        1.5926590957669394e-06
+      ]
+    },
+    "raw_final_state": {
+      "fortran_wrapper": [
+        1.1437055002447514,
+        9.63811937917235,
+        1.5980451123954241e-06
+      ],
+      "max_abs": 0.0,
+      "torch": [
+        1.1437055002447514,
+        9.63811937917235,
+        1.5980451123954241e-06
+      ]
+    },
+    "stage1_flux": {
+      "fortran_wrapper": [
+        0.0,
+        0.0019849121011973336,
+        0.0,
+        0.0,
+        0.24991813587302672,
+        0.0,
+        0.0,
+        3.623019975730472e-08,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        2.262986908535696e-07,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "max_abs": 0.0,
+      "torch": [
+        0.0,
+        0.0019849121011973336,
+        0.0,
+        0.0,
+        0.24991813587302672,
+        0.0,
+        0.0,
+        3.623019975730472e-08,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        2.262986908535696e-07,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "stage2_flux": {
+      "fortran_wrapper": [
+        0.0,
+        0.0019371840991330158,
+        0.0,
+        0.0,
+        0.20435558511808927,
+        0.0,
+        0.0,
+        3.623019804255409e-08,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        2.1552665588184938e-07,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "max_abs": 0.0,
+      "torch": [
+        0.0,
+        0.0019371840991330158,
+        0.0,
+        0.0,
+        0.20435558511808927,
+        0.0,
+        0.0,
+        3.623019804255409e-08,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        2.1552665588184938e-07,
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  },
+  "trace": {
+    "fortran_wrapper": {
+      "D0": [
+        -0.24991813587302672,
+        -3.623019975730472e-08,
+        -1.9006849109626488e-07
+      ],
+      "D1": [
+        -0.20435558511808927,
+        -3.623019804255409e-08,
+        -1.7929645783929528e-07
+      ],
+      "FINAL_ERRORS": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.4996562574149554e-06
+      ],
+      "FINAL_FLUX_BEFORE_FIX": [
+        0.0,
+        0.0019610481001651747,
+        0.0,
+        0.0,
+        0.22713686049555798,
+        0.0,
+        0.0,
+        3.6230198899929405e-08,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        2.209126733677095e-07,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "FINAL_LOWER_VIOLATION": [
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "FINAL_STATE_CORRECTION": [
+        0.0,
+        0.0,
+        9.982292959676344e-08,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "FINAL_UPPER_VIOLATION": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "FLUX0": [
+        0.0,
+        0.0019849121011973336,
+        0.0,
+        0.0,
+        0.24991813587302672,
+        0.0,
+        0.0,
+        3.623019975730472e-08,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        2.262986908535696e-07,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "FLUX1": [
+        0.0,
+        0.0019371840991330158,
+        0.0,
+        0.0,
+        0.20435558511808927,
+        0.0,
+        0.0,
+        3.623019804255409e-08,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        2.1552665588184938e-07,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "FLUX_AVG": [
+        0.0,
+        0.0019610481001651747,
+        0.0,
+        0.0,
+        0.22713686049555798,
+        0.0,
+        0.0,
+        3.6230198899929405e-08,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        2.209126733677095e-07,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "FLUX_FINAL": [
+        0.0,
+        0.0019610481001651747,
+        0.0,
+        0.0,
+        0.22713686049555798,
+        0.0,
+        0.0,
+        3.6230198899929405e-08,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.7205689307826648e-06,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "HEUN_RAW": [
+        1.1437055002447514,
+        9.63811937917235,
+        1.5980451123954241e-06
+      ],
+      "PREDICTOR": [
+        1.1209242248672826,
+        9.63811937917235,
+        1.5926590957669394e-06
+      ],
+      "PREDICTOR_ERRORS": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.4942702407864706e-06
+      ],
+      "PREDICTOR_FLUX_FIXED": [
+        0.0,
+        0.0019849121011973336,
+        0.0,
+        0.0,
+        0.24991813587302672,
+        0.0,
+        0.0,
+        3.623019975730472e-08,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.7205689316400403e-06,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "PREDICTOR_LOWER_VIOLATION": [
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "PREDICTOR_SAFE": [
+        1.1209242248672826,
+        9.63811937917235,
+        1.6978680419921876e-06
+      ],
+      "PREDICTOR_STATE_CORRECTION": [
+        0.0,
+        0.0,
+        1.052089462252482e-07,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "PREDICTOR_UPPER_VIOLATION": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "STATE0": [
+        1.3708423607403093,
+        9.63811941540255,
+        1.7827275868632043e-06
+      ],
+      "STATE1": [
+        1.1437055002447514,
+        9.63811937917235,
+        1.6978680419921876e-06
+      ],
+      "STATE_CODES": [
+        9003.0,
+        9004.0,
+        9009.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "STATE_LOWER_BOUNDS": [
+        3.436834393293248e-08,
+        6.402051104753628e-08,
+        1.6978680419921876e-06,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "STATE_UPPER_BOUNDS": [
+        34.368343932932476,
+        64.02051104753627,
+        1697.8680419921875,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "hidden_fields": {
+      "FINAL_HIDDEN_FREE2A": [
+        -9999.0
+      ],
+      "FINAL_HIDDEN_FREE2B": [
+        0.0
+      ],
+      "PREDICTOR_HIDDEN_FREE2A": [
+        -9999.0
+      ],
+      "PREDICTOR_HIDDEN_FREE2B": [
+        0.0
+      ]
+    },
+    "torch": {
+      "accepted_flux": [
+        0.0,
+        0.0019610481001651747,
+        0.0,
+        0.0,
+        0.22713686049555798,
+        0.0,
+        0.0,
+        3.6230198899929405e-08,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.2108974377094604e-07,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "accepted_state": [
+        1.1437055002447514,
+        9.63811937917235,
+        1.6978680419921876e-06
+      ],
+      "final_correction": [
+        0.0,
+        0.0,
+        9.982292959676344e-08
+      ],
+      "final_lower": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "final_upper": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "input_state": [
+        1.3708423607403093,
+        9.63811941540255,
+        1.7827275868632043e-06
+      ],
+      "instantaneous": 1.2108974377094604e-07,
+      "mean_flux": [
+        0.0,
+        0.0019610481001651747,
+        0.0,
+        0.0,
+        0.22713686049555798,
+        0.0,
+        0.0,
+        3.6230198899929405e-08,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        2.209126733677095e-07,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "post_predictor_flux": [
+        0.0,
+        0.0019849121011973336,
+        0.0,
+        0.0,
+        0.24991813587302672,
+        0.0,
+        0.0,
+        3.623019975730472e-08,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.210897446283214e-07,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "post_predictor_state": [
+        1.1209242248672826,
+        9.63811937917235,
+        1.6978680419921876e-06
+      ],
+      "predictor_correction": [
+        0.0,
+        0.0,
+        1.052089462252482e-07
+      ],
+      "predictor_lower": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "predictor_raw_state": [
+        1.1209242248672826,
+        9.63811937917235,
+        1.5926590957669394e-06
+      ],
+      "predictor_upper": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "raw_final_state": [
+        1.1437055002447514,
+        9.63811937917235,
+        1.5980451123954241e-06
+      ],
+      "stage1_flux": [
+        0.0,
+        0.0019849121011973336,
+        0.0,
+        0.0,
+        0.24991813587302672,
+        0.0,
+        0.0,
+        3.623019975730472e-08,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        2.262986908535696e-07,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "stage2_flux": [
+        0.0,
+        0.0019371840991330158,
+        0.0,
+        0.0,
+        0.20435558511808927,
+        0.0,
+        0.0,
+        3.623019804255409e-08,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        2.1552665588184938e-07,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "zero": 0.0
+    }
+  },
+  "water_balance_terms": {
+    "fortran_wrapper_legacy": {
+      "effective_precipitation": 0.0,
+      "evap_1": 0.22713686049555798,
+      "evap_2": 0.0,
+      "external_net_input": -0.22713858106448875,
+      "instantaneous_outflow": 1.7205689307826648e-06,
+      "oflow_1": 0.0,
+      "oflow_2": 0.0,
+      "qbase_2": 1.7205689307826648e-06,
+      "qintf_1": 0.0,
+      "qperc_12": 3.6230198899929405e-08,
+      "qsurf": 0.0,
+      "residual": 1.5994791870421743e-06,
+      "storage_delta": -0.2271369815853017,
+      "storage_end": 10.781826577285143,
+      "storage_start": 11.008963558870445
+    },
+    "legacy_torch_bookkeeping_reconstructed": {
+      "effective_precipitation": 0.0,
+      "evap_1": 0.22713686049555798,
+      "evap_2": 0.0,
+      "external_net_input": -0.22713858106448875,
+      "instantaneous_outflow": 1.7205689307826648e-06,
+      "oflow_1": 0.0,
+      "oflow_2": 0.0,
+      "qbase_2": 1.7205689307826648e-06,
+      "qintf_1": 0.0,
+      "qperc_12": 3.6230198899929405e-08,
+      "qsurf": 0.0,
+      "residual": 1.5994791870421743e-06,
+      "storage_delta": -0.2271369815853017,
+      "storage_end": 10.781826577285143,
+      "storage_start": 11.008963558870445
+    },
+    "torch_corrected": {
+      "effective_precipitation": 0.0,
+      "evap_1": 0.22713686049555798,
+      "evap_2": 0.0,
+      "external_net_input": -0.22713698158530174,
+      "instantaneous_outflow": 1.2108974377094604e-07,
+      "oflow_1": 0.0,
+      "oflow_2": 0.0,
+      "qbase_2": 1.2108974377094604e-07,
+      "qintf_1": 0.0,
+      "qperc_12": 3.6230198899929405e-08,
+      "qsurf": 0.0,
+      "residual": 2.7755575615628914e-17,
+      "storage_delta": -0.2271369815853017,
+      "storage_end": 10.781826577285143,
+      "storage_start": 11.008963558870445
+    }
+  }
+}

@@ -1,0 +1,163 @@
+{
+  "closeout_updated_at_utc": "2026-09-08T06:39:17.351164+00:00",
+  "decision": "Full rollout is adopted only if all requested levels compile, remain stable, and pass parity without unacceptable compile/memory cost.",
+  "generated_at_utc": "2026-09-08T06:05:37.784201+00:00",
+  "levels": [
+    2,
+    4,
+    30,
+    365,
+    730
+  ],
+  "method": "torch.compile(fullgraph=True) around a fixed Python recurrent rollout using the generated coupled-RK2 step; Lite outputs only",
+  "provenance": {
+    "data_status": "prior_probe_reused",
+    "final_source_checked_at_utc": "2026-09-08T06:39:17.350934+00:00",
+    "long_temporal_probe_rerun_in_closeout": false,
+    "numerical_core_hashes": {
+      "dfuse/kernel.py": "4a79b4caa8d93881c849476e2ffe5aa304c8033cf271bd7e11073d7f7227faff",
+      "dfuse/runtime.py": "f6b9f066489929479ccabb2035e50bed146e536af24a641cae68e11c37e9ad13",
+      "dfuse/spec.py": "0e7c569260e11acd49b8b61174934afbbccf9d1c0ec46c4a3bae561b2491d2bb"
+    },
+    "probe_original_generated_at_utc": "2026-09-08T06:05:37.784201+00:00",
+    "rerun": false,
+    "reuse_reason": "Closeout explicitly reuses the already executed bounded probe; no T>=30/full-730/chunk/wide compile was rerun.",
+    "source_git_sha": "3caca37a4243ae0a95ebe9cc4f22998672ddf464"
+  },
+  "records": [
+    {
+      "abs_loss_diff": 0.0,
+      "batch_size": 2,
+      "chunk_size": null,
+      "compile_wall_seconds_in_first_forward": 5.211726090987213,
+      "compiled_variants": 1,
+      "counter_delta": {
+        "after": {
+          "aot_autograd": {
+            "autograd_cache_hit": 1,
+            "ok": 1,
+            "total": 1
+          },
+          "inductor": {
+            "async_compile_cache_hit": 283,
+            "async_compile_cache_miss": 435,
+            "fxgraph_cache_hit": 2,
+            "triton_bundler_load_static_autotuner": 138
+          },
+          "stats": {
+            "calls_captured": 3777,
+            "unique_graphs": 1
+          }
+        },
+        "before": {}
+      },
+      "device": "cuda",
+      "dtype": "torch.float64",
+      "first_backward_seconds": 0.005688956007361412,
+      "first_forward_seconds": 5.211726090987213,
+      "first_peak_allocated_mb": 0.49609375,
+      "graph_breaks_observed": 0,
+      "max_abs_final_state_diff": 0.0,
+      "max_abs_q_diff": 0.0,
+      "max_abs_theta_gradient_diff": 7.105427357601002e-15,
+      "model_id": 2,
+      "recompilation_counter_delta": 1,
+      "status": "passed",
+      "steady_backward_seconds": 0.005937066045589745,
+      "steady_forward_seconds": 0.007006836938671768,
+      "steps": 2,
+      "strategy": "full",
+      "variant_lengths": [
+        2
+      ]
+    },
+    {
+      "abs_loss_diff": 0.0,
+      "batch_size": 2,
+      "chunk_size": null,
+      "compile_wall_seconds_in_first_forward": 10.546081235981546,
+      "compiled_variants": 1,
+      "counter_delta": {
+        "after": {
+          "aot_autograd": {
+            "autograd_cache_hit": 1,
+            "ok": 1,
+            "total": 1
+          },
+          "inductor": {
+            "async_compile_cache_hit": 440,
+            "async_compile_cache_miss": 681,
+            "fxgraph_cache_hit": 2,
+            "triton_bundler_load_static_autotuner": 213
+          },
+          "stats": {
+            "calls_captured": 7553,
+            "unique_graphs": 1
+          }
+        },
+        "before": {}
+      },
+      "device": "cuda",
+      "dtype": "torch.float64",
+      "first_backward_seconds": 0.06649466103408486,
+      "first_forward_seconds": 10.546081235981546,
+      "first_peak_allocated_mb": 0.8486328125,
+      "graph_breaks_observed": 0,
+      "max_abs_final_state_diff": 0.0,
+      "max_abs_q_diff": 4.440892098500626e-16,
+      "max_abs_theta_gradient_diff": 5.329070518200751e-15,
+      "model_id": 2,
+      "recompilation_counter_delta": 1,
+      "status": "passed",
+      "steady_backward_seconds": 0.048155813943594694,
+      "steady_forward_seconds": 0.06586104293819517,
+      "steps": 4,
+      "strategy": "full",
+      "variant_lengths": [
+        4
+      ]
+    },
+    {
+      "batch_size": 2,
+      "model_id": 2,
+      "status": "timeout",
+      "stderr_tail": "",
+      "stdout_tail": "",
+      "steps": 30,
+      "strategy": "full",
+      "timeout_seconds": 120
+    },
+    {
+      "batch_size": 100,
+      "model_id": 2,
+      "status": "timeout",
+      "stderr_tail": "",
+      "stdout_tail": "",
+      "steps": 365,
+      "strategy": "full",
+      "timeout_seconds": 120
+    },
+    {
+      "batch_size": 100,
+      "model_id": 2,
+      "status": "timeout",
+      "stderr_tail": "",
+      "stdout_tail": "",
+      "steps": 730,
+      "strategy": "full",
+      "timeout_seconds": 120
+    },
+    {
+      "batch_size": 100,
+      "model_id": 8,
+      "status": "timeout",
+      "stderr_tail": "",
+      "stdout_tail": "",
+      "steps": 730,
+      "strategy": "full",
+      "timeout_seconds": 120
+    }
+  ],
+  "schema_version": "torch-fuse-full-temporal-compile-probe-v1",
+  "status": "completed"
+}

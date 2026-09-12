@@ -1,0 +1,52 @@
+{
+  "empirical_b100_step_metrics": {
+    "backward_seconds": 1.2827545210020617,
+    "batch_size": 100,
+    "forward_seconds": 3.4681199389742687,
+    "gpu_vram_headroom_fraction": 0.961830692077823,
+    "optimizer_seconds": 0.0006978070014156401,
+    "peak_vram_allocated_mb": 469.00537109375,
+    "step_wall_clock_seconds": 4.780374564987142,
+    "steps_per_hour": 753.0790633787257,
+    "window_days": 730
+  },
+  "generated_at_utc": "2026-09-07T09:50:22.762844+00:00",
+  "multi_structure_organization_strategies": {
+    "strategy_1_fixed_structure_per_batch": {
+      "compile_efficiency": "Maximum (reuses single compiled _compiled_step for structure s across all 100 windows with zero recompilations).",
+      "description": "Each mini-batch fixes structure s and samples 100 basin-time windows. Structures cycle across mini-batches.",
+      "recommended": true
+    },
+    "strategy_2_mixed_structures_in_single_batch": {
+      "compile_efficiency": "Poor (breaks vmap vectorization and requires dynamic branching inside timestep loop).",
+      "description": "Single mini-batch mixes multiple structures.",
+      "recommended": false
+    }
+  },
+  "protocol_id": "formal-experiment-protocol-v1-db53091e6e222066",
+  "schema_version": "autofuse-dpl-resource-estimate-b100-v1",
+  "status": "completed",
+  "training_scenarios_single_structure": {
+    "full_coverage_530_batches_100_epochs": {
+      "batches_per_epoch": 530,
+      "epochs": 100,
+      "total_gpu_days": 2.9324056937999825,
+      "total_gpu_hours": 70.37773665119958,
+      "total_steps": 53000
+    },
+    "pilot_50_batches_50_epochs": {
+      "batches_per_epoch": 50,
+      "epochs": 50,
+      "total_gpu_days": 0.13832102329245202,
+      "total_gpu_hours": 3.3197045590188483,
+      "total_steps": 2500
+    },
+    "standard_100_batches_100_epochs": {
+      "batches_per_epoch": 100,
+      "epochs": 100,
+      "total_gpu_days": 0.5532840931698081,
+      "total_gpu_hours": 13.278818236075393,
+      "total_steps": 10000
+    }
+  }
+}

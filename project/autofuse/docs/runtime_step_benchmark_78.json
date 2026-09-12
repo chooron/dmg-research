@@ -1,0 +1,570 @@
+{
+  "all_passed": true,
+  "failures": [],
+  "models": [
+    164,
+    166,
+    178,
+    188,
+    190,
+    210,
+    212,
+    214
+  ],
+  "results": [
+    {
+      "backward": {
+        "compiled": {
+          "max_seconds": 0.29641222399368417,
+          "median_seconds": 0.2517570935015101,
+          "min_seconds": 0.20710196300933603
+        },
+        "generated_eager": {
+          "max_seconds": 2.510478141994099,
+          "median_seconds": 2.4995189039982506,
+          "min_seconds": 2.488559666002402
+        },
+        "speedup": 9.928295839589751
+      },
+      "decisions": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "forward": {
+        "compiled": {
+          "max_seconds": 0.37019041199528147,
+          "median_seconds": 0.3423484009981621,
+          "min_seconds": 0.31450639000104275
+        },
+        "generated_eager": {
+          "max_seconds": 1.4017443369957618,
+          "median_seconds": 1.3984491390001494,
+          "min_seconds": 1.395153941004537
+        },
+        "speedup": 4.084871244973792
+      },
+      "forward_backward": {
+        "compiled": {
+          "max_seconds": 0.757799202008755,
+          "median_seconds": 0.6758544330004952,
+          "min_seconds": 0.5939096639922354
+        },
+        "generated_eager": {
+          "max_seconds": 4.130399478992331,
+          "median_seconds": 3.945894018492254,
+          "min_seconds": 3.761388557992177
+        },
+        "speedup": 5.838378541033204
+      },
+      "model_id": 164,
+      "peak_gpu_memory": {
+        "compiled": {
+          "allocated_bytes": 54272,
+          "peak_allocated_bytes": 14813696,
+          "peak_reserved_bytes": 18874368,
+          "reserved_bytes": 18874368
+        },
+        "generated_eager": {
+          "allocated_bytes": 54272,
+          "peak_allocated_bytes": 17912320,
+          "peak_reserved_bytes": 18874368,
+          "reserved_bytes": 18874368
+        }
+      },
+      "signature_digest": "a9b44d070c8788eb",
+      "steps": 128
+    },
+    {
+      "backward": {
+        "compiled": {
+          "max_seconds": 0.22874104599759448,
+          "median_seconds": 0.2252828619966749,
+          "min_seconds": 0.22182467799575534
+        },
+        "generated_eager": {
+          "max_seconds": 3.1863061569893034,
+          "median_seconds": 3.0887900969974,
+          "min_seconds": 2.991274037005496
+        },
+        "speedup": 13.71071935797313
+      },
+      "decisions": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "forward": {
+        "compiled": {
+          "max_seconds": 0.34640884400869254,
+          "median_seconds": 0.3420954325047205,
+          "min_seconds": 0.3377820210007485
+        },
+        "generated_eager": {
+          "max_seconds": 1.439301651000278,
+          "median_seconds": 1.3960409374994924,
+          "min_seconds": 1.3527802239987068
+        },
+        "speedup": 4.080852314449503
+      },
+      "forward_backward": {
+        "compiled": {
+          "max_seconds": 0.7760825510049472,
+          "median_seconds": 0.7176485809977748,
+          "min_seconds": 0.6592146109906025
+        },
+        "generated_eager": {
+          "max_seconds": 5.0638475110026775,
+          "median_seconds": 4.887792446999811,
+          "min_seconds": 4.711737382996944
+        },
+        "speedup": 6.8108438815612535
+      },
+      "model_id": 166,
+      "peak_gpu_memory": {
+        "compiled": {
+          "allocated_bytes": 54272,
+          "peak_allocated_bytes": 18092032,
+          "peak_reserved_bytes": 23068672,
+          "reserved_bytes": 23068672
+        },
+        "generated_eager": {
+          "allocated_bytes": 54272,
+          "peak_allocated_bytes": 22960128,
+          "peak_reserved_bytes": 23068672,
+          "reserved_bytes": 23068672
+        }
+      },
+      "signature_digest": "3bc7e3de9025efc6",
+      "steps": 128
+    },
+    {
+      "backward": {
+        "compiled": {
+          "max_seconds": 0.22939886400126852,
+          "median_seconds": 0.2259652435022872,
+          "min_seconds": 0.22253162300330587
+        },
+        "generated_eager": {
+          "max_seconds": 2.6866902470064815,
+          "median_seconds": 2.6288371784976334,
+          "min_seconds": 2.5709841099887853
+        },
+        "speedup": 11.633812075488612
+      },
+      "decisions": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "unlimfrc_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "forward": {
+        "compiled": {
+          "max_seconds": 0.3092952739971224,
+          "median_seconds": 0.30678328149951994,
+          "min_seconds": 0.30427128900191747
+        },
+        "generated_eager": {
+          "max_seconds": 1.4470006190094864,
+          "median_seconds": 1.4048286375036696,
+          "min_seconds": 1.3626566559978528
+        },
+        "speedup": 4.579221627192445
+      },
+      "forward_backward": {
+        "compiled": {
+          "max_seconds": 0.6387511030043242,
+          "median_seconds": 0.6305714929985697,
+          "min_seconds": 0.6223918829928152
+        },
+        "generated_eager": {
+          "max_seconds": 4.494372218003264,
+          "median_seconds": 4.404983038504724,
+          "min_seconds": 4.315593859006185
+        },
+        "speedup": 6.985699619178179
+      },
+      "model_id": 178,
+      "peak_gpu_memory": {
+        "compiled": {
+          "allocated_bytes": 54272,
+          "peak_allocated_bytes": 15667200,
+          "peak_reserved_bytes": 20971520,
+          "reserved_bytes": 20971520
+        },
+        "generated_eager": {
+          "allocated_bytes": 54272,
+          "peak_allocated_bytes": 20862976,
+          "peak_reserved_bytes": 20971520,
+          "reserved_bytes": 20971520
+        }
+      },
+      "signature_digest": "043505119dd17d5f",
+      "steps": 128
+    },
+    {
+      "backward": {
+        "compiled": {
+          "max_seconds": 0.23792126700573135,
+          "median_seconds": 0.2205561690061586,
+          "min_seconds": 0.20319107100658584
+        },
+        "generated_eager": {
+          "max_seconds": 2.5367133999970974,
+          "median_seconds": 2.4683302940029535,
+          "min_seconds": 2.3999471880088095
+        },
+        "speedup": 11.191390860321073
+      },
+      "decisions": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "forward": {
+        "compiled": {
+          "max_seconds": 0.30660172100760974,
+          "median_seconds": 0.3031257190014003,
+          "min_seconds": 0.29964971699519083
+        },
+        "generated_eager": {
+          "max_seconds": 1.3397007340099663,
+          "median_seconds": 1.3159862395041273,
+          "min_seconds": 1.2922717449982883
+        },
+        "speedup": 4.34138760590634
+      },
+      "forward_backward": {
+        "compiled": {
+          "max_seconds": 0.7760146979999263,
+          "median_seconds": 0.7024219360027928,
+          "min_seconds": 0.6288291740056593
+        },
+        "generated_eager": {
+          "max_seconds": 4.692858270005672,
+          "median_seconds": 4.424429729006079,
+          "min_seconds": 4.156001188006485
+        },
+        "speedup": 6.29882055532572
+      },
+      "model_id": 188,
+      "peak_gpu_memory": {
+        "compiled": {
+          "allocated_bytes": 54272,
+          "peak_allocated_bytes": 14813696,
+          "peak_reserved_bytes": 18874368,
+          "reserved_bytes": 18874368
+        },
+        "generated_eager": {
+          "allocated_bytes": 54272,
+          "peak_allocated_bytes": 17650176,
+          "peak_reserved_bytes": 18874368,
+          "reserved_bytes": 18874368
+        }
+      },
+      "signature_digest": "41166076d06eaf32",
+      "steps": 128
+    },
+    {
+      "backward": {
+        "compiled": {
+          "max_seconds": 0.25957290700171143,
+          "median_seconds": 0.2486424415037618,
+          "min_seconds": 0.23771197600581218
+        },
+        "generated_eager": {
+          "max_seconds": 3.20811152200622,
+          "median_seconds": 3.1955469785025343,
+          "min_seconds": 3.1829824349988485
+        },
+        "speedup": 12.85197715714269
+      },
+      "decisions": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "forward": {
+        "compiled": {
+          "max_seconds": 0.32824412899208255,
+          "median_seconds": 0.32737667900073575,
+          "min_seconds": 0.32650922900938895
+        },
+        "generated_eager": {
+          "max_seconds": 1.60816191000049,
+          "median_seconds": 1.5289036199974362,
+          "min_seconds": 1.4496453299943823
+        },
+        "speedup": 4.6701665636787775
+      },
+      "forward_backward": {
+        "compiled": {
+          "max_seconds": 0.7769017190003069,
+          "median_seconds": 0.7160084900024231,
+          "min_seconds": 0.6551152610045392
+        },
+        "generated_eager": {
+          "max_seconds": 4.627597324011731,
+          "median_seconds": 4.526037925512355,
+          "min_seconds": 4.42447852701298
+        },
+        "speedup": 6.3212070648729854
+      },
+      "model_id": 190,
+      "peak_gpu_memory": {
+        "compiled": {
+          "allocated_bytes": 54272,
+          "peak_allocated_bytes": 18092032,
+          "peak_reserved_bytes": 23068672,
+          "reserved_bytes": 23068672
+        },
+        "generated_eager": {
+          "allocated_bytes": 54272,
+          "peak_allocated_bytes": 22697984,
+          "peak_reserved_bytes": 23068672,
+          "reserved_bytes": 23068672
+        }
+      },
+      "signature_digest": "5934170567acb16f",
+      "steps": 128
+    },
+    {
+      "backward": {
+        "compiled": {
+          "max_seconds": 0.20668978600588161,
+          "median_seconds": 0.18510080750274938,
+          "min_seconds": 0.16351182899961714
+        },
+        "generated_eager": {
+          "max_seconds": 2.1142167810030514,
+          "median_seconds": 2.040449064501445,
+          "min_seconds": 1.9666813479998382
+        },
+        "speedup": 11.023447666327103
+      },
+      "decisions": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "unlimpow_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "forward": {
+        "compiled": {
+          "max_seconds": 0.4270113370002946,
+          "median_seconds": 0.4079829365000478,
+          "min_seconds": 0.388954535999801
+        },
+        "generated_eager": {
+          "max_seconds": 1.4387998769961996,
+          "median_seconds": 1.3823352714971406,
+          "min_seconds": 1.3258706659980817
+        },
+        "speedup": 3.3882183489234694
+      },
+      "forward_backward": {
+        "compiled": {
+          "max_seconds": 0.6616828799888026,
+          "median_seconds": 0.6487056414916879,
+          "min_seconds": 0.6357284029945731
+        },
+        "generated_eager": {
+          "max_seconds": 3.536416533999727,
+          "median_seconds": 3.5069808435000596,
+          "min_seconds": 3.477545153000392
+        },
+        "speedup": 5.406120463876058
+      },
+      "model_id": 210,
+      "peak_gpu_memory": {
+        "compiled": {
+          "allocated_bytes": 70144,
+          "peak_allocated_bytes": 10391040,
+          "peak_reserved_bytes": 12582912,
+          "reserved_bytes": 12582912
+        },
+        "generated_eager": {
+          "allocated_bytes": 70144,
+          "peak_allocated_bytes": 12444160,
+          "peak_reserved_bytes": 12582912,
+          "reserved_bytes": 12582912
+        }
+      },
+      "signature_digest": "d0d65bec23a7a873",
+      "steps": 128
+    },
+    {
+      "backward": {
+        "compiled": {
+          "max_seconds": 0.29127253299520817,
+          "median_seconds": 0.273754766494676,
+          "min_seconds": 0.25623699999414384
+        },
+        "generated_eager": {
+          "max_seconds": 4.045180182001786,
+          "median_seconds": 3.6734699015069054,
+          "min_seconds": 3.3017596210120246
+        },
+        "speedup": 13.418834486589104
+      },
+      "decisions": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "forward": {
+        "compiled": {
+          "max_seconds": 0.42386422101117205,
+          "median_seconds": 0.40828335900005186,
+          "min_seconds": 0.39270249698893167
+        },
+        "generated_eager": {
+          "max_seconds": 1.6182788159931079,
+          "median_seconds": 1.5883752144945902,
+          "min_seconds": 1.5584716129960725
+        },
+        "speedup": 3.8903746123397314
+      },
+      "forward_backward": {
+        "compiled": {
+          "max_seconds": 0.7487605729984352,
+          "median_seconds": 0.7385125994987902,
+          "min_seconds": 0.7282646259991452
+        },
+        "generated_eager": {
+          "max_seconds": 4.8541410739999264,
+          "median_seconds": 4.697420360498654,
+          "min_seconds": 4.540699646997382
+        },
+        "speedup": 6.360650263362703
+      },
+      "model_id": 212,
+      "peak_gpu_memory": {
+        "compiled": {
+          "allocated_bytes": 70144,
+          "peak_allocated_bytes": 14979072,
+          "peak_reserved_bytes": 20971520,
+          "reserved_bytes": 20971520
+        },
+        "generated_eager": {
+          "allocated_bytes": 70144,
+          "peak_allocated_bytes": 19060736,
+          "peak_reserved_bytes": 20971520,
+          "reserved_bytes": 20971520
+        }
+      },
+      "signature_digest": "6b20f5de63fbf3bb",
+      "steps": 128
+    },
+    {
+      "backward": {
+        "compiled": {
+          "max_seconds": 0.2721489770046901,
+          "median_seconds": 0.2509070470041479,
+          "min_seconds": 0.2296651170036057
+        },
+        "generated_eager": {
+          "max_seconds": 3.12814931399771,
+          "median_seconds": 3.123393305497302,
+          "min_seconds": 3.1186372969968943
+        },
+        "speedup": 12.448408057050974
+      },
+      "decisions": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "forward": {
+        "compiled": {
+          "max_seconds": 0.37038814499101136,
+          "median_seconds": 0.3514895289990818,
+          "min_seconds": 0.33259091300715227
+        },
+        "generated_eager": {
+          "max_seconds": 1.6684550900099566,
+          "median_seconds": 1.614626391507045,
+          "min_seconds": 1.5607976930041332
+        },
+        "speedup": 4.593668540012931
+      },
+      "forward_backward": {
+        "compiled": {
+          "max_seconds": 0.8117982789990492,
+          "median_seconds": 0.7662743370019598,
+          "min_seconds": 0.7207503950048704
+        },
+        "generated_eager": {
+          "max_seconds": 5.316776450999896,
+          "median_seconds": 5.219091462997312,
+          "min_seconds": 5.121406474994728
+        },
+        "speedup": 6.810996024500771
+      },
+      "model_id": 214,
+      "peak_gpu_memory": {
+        "compiled": {
+          "allocated_bytes": 70144,
+          "peak_allocated_bytes": 18126336,
+          "peak_reserved_bytes": 25165824,
+          "reserved_bytes": 25165824
+        },
+        "generated_eager": {
+          "allocated_bytes": 70144,
+          "peak_allocated_bytes": 24108544,
+          "peak_reserved_bytes": 25165824,
+          "reserved_bytes": 25165824
+        }
+      },
+      "signature_digest": "51f73426b6262a84",
+      "steps": 128
+    }
+  ],
+  "schema": "dfuse-runtime-step-representative-benchmark-v1",
+  "steps": 128
+}

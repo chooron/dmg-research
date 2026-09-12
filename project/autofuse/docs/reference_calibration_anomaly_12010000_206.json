@@ -1,0 +1,2616 @@
+{
+  "best_output": {
+    "all_required_q_state_flux_finite": true,
+    "dimensions": {
+      "latitude": 1,
+      "longitude": 1,
+      "param_set": 1,
+      "time": null
+    },
+    "exists": true,
+    "finite_series": {
+      "flux:EFF_PPT": {
+        "count": 8401,
+        "expected": 8401,
+        "finite_count": 8401,
+        "max": 114.07200622558594,
+        "min": 0.0
+      },
+      "flux:EVAP_1": {
+        "count": 8401,
+        "expected": 8401,
+        "finite_count": 8401,
+        "max": 4.9462785720825195,
+        "min": 0.0
+      },
+      "flux:EVAP_1A": {
+        "count": 8401,
+        "expected": 8401,
+        "finite_count": 8401,
+        "max": 0.0,
+        "min": 0.0
+      },
+      "flux:EVAP_1B": {
+        "count": 8401,
+        "expected": 8401,
+        "finite_count": 8401,
+        "max": 0.0,
+        "min": 0.0
+      },
+      "flux:EVAP_2": {
+        "count": 8401,
+        "expected": 8401,
+        "finite_count": 8401,
+        "max": 0.0,
+        "min": 0.0
+      },
+      "flux:OFLOW_1": {
+        "count": 8401,
+        "expected": 8401,
+        "finite_count": 8401,
+        "max": 88.69598388671875,
+        "min": 0.0
+      },
+      "flux:OFLOW_2": {
+        "count": 8401,
+        "expected": 8401,
+        "finite_count": 8401,
+        "max": 0.0,
+        "min": 0.0
+      },
+      "flux:OFLOW_2A": {
+        "count": 8401,
+        "expected": 8401,
+        "finite_count": 8401,
+        "max": 0.0,
+        "min": 0.0
+      },
+      "flux:OFLOW_2B": {
+        "count": 8401,
+        "expected": 8401,
+        "finite_count": 8401,
+        "max": 0.0,
+        "min": 0.0
+      },
+      "flux:QBASE_2": {
+        "count": 8401,
+        "expected": 8401,
+        "finite_count": 8401,
+        "max": 0.9319638013839722,
+        "min": 0.2334534376859665
+      },
+      "flux:QBASE_2A": {
+        "count": 8401,
+        "expected": 8401,
+        "finite_count": 8401,
+        "max": 0.0,
+        "min": 0.0
+      },
+      "flux:QBASE_2B": {
+        "count": 8401,
+        "expected": 8401,
+        "finite_count": 8401,
+        "max": 0.0,
+        "min": 0.0
+      },
+      "flux:QINTF_1": {
+        "count": 8401,
+        "expected": 8401,
+        "finite_count": 8401,
+        "max": 0.0,
+        "min": 0.0
+      },
+      "flux:QPERC_12": {
+        "count": 8401,
+        "expected": 8401,
+        "finite_count": 8401,
+        "max": 25.65524673461914,
+        "min": 0.1768609583377838
+      },
+      "flux:QSURF": {
+        "count": 8401,
+        "expected": 8401,
+        "finite_count": 8401,
+        "max": 21.60391616821289,
+        "min": 0.0
+      },
+      "flux:RCHR2EXCS": {
+        "count": 8401,
+        "expected": 8401,
+        "finite_count": 8401,
+        "max": 0.0,
+        "min": 0.0
+      },
+      "flux:SATAREA": {
+        "count": 8401,
+        "expected": 8401,
+        "finite_count": 8401,
+        "max": 0.18951651453971863,
+        "min": 0.03920620307326317
+      },
+      "flux:TENS2FREE_1": {
+        "count": 8401,
+        "expected": 8401,
+        "finite_count": 8401,
+        "max": 90.80524444580078,
+        "min": 0.0
+      },
+      "flux:TENS2FREE_2": {
+        "count": 8401,
+        "expected": 8401,
+        "finite_count": 8401,
+        "max": 0.0,
+        "min": 0.0
+      },
+      "q_instantaneous": {
+        "count": 8401,
+        "expected": 8401,
+        "finite_count": 8401,
+        "max": 111.23125457763672,
+        "min": 0.2895358204841614
+      },
+      "q_routed": {
+        "count": 8401,
+        "expected": 8401,
+        "finite_count": 8401,
+        "max": 109.62812805175781,
+        "min": 0.2921300232410431
+      },
+      "state:FREE_1": {
+        "count": 8401,
+        "expected": 8401,
+        "finite_count": 8401,
+        "max": 126.07805633544922,
+        "min": 0.19227635860443115
+      },
+      "state:TENS_1": {
+        "count": 8401,
+        "expected": 8401,
+        "finite_count": 8401,
+        "max": 62.625980377197266,
+        "min": 1.591891884803772
+      },
+      "state:WATR_2": {
+        "count": 8401,
+        "expected": 8401,
+        "finite_count": 8401,
+        "max": 746.534423828125,
+        "min": 187.65650939941406
+      }
+    },
+    "mtime_ns": 1788543332153183917,
+    "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/reference_calibration_anomaly_12010000_206_final/calib_sce_reproduction/output/12010000_206_runs_best.nc",
+    "sha256": "3812b95d5ba9981568594ff91f3f32089932aa5b44a78a2d82a8044024aaf082",
+    "variables": [
+      "chk_time",
+      "eff_ppt",
+      "err_free_1",
+      "err_free_2",
+      "err_free_2a",
+      "err_free_2b",
+      "err_tens_1",
+      "err_tens_1a",
+      "err_tens_1b",
+      "err_tens_2",
+      "err_watr_1",
+      "err_watr_2",
+      "evap_1",
+      "evap_1a",
+      "evap_1b",
+      "evap_2",
+      "free_1",
+      "free_2",
+      "free_2a",
+      "free_2b",
+      "latitude",
+      "longitude",
+      "max_iterns",
+      "num_funcs",
+      "numjacobian",
+      "obsq",
+      "oflow_1",
+      "oflow_2",
+      "oflow_2a",
+      "oflow_2b",
+      "param_set",
+      "pet",
+      "ppt",
+      "q_instnt",
+      "q_routed",
+      "qbase_2",
+      "qbase_2a",
+      "qbase_2b",
+      "qintf_1",
+      "qperc_12",
+      "qsurf",
+      "rchr2excs",
+      "satarea",
+      "snwacml_z01",
+      "snwacml_z02",
+      "snwacml_z03",
+      "snwacml_z04",
+      "snwacml_z05",
+      "snwacml_z06",
+      "snwacml_z07",
+      "snwacml_z08",
+      "snwacml_z09",
+      "snwmelt_z01",
+      "snwmelt_z02",
+      "snwmelt_z03",
+      "snwmelt_z04",
+      "snwmelt_z05",
+      "snwmelt_z06",
+      "snwmelt_z07",
+      "snwmelt_z08",
+      "snwmelt_z09",
+      "sub_accept",
+      "sub_noconv",
+      "sub_reject",
+      "swe_tot",
+      "swe_z01",
+      "swe_z02",
+      "swe_z03",
+      "swe_z04",
+      "swe_z05",
+      "swe_z06",
+      "swe_z07",
+      "swe_z08",
+      "swe_z09",
+      "temp",
+      "tens2free_1",
+      "tens2free_2",
+      "tens_1",
+      "tens_1a",
+      "tens_1b",
+      "tens_2",
+      "time",
+      "watr_1",
+      "watr_2"
+    ]
+  },
+  "best_so_far": {
+    "objective": 0.6388800740242004,
+    "parameter_hash": "7fe9244a9717d8ece2091c25082adbffb1e89521a0c0b0f2b3213c8d73f6026d",
+    "parameter_vector": {
+      "BASERTE": 764.3844604492188,
+      "FRACTEN": 0.32969895005226135,
+      "LAPSE": -4.168515205383301,
+      "LOGLAMB": 5.43980598449707,
+      "MAXWATR_1": 190.2964324951172,
+      "MAXWATR_2": 750.6260375976562,
+      "MBASE": 1.60659921169281,
+      "MFMAX": 7.030555725097656,
+      "MFMIN": 4.584628105163574,
+      "OPG": 1.1788103580474854,
+      "PXTEMP": -0.17813843488693237,
+      "QB_POWR": 1.06689453125,
+      "RFERR_MLT": 1.0000629425048828,
+      "SACPEXP": 1.69602632522583,
+      "SACPMLT": 249.26828002929688,
+      "TIMEDELAY": 0.37794002890586853,
+      "TISHAPE": 4.66908073425293
+    },
+    "run_best_parameter_file": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/reference_calibration_anomaly_12010000_206_final/calib_sce_reproduction/output/12010000_206_para_best.nc",
+    "run_best_parameter_file_sha256": "83df5aa6e9565e53080cdefb1156ecf231709f2254e6f94948d383de3ec7e29b",
+    "source": "max(metric_val) from calib_sce para_sce.nc"
+  },
+  "catchment": "USA_12010000",
+  "classification": {
+    "A_sce_optimizer_control_flow_pathology": true,
+    "B_single_candidate_forward_pathology": true,
+    "C_io_netcdf_output_path_issue": false,
+    "D_numerical_nonconvergence_or_pathological_parameter_region": true,
+    "E_deterministic_catchment_model_issue": false,
+    "interpretation": "the original long run is explained by an uninitialized ISEED in the upstream fuse_driver.f90 calibration driver, which makes the SCE trajectory uncontrolled; the captured legal candidate is independently pathological in model-206 run_pre (120-second cap, one-core CPU), while a model-206 vector from another completed catchment and the successful bounded SCE trajectory both complete with finite Q/state/flux. This is a calibration-trajectory/numerical non-convergence issue, not an I/O-path failure or a hydrological-equation change."
+  },
+  "configuration": {
+    "forward_cap_seconds": 120.0,
+    "kstop": 3,
+    "maxn": 100,
+    "pcento": 0.001,
+    "reproduction_cap_seconds": 300.0,
+    "threads": 1
+  },
+  "driver_seed_audit": {
+    "assignment_before_SCEUA_call": false,
+    "effect": "SCEUA receives an undefined initial seed; trajectories are not reproducible from the exposed workflow",
+    "source": "vendor/upstream/cyrilthebault-fuse/build/FUSE_SRC/FUSE_DMSL/fuse_driver.f90",
+    "variable": "ISEED"
+  },
+  "executable": "/tmp/autofuse-reference-toolchain/repro-build/bin/fuse.exe",
+  "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+  "fresh_accepted_vector_attestation": {
+    "after": [
+      {
+        "mtime_ns": 1788543466769271266,
+        "path": "fm_catch.txt",
+        "size": 1162
+      },
+      {
+        "mtime_ns": 1788543466765141843,
+        "path": "input/12010000_elev_bands.nc",
+        "size": 268
+      },
+      {
+        "mtime_ns": 1788543466764923742,
+        "path": "input/12010000_input.nc",
+        "size": 168460
+      },
+      {
+        "mtime_ns": 1788543467340749481,
+        "path": "output/12010000_206_para_best.nc",
+        "size": 24540
+      },
+      {
+        "mtime_ns": 1788543466770418462,
+        "path": "output/12010000_206_para_sce.nc",
+        "size": 1768
+      },
+      {
+        "mtime_ns": 1788543467333188733,
+        "path": "output/12010000_206_runs_best.nc",
+        "size": 2736384
+      },
+      {
+        "mtime_ns": 1788543467340749481,
+        "path": "run_best.stderr.log",
+        "size": 82
+      },
+      {
+        "mtime_ns": 1788543467340749481,
+        "path": "run_best.stdout.log",
+        "size": 7588
+      },
+      {
+        "mtime_ns": 1788253546731349398,
+        "path": "settings/fuse_zConstraints_snow.txt",
+        "size": 5893
+      },
+      {
+        "mtime_ns": 1788253546736674674,
+        "path": "settings/fuse_zDecisions_206.txt",
+        "size": 3000
+      },
+      {
+        "mtime_ns": 1788253546756674673,
+        "path": "settings/fuse_zNumerix.txt",
+        "size": 1213
+      },
+      {
+        "mtime_ns": 1788543466764552122,
+        "path": "settings/input_info.txt",
+        "size": 2293
+      }
+    ],
+    "before": [
+      {
+        "mtime_ns": 1788543466769271266,
+        "path": "fm_catch.txt",
+        "size": 1162
+      },
+      {
+        "mtime_ns": 1788543466765141843,
+        "path": "input/12010000_elev_bands.nc",
+        "size": 268
+      },
+      {
+        "mtime_ns": 1788543466764923742,
+        "path": "input/12010000_input.nc",
+        "size": 168460
+      },
+      {
+        "mtime_ns": 1788543466770418462,
+        "path": "output/12010000_206_para_sce.nc",
+        "size": 1768
+      },
+      {
+        "mtime_ns": 1788253546731349398,
+        "path": "settings/fuse_zConstraints_snow.txt",
+        "size": 5893
+      },
+      {
+        "mtime_ns": 1788253546736674674,
+        "path": "settings/fuse_zDecisions_206.txt",
+        "size": 3000
+      },
+      {
+        "mtime_ns": 1788253546756674673,
+        "path": "settings/fuse_zNumerix.txt",
+        "size": 1213
+      },
+      {
+        "mtime_ns": 1788543466764552122,
+        "path": "settings/input_info.txt",
+        "size": 2293
+      }
+    ],
+    "fresh_output_evidence": {
+      "output_mtime_changed": true,
+      "output_sha256": "96852f391693a334312b96d4f4a10f5830084fb71760c80df35f8cd6c5ca3eb5",
+      "parameter_best_sha256": "f7149d482a8a7cbaa18d10075456d3005901256cbc0957bcf7dff4778223f944"
+    },
+    "objective": 0.5683188438415527,
+    "output": {
+      "all_required_q_state_flux_finite": true,
+      "dimensions": {
+        "latitude": 1,
+        "longitude": 1,
+        "param_set": 1,
+        "time": null
+      },
+      "exists": true,
+      "finite_series": {
+        "flux:EFF_PPT": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 120.46768951416016,
+          "min": 0.0
+        },
+        "flux:EVAP_1": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 6.170419692993164,
+          "min": 0.0
+        },
+        "flux:EVAP_1A": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "flux:EVAP_1B": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "flux:EVAP_2": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "flux:OFLOW_1": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 75.44761657714844,
+          "min": 0.0
+        },
+        "flux:OFLOW_2": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "flux:OFLOW_2A": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "flux:OFLOW_2B": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "flux:QBASE_2": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 0.8920993804931641,
+          "min": 0.0017637922428548336
+        },
+        "flux:QBASE_2A": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "flux:QBASE_2B": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "flux:QINTF_1": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "flux:QPERC_12": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 48.652469635009766,
+          "min": 2.5251778424717486e-05
+        },
+        "flux:QSURF": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 39.380863189697266,
+          "min": 0.0
+        },
+        "flux:RCHR2EXCS": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "flux:SATAREA": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 0.32741451263427734,
+          "min": 0.004810005892068148
+        },
+        "flux:TENS2FREE_1": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 77.85433959960938,
+          "min": 0.0
+        },
+        "flux:TENS2FREE_2": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "q_instantaneous": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 115.71810913085938,
+          "min": 0.0019318221602588892
+        },
+        "q_routed": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 65.04713439941406,
+          "min": 0.0031469559762626886
+        },
+        "state:FREE_1": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 172.87466430664062,
+          "min": 0.00017560501873958856
+        },
+        "state:TENS_1": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 293.38189697265625,
+          "min": 74.2125244140625
+        },
+        "state:WATR_2": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 4375.06884765625,
+          "min": 1094.9869384765625
+        }
+      },
+      "mtime_ns": 1788543467333188733,
+      "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/reference_calibration_anomaly_12010000_206_final/accepted_vector_run_best/output/12010000_206_runs_best.nc",
+      "sha256": "96852f391693a334312b96d4f4a10f5830084fb71760c80df35f8cd6c5ca3eb5",
+      "variables": [
+        "chk_time",
+        "eff_ppt",
+        "err_free_1",
+        "err_free_2",
+        "err_free_2a",
+        "err_free_2b",
+        "err_tens_1",
+        "err_tens_1a",
+        "err_tens_1b",
+        "err_tens_2",
+        "err_watr_1",
+        "err_watr_2",
+        "evap_1",
+        "evap_1a",
+        "evap_1b",
+        "evap_2",
+        "free_1",
+        "free_2",
+        "free_2a",
+        "free_2b",
+        "latitude",
+        "longitude",
+        "max_iterns",
+        "num_funcs",
+        "numjacobian",
+        "obsq",
+        "oflow_1",
+        "oflow_2",
+        "oflow_2a",
+        "oflow_2b",
+        "param_set",
+        "pet",
+        "ppt",
+        "q_instnt",
+        "q_routed",
+        "qbase_2",
+        "qbase_2a",
+        "qbase_2b",
+        "qintf_1",
+        "qperc_12",
+        "qsurf",
+        "rchr2excs",
+        "satarea",
+        "snwacml_z01",
+        "snwacml_z02",
+        "snwacml_z03",
+        "snwacml_z04",
+        "snwacml_z05",
+        "snwacml_z06",
+        "snwacml_z07",
+        "snwacml_z08",
+        "snwacml_z09",
+        "snwmelt_z01",
+        "snwmelt_z02",
+        "snwmelt_z03",
+        "snwmelt_z04",
+        "snwmelt_z05",
+        "snwmelt_z06",
+        "snwmelt_z07",
+        "snwmelt_z08",
+        "snwmelt_z09",
+        "sub_accept",
+        "sub_noconv",
+        "sub_reject",
+        "swe_tot",
+        "swe_z01",
+        "swe_z02",
+        "swe_z03",
+        "swe_z04",
+        "swe_z05",
+        "swe_z06",
+        "swe_z07",
+        "swe_z08",
+        "swe_z09",
+        "temp",
+        "tens2free_1",
+        "tens2free_2",
+        "tens_1",
+        "tens_1a",
+        "tens_1b",
+        "tens_2",
+        "time",
+        "watr_1",
+        "watr_2"
+      ]
+    },
+    "parameter_hash": "473e905c1f499acb3e9cce134e4c90c5df3168fad9b7b7dc7a8019fb120659f2",
+    "parameter_vector": {
+      "BASERTE": 369.6773986816406,
+      "FRACTEN": 0.6283138394355774,
+      "LAPSE": -5.475508689880371,
+      "LOGLAMB": 5.579833030700684,
+      "MAXWATR_1": 472.4551086425781,
+      "MAXWATR_2": 4379.94775390625,
+      "MBASE": 2.2461371421813965,
+      "MFMAX": 2.688593864440918,
+      "MFMIN": 0.7514623403549194,
+      "OPG": 1.8643991947174072,
+      "PXTEMP": 2.518165111541748,
+      "QB_POWR": 4.555251598358154,
+      "RFERR_MLT": 1.0005009174346924,
+      "SACPEXP": 1.2479735612869263,
+      "SACPMLT": 241.98231506347656,
+      "TIMEDELAY": 1.955230474472046,
+      "TISHAPE": 2.2013156414031982
+    },
+    "recovered_matches": true,
+    "recovered_parameter_hash": "473e905c1f499acb3e9cce134e4c90c5df3168fad9b7b7dc7a8019fb120659f2",
+    "run": {
+      "cap_seconds": 120.0,
+      "command": [
+        "/tmp/autofuse-reference-toolchain/repro-build/bin/fuse.exe",
+        "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/reference_calibration_anomaly_12010000_206_final/accepted_vector_run_best/fm_catch.txt",
+        "12010000",
+        "run_best"
+      ],
+      "elapsed_seconds": 5.006624102010392,
+      "mode": "run_best",
+      "monitor_samples": [
+        {
+          "alive": true,
+          "cpu_percent_of_one_core": 0.0,
+          "cpu_seconds": 0.0,
+          "rss_kb": 352,
+          "state": "R",
+          "wall_seconds": 0.0010175079805776477
+        },
+        {
+          "alive": false,
+          "wall_seconds": 5.006378824007697
+        }
+      ],
+      "peak_cpu_percent_of_one_core": 0.0,
+      "peak_rss_kb": 352,
+      "returncode": 0,
+      "stderr_path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/reference_calibration_anomaly_12010000_206_final/accepted_vector_run_best/run_best.stderr.log",
+      "stdout_path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/reference_calibration_anomaly_12010000_206_final/accepted_vector_run_best/run_best.stdout.log",
+      "termination": {
+        "forced_kill": false,
+        "termination_signal": null
+      },
+      "timed_out": false
+    },
+    "source": "exact fixed model-206 row from completed reference archive"
+  },
+  "host_ru_maxrss_kb": 802864,
+  "hru_id": 12010000,
+  "intermediates": {
+    "after": [
+      {
+        "mtime_ns": 1788543330558787284,
+        "path": "calib_sce.stderr.log",
+        "size": 96
+      },
+      {
+        "mtime_ns": 1788543330558787284,
+        "path": "calib_sce.stdout.log",
+        "size": 158417
+      },
+      {
+        "mtime_ns": 1788543316564001414,
+        "path": "fm_catch.txt",
+        "size": 1156
+      },
+      {
+        "mtime_ns": 1788543316563939465,
+        "path": "input/12010000_elev_bands.nc",
+        "size": 268
+      },
+      {
+        "mtime_ns": 1788543316563686151,
+        "path": "input/12010000_input.nc",
+        "size": 168460
+      },
+      {
+        "mtime_ns": 1788543330558787284,
+        "path": "output/12010000_206_para_sce.nc",
+        "size": 67344
+      },
+      {
+        "mtime_ns": 1788543316573186838,
+        "path": "output/12010000_206_runs_sce.nc",
+        "size": 16376
+      },
+      {
+        "mtime_ns": 1788543330558787284,
+        "path": "output/12010000_206_sce_output.txt",
+        "size": 16820
+      },
+      {
+        "mtime_ns": 1788253546731349398,
+        "path": "settings/fuse_zConstraints_snow.txt",
+        "size": 5893
+      },
+      {
+        "mtime_ns": 1788253546736674674,
+        "path": "settings/fuse_zDecisions_206.txt",
+        "size": 3000
+      },
+      {
+        "mtime_ns": 1788253546756674673,
+        "path": "settings/fuse_zNumerix.txt",
+        "size": 1213
+      },
+      {
+        "mtime_ns": 1788543316563322112,
+        "path": "settings/input_info.txt",
+        "size": 2293
+      }
+    ],
+    "before": [
+      {
+        "mtime_ns": 1788543316564001414,
+        "path": "fm_catch.txt",
+        "size": 1156
+      },
+      {
+        "mtime_ns": 1788543316563939465,
+        "path": "input/12010000_elev_bands.nc",
+        "size": 268
+      },
+      {
+        "mtime_ns": 1788543316563686151,
+        "path": "input/12010000_input.nc",
+        "size": 168460
+      },
+      {
+        "mtime_ns": 1788253546731349398,
+        "path": "settings/fuse_zConstraints_snow.txt",
+        "size": 5893
+      },
+      {
+        "mtime_ns": 1788253546736674674,
+        "path": "settings/fuse_zDecisions_206.txt",
+        "size": 3000
+      },
+      {
+        "mtime_ns": 1788253546756674673,
+        "path": "settings/fuse_zNumerix.txt",
+        "size": 1213
+      },
+      {
+        "mtime_ns": 1788543316563322112,
+        "path": "settings/input_info.txt",
+        "size": 2293
+      }
+    ],
+    "parameter_archive": {
+      "best_index_zero_based": 98,
+      "best_metric": 0.6388800740242004,
+      "best_parameter_hash": "7fe9244a9717d8ece2091c25082adbffb1e89521a0c0b0f2b3213c8d73f6026d",
+      "best_parameter_vector": {
+        "BASERTE": 764.3844604492188,
+        "FRACTEN": 0.32969895005226135,
+        "LAPSE": -4.168515205383301,
+        "LOGLAMB": 5.43980598449707,
+        "MAXWATR_1": 190.2964324951172,
+        "MAXWATR_2": 750.6260375976562,
+        "MBASE": 1.60659921169281,
+        "MFMAX": 7.030555725097656,
+        "MFMIN": 4.584628105163574,
+        "OPG": 1.1788103580474854,
+        "PXTEMP": -0.17813843488693237,
+        "QB_POWR": 1.06689453125,
+        "RFERR_MLT": 1.0000629425048828,
+        "SACPEXP": 1.69602632522583,
+        "SACPMLT": 249.26828002929688,
+        "TIMEDELAY": 0.37794002890586853,
+        "TISHAPE": 4.66908073425293
+      },
+      "dimensions": {
+        "par": 120
+      },
+      "exists": true,
+      "finite_metric_count": 100,
+      "metric_count": 120,
+      "metric_max": 0.6388800740242004,
+      "metric_min": -6.5923686027526855,
+      "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/reference_calibration_anomaly_12010000_206_final/calib_sce_reproduction/output/12010000_206_para_sce.nc",
+      "variables": [
+        "AF01",
+        "AF02",
+        "AF03",
+        "AF04",
+        "AF05",
+        "AF06",
+        "AF07",
+        "AF08",
+        "AF09",
+        "AXV_BEXP",
+        "BASERTE",
+        "CK_OVRSHOOT",
+        "ERRITERFUNC",
+        "ERRTRUNCABS",
+        "ERRTRUNCREL",
+        "ERR_ITER_DX",
+        "FPRIMQB",
+        "FRACLOWZ",
+        "FRACTEN",
+        "FRCHZNE",
+        "FSTATE_MIN",
+        "IFLWRTE",
+        "INITL_GUESS",
+        "JAC_RECOMPT",
+        "LAPSE",
+        "LOGLAMB",
+        "MAXFREE_1",
+        "MAXFREE_2",
+        "MAXFREE_2A",
+        "MAXFREE_2B",
+        "MAXPOW",
+        "MAXTENS_1",
+        "MAXTENS_1A",
+        "MAXTENS_1B",
+        "MAXTENS_2",
+        "MAXWATR_1",
+        "MAXWATR_2",
+        "MAX_TSTEP",
+        "MBASE",
+        "MFMAX",
+        "MFMIN",
+        "MIN_TSTEP",
+        "NITER_TOTAL",
+        "N_BANDS",
+        "OPG",
+        "PERCEXP",
+        "PERCFRAC",
+        "PERCRTE",
+        "POWLAMB",
+        "PXTEMP",
+        "QBRATE_2A",
+        "QBRATE_2B",
+        "QBSAT",
+        "QB_POWR",
+        "QB_PRMS",
+        "RFERR_ADD",
+        "RFERR_MLT",
+        "RMAX",
+        "RMIN",
+        "RTFRAC1",
+        "RTFRAC2",
+        "SACPEXP",
+        "SACPMLT",
+        "SAREAMAX",
+        "SMALL_ESTEP",
+        "SOBOL_INDX",
+        "SOLUTION",
+        "STEP_SAFETY",
+        "THRESH_FRZE",
+        "TIMEDELAY",
+        "TIMSTEP_TYP",
+        "TISHAPE",
+        "Z_FORCING",
+        "Z_MID01",
+        "Z_MID02",
+        "Z_MID03",
+        "Z_MID04",
+        "Z_MID05",
+        "Z_MID06",
+        "Z_MID07",
+        "Z_MID08",
+        "Z_MID09",
+        "jump_taken",
+        "kge",
+        "kgecomp",
+        "kgep",
+        "log_rmse",
+        "logp_simuln",
+        "mae",
+        "maxnum_iter",
+        "mean_accept",
+        "mean_nfuncs",
+        "mean_njacob",
+        "mean_noconv",
+        "mean_reject",
+        "metric_val",
+        "nash_sutt",
+        "numerx_rmse",
+        "qobs_cvar",
+        "qobs_lag1",
+        "qobs_mean",
+        "qsim_cvar",
+        "qsim_lag1",
+        "qsim_mean",
+        "raw_rmse",
+        "var_residul"
+      ]
+    },
+    "sce_output": {
+      "exists": true,
+      "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/reference_calibration_anomaly_12010000_206_final/calib_sce_reproduction/output/12010000_206_sce_output.txt",
+      "sha256": "7de891fcdffed7d35361daf83b00ad5bad8084bf2331e012df353ffa954f2662",
+      "size": 16820
+    }
+  },
+  "known_good_model206_forward": {
+    "output": {
+      "all_required_q_state_flux_finite": true,
+      "dimensions": {
+        "latitude": 1,
+        "longitude": 1,
+        "param_set": 1,
+        "time": null
+      },
+      "exists": true,
+      "finite_series": {
+        "flux:EFF_PPT": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 123.27469635009766,
+          "min": 0.0
+        },
+        "flux:EVAP_1": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 5.943141937255859,
+          "min": 0.0
+        },
+        "flux:EVAP_1A": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "flux:EVAP_1B": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "flux:EVAP_2": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "flux:OFLOW_1": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 91.73138427734375,
+          "min": 0.0
+        },
+        "flux:OFLOW_2": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "flux:OFLOW_2A": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "flux:OFLOW_2B": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "flux:QBASE_2": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 0.15422934293746948,
+          "min": 0.0049771578051149845
+        },
+        "flux:QBASE_2A": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "flux:QBASE_2B": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "flux:QINTF_1": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "flux:QPERC_12": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 11.576837539672852,
+          "min": 3.203306278010132e-06
+        },
+        "flux:QSURF": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 28.106958389282227,
+          "min": 0.0
+        },
+        "flux:RCHR2EXCS": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "flux:SATAREA": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 0.23144713044166565,
+          "min": 0.028339948505163193
+        },
+        "flux:TENS2FREE_1": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 92.3494644165039,
+          "min": 0.0
+        },
+        "flux:TENS2FREE_2": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "q_instantaneous": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 119.98838806152344,
+          "min": 0.0051446291618049145
+        },
+        "q_routed": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 69.56018829345703,
+          "min": 0.029144397005438805
+        },
+        "state:FREE_1": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 33.648555755615234,
+          "min": 3.325043508084491e-05
+        },
+        "state:TENS_1": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 233.80421447753906,
+          "min": 55.70581817626953
+        },
+        "state:WATR_2": {
+          "count": 8401,
+          "expected": 8401,
+          "finite_count": 8401,
+          "max": 1415.562744140625,
+          "min": 362.6419677734375
+        }
+      },
+      "mtime_ns": 1788543337169185377,
+      "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/reference_calibration_anomaly_12010000_206_final/known_good_model206_forward/output/12010000_206_runs_pre.nc",
+      "sha256": "edc40ac541cc9ec4e1a31e460b3a4e2dff56a137ca75311a895f80f11b43e061",
+      "variables": [
+        "chk_time",
+        "eff_ppt",
+        "err_free_1",
+        "err_free_2",
+        "err_free_2a",
+        "err_free_2b",
+        "err_tens_1",
+        "err_tens_1a",
+        "err_tens_1b",
+        "err_tens_2",
+        "err_watr_1",
+        "err_watr_2",
+        "evap_1",
+        "evap_1a",
+        "evap_1b",
+        "evap_2",
+        "free_1",
+        "free_2",
+        "free_2a",
+        "free_2b",
+        "latitude",
+        "longitude",
+        "max_iterns",
+        "num_funcs",
+        "numjacobian",
+        "obsq",
+        "oflow_1",
+        "oflow_2",
+        "oflow_2a",
+        "oflow_2b",
+        "param_set",
+        "pet",
+        "ppt",
+        "q_instnt",
+        "q_routed",
+        "qbase_2",
+        "qbase_2a",
+        "qbase_2b",
+        "qintf_1",
+        "qperc_12",
+        "qsurf",
+        "rchr2excs",
+        "satarea",
+        "snwacml_z01",
+        "snwacml_z02",
+        "snwacml_z03",
+        "snwacml_z04",
+        "snwacml_z05",
+        "snwacml_z06",
+        "snwacml_z07",
+        "snwacml_z08",
+        "snwacml_z09",
+        "snwmelt_z01",
+        "snwmelt_z02",
+        "snwmelt_z03",
+        "snwmelt_z04",
+        "snwmelt_z05",
+        "snwmelt_z06",
+        "snwmelt_z07",
+        "snwmelt_z08",
+        "snwmelt_z09",
+        "sub_accept",
+        "sub_noconv",
+        "sub_reject",
+        "swe_tot",
+        "swe_z01",
+        "swe_z02",
+        "swe_z03",
+        "swe_z04",
+        "swe_z05",
+        "swe_z06",
+        "swe_z07",
+        "swe_z08",
+        "swe_z09",
+        "temp",
+        "tens2free_1",
+        "tens2free_2",
+        "tens_1",
+        "tens_1a",
+        "tens_1b",
+        "tens_2",
+        "time",
+        "watr_1",
+        "watr_2"
+      ]
+    },
+    "run": {
+      "cap_seconds": 120.0,
+      "command": [
+        "/tmp/autofuse-reference-toolchain/repro-build/bin/fuse.exe",
+        "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/reference_calibration_anomaly_12010000_206_final/known_good_model206_forward/fm_catch.txt",
+        "12010000",
+        "run_pre",
+        "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/reference_calibration_anomaly_12010000_206_final/known_good_model206_forward/params.txt"
+      ],
+      "elapsed_seconds": 5.006753564986866,
+      "mode": "run_pre",
+      "monitor_samples": [
+        {
+          "alive": true,
+          "cpu_percent_of_one_core": 0.0,
+          "cpu_seconds": 0.0,
+          "rss_kb": 16,
+          "state": "R",
+          "wall_seconds": 0.0013029389665462077
+        },
+        {
+          "alive": false,
+          "wall_seconds": 5.006637343962211
+        }
+      ],
+      "peak_cpu_percent_of_one_core": 0.0,
+      "peak_rss_kb": 16,
+      "returncode": 0,
+      "stderr_path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/reference_calibration_anomaly_12010000_206_final/known_good_model206_forward/run_pre.stderr.log",
+      "stdout_path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/reference_calibration_anomaly_12010000_206_final/known_good_model206_forward/run_pre.stdout.log",
+      "termination": {
+        "forced_kill": false,
+        "termination_signal": null
+      },
+      "timed_out": false
+    },
+    "source_case_status": "passed",
+    "source_catchment": "USA_02082950",
+    "source_parameter_hash": "734b5f968233b9972a7e56a40f559cb82b8e41233a46ed961f70fd5a2655740f"
+  },
+  "logged_candidates": [
+    {
+      "all_within_bounds": true,
+      "bounds": {
+        "BASERTE": {
+          "lower": 0.001,
+          "upper": 1000.0,
+          "value": 630.6514282226562,
+          "within": true
+        },
+        "FRACTEN": {
+          "lower": 0.05,
+          "upper": 0.95,
+          "value": 0.10697151720523834,
+          "within": true
+        },
+        "LAPSE": {
+          "lower": -7.0,
+          "upper": -4.0,
+          "value": -5.446642875671387,
+          "within": true
+        },
+        "LOGLAMB": {
+          "lower": 5.0,
+          "upper": 10.0,
+          "value": 5.393237113952637,
+          "within": true
+        },
+        "MAXWATR_1": {
+          "lower": 25.0,
+          "upper": 500.0,
+          "value": 77.93206787109375,
+          "within": true
+        },
+        "MAXWATR_2": {
+          "lower": 50.0,
+          "upper": 5000.0,
+          "value": 311.52886962890625,
+          "within": true
+        },
+        "MBASE": {
+          "lower": 0.0,
+          "upper": 3.0,
+          "value": 0.9227734804153442,
+          "within": true
+        },
+        "MFMAX": {
+          "lower": 2.0,
+          "upper": 8.0,
+          "value": 3.529526472091675,
+          "within": true
+        },
+        "MFMIN": {
+          "lower": 0.4,
+          "upper": 6.0,
+          "value": 0.43439677357673645,
+          "within": true
+        },
+        "OPG": {
+          "lower": 0.0,
+          "upper": 2.5,
+          "value": 2.3427109718322754,
+          "within": true
+        },
+        "PXTEMP": {
+          "lower": -1.0,
+          "upper": 5.0,
+          "value": 1.4985401630401611,
+          "within": true
+        },
+        "QB_POWR": {
+          "lower": 1.0,
+          "upper": 10.0,
+          "value": 9.293396949768066,
+          "within": true
+        },
+        "RFERR_MLT": {
+          "lower": 1.0,
+          "upper": 1.001,
+          "value": 1.0005508661270142,
+          "within": true
+        },
+        "SACPEXP": {
+          "lower": 1.0,
+          "upper": 5.0,
+          "value": 1.286679983139038,
+          "within": true
+        },
+        "SACPMLT": {
+          "lower": 1.0,
+          "upper": 250.0,
+          "value": 243.1477508544922,
+          "within": true
+        },
+        "TIMEDELAY": {
+          "lower": 0.01,
+          "upper": 5.0,
+          "value": 2.5961110591888428,
+          "within": true
+        },
+        "TISHAPE": {
+          "lower": 2.0,
+          "upper": 5.0,
+          "value": 4.77020788192749,
+          "within": true
+        }
+      },
+      "full_parameter_values": {
+        "AXV_BEXP": 0.3,
+        "BASERTE": 630.6514282226562,
+        "FPRIMQB": 0.5,
+        "FRACLOWZ": 0.5,
+        "FRACTEN": 0.10697151720523834,
+        "FRCHZNE": 0.5,
+        "IFLWRTE": 500.0,
+        "LAPSE": -5.446642875671387,
+        "LOGLAMB": 5.393237113952637,
+        "MAXWATR_1": 77.93206787109375,
+        "MAXWATR_2": 311.52886962890625,
+        "MBASE": 0.9227734804153442,
+        "MFMAX": 3.529526472091675,
+        "MFMIN": 0.43439677357673645,
+        "OPG": 2.3427109718322754,
+        "PERCEXP": 5.0,
+        "PERCFRAC": 0.5,
+        "PERCRTE": 100.0,
+        "PXTEMP": 1.4985401630401611,
+        "QBRATE_2A": 0.025,
+        "QBRATE_2B": 0.01,
+        "QB_POWR": 9.293396949768066,
+        "QB_PRMS": 0.01,
+        "RFERR_ADD": 0.0,
+        "RFERR_MLT": 1.0005508661270142,
+        "RFH1_MEAN": 0.003,
+        "RFH2_SDEV": 0.361,
+        "RH1P_MEAN": 0.0,
+        "RH1P_SDEV": 0.4,
+        "RH2P_MEAN": 0.05,
+        "RH2P_SDEV": 0.7,
+        "RTFRAC1": 0.75,
+        "SACPEXP": 1.286679983139038,
+        "SACPMLT": 243.1477508544922,
+        "SAREAMAX": 0.25,
+        "TIMEDELAY": 2.5961110591888428,
+        "TISHAPE": 4.77020788192749
+      },
+      "index": 1,
+      "objective_from_log": -3.1360985225247577,
+      "output": {
+        "all_required_q_state_flux_finite": true,
+        "dimensions": {
+          "latitude": 1,
+          "longitude": 1,
+          "param_set": 1,
+          "time": null
+        },
+        "exists": true,
+        "finite_series": {
+          "flux:EFF_PPT": {
+            "count": 8401,
+            "expected": 8401,
+            "finite_count": 8401,
+            "max": 120.75971221923828,
+            "min": 0.0
+          },
+          "flux:EVAP_1": {
+            "count": 8401,
+            "expected": 8401,
+            "finite_count": 8401,
+            "max": 4.279029369354248,
+            "min": 0.0
+          },
+          "flux:EVAP_1A": {
+            "count": 8401,
+            "expected": 8401,
+            "finite_count": 8401,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "flux:EVAP_1B": {
+            "count": 8401,
+            "expected": 8401,
+            "finite_count": 8401,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "flux:EVAP_2": {
+            "count": 8401,
+            "expected": 8401,
+            "finite_count": 8401,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "flux:OFLOW_1": {
+            "count": 8401,
+            "expected": 8401,
+            "finite_count": 8401,
+            "max": 69.2003402709961,
+            "min": 0.0
+          },
+          "flux:OFLOW_2": {
+            "count": 8401,
+            "expected": 8401,
+            "finite_count": 8401,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "flux:OFLOW_2A": {
+            "count": 8401,
+            "expected": 8401,
+            "finite_count": 8401,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "flux:OFLOW_2B": {
+            "count": 8401,
+            "expected": 8401,
+            "finite_count": 8401,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "flux:QBASE_2": {
+            "count": 8401,
+            "expected": 8401,
+            "finite_count": 8401,
+            "max": 0.08964637666940689,
+            "min": 4.1920557691810245e-07
+          },
+          "flux:QBASE_2A": {
+            "count": 8401,
+            "expected": 8401,
+            "finite_count": 8401,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "flux:QBASE_2B": {
+            "count": 8401,
+            "expected": 8401,
+            "finite_count": 8401,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "flux:QINTF_1": {
+            "count": 8401,
+            "expected": 8401,
+            "finite_count": 8401,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "flux:QPERC_12": {
+            "count": 8401,
+            "expected": 8401,
+            "finite_count": 8401,
+            "max": 10.520565032958984,
+            "min": 0.08203720301389694
+          },
+          "flux:QSURF": {
+            "count": 8401,
+            "expected": 8401,
+            "finite_count": 8401,
+            "max": 50.04159927368164,
+            "min": 0.0
+          },
+          "flux:RCHR2EXCS": {
+            "count": 8401,
+            "expected": 8401,
+            "finite_count": 8401,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "flux:SATAREA": {
+            "count": 8401,
+            "expected": 8401,
+            "finite_count": 8401,
+            "max": 0.4144662618637085,
+            "min": 4.010422660627455e-09
+          },
+          "flux:TENS2FREE_1": {
+            "count": 8401,
+            "expected": 8401,
+            "finite_count": 8401,
+            "max": 69.66661071777344,
+            "min": 0.0
+          },
+          "flux:TENS2FREE_2": {
+            "count": 8401,
+            "expected": 8401,
+            "finite_count": 8401,
+            "max": 0.0,
+            "min": 0.0
+          },
+          "q_instantaneous": {
+            "count": 8401,
+            "expected": 8401,
+            "finite_count": 8401,
+            "max": 119.3315658569336,
+            "min": 4.956697807756427e-07
+          },
+          "q_routed": {
+            "count": 8401,
+            "expected": 8401,
+            "finite_count": 8401,
+            "max": 68.53536987304688,
+            "min": 6.974448041319192e-08
+          },
+          "state:FREE_1": {
+            "count": 8401,
+            "expected": 8401,
+            "finite_count": 8401,
+            "max": 69.96247863769531,
+            "min": 17.398889541625977
+          },
+          "state:TENS_1": {
+            "count": 8401,
+            "expected": 8401,
+            "finite_count": 8401,
+            "max": 8.530573844909668,
+            "min": 8.336511200468522e-06
+          },
+          "state:WATR_2": {
+            "count": 8401,
+            "expected": 8401,
+            "finite_count": 8401,
+            "max": 311.4348449707031,
+            "min": 77.88221740722656
+          }
+        },
+        "mtime_ns": 1788543342213188040,
+        "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/reference_calibration_anomaly_12010000_206_final/logged_candidate_01_forward/output/12010000_206_runs_pre.nc",
+        "sha256": "ed6ce7e8eeaeb4bf35fa5d92143db049053e4741659d37eee175ee76b470873f",
+        "variables": [
+          "chk_time",
+          "eff_ppt",
+          "err_free_1",
+          "err_free_2",
+          "err_free_2a",
+          "err_free_2b",
+          "err_tens_1",
+          "err_tens_1a",
+          "err_tens_1b",
+          "err_tens_2",
+          "err_watr_1",
+          "err_watr_2",
+          "evap_1",
+          "evap_1a",
+          "evap_1b",
+          "evap_2",
+          "free_1",
+          "free_2",
+          "free_2a",
+          "free_2b",
+          "latitude",
+          "longitude",
+          "max_iterns",
+          "num_funcs",
+          "numjacobian",
+          "obsq",
+          "oflow_1",
+          "oflow_2",
+          "oflow_2a",
+          "oflow_2b",
+          "param_set",
+          "pet",
+          "ppt",
+          "q_instnt",
+          "q_routed",
+          "qbase_2",
+          "qbase_2a",
+          "qbase_2b",
+          "qintf_1",
+          "qperc_12",
+          "qsurf",
+          "rchr2excs",
+          "satarea",
+          "snwacml_z01",
+          "snwacml_z02",
+          "snwacml_z03",
+          "snwacml_z04",
+          "snwacml_z05",
+          "snwacml_z06",
+          "snwacml_z07",
+          "snwacml_z08",
+          "snwacml_z09",
+          "snwmelt_z01",
+          "snwmelt_z02",
+          "snwmelt_z03",
+          "snwmelt_z04",
+          "snwmelt_z05",
+          "snwmelt_z06",
+          "snwmelt_z07",
+          "snwmelt_z08",
+          "snwmelt_z09",
+          "sub_accept",
+          "sub_noconv",
+          "sub_reject",
+          "swe_tot",
+          "swe_z01",
+          "swe_z02",
+          "swe_z03",
+          "swe_z04",
+          "swe_z05",
+          "swe_z06",
+          "swe_z07",
+          "swe_z08",
+          "swe_z09",
+          "temp",
+          "tens2free_1",
+          "tens2free_2",
+          "tens_1",
+          "tens_1a",
+          "tens_1b",
+          "tens_2",
+          "time",
+          "watr_1",
+          "watr_2"
+        ]
+      },
+      "parameter_hash": "4711f31c76877b13bb256bb3625c38a3ce88c3f585ec5dcc61901326d1171cea",
+      "parameter_vector": {
+        "BASERTE": 630.6514282226562,
+        "FRACTEN": 0.10697151720523834,
+        "LAPSE": -5.446642875671387,
+        "LOGLAMB": 5.393237113952637,
+        "MAXWATR_1": 77.93206787109375,
+        "MAXWATR_2": 311.52886962890625,
+        "MBASE": 0.9227734804153442,
+        "MFMAX": 3.529526472091675,
+        "MFMIN": 0.43439677357673645,
+        "OPG": 2.3427109718322754,
+        "PXTEMP": 1.4985401630401611,
+        "QB_POWR": 9.293396949768066,
+        "RFERR_MLT": 1.0005508661270142,
+        "SACPEXP": 1.286679983139038,
+        "SACPMLT": 243.1477508544922,
+        "TIMEDELAY": 2.5961110591888428,
+        "TISHAPE": 4.77020788192749
+      },
+      "run": {
+        "cap_seconds": 120.0,
+        "command": [
+          "/tmp/autofuse-reference-toolchain/repro-build/bin/fuse.exe",
+          "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/reference_calibration_anomaly_12010000_206_final/logged_candidate_01_forward/fm_catch.txt",
+          "12010000",
+          "run_pre",
+          "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/reference_calibration_anomaly_12010000_206_final/logged_candidate_01_forward/params.txt"
+        ],
+        "elapsed_seconds": 5.005867792002391,
+        "mode": "run_pre",
+        "monitor_samples": [
+          {
+            "alive": true,
+            "cpu_percent_of_one_core": 0.0,
+            "cpu_seconds": 0.0,
+            "rss_kb": 416,
+            "state": "R",
+            "wall_seconds": 0.0004734360263682902
+          },
+          {
+            "alive": false,
+            "wall_seconds": 5.005783803004306
+          }
+        ],
+        "peak_cpu_percent_of_one_core": 0.0,
+        "peak_rss_kb": 416,
+        "returncode": 0,
+        "stderr_path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/reference_calibration_anomaly_12010000_206_final/logged_candidate_01_forward/run_pre.stderr.log",
+        "stdout_path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/reference_calibration_anomaly_12010000_206_final/logged_candidate_01_forward/run_pre.stdout.log",
+        "termination": {
+          "forced_kill": false,
+          "termination_signal": null
+        },
+        "timed_out": false
+      }
+    },
+    {
+      "all_within_bounds": true,
+      "bounds": {
+        "BASERTE": {
+          "lower": 0.001,
+          "upper": 1000.0,
+          "value": 542.9047241210938,
+          "within": true
+        },
+        "FRACTEN": {
+          "lower": 0.05,
+          "upper": 0.95,
+          "value": 0.8306655883789062,
+          "within": true
+        },
+        "LAPSE": {
+          "lower": -7.0,
+          "upper": -4.0,
+          "value": -5.039783477783203,
+          "within": true
+        },
+        "LOGLAMB": {
+          "lower": 5.0,
+          "upper": 10.0,
+          "value": 5.71088981628418,
+          "within": true
+        },
+        "MAXWATR_1": {
+          "lower": 25.0,
+          "upper": 500.0,
+          "value": 196.33595275878906,
+          "within": true
+        },
+        "MAXWATR_2": {
+          "lower": 50.0,
+          "upper": 5000.0,
+          "value": 89.33621215820312,
+          "within": true
+        },
+        "MBASE": {
+          "lower": 0.0,
+          "upper": 3.0,
+          "value": 0.01987285539507866,
+          "within": true
+        },
+        "MFMAX": {
+          "lower": 2.0,
+          "upper": 8.0,
+          "value": 2.544161319732666,
+          "within": true
+        },
+        "MFMIN": {
+          "lower": 0.4,
+          "upper": 6.0,
+          "value": 4.3338470458984375,
+          "within": true
+        },
+        "OPG": {
+          "lower": 0.0,
+          "upper": 2.5,
+          "value": 1.1278126239776611,
+          "within": true
+        },
+        "PXTEMP": {
+          "lower": -1.0,
+          "upper": 5.0,
+          "value": -0.5160141587257385,
+          "within": true
+        },
+        "QB_POWR": {
+          "lower": 1.0,
+          "upper": 10.0,
+          "value": 6.56577205657959,
+          "within": true
+        },
+        "RFERR_MLT": {
+          "lower": 1.0,
+          "upper": 1.001,
+          "value": 1.000687599182129,
+          "within": true
+        },
+        "SACPEXP": {
+          "lower": 1.0,
+          "upper": 5.0,
+          "value": 4.241113662719727,
+          "within": true
+        },
+        "SACPMLT": {
+          "lower": 1.0,
+          "upper": 250.0,
+          "value": 118.12003326416016,
+          "within": true
+        },
+        "TIMEDELAY": {
+          "lower": 0.01,
+          "upper": 5.0,
+          "value": 4.596131324768066,
+          "within": true
+        },
+        "TISHAPE": {
+          "lower": 2.0,
+          "upper": 5.0,
+          "value": 4.152585506439209,
+          "within": true
+        }
+      },
+      "full_parameter_values": {
+        "AXV_BEXP": 0.3,
+        "BASERTE": 542.9047241210938,
+        "FPRIMQB": 0.5,
+        "FRACLOWZ": 0.5,
+        "FRACTEN": 0.8306655883789062,
+        "FRCHZNE": 0.5,
+        "IFLWRTE": 500.0,
+        "LAPSE": -5.039783477783203,
+        "LOGLAMB": 5.71088981628418,
+        "MAXWATR_1": 196.33595275878906,
+        "MAXWATR_2": 89.33621215820312,
+        "MBASE": 0.01987285539507866,
+        "MFMAX": 2.544161319732666,
+        "MFMIN": 4.3338470458984375,
+        "OPG": 1.1278126239776611,
+        "PERCEXP": 5.0,
+        "PERCFRAC": 0.5,
+        "PERCRTE": 100.0,
+        "PXTEMP": -0.5160141587257385,
+        "QBRATE_2A": 0.025,
+        "QBRATE_2B": 0.01,
+        "QB_POWR": 6.56577205657959,
+        "QB_PRMS": 0.01,
+        "RFERR_ADD": 0.0,
+        "RFERR_MLT": 1.000687599182129,
+        "RFH1_MEAN": 0.003,
+        "RFH2_SDEV": 0.361,
+        "RH1P_MEAN": 0.0,
+        "RH1P_SDEV": 0.4,
+        "RH2P_MEAN": 0.05,
+        "RH2P_SDEV": 0.7,
+        "RTFRAC1": 0.75,
+        "SACPEXP": 4.241113662719727,
+        "SACPMLT": 118.12003326416016,
+        "SAREAMAX": 0.25,
+        "TIMEDELAY": 4.596131324768066,
+        "TISHAPE": 4.152585506439209
+      },
+      "index": 2,
+      "objective_from_log": -0.4777919228509259,
+      "output": {
+        "all_required_q_state_flux_finite": false,
+        "dimensions": {
+          "latitude": 1,
+          "longitude": 1,
+          "param_set": 1,
+          "time": null
+        },
+        "exists": true,
+        "finite_series": {
+          "flux:EFF_PPT": {
+            "count": 0,
+            "expected": 8401,
+            "finite_count": 0,
+            "max": null,
+            "min": null
+          },
+          "flux:EVAP_1": {
+            "count": 0,
+            "expected": 8401,
+            "finite_count": 0,
+            "max": null,
+            "min": null
+          },
+          "flux:EVAP_1A": {
+            "count": 0,
+            "expected": 8401,
+            "finite_count": 0,
+            "max": null,
+            "min": null
+          },
+          "flux:EVAP_1B": {
+            "count": 0,
+            "expected": 8401,
+            "finite_count": 0,
+            "max": null,
+            "min": null
+          },
+          "flux:EVAP_2": {
+            "count": 0,
+            "expected": 8401,
+            "finite_count": 0,
+            "max": null,
+            "min": null
+          },
+          "flux:OFLOW_1": {
+            "count": 0,
+            "expected": 8401,
+            "finite_count": 0,
+            "max": null,
+            "min": null
+          },
+          "flux:OFLOW_2": {
+            "count": 0,
+            "expected": 8401,
+            "finite_count": 0,
+            "max": null,
+            "min": null
+          },
+          "flux:OFLOW_2A": {
+            "count": 0,
+            "expected": 8401,
+            "finite_count": 0,
+            "max": null,
+            "min": null
+          },
+          "flux:OFLOW_2B": {
+            "count": 0,
+            "expected": 8401,
+            "finite_count": 0,
+            "max": null,
+            "min": null
+          },
+          "flux:QBASE_2": {
+            "count": 0,
+            "expected": 8401,
+            "finite_count": 0,
+            "max": null,
+            "min": null
+          },
+          "flux:QBASE_2A": {
+            "count": 0,
+            "expected": 8401,
+            "finite_count": 0,
+            "max": null,
+            "min": null
+          },
+          "flux:QBASE_2B": {
+            "count": 0,
+            "expected": 8401,
+            "finite_count": 0,
+            "max": null,
+            "min": null
+          },
+          "flux:QINTF_1": {
+            "count": 0,
+            "expected": 8401,
+            "finite_count": 0,
+            "max": null,
+            "min": null
+          },
+          "flux:QPERC_12": {
+            "count": 0,
+            "expected": 8401,
+            "finite_count": 0,
+            "max": null,
+            "min": null
+          },
+          "flux:QSURF": {
+            "count": 0,
+            "expected": 8401,
+            "finite_count": 0,
+            "max": null,
+            "min": null
+          },
+          "flux:RCHR2EXCS": {
+            "count": 0,
+            "expected": 8401,
+            "finite_count": 0,
+            "max": null,
+            "min": null
+          },
+          "flux:SATAREA": {
+            "count": 0,
+            "expected": 8401,
+            "finite_count": 0,
+            "max": null,
+            "min": null
+          },
+          "flux:TENS2FREE_1": {
+            "count": 0,
+            "expected": 8401,
+            "finite_count": 0,
+            "max": null,
+            "min": null
+          },
+          "flux:TENS2FREE_2": {
+            "count": 0,
+            "expected": 8401,
+            "finite_count": 0,
+            "max": null,
+            "min": null
+          },
+          "q_instantaneous": {
+            "count": 0,
+            "expected": 8401,
+            "finite_count": 0,
+            "max": null,
+            "min": null
+          },
+          "q_routed": {
+            "count": 0,
+            "expected": 8401,
+            "finite_count": 0,
+            "max": null,
+            "min": null
+          },
+          "state:FREE_1": {
+            "count": 0,
+            "expected": 8401,
+            "finite_count": 0,
+            "max": null,
+            "min": null
+          },
+          "state:TENS_1": {
+            "count": 0,
+            "expected": 8401,
+            "finite_count": 0,
+            "max": null,
+            "min": null
+          },
+          "state:WATR_2": {
+            "count": 0,
+            "expected": 8401,
+            "finite_count": 0,
+            "max": null,
+            "min": null
+          }
+        },
+        "mtime_ns": 1788543346656551600,
+        "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/reference_calibration_anomaly_12010000_206_final/logged_candidate_02_forward/output/12010000_206_runs_pre.nc",
+        "sha256": "e68f557342a55005ac65191e6eaf37920dd55cbebef37ecfe11d34dc79162612",
+        "variables": [
+          "chk_time",
+          "eff_ppt",
+          "err_free_1",
+          "err_free_2",
+          "err_free_2a",
+          "err_free_2b",
+          "err_tens_1",
+          "err_tens_1a",
+          "err_tens_1b",
+          "err_tens_2",
+          "err_watr_1",
+          "err_watr_2",
+          "evap_1",
+          "evap_1a",
+          "evap_1b",
+          "evap_2",
+          "free_1",
+          "free_2",
+          "free_2a",
+          "free_2b",
+          "latitude",
+          "longitude",
+          "max_iterns",
+          "num_funcs",
+          "numjacobian",
+          "obsq",
+          "oflow_1",
+          "oflow_2",
+          "oflow_2a",
+          "oflow_2b",
+          "param_set",
+          "pet",
+          "ppt",
+          "q_instnt",
+          "q_routed",
+          "qbase_2",
+          "qbase_2a",
+          "qbase_2b",
+          "qintf_1",
+          "qperc_12",
+          "qsurf",
+          "rchr2excs",
+          "satarea",
+          "snwacml_z01",
+          "snwacml_z02",
+          "snwacml_z03",
+          "snwacml_z04",
+          "snwacml_z05",
+          "snwacml_z06",
+          "snwacml_z07",
+          "snwacml_z08",
+          "snwacml_z09",
+          "snwmelt_z01",
+          "snwmelt_z02",
+          "snwmelt_z03",
+          "snwmelt_z04",
+          "snwmelt_z05",
+          "snwmelt_z06",
+          "snwmelt_z07",
+          "snwmelt_z08",
+          "snwmelt_z09",
+          "sub_accept",
+          "sub_noconv",
+          "sub_reject",
+          "swe_tot",
+          "swe_z01",
+          "swe_z02",
+          "swe_z03",
+          "swe_z04",
+          "swe_z05",
+          "swe_z06",
+          "swe_z07",
+          "swe_z08",
+          "swe_z09",
+          "temp",
+          "tens2free_1",
+          "tens2free_2",
+          "tens_1",
+          "tens_1a",
+          "tens_1b",
+          "tens_2",
+          "time",
+          "watr_1",
+          "watr_2"
+        ]
+      },
+      "parameter_hash": "f51c47f0ecde02bfe7cc82c3da8ef253989f019374c8cb2b521d06a5b1941b1b",
+      "parameter_vector": {
+        "BASERTE": 542.9047241210938,
+        "FRACTEN": 0.8306655883789062,
+        "LAPSE": -5.039783477783203,
+        "LOGLAMB": 5.71088981628418,
+        "MAXWATR_1": 196.33595275878906,
+        "MAXWATR_2": 89.33621215820312,
+        "MBASE": 0.01987285539507866,
+        "MFMAX": 2.544161319732666,
+        "MFMIN": 4.3338470458984375,
+        "OPG": 1.1278126239776611,
+        "PXTEMP": -0.5160141587257385,
+        "QB_POWR": 6.56577205657959,
+        "RFERR_MLT": 1.000687599182129,
+        "SACPEXP": 4.241113662719727,
+        "SACPMLT": 118.12003326416016,
+        "TIMEDELAY": 4.596131324768066,
+        "TISHAPE": 4.152585506439209
+      },
+      "run": {
+        "cap_seconds": 120.0,
+        "command": [
+          "/tmp/autofuse-reference-toolchain/repro-build/bin/fuse.exe",
+          "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/reference_calibration_anomaly_12010000_206_final/logged_candidate_02_forward/fm_catch.txt",
+          "12010000",
+          "run_pre",
+          "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/reference_calibration_anomaly_12010000_206_final/logged_candidate_02_forward/params.txt"
+        ],
+        "elapsed_seconds": 120.10368538601324,
+        "mode": "run_pre",
+        "monitor_samples": [
+          {
+            "alive": true,
+            "cpu_percent_of_one_core": 0.0,
+            "cpu_seconds": 0.0,
+            "rss_kb": 324,
+            "state": "R",
+            "wall_seconds": 0.0004228210309520364
+          },
+          {
+            "alive": true,
+            "cpu_percent_of_one_core": 99.5820446595372,
+            "cpu_seconds": 4.98,
+            "rss_kb": 18864,
+            "state": "R",
+            "wall_seconds": 5.000901535036974
+          },
+          {
+            "alive": true,
+            "cpu_percent_of_one_core": 99.84145239342634,
+            "cpu_seconds": 9.99,
+            "rss_kb": 18864,
+            "state": "R",
+            "wall_seconds": 10.005864057980943
+          },
+          {
+            "alive": true,
+            "cpu_percent_of_one_core": 99.86791061053685,
+            "cpu_seconds": 14.99,
+            "rss_kb": 18864,
+            "state": "R",
+            "wall_seconds": 15.009826388035435
+          },
+          {
+            "alive": true,
+            "cpu_percent_of_one_core": 99.9237631250466,
+            "cpu_seconds": 20.0,
+            "rss_kb": 18864,
+            "state": "R",
+            "wall_seconds": 20.015259007981513
+          },
+          {
+            "alive": true,
+            "cpu_percent_of_one_core": 99.91789457239312,
+            "cpu_seconds": 25.0,
+            "rss_kb": 18864,
+            "state": "R",
+            "wall_seconds": 25.02054322400363
+          },
+          {
+            "alive": true,
+            "cpu_percent_of_one_core": 99.94698679266618,
+            "cpu_seconds": 30.01,
+            "rss_kb": 18864,
+            "state": "R",
+            "wall_seconds": 30.025917702005245
+          },
+          {
+            "alive": true,
+            "cpu_percent_of_one_core": 99.93925412675104,
+            "cpu_seconds": 35.01,
+            "rss_kb": 18864,
+            "state": "R",
+            "wall_seconds": 35.031280056980904
+          },
+          {
+            "alive": true,
+            "cpu_percent_of_one_core": 99.96526509031644,
+            "cpu_seconds": 40.02,
+            "rss_kb": 18864,
+            "state": "R",
+            "wall_seconds": 40.033905741001945
+          },
+          {
+            "alive": true,
+            "cpu_percent_of_one_core": 99.96013493452487,
+            "cpu_seconds": 45.02,
+            "rss_kb": 18864,
+            "state": "R",
+            "wall_seconds": 45.03795441001421
+          },
+          {
+            "alive": true,
+            "cpu_percent_of_one_core": 99.97351379698611,
+            "cpu_seconds": 50.03,
+            "rss_kb": 18864,
+            "state": "R",
+            "wall_seconds": 50.04325455799699
+          },
+          {
+            "alive": true,
+            "cpu_percent_of_one_core": 99.96612416542443,
+            "cpu_seconds": 55.03,
+            "rss_kb": 18864,
+            "state": "R",
+            "wall_seconds": 55.048648188996594
+          },
+          {
+            "alive": true,
+            "cpu_percent_of_one_core": 99.97651217033138,
+            "cpu_seconds": 60.04,
+            "rss_kb": 18864,
+            "state": "R",
+            "wall_seconds": 60.054105405986775
+          },
+          {
+            "alive": true,
+            "cpu_percent_of_one_core": 99.97391537437977,
+            "cpu_seconds": 65.04,
+            "rss_kb": 18864,
+            "state": "R",
+            "wall_seconds": 65.0569698670297
+          },
+          {
+            "alive": true,
+            "cpu_percent_of_one_core": 99.96876469950416,
+            "cpu_seconds": 70.04,
+            "rss_kb": 18864,
+            "state": "R",
+            "wall_seconds": 70.06188404001296
+          },
+          {
+            "alive": true,
+            "cpu_percent_of_one_core": 99.97716734102616,
+            "cpu_seconds": 75.05,
+            "rss_kb": 18864,
+            "state": "R",
+            "wall_seconds": 75.06713982403744
+          },
+          {
+            "alive": true,
+            "cpu_percent_of_one_core": 99.97564550563897,
+            "cpu_seconds": 80.05,
+            "rss_kb": 18864,
+            "state": "R",
+            "wall_seconds": 80.06950052198954
+          },
+          {
+            "alive": true,
+            "cpu_percent_of_one_core": 99.98365246007327,
+            "cpu_seconds": 85.06,
+            "rss_kb": 18864,
+            "state": "R",
+            "wall_seconds": 85.07390749099432
+          },
+          {
+            "alive": true,
+            "cpu_percent_of_one_core": 99.97858466372783,
+            "cpu_seconds": 90.06,
+            "rss_kb": 18864,
+            "state": "R",
+            "wall_seconds": 90.07929078303277
+          },
+          {
+            "alive": true,
+            "cpu_percent_of_one_core": 99.97552025978138,
+            "cpu_seconds": 95.06,
+            "rss_kb": 18864,
+            "state": "R",
+            "wall_seconds": 95.08327613899019
+          },
+          {
+            "alive": true,
+            "cpu_percent_of_one_core": 99.975288954149,
+            "cpu_seconds": 100.06,
+            "rss_kb": 18864,
+            "state": "R",
+            "wall_seconds": 100.08473198401043
+          },
+          {
+            "alive": true,
+            "cpu_percent_of_one_core": 99.98086225846838,
+            "cpu_seconds": 105.07,
+            "rss_kb": 18864,
+            "state": "R",
+            "wall_seconds": 105.09011187398573
+          },
+          {
+            "alive": true,
+            "cpu_percent_of_one_core": 99.97690103229858,
+            "cpu_seconds": 110.07,
+            "rss_kb": 18864,
+            "state": "R",
+            "wall_seconds": 110.09543090802617
+          },
+          {
+            "alive": true,
+            "cpu_percent_of_one_core": 99.97679320289363,
+            "cpu_seconds": 115.07,
+            "rss_kb": 18864,
+            "state": "R",
+            "wall_seconds": 115.09671026002616
+          },
+          {
+            "alive": true,
+            "cpu_percent_of_one_core": 99.98177939310881,
+            "cpu_seconds": 120.08,
+            "rss_kb": 18864,
+            "state": "R",
+            "wall_seconds": 120.10188329202356
+          },
+          {
+            "alive": false,
+            "wall_seconds": 120.10359566198895
+          }
+        ],
+        "peak_cpu_percent_of_one_core": 99.98365246007327,
+        "peak_rss_kb": 18864,
+        "returncode": -15,
+        "stderr_path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/reference_calibration_anomaly_12010000_206_final/logged_candidate_02_forward/run_pre.stderr.log",
+        "stdout_path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/reference_calibration_anomaly_12010000_206_final/logged_candidate_02_forward/run_pre.stdout.log",
+        "termination": {
+          "forced_kill": false,
+          "termination_signal": "SIGTERM"
+        },
+        "timed_out": true
+      }
+    }
+  ],
+  "mode": "calib_sce",
+  "model_id": 206,
+  "partial_before": {
+    "completed": 936,
+    "expected": 936,
+    "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/reference_calibration_12x78.partial.json",
+    "sha256": "1160c9c0da459d24c5569fda16f4a504392960bf36b2c1d2efd2955f9ecc1255",
+    "target_row_present": true
+  },
+  "preserved_case_directory": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/reference_calibration_anomaly_12010000_206_final",
+  "reference_row": {
+    "basin_id": "USA_12010000",
+    "config": {
+      "early_stop_reason": "calib_sce timed out on pathological trajectory; finite best-so-far parameter archive recovered and run_best passed",
+      "initial_fraction": 0.25,
+      "kstop": 3,
+      "maxn": 100,
+      "metric": "KGECOMP",
+      "pcento": 0.001,
+      "seed": null,
+      "seed_note": "upstream driver passes an uninitialized ISEED; no external seed/restart argument is exposed; exact archive/log hashes are retained",
+      "transform": 1.0
+    },
+    "diagnostics": {
+      "metric_val": 0.5683188438415527
+    },
+    "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+    "forcing_protocol": {
+      "calibration_end": "1998-12-31",
+      "calibration_start": "1989-01-01",
+      "elevation_band_count": 9,
+      "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+      "forcing_start": "1987-01-01",
+      "simulation_end": "2009-12-31"
+    },
+    "hru_id": 12010000,
+    "model_id": 206,
+    "parameter_output_format": "Fortran *_para_sce.nc best record; run_best *_para_best.nc",
+    "parameter_vector": {
+      "BASERTE": 369.6773986816406,
+      "FRACTEN": 0.6283138394355774,
+      "LAPSE": -5.475508689880371,
+      "LOGLAMB": 5.579833030700684,
+      "MAXWATR_1": 472.4551086425781,
+      "MAXWATR_2": 4379.94775390625,
+      "MBASE": 2.2461371421813965,
+      "MFMAX": 2.688593864440918,
+      "MFMIN": 0.7514623403549194,
+      "OPG": 1.8643991947174072,
+      "PXTEMP": 2.518165111541748,
+      "QB_POWR": 4.555251598358154,
+      "RFERR_MLT": 1.0005009174346924,
+      "SACPEXP": 1.2479735612869263,
+      "SACPMLT": 241.98231506347656,
+      "TIMEDELAY": 1.955230474472046,
+      "TISHAPE": 2.2013156414031982
+    },
+    "runtime": {
+      "calib_sce_seconds": 300.2740551879979,
+      "child_ru_maxrss_kb": 802608,
+      "run_best_seconds": 5.00462355199852
+    },
+    "source_label": "bounded local original-Fortran SCE; Option A early-stop",
+    "status": "early_stopped"
+  },
+  "reproduction": {
+    "cap_seconds": 300.0,
+    "command": [
+      "/tmp/autofuse-reference-toolchain/repro-build/bin/fuse.exe",
+      "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/reference_calibration_anomaly_12010000_206_final/calib_sce_reproduction/fm_catch.txt",
+      "12010000",
+      "calib_sce"
+    ],
+    "elapsed_seconds": 15.01471603201935,
+    "mode": "calib_sce",
+    "monitor_samples": [
+      {
+        "alive": true,
+        "cpu_percent_of_one_core": 0.0,
+        "cpu_seconds": 0.0,
+        "rss_kb": 336,
+        "state": "R",
+        "wall_seconds": 0.0004383730120025575
+      },
+      {
+        "alive": true,
+        "cpu_percent_of_one_core": 99.68698631943313,
+        "cpu_seconds": 4.99,
+        "rss_kb": 19448,
+        "state": "R",
+        "wall_seconds": 5.0056684269802645
+      },
+      {
+        "alive": true,
+        "cpu_percent_of_one_core": 99.80980038612564,
+        "cpu_seconds": 9.99,
+        "rss_kb": 19452,
+        "state": "R",
+        "wall_seconds": 10.009037150011864
+      },
+      {
+        "alive": false,
+        "wall_seconds": 15.014599510002881
+      }
+    ],
+    "peak_cpu_percent_of_one_core": 99.80980038612564,
+    "peak_rss_kb": 19452,
+    "returncode": 0,
+    "stderr_path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/reference_calibration_anomaly_12010000_206_final/calib_sce_reproduction/calib_sce.stderr.log",
+    "stdout_path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/reference_calibration_anomaly_12010000_206_final/calib_sce_reproduction/calib_sce.stdout.log",
+    "termination": {
+      "forced_kill": false,
+      "termination_signal": null
+    },
+    "timed_out": false
+  },
+  "resolution": "option_a_valid_best_so_far_early_stop",
+  "run_best": {
+    "cap_seconds": 120.0,
+    "command": [
+      "/tmp/autofuse-reference-toolchain/repro-build/bin/fuse.exe",
+      "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/reference_calibration_anomaly_12010000_206_final/calib_sce_reproduction/fm_catch.txt",
+      "12010000",
+      "run_best"
+    ],
+    "elapsed_seconds": 5.003914070024621,
+    "mode": "run_best",
+    "monitor_samples": [
+      {
+        "alive": true,
+        "cpu_percent_of_one_core": 0.0,
+        "cpu_seconds": 0.0,
+        "rss_kb": 508,
+        "state": "R",
+        "wall_seconds": 0.0005929429898969829
+      },
+      {
+        "alive": false,
+        "wall_seconds": 5.003701495996211
+      }
+    ],
+    "peak_cpu_percent_of_one_core": 0.0,
+    "peak_rss_kb": 508,
+    "returncode": 0,
+    "stderr_path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/reference_calibration_anomaly_12010000_206_final/calib_sce_reproduction/run_best.stderr.log",
+    "stdout_path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/reference_calibration_anomaly_12010000_206_final/calib_sce_reproduction/run_best.stdout.log",
+    "termination": {
+      "forced_kill": false,
+      "termination_signal": null
+    },
+    "timed_out": false
+  },
+  "schema_version": "reference-calibration-anomaly-v1",
+  "source_commit": "e6e23a4fc4ff4019bcab55f14537ea43b9525967",
+  "status": "diagnosed_early_stop_candidate"
+}

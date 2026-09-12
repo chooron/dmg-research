@@ -1,0 +1,213 @@
+{
+  "constraints": {
+    "batch_size": 100,
+    "campaign_started": false,
+    "device": "cuda",
+    "dtype": "torch.float64",
+    "repeats": 3,
+    "scored_days": 365,
+    "warmup_days": 365,
+    "window_days": 730
+  },
+  "generated_at_utc": "2026-09-08T06:39:12.317979+00:00",
+  "provenance": {
+    "data_status": "rerun",
+    "final_source_checked_at_utc": "2026-09-08T06:39:12.320450+00:00",
+    "numerical_core_hashes": {
+      "dfuse/kernel.py": "4a79b4caa8d93881c849476e2ffe5aa304c8033cf271bd7e11073d7f7227faff",
+      "dfuse/runtime.py": "f6b9f066489929479ccabb2035e50bed146e536af24a641cae68e11c37e9ad13",
+      "dfuse/spec.py": "0e7c569260e11acd49b8b61174934afbbccf9d1c0ec46c4a3bae561b2491d2bb"
+    },
+    "rerun": true,
+    "scope": "Final B=100,T=730 Full/Lite three-repeat steady-state training benchmark",
+    "source_git_sha": "3caca37a4243ae0a95ebe9cc4f22998672ddf464"
+  },
+  "records": [
+    {
+      "batch_size": 100,
+      "median": {
+        "backward": 1.2566279689781368,
+        "forward": 3.206572716939263,
+        "optimizer": 0.00292606302537024,
+        "parameter_forward": 0.004754420020617545,
+        "peak_allocated_mb": 490.65478515625,
+        "peak_reserved_mb": 516.0,
+        "total_step": 4.489862065995112
+      },
+      "model_id": 2,
+      "output_mode": "full",
+      "samples": [
+        {
+          "backward": 1.2566279689781368,
+          "forward": 3.4157495440449566,
+          "optimizer": 0.0033294999739155173,
+          "parameter_forward": 0.004540221998468041,
+          "peak_allocated_mb": 490.65478515625,
+          "peak_reserved_mb": 516.0,
+          "total_step": 4.680598734994419
+        },
+        {
+          "backward": 1.2066721750888973,
+          "forward": 3.2039189679780975,
+          "optimizer": 0.002590883057564497,
+          "parameter_forward": 0.004754420020617545,
+          "peak_allocated_mb": 490.65478515625,
+          "peak_reserved_mb": 516.0,
+          "total_step": 4.418236088939011
+        },
+        {
+          "backward": 1.2721804479369894,
+          "forward": 3.206572716939263,
+          "optimizer": 0.00292606302537024,
+          "parameter_forward": 0.007755083963274956,
+          "peak_allocated_mb": 490.65478515625,
+          "peak_reserved_mb": 516.0,
+          "total_step": 4.489862065995112
+        }
+      ],
+      "scored_days": 365,
+      "warmup_days": 365,
+      "window_days": 730
+    },
+    {
+      "batch_size": 100,
+      "median": {
+        "backward": 1.1915294060017914,
+        "forward": 2.9815899500390515,
+        "optimizer": 0.002575390040874481,
+        "parameter_forward": 0.0050063260132446885,
+        "peak_allocated_mb": 448.55859375,
+        "peak_reserved_mb": 472.0,
+        "total_step": 4.17783886496909
+      },
+      "model_id": 2,
+      "output_mode": "lite",
+      "samples": [
+        {
+          "backward": 1.2106555629288778,
+          "forward": 3.462093750014901,
+          "optimizer": 0.0030500380089506507,
+          "parameter_forward": 0.003982482012361288,
+          "peak_allocated_mb": 448.55859375,
+          "peak_reserved_mb": 472.0,
+          "total_step": 4.680271255900152
+        },
+        {
+          "backward": 1.1915294060017914,
+          "forward": 2.8476806830149144,
+          "optimizer": 0.002575390040874481,
+          "parameter_forward": 0.0050063260132446885,
+          "peak_allocated_mb": 448.55859375,
+          "peak_reserved_mb": 472.0,
+          "total_step": 4.047172435093671
+        },
+        {
+          "backward": 1.1887346069561318,
+          "forward": 2.9815899500390515,
+          "optimizer": 0.0020022360840812325,
+          "parameter_forward": 0.005093871965073049,
+          "peak_allocated_mb": 448.55859375,
+          "peak_reserved_mb": 472.0,
+          "total_step": 4.17783886496909
+        }
+      ],
+      "scored_days": 365,
+      "warmup_days": 365,
+      "window_days": 730
+    },
+    {
+      "batch_size": 100,
+      "median": {
+        "backward": 0.9219802729785442,
+        "forward": 2.756288717035204,
+        "optimizer": 0.003624807926826179,
+        "parameter_forward": 0.00516018399503082,
+        "peak_allocated_mb": 406.11962890625,
+        "peak_reserved_mb": 432.0,
+        "total_step": 3.773851608042605
+      },
+      "model_id": 8,
+      "output_mode": "full",
+      "samples": [
+        {
+          "backward": 0.9219802729785442,
+          "forward": 2.9811719389399514,
+          "optimizer": 0.003624807926826179,
+          "parameter_forward": 0.00415512197650969,
+          "peak_allocated_mb": 406.11962890625,
+          "peak_reserved_mb": 432.0,
+          "total_step": 3.9114799910457805
+        },
+        {
+          "backward": 0.9978966090129688,
+          "forward": 2.756288717035204,
+          "optimizer": 0.013613729970529675,
+          "parameter_forward": 0.005651554907672107,
+          "peak_allocated_mb": 406.11962890625,
+          "peak_reserved_mb": 432.0,
+          "total_step": 3.773851608042605
+        },
+        {
+          "backward": 0.8974732470232993,
+          "forward": 2.5672590900212526,
+          "optimizer": 0.0029905210249125957,
+          "parameter_forward": 0.00516018399503082,
+          "peak_allocated_mb": 406.11962890625,
+          "peak_reserved_mb": 432.0,
+          "total_step": 3.4733507139608264
+        }
+      ],
+      "scored_days": 365,
+      "warmup_days": 365,
+      "window_days": 730
+    },
+    {
+      "batch_size": 100,
+      "median": {
+        "backward": 0.8742934499168769,
+        "forward": 2.405563995009288,
+        "optimizer": 0.010242121992632747,
+        "parameter_forward": 0.0036800799425691366,
+        "peak_allocated_mb": 365.7216796875,
+        "peak_reserved_mb": 390.0,
+        "total_step": 3.311498795985244
+      },
+      "model_id": 8,
+      "output_mode": "lite",
+      "samples": [
+        {
+          "backward": 0.8428122800542042,
+          "forward": 2.7302357819862664,
+          "optimizer": 0.009420121088624,
+          "parameter_forward": 0.00339371501468122,
+          "peak_allocated_mb": 365.7216796875,
+          "peak_reserved_mb": 390.0,
+          "total_step": 3.5867511039832607
+        },
+        {
+          "backward": 0.8905928769381717,
+          "forward": 2.405563995009288,
+          "optimizer": 0.010527895065024495,
+          "parameter_forward": 0.004590073018334806,
+          "peak_allocated_mb": 365.7216796875,
+          "peak_reserved_mb": 390.0,
+          "total_step": 3.311498795985244
+        },
+        {
+          "backward": 0.8742934499168769,
+          "forward": 2.3907668340252712,
+          "optimizer": 0.010242121992632747,
+          "parameter_forward": 0.0036800799425691366,
+          "peak_allocated_mb": 365.7216796875,
+          "peak_reserved_mb": 390.0,
+          "total_step": 3.2792658439138904
+        }
+      ],
+      "scored_days": 365,
+      "warmup_days": 365,
+      "window_days": 730
+    }
+  ],
+  "schema_version": "torch-fuse-lite-full-b100-benchmark-v1",
+  "status": "completed"
+}

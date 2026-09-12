@@ -38,6 +38,7 @@ archive/
 *.h5
 *.ckpt
 *.csv
+*.nc
 *.parquet
 results.tsv
 
@@ -112,6 +113,11 @@ project/benchmark/dmotpy/
 
 # --- Third-party vendored reference (local only) ---
 MARRMoT/
+vendor/upstream/
+project/autofuse/.cache/
+project/autofuse/docs/coupled_rk2_teacher_forced_trace.json
+project/autofuse/docs/coupled_rk2_free_run_divergence.json
+project/autofuse/docs/coupled_rk2_accepted_flux_audit.json
 
 # --- Secrets ---
 .env

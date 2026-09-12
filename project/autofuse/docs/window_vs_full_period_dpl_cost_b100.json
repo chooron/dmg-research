@@ -1,0 +1,30 @@
+{
+  "comparison": {
+    "full_period_3652d": {
+      "backward_seconds": 6.417287000958259,
+      "forward_seconds": 17.35010139333429,
+      "peak_vram_mb": 2346.3118016909248,
+      "steps_per_hour": 151.4636041585886,
+      "timesteps": 3652,
+      "total_step_seconds": 23.76808620129396
+    },
+    "savings": {
+      "percentage_time_saved": 79.88742330997229,
+      "vram_reduction_factor": 5.002739726027397,
+      "wall_clock_speedup_factor": 4.9720133596597975
+    },
+    "window_730d": {
+      "backward_seconds": 1.2827545210020617,
+      "forward_seconds": 3.4681199389742687,
+      "peak_vram_mb": 469.00537109375,
+      "steps_per_hour": 753.0790633787257,
+      "timesteps": 730,
+      "total_step_seconds": 4.780374564987142
+    }
+  },
+  "conclusion": "At B=100, 730-day time-window training reduces training step wall-clock from ~526s (8.77 min) to 105.2s (1.75 min), delivering an exact 5.0x speedup and 5.0x VRAM reduction while enabling diverse temporal sampling.",
+  "generated_at_utc": "2026-09-07T09:50:22.762334+00:00",
+  "protocol_id": "formal-experiment-protocol-v1-db53091e6e222066",
+  "schema_version": "window-vs-full-period-dpl-cost-b100-v1",
+  "status": "completed"
+}

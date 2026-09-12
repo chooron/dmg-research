@@ -1,0 +1,206 @@
+{
+  "execution_contract": {
+    "batch_layout": "[basin,time,forcing_channel]",
+    "compilation": "torch.compile(inductor, fullgraph=True); zero fallback/graph-break/recompilation",
+    "formal_forward": "UnifiedEvaluator.score_batched -> simulate_coupled_rk2_batched",
+    "implementation": "torch.vmap over generated scalar coupled-RK2 step; one Python timestep loop",
+    "legacy_scalar_compatibility": "UnifiedEvaluator.forward -> dfuse.simulate retained only for scalar compatibility; formal SCE does not use it",
+    "monitoring": "GPU-resident masks/extrema with chunk-boundary synchronization; chunk_size=64"
+  },
+  "formal_sce_contract": {
+    "algorithm": "SCE-UA",
+    "campaign": "readiness smoke only; no formal campaign started",
+    "different_seed": "different candidate trajectory",
+    "objective": "1 - mean(per-basin KGECOMP)",
+    "rng": "torch.Generator(device=cpu), seed propagated from SCEConfig.seed",
+    "runner": "SCEBaseline.run",
+    "same_seed": "identical result and trajectory"
+  },
+  "freeze_decision": {
+    "dpl_campaign_started": false,
+    "formal_sce_campaign_started": false,
+    "release_or_deployment_started": false,
+    "requested_readiness_gates_passed": true,
+    "training_started": false
+  },
+  "frozen_numerical_contract": {
+    "coupled_rhs": "canonical coupled RHS with frozen process ordering and accepted-flux bookkeeping",
+    "fix_states": "Fortran-equivalent FIX_STATES boundary correction",
+    "forcing_and_outputs": "frozen forcing archives; Q, instantaneous Q, states, fluxes, water residuals, snow residuals",
+    "gamma_gradient": {
+      "forward_preserving": true,
+      "gradient_only_change": true
+    },
+    "parameters": "frozen PARAMETER_NAMES, active mapping, and archived theta source",
+    "process_equations": "pinned Fortran-traced process equations; no empirical calibration or solver redesign",
+    "snow_checker": {
+      "equations_changed": false,
+      "strict_partition": "TEMP < PXTEMP snow; TEMP > PXTEMP rain; equality neither"
+    },
+    "time_integrator": "coupled explicit RK2/Heun",
+    "watr2": {
+      "formula": "ERROR_LOSS = (WATR_2_raw - XMIN*MAXWATR_2)/DT",
+      "kind": "source-grounded bookkeeping correction",
+      "process_equations_changed": false
+    }
+  },
+  "gate_results": {
+    "78_structure_long_horizon": {
+      "compile": {
+        "all_fullgraph_clean": true,
+        "build_success_count": 78,
+        "compile_attempts": 78,
+        "compile_successes": 78,
+        "fallbacks": 0,
+        "fullgraph_compile_success_count": 78,
+        "graph_breaks": 0,
+        "recompilations": 0
+      },
+      "logical_runs": 156,
+      "max_snow_balance_abs": 1.8118839761882555e-13,
+      "max_water_balance_abs": 1.1254996934439987e-11,
+      "passed": true,
+      "structures": 78
+    },
+    "batched_executor": {
+      "compile": true,
+      "parity": true,
+      "passed": true,
+      "safe_default_basin_batch_size": 2,
+      "science_conservation": true
+    },
+    "formal_sce_seed": {
+      "campaign_started": false,
+      "different_seed_changes_search": true,
+      "passed": true,
+      "path_clear": true,
+      "runner_connected": true,
+      "same_seed_reproducible": true
+    },
+    "snow_balance_checker": {
+      "corrected_max_abs": 1.1368683772161603e-13,
+      "equality_semantics": "TEMP == PXTEMP contributes to neither snow nor rain",
+      "passed": true
+    },
+    "topology_gradient": {
+      "fullgraph": true,
+      "models": null,
+      "passed": true
+    },
+    "unlimfrc_2_long_horizon": {
+      "logical_runs": 42,
+      "max_snow_balance_abs": 1.8118839761882555e-13,
+      "max_water_balance_abs": 2.1795898419441073e-12,
+      "passed": true,
+      "structures": 21
+    },
+    "watr2_source_grounded_correction": {
+      "formula": "ERROR_LOSS = (WATR_2_raw - XMIN*MAXWATR_2)/DT",
+      "no_empirical_patch": true,
+      "passed": true,
+      "residual_after": 2.7755575615628914e-17,
+      "residual_before": 1.5994791870421743e-06
+    }
+  },
+  "generated_at_utc": "2026-09-06T09:33:30.210159+00:00",
+  "known_non_gates": {
+    "real_trajectory_fidelity": "prior qperc/real-trajectory mismatch remains documented and is not claimed solved by this computational freeze",
+    "scientific_use": "computational/path readiness freeze only; does not authorize formal SCE, dPL, training, or landscape campaigns"
+  },
+  "schema_version": "torch-fuse-v1-freeze-v1",
+  "scope": {
+    "basins": [
+      "USA_09447800",
+      "USA_14138900"
+    ],
+    "catalogue_order": "dfuse/specs/structures_78.json order; serial structure execution",
+    "cpu_interop_threads": 1,
+    "cpu_threads": 1,
+    "device": "cuda",
+    "dt_days": 1.0,
+    "dtype": "torch.float64",
+    "forcing_end": "2009-12-31",
+    "forcing_start": "1987-01-01",
+    "initial_fraction": 0.25,
+    "n_steps": 8401,
+    "production_baseline": "S3",
+    "safe_default_basin_batch_size": 2,
+    "structures": 78
+  },
+  "source_provenance": {
+    "git_head": "3caca37a4243ae0a95ebe9cc4f22998672ddf464",
+    "source": {
+      "batched": {
+        "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/dfuse/batched.py",
+        "sha256": "2a536aef8ab3e536765428a6c152f441f5066776da244c82bb69a67f2b529160"
+      },
+      "catalogue": {
+        "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/dfuse/specs/structures_78.json",
+        "sha256": "457b232b71c870fd3cb698fd9bb517e58844c5e9bba5f0c4ac4ad0bcc971d6fc"
+      },
+      "evaluator": {
+        "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/evaluator.py",
+        "sha256": "a060319a824bd9ce821e27596b52db70f2e93701bf7fd7908ddc3593da6f92f2"
+      },
+      "kernel": {
+        "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/dfuse/kernel.py",
+        "sha256": "4a79b4caa8d93881c849476e2ffe5aa304c8033cf271bd7e11073d7f7227faff"
+      },
+      "metrics": {
+        "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/metrics.py",
+        "sha256": "435f50669992e6a2bdb71001457717f05c154599e177ea65692384e2ffda066b"
+      },
+      "runtime": {
+        "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/dfuse/runtime.py",
+        "sha256": "f6b9f066489929479ccabb2035e50bed146e536af24a641cae68e11c37e9ad13"
+      },
+      "sce": {
+        "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/sce.py",
+        "sha256": "4861036ec66c75eb4d21876ad4f4d270995f270208bd7a5db7cfe8fd9b6c2959"
+      },
+      "seed_smoke": {
+        "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/formal_sce_seed_smoke.py",
+        "sha256": "d49a799ae4f0afec4e11290f736202931cfd6fe3e77ebefa7ff0563e3b7a15fb"
+      }
+    },
+    "working_tree": "dirty/uncommitted state preserved; no commit or remote mutation"
+  },
+  "status": "frozen",
+  "validation_artifacts": {
+    "batched_executor": {
+      "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/torch_fuse_batched_executor_validation.json",
+      "sha256": "bcdd8fd648eb1337a8801978bea863d3ae6f5ebded2d0351e3bac5fc5130cdec",
+      "status": "passed"
+    },
+    "formal_sce_seed": {
+      "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/formal_sce_seed_readiness.json",
+      "sha256": "f4a712d34d6c18c5113ab9c951ac4db1289cf40f8dc332101af07422351b7829",
+      "status": "passed"
+    },
+    "long_horizon_78": {
+      "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/torch_fuse_78_long_horizon_smoke_v2.json",
+      "sha256": "07a0555c4201042090f9c1f0c8677d273647e40db1e3d1fbf2c207ed8e7715fa",
+      "status": "passed"
+    },
+    "snow_balance": {
+      "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/snow_balance_long_horizon_audit.json",
+      "sha256": "8abe0151f1d7588ad02dc6547fafd64b242a460048e25a1298507a15fe313266",
+      "status": "complete"
+    },
+    "topology_gradient": {
+      "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/torch_fuse_topology_gradient_smoke.json",
+      "sha256": "c5e94734da42d32cc56762cffe1acf3525e5a828643d6c2c051e22b418d3571d",
+      "status": "passed"
+    },
+    "unlimfrc_2": {
+      "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/unlimfrc_2_long_horizon_smoke.json",
+      "sha256": "10a610b0fadf4864be556e6232e98687f97a8b0834916ecb379315137ad0d643",
+      "status": "passed"
+    },
+    "watr2_correction": {
+      "path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/watr2_lower_floor_torch_correction.json",
+      "sha256": "4e0e2285cb43d17d8bf4269fcd981b087fe96ced2f980f087df7622df2c5dfc2",
+      "status": "passed"
+    }
+  }
+}

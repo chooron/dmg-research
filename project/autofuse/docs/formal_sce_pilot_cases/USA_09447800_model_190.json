@@ -1,0 +1,548 @@
+{
+  "active_parameter_names": [
+    "RFERR_MLT",
+    "FRCHZNE",
+    "FRACTEN",
+    "MAXWATR_1",
+    "FRACLOWZ",
+    "MAXWATR_2",
+    "BASERTE",
+    "QB_POWR",
+    "SACPMLT",
+    "SACPEXP",
+    "SAREAMAX",
+    "TIMEDELAY",
+    "MBASE",
+    "MFMAX",
+    "MFMIN",
+    "PXTEMP",
+    "OPG",
+    "LAPSE"
+  ],
+  "artifact_path": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/formal_sce_pilot_cases/USA_09447800_model_190.json",
+  "artifact_sha256": "93e900b6eb23c23eabfc8798ce55642b045b56a496f16f85cdb199cc265794ae",
+  "best_objective": 1.7133514583205642,
+  "best_theta": {
+    "AXV_BEXP": 0.3,
+    "BASERTE": 50.0,
+    "FPRIMQB": 0.5,
+    "FRACLOWZ": 0.5,
+    "FRACTEN": 0.5,
+    "FRCHZNE": 0.5,
+    "IFLWRTE": 500.0,
+    "LAPSE": -5.0,
+    "LOGLAMB": 7.5,
+    "MAXWATR_1": 100.0,
+    "MAXWATR_2": 1000.0,
+    "MBASE": 1.0,
+    "MFMAX": 4.2,
+    "MFMIN": 2.4,
+    "OPG": 0.5,
+    "PERCEXP": 5.0,
+    "PERCFRAC": 0.5,
+    "PERCRTE": 100.0,
+    "PXTEMP": 1.0,
+    "QBRATE_2A": 0.025,
+    "QBRATE_2B": 0.01,
+    "QB_POWR": 5.0,
+    "QB_PRMS": 0.01,
+    "RFERR_ADD": 0.0,
+    "RFERR_MLT": 1.0,
+    "RFH1_MEAN": 0.003,
+    "RFH2_SDEV": 0.361,
+    "RH1P_MEAN": 0.0,
+    "RH1P_SDEV": 0.4,
+    "RH2P_MEAN": 0.05,
+    "RH2P_SDEV": 0.7,
+    "RTFRAC1": 0.75,
+    "SACPEXP": 5.0,
+    "SACPMLT": 10.0,
+    "SAREAMAX": 0.25,
+    "TIMEDELAY": 0.9,
+    "TISHAPE": 3.0
+  },
+  "best_theta_recomputation": {
+    "objective_abs_diff": 0.0,
+    "recomputed_objective": 1.7133514583205642,
+    "saved_best_reproduces_test": true,
+    "saved_best_reproduces_train": true,
+    "test_metric_from_saved_best_result": -4.395889882455779,
+    "test_metric_recomputed": -4.395889882455779,
+    "train_metric_from_saved_best_result": -0.7133514583205642,
+    "train_metric_recomputed": -0.7133514583205642
+  },
+  "catchment": "USA_09447800",
+  "compile": {
+    "passed": true,
+    "record": {
+      "backend": "inductor",
+      "batch_size": 1,
+      "cold_compile_seconds": [
+        1.8104673289926723
+      ],
+      "compile_attempts": 1,
+      "compile_successes": 1,
+      "dynamo_counters": {
+        "aot_autograd": {
+          "autograd_cache_hit": 1,
+          "ok": 1,
+          "total": 1
+        },
+        "inductor": {
+          "async_compile_cache_hit": 120,
+          "async_compile_cache_miss": 180,
+          "fxgraph_cache_hit": 1,
+          "triton_bundler_load_static_autotuner": 60
+        },
+        "stats": {
+          "calls_captured": 1563,
+          "unique_graphs": 1
+        }
+      },
+      "failures": [],
+      "fallbacks": 0,
+      "forward_unique_graphs": 1,
+      "fullgraph": true,
+      "graph_breaks": 0,
+      "graph_signature": {
+        "decisions": {
+          "ARCH1": "tension2_1",
+          "ARCH2": "fixedsiz_2",
+          "ESOIL": "sequential",
+          "QINTF": "intflwnone",
+          "QPERC": "perc_lower",
+          "QSURF": "prms_varnt",
+          "Q_TDH": "rout_gamma",
+          "RFERR": "multiplc_e",
+          "SNOWM": "temp_index"
+        },
+        "execution_mode": "coupled_rk2",
+        "n_substeps": 1,
+        "parameter_names": [
+          "RFERR_MLT",
+          "FRCHZNE",
+          "FRACTEN",
+          "MAXWATR_1",
+          "FRACLOWZ",
+          "MAXWATR_2",
+          "BASERTE",
+          "QB_POWR",
+          "SACPMLT",
+          "SACPEXP",
+          "SAREAMAX",
+          "TIMEDELAY",
+          "MBASE",
+          "MFMAX",
+          "MFMIN",
+          "PXTEMP",
+          "OPG",
+          "LAPSE"
+        ],
+        "sequential_order": [
+          "coupled_rhs"
+        ],
+        "state_names": [
+          "TENS_1A",
+          "TENS_1B",
+          "FREE_1",
+          "WATR_2"
+        ],
+        "topology": [
+          [
+            "lower",
+            [
+              [
+                "WATR_2",
+                [
+                  [
+                    "EVAP_2",
+                    -1
+                  ],
+                  [
+                    "OFLOW_2",
+                    -1
+                  ],
+                  [
+                    "QBASE_2",
+                    -1
+                  ],
+                  [
+                    "QPERC_12",
+                    1
+                  ]
+                ]
+              ]
+            ]
+          ],
+          [
+            "upper",
+            [
+              [
+                "FREE_1",
+                [
+                  [
+                    "OFLOW_1",
+                    -1
+                  ],
+                  [
+                    "QINTF_1",
+                    -1
+                  ],
+                  [
+                    "QPERC_12",
+                    -1
+                  ],
+                  [
+                    "TENS2FREE_1",
+                    1
+                  ]
+                ]
+              ],
+              [
+                "TENS_1A",
+                [
+                  [
+                    "EFF_PPT",
+                    1
+                  ],
+                  [
+                    "EVAP_1A",
+                    -1
+                  ],
+                  [
+                    "QSURF",
+                    -1
+                  ],
+                  [
+                    "RCHR2EXCS",
+                    -1
+                  ]
+                ]
+              ],
+              [
+                "TENS_1B",
+                [
+                  [
+                    "EVAP_1B",
+                    -1
+                  ],
+                  [
+                    "RCHR2EXCS",
+                    1
+                  ],
+                  [
+                    "TENS2FREE_1",
+                    -1
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ]
+      },
+      "graph_signature_digest": "ae7d7e053cd6b4b5",
+      "model_id": 190,
+      "recompilations": 0
+    },
+    "recorded": true
+  },
+  "evaluation_count": 2,
+  "git_sha": "3caca37a4243ae0a95ebe9cc4f22998672ddf464",
+  "inactive_parameter_names": [
+    "RFERR_ADD",
+    "RFH1_MEAN",
+    "RFH2_SDEV",
+    "RH1P_MEAN",
+    "RH1P_SDEV",
+    "RH2P_MEAN",
+    "RH2P_SDEV",
+    "FPRIMQB",
+    "RTFRAC1",
+    "PERCRTE",
+    "PERCEXP",
+    "PERCFRAC",
+    "IFLWRTE",
+    "QB_PRMS",
+    "QBRATE_2A",
+    "QBRATE_2B",
+    "AXV_BEXP",
+    "LOGLAMB",
+    "TISHAPE"
+  ],
+  "leakage": {
+    "calibration_period": [
+      "1989-01-01",
+      "1998-12-31"
+    ],
+    "disjoint_masks": true,
+    "evaluation_observations_passed_to_optimizer": false,
+    "evaluation_period": [
+      "1999-01-01",
+      "2009-12-31"
+    ]
+  },
+  "optimizer": {
+    "algorithm": "SCE-UA",
+    "config": {
+      "kstop": 3,
+      "max_evaluations": 2,
+      "n_complexes": 2,
+      "optimization_forcing_end": "2009-12-31",
+      "pcento": 0.0,
+      "population_size": 2
+    },
+    "implementation": "SCEBaseline.run",
+    "initial_population": [
+      [
+        1.0,
+        0.5,
+        0.5,
+        100.0,
+        0.5,
+        1000.0,
+        50.0,
+        5.0,
+        10.0,
+        5.0,
+        0.25,
+        0.9,
+        1.0,
+        4.2,
+        2.4,
+        1.0,
+        0.5,
+        -5.0
+      ],
+      [
+        1.0008905268931647,
+        0.347914537281875,
+        0.8743565496685356,
+        157.86934630765006,
+        0.6447766105903192,
+        4828.97048264947,
+        929.684086719481,
+        7.330558990649026,
+        194.6677640393433,
+        3.7493820892292646,
+        0.9191782885536336,
+        2.7737643525545375,
+        1.6925965861533059,
+        4.333414825072104,
+        5.080523847297955,
+        -0.5059536099485749,
+        0.5560007625972583,
+        -4.380793619152641
+      ]
+    ],
+    "rng": "torch.Generator(device=cpu).manual_seed(config.seed)"
+  },
+  "parameter_checks": {
+    "all_candidate_bounds_valid": true,
+    "all_candidates_finite": true,
+    "best_active_bounds_valid": true,
+    "inactive_parameters_fixed_to_defaults": true
+  },
+  "pass": true,
+  "path_audit": {
+    "compile_fullgraph": true,
+    "device": "cuda:0",
+    "dtype": "torch.float64",
+    "legacy_fortran_used": false,
+    "legacy_sequential_used": false,
+    "objective": "SCEBaseline.objective_batched -> UnifiedEvaluator.score_batched",
+    "optimizer": "SCEBaseline.run",
+    "optimizer_forcing_period": [
+      "1987-01-01",
+      "2009-12-31"
+    ],
+    "simulation": "simulate_coupled_rk2_batched"
+  },
+  "protocol_artifact_sha256": "a8bfcdcb835606e3d1a47f78a9c782d4ad84e4776583f106e4334d0ca8bc1d39",
+  "protocol_id": "formal-experiment-protocol-v1-db53091e6e222066",
+  "recomputation": {
+    "objective_abs_diff": 0.0,
+    "recomputed_objective": 1.7133514583205642,
+    "saved_best_reproduces_test": true,
+    "saved_best_reproduces_train": true,
+    "test_metric_from_saved_best_result": -4.395889882455779,
+    "test_metric_recomputed": -4.395889882455779,
+    "train_metric_from_saved_best_result": -0.7133514583205642,
+    "train_metric_recomputed": -0.7133514583205642
+  },
+  "resource": {
+    "gpu_end": {
+      "memory_total_mib": 12288,
+      "memory_used_mib": 3666,
+      "utilization_gpu_percent": 10
+    },
+    "gpu_peak_allocated_bytes": 53248000,
+    "gpu_peak_reserved_bytes": 54525952,
+    "gpu_start": {
+      "memory_total_mib": 12288,
+      "memory_used_mib": 3697,
+      "utilization_gpu_percent": 3
+    },
+    "host_peak_rss_kb": 1563104,
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.41",
+    "python": "3.10.20",
+    "wall_clock_seconds": 235.1597229289473
+  },
+  "runtime": {
+    "gpu_end": {
+      "memory_total_mib": 12288,
+      "memory_used_mib": 3666,
+      "utilization_gpu_percent": 10
+    },
+    "gpu_peak_allocated_bytes": 53248000,
+    "gpu_peak_reserved_bytes": 54525952,
+    "gpu_start": {
+      "memory_total_mib": 12288,
+      "memory_used_mib": 3697,
+      "utilization_gpu_percent": 3
+    },
+    "host_peak_rss_kb": 1563104,
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.41",
+    "python": "3.10.20",
+    "wall_clock_seconds": 235.1597229289473
+  },
+  "schema_version": "formal-sce-pilot-case-v1",
+  "seed": 20260903,
+  "structure": 190,
+  "termination_reason": "max_evaluations",
+  "test_metric": -4.395889882455779,
+  "torch_fuse_freeze_artifact_sha256": "327c193c933a744d7837ec1590eae4f2454e303ce563559d355982b7bece2753",
+  "torch_fuse_freeze_id": "torch-fuse-v1-freeze-v1",
+  "train_metric": -0.7133514583205642,
+  "train_test": {
+    "calibration_period": [
+      "1989-01-01",
+      "1998-12-31"
+    ],
+    "calibration_steps": 3652,
+    "disjoint_masks": true,
+    "epsilon": 0.0005606689075247039,
+    "evaluation_observations_passed_to_optimizer": false,
+    "evaluation_period": [
+      "1999-01-01",
+      "2009-12-31"
+    ],
+    "evaluation_steps": 4018,
+    "forcing_period": [
+      "1987-01-01",
+      "2009-12-31"
+    ],
+    "optimization_forcing_steps": 8401,
+    "test_monitoring": {
+      "actual_steps": 8401,
+      "capacity_violation_count": [
+        0
+      ],
+      "completed_full_period": true,
+      "monitor_chunk_size": 64,
+      "negative_active_state_count": [
+        0
+      ],
+      "nonfinite_count": [
+        0
+      ],
+      "per_basin": [
+        {
+          "basin_id": "USA_09447800",
+          "first_failure_category": null,
+          "first_failure_index": null
+        }
+      ],
+      "snow_balance_max_abs": [
+        2.6645352591003757e-15
+      ],
+      "stopped_on_failure": false,
+      "water_balance_max_abs": [
+        1.176836406102666e-13
+      ]
+    },
+    "train_monitoring": {
+      "actual_steps": 8401,
+      "capacity_violation_count": [
+        0
+      ],
+      "completed_full_period": true,
+      "monitor_chunk_size": 64,
+      "negative_active_state_count": [
+        0
+      ],
+      "nonfinite_count": [
+        0
+      ],
+      "per_basin": [
+        {
+          "basin_id": "USA_09447800",
+          "first_failure_category": null,
+          "first_failure_index": null
+        }
+      ],
+      "snow_balance_max_abs": [
+        2.6645352591003757e-15
+      ],
+      "stopped_on_failure": false,
+      "water_balance_max_abs": [
+        1.176836406102666e-13
+      ]
+    },
+    "warmup_period": [
+      "1987-01-01",
+      "1988-12-31"
+    ]
+  },
+  "trajectory": [
+    {
+      "active_parameters": [
+        1.0,
+        0.5,
+        0.5,
+        100.0,
+        0.5,
+        1000.0,
+        50.0,
+        5.0,
+        10.0,
+        5.0,
+        0.25,
+        0.9,
+        1.0,
+        4.2,
+        2.4,
+        1.0,
+        0.5,
+        -5.0
+      ],
+      "evaluation": 1,
+      "operation": "initial_population",
+      "score": 1.7133514583205642
+    },
+    {
+      "active_parameters": [
+        1.0008905268931647,
+        0.347914537281875,
+        0.8743565496685356,
+        157.86934630765006,
+        0.6447766105903192,
+        4828.97048264947,
+        929.684086719481,
+        7.330558990649026,
+        194.6677640393433,
+        3.7493820892292646,
+        0.9191782885536336,
+        2.7737643525545375,
+        1.6925965861533059,
+        4.333414825072104,
+        5.080523847297955,
+        -0.5059536099485749,
+        0.5560007625972583,
+        -4.380793619152641
+      ],
+      "evaluation": 2,
+      "operation": "initial_population",
+      "score": 2.2478433731401326
+    }
+  ]
+}

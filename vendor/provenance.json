@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "repositories": [
+    {
+      "name": "cyrilthebault-fuse",
+      "path": "vendor/upstream/cyrilthebault-fuse",
+      "remote": "https://github.com/CyrilThebault/fuse.git",
+      "requested_ref": "v1.0_MMpaper",
+      "branch": "HEAD",
+      "tag_at_head": "v1.0_MMpaper",
+      "commit": "e6e23a4fc4ff4019bcab55f14537ea43b9525967",
+      "clone_date_utc": "2026-09-01T09:07:17Z",
+      "recorded_at_utc": "2026-09-01T09:13:07.191837Z",
+      "dirty": false
+    },
+    {
+      "name": "fuse-mmcomparison-paper",
+      "path": "vendor/upstream/fuse-mmcomparison-paper",
+      "remote": "https://github.com/CyrilThebault/FUSE-MMComparison-paper.git",
+      "requested_ref": "main",
+      "branch": "main",
+      "tag_at_head": null,
+      "commit": "f1f94a3e9662672d01861bee53eee74a34b8942a",
+      "clone_date_utc": "2026-09-01T09:07:17Z",
+      "recorded_at_utc": "2026-09-01T09:13:07.191837Z",
+      "dirty": false
+    },
+    {
+      "name": "ncar-fuse",
+      "path": "vendor/upstream/ncar-fuse",
+      "remote": "https://github.com/NCAR/FUSE.git",
+      "requested_ref": "master",
+      "branch": "master",
+      "tag_at_head": null,
+      "commit": "dbcd0bcc6b3774888a51701146e016ac68f6a2ce",
+      "clone_date_utc": "2026-09-01T09:07:17Z",
+      "recorded_at_utc": "2026-09-01T09:13:07.191837Z",
+      "dirty": false
+    },
+    {
+      "name": "fathom-fuse",
+      "path": "vendor/upstream/fathom-fuse",
+      "remote": "https://github.com/fathom-global/fuse.git",
+      "requested_ref": "master",
+      "branch": "master",
+      "tag_at_head": null,
+      "commit": "ebf4fa9d687ef47157adcca01b3e6aa2104fcbbd",
+      "clone_date_utc": "2026-09-01T09:07:17Z",
+      "recorded_at_utc": "2026-09-01T09:13:07.191837Z",
+      "dirty": false
+    },
+    {
+      "name": "cvitolo-fuse",
+      "path": "vendor/upstream/cvitolo-fuse",
+      "remote": "https://github.com/cvitolo/fuse.git",
+      "requested_ref": "master",
+      "branch": "master",
+      "tag_at_head": null,
+      "commit": "b44cb98699a62bb17dd4279a71afd9124496e936",
+      "clone_date_utc": "2026-09-01T09:07:17Z",
+      "recorded_at_utc": "2026-09-01T09:13:07.191837Z",
+      "dirty": false
+    }
+  ]
+}

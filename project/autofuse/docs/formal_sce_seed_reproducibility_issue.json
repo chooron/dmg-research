@@ -1,0 +1,26 @@
+{
+  "schema_version": "formal-sce-seed-reproducibility-issue-v1",
+  "status": "documented_not_fixed_in_reference_archive",
+  "title": "SCE ISEED must be initialized before formal baseline calibration",
+  "source": {
+    "path": "vendor/upstream/cyrilthebault-fuse/build/FUSE_SRC/FUSE_DMSL/fuse_driver.f90",
+    "sha256": "ae562b17ddff8b2f6c0a4e3716821a1db268d7a3b4562056c4e37883a25b5efa",
+    "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+    "commit": "e6e23a4fc4ff4019bcab55f14537ea43b9525967"
+  },
+  "finding": {
+    "variable": "ISEED",
+    "call": "SCEUA",
+    "assignment_before_call": false,
+    "impact": "the calibration trajectory is uncontrolled and bounded repeats are not guaranteed to be reproducible; a legal model-206 candidate can enter a pathological forward path"
+  },
+  "required_formal_calibration_action": "initialize ISEED deterministically before SCEUA and record the seed in the calibration provenance",
+  "scope_guard": {
+    "current_936_case_archive_unchanged": true,
+    "current_archive": "project/autofuse/docs/reference_calibration_12x78.json",
+    "current_archive_sha256": "3f290923a518c7c0c0194a8935c520178e813602b7823f88988c843446146551",
+    "no_recalibration_in_s4_task": true,
+    "no_scientific_equation_change": true,
+    "no_formal_sce_or_dpl_started": true
+  }
+}

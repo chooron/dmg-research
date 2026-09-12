@@ -1,0 +1,119 @@
+{
+  "schema_version": "landscape-parameter-source-v1",
+  "checked_at_utc": "2026-09-03T08:59:48Z",
+  "usable": true,
+  "fallback_usable": true,
+  "published_archive_available": false,
+  "local_fortran_reference_available": true,
+  "fallback": "bounded_local_fortran_calibration",
+  "status": "bounded local Fortran calibration complete with one Option-A early-stopped case",
+  "local_fortran_reference": {
+    "available": true,
+    "executable": "/tmp/autofuse-reference-toolchain/repro-build/bin/fuse.exe",
+    "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+    "repository": "vendor/upstream/cyrilthebault-fuse",
+    "ref": "v1.0_MMpaper",
+    "commit": "e6e23a4fc4ff4019bcab55f14537ea43b9525967",
+    "oracle_smoke": "A0 210/12-step run_reference passed with finite Q/state/flux"
+  },
+  "calibration_fallback": {
+    "method": "original Fortran calib_sce followed by run_best",
+    "s3_used_for_optimization": false,
+    "parameter_freeze_after_calibration": true,
+    "scope": "12 frozen catchments x 78 structures only",
+  "smoke_status": "passed: USA_01013500 x models 2,108,178,210",
+    "full_calibration_status": "complete_with_one_early_stopped_case",
+    "full_calibration_completed": 936,
+    "full_calibration_expected": 936,
+    "full_calibration_failure_case": "USA_12010000/206 calib_sce timeout; Option A finite best-so-far vector accepted",
+    "parameter_archive": "project/autofuse/docs/reference_calibration_12x78.json",
+    "parameter_results_sha256": "3f290923a518c7c0c0194a8935c520178e813602b7823f88988c843446146551"
+  },
+  "decision": "public archive unavailable; local original-Fortran calibration is the only accepted parameter source for this gate",
+  "required_source": "Thébault 78-structure calibrated parameters mapped as catchment x structure -> calibrated parameter vector",
+  "checked_sources": [
+    {
+      "priority": 1,
+      "source": "CyrilThebault/fuse",
+      "url": "https://github.com/CyrilThebault/fuse",
+      "requested_ref": "v1.0_MMpaper",
+      "local_path": "vendor/upstream/cyrilthebault-fuse",
+      "commit": "e6e23a4fc4ff4019bcab55f14537ea43b9525967",
+      "status": "checked",
+      "finding": "FUSE source and build tree are present; no catchment-calibrated parameter archive is present in the checked ref"
+    },
+    {
+      "priority": 1,
+      "source": "CyrilThebault/FUSE-MMComparison-paper",
+      "url": "https://github.com/CyrilThebault/FUSE-MMComparison-paper",
+      "requested_ref": "main",
+      "local_path": "vendor/upstream/fuse-mmcomparison-paper",
+      "commit": "f1f94a3e9662672d01861bee53eee74a34b8942a",
+      "status": "checked",
+      "finding": "00_DATA is a .gitkeep in the checked clone; the repository contains scripts and decision lists, not calibrated parameter vectors"
+    },
+    {
+      "priority": 1,
+      "source": "HydroShare FUSE-MMComparison-paper resource",
+      "url": "https://www.hydroshare.org/resource/53063da8fc894149b5b25f3201d1e8e8/",
+      "data_endpoint": "https://www.hydroshare.org/hsapi/resource/53063da8fc894149b5b25f3201d1e8e8/files/",
+      "resource_file_count": 37,
+      "file_inventory_sha256": "a49e55e8dd335869618efda8c34621fafeef7af3f5f00f6298513198743bd786",
+      "downloaded_probe": {
+        "name": "Eval_FUSE.Rdata",
+        "size_bytes": 2594440,
+        "sha256": "451a5b0c9a33c3af1574ecb1fbcb3c2cd39481cfe6a3106b54a0c881051bfa4f",
+        "finding": "evaluation summary artifact; not a calibrated parameter archive"
+      },
+      "status": "checked",
+      "finding": "resource file inventory contains observed streamflow, topology, decision lists, metrics/Rdata summaries, and shapefiles, but no calibrated parameter archive or per-catchment parameter files"
+    },
+    {
+      "priority": 2,
+      "source": "current project/autofuse",
+      "local_path": "project/autofuse",
+      "status": "checked",
+      "finding": "existing artifacts contain synthetic forcing/reference runs, compiler validation, and structure specifications; no real-catchment calibrated parameter vectors"
+    },
+    {
+      "priority": 2,
+      "source": "current vendor",
+      "local_path": "vendor",
+      "status": "checked",
+      "provenance_file_sha256": "a18eed73d5898fa27be6eccb9affb495187b0402d988b6b693611ce0264de5a6",
+      "finding": "only upstream source/build/reference materials and unrelated test data are present; no usable Thébault calibrated parameter archive"
+    }
+  ],
+  "expected_parameter_dimensionality": {
+    "structure_count": 78,
+    "vector_dimension_range": [15, 20],
+    "dimension_counts": {"15": 10, "16": 10, "17": 19, "18": 24, "19": 6, "20": 9},
+    "catalogue_path": "dfuse/specs/structures_78.json",
+    "catalogue_sha256": "457b232b71c870fd3cb698fd9bb517e58844c5e9bba5f0c4ac4ad0bcc971d6fc",
+    "parameter_catalogue_path": "dfuse/specs/parameter_catalog.json",
+    "parameter_catalogue_sha256": "711a09dec32f39bb32a667030fc476b224c5f5aa3a600df71baec75eead4cdf9"
+  },
+  "structure_mapping": {
+    "structure_catalogue_available": true,
+    "structure_count": 78,
+    "published_calibrated_parameter_mapping_available": false,
+    "local_fallback_mapping_available": true,
+    "required_mapping": "catchment x structure -> vector with structure-specific dimensionality"
+  },
+  "catchment_coverage": {
+    "required_for_gate": 12,
+    "calibrated_parameter_catchment_count": 12,
+    "calibrated_parameter_structure_count": 78,
+    "calibrated_parameter_vector_count": 936,
+    "expected_parameter_vector_count": 936,
+    "usable_12x78": true,
+    "missing": null
+  },
+  "related_available_artifacts_not_accepted_as_parameters": [
+    "project/autofuse/docs/sequential_order_references/reference-*.npz: synthetic/reference forcing runs, not calibrated CAMELS parameters",
+    "project/autofuse/docs/sequential_order_validation.json: synthetic order-selection artifact, not calibrated CAMELS parameters",
+    "vendor/upstream/cvitolo-fuse/data/fuse_parameters.rda: package parameter metadata/defaults, not Thébault catchment calibration",
+    "project/hydrodiag/manuscript/results/R2/raw_parameter_ledger.csv: unrelated XAJ model parameter ledger; contains no FUSE parameter names"
+  ],
+  "next_required_action": "locate or separately authorize a bounded reference-calibration fallback; do not start Stage B-E, SCE, dPL, or any 12x78 landscape run"
+}

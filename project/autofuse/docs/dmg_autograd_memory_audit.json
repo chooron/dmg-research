@@ -1,0 +1,16 @@
+{
+  "schema_version": "dmg-autograd-memory-audit-v1",
+  "status": "completed",
+  "protocol_id": "formal-experiment-protocol-v1-db53091e6e222066",
+  "generated_at_utc": "2026-09-07T00:00:00+00:00",
+  "autograd_and_memory_mechanisms": {
+    "warmup_graph_retention": "Configurable. Default DMG ModelHandler runs full 730d graph and trims output[365:]. Specialized physical models (e.g. Hbv_1_1p) support warmup_states=True which executes the 365d warmup under with torch.no_grad():.",
+    "warmup_state_detach": "Supported in Hbv_1_1p via s.detach() at warmup boundary. In ModelHandler default mode, state graph is continuous.",
+    "bptt_horizon": "Full BPTT over the scored 365-day period (or 730-day window). No within-window truncated-BPTT is used.",
+    "gradient_checkpointing": false,
+    "gradient_accumulation": false,
+    "mixed_precision_amp": false,
+    "precision_dtype": "Configurable float32 or float64.",
+    "memory_reduction_primary_driver": "Time-window sampling (730 days instead of 3652-day calibration period). Truncating the temporal sequence length from 10 years to 2 years reduces autograd graph size by 5.0x per batch."
+  }
+}

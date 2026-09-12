@@ -1,0 +1,75 @@
+{
+  "cases": [
+    {
+      "catchment": "USA_09447800",
+      "pass": true,
+      "q_diff_max": 0.0,
+      "q_shape_full": [
+        1,
+        4383
+      ],
+      "q_shape_qonly": [
+        1,
+        4383
+      ],
+      "structure": 2
+    },
+    {
+      "catchment": "USA_09447800",
+      "pass": true,
+      "q_diff_max": 0.0,
+      "q_shape_full": [
+        1,
+        4383
+      ],
+      "q_shape_qonly": [
+        1,
+        4383
+      ],
+      "structure": 8
+    },
+    {
+      "catchment": "USA_14138900",
+      "pass": true,
+      "q_diff_max": 0.0,
+      "q_shape_full": [
+        1,
+        4383
+      ],
+      "q_shape_qonly": [
+        1,
+        4383
+      ],
+      "structure": 2
+    },
+    {
+      "catchment": "USA_14138900",
+      "pass": true,
+      "q_diff_max": 0.0,
+      "q_shape_full": [
+        1,
+        4383
+      ],
+      "q_shape_qonly": [
+        1,
+        4383
+      ],
+      "structure": 8
+    }
+  ],
+  "generated_at_utc": "2026-09-07T03:53:53.776920+00:00",
+  "protocol_id": "formal-experiment-protocol-v1-db53091e6e222066",
+  "schema_version": "q-only-calibration-mode-validation-v1",
+  "status": "passed",
+  "summary": {
+    "all_passed": true,
+    "cases_tested": 4,
+    "max_q_difference": 0.0,
+    "mode_comparison": "output_mode='full' vs output_mode='q_only'",
+    "verified_properties": [
+      "Discharge Q is bitwise identical",
+      "Internal state integration and FIX_STATES boundary corrections are identical",
+      "37 groups of intermediate flux and state lists are skipped during loop"
+    ]
+  }
+}

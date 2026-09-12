@@ -1,0 +1,311 @@
+{
+  "cache_after": {
+    "bytes": 2466908782,
+    "files": 19314
+  },
+  "cache_before": {
+    "bytes": 2466874518,
+    "files": 19313
+  },
+  "cache_dir": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/.cache/runtime-validation-78-safe",
+  "compile_record": {
+    "autograd_recompilations": 0,
+    "autograd_unique_graphs": 1,
+    "calls": 4,
+    "code_object_id": 138198359323232,
+    "code_object_name": "generated_step_f343e482bf22468b",
+    "cold_compile_seconds": [
+      2.0294862700102385
+    ],
+    "compile_attempts": 1,
+    "compile_successes": 1,
+    "dynamo_counters": {
+      "aot_autograd": {
+        "autograd_cache_hit": 2,
+        "ok": 2,
+        "total": 2
+      },
+      "inductor": {
+        "async_compile_cache_hit": 187,
+        "async_compile_cache_miss": 282,
+        "fxgraph_cache_hit": 3,
+        "triton_bundler_load_static_autotuner": 93
+      },
+      "stats": {
+        "calls_captured": 1892,
+        "unique_graphs": 2
+      }
+    },
+    "failures": [],
+    "fallbacks": 0,
+    "forward_unique_graphs": 1,
+    "graph_breaks": 0,
+    "graph_signature": {
+      "decisions": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "unlimfrc_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_w2sat",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "n_substeps": 1,
+      "parameter_names": [
+        "RFERR_MLT",
+        "FRACTEN",
+        "MAXWATR_1",
+        "MAXWATR_2",
+        "QB_PRMS",
+        "PERCRTE",
+        "PERCEXP",
+        "SAREAMAX",
+        "TIMEDELAY",
+        "MBASE",
+        "MFMAX",
+        "MFMIN",
+        "PXTEMP",
+        "OPG",
+        "LAPSE"
+      ],
+      "sequential_order": [
+        "recharge",
+        "et",
+        "surface_runoff",
+        "percolation",
+        "interflow",
+        "baseflow"
+      ],
+      "state_names": [
+        "WATR_1",
+        "WATR_2"
+      ],
+      "topology": [
+        [
+          "lower",
+          [
+            [
+              "WATR_2",
+              [
+                [
+                  "EVAP_2",
+                  -1
+                ],
+                [
+                  "OFLOW_2",
+                  -1
+                ],
+                [
+                  "QBASE_2",
+                  -1
+                ],
+                [
+                  "QPERC_12",
+                  1
+                ]
+              ]
+            ]
+          ]
+        ],
+        [
+          "upper",
+          [
+            [
+              "WATR_1",
+              [
+                [
+                  "EFF_PPT",
+                  1
+                ],
+                [
+                  "EVAP_1",
+                  -1
+                ],
+                [
+                  "OFLOW_1",
+                  -1
+                ],
+                [
+                  "QINTF_1",
+                  -1
+                ],
+                [
+                  "QPERC_12",
+                  -1
+                ],
+                [
+                  "QSURF",
+                  -1
+                ]
+              ]
+            ]
+          ]
+        ]
+      ]
+    },
+    "guard_failure_reasons": {},
+    "key": {
+      "backend": "inductor",
+      "device": "cuda:0",
+      "dtype": "torch.float64",
+      "fullgraph": true,
+      "graph_signature": {
+        "decisions": {
+          "ARCH1": "onestate_1",
+          "ARCH2": "unlimfrc_2",
+          "ESOIL": "sequential",
+          "QINTF": "intflwnone",
+          "QPERC": "perc_w2sat",
+          "QSURF": "prms_varnt",
+          "Q_TDH": "rout_gamma",
+          "RFERR": "multiplc_e",
+          "SNOWM": "temp_index"
+        },
+        "n_substeps": 1,
+        "parameter_names": [
+          "RFERR_MLT",
+          "FRACTEN",
+          "MAXWATR_1",
+          "MAXWATR_2",
+          "QB_PRMS",
+          "PERCRTE",
+          "PERCEXP",
+          "SAREAMAX",
+          "TIMEDELAY",
+          "MBASE",
+          "MFMAX",
+          "MFMIN",
+          "PXTEMP",
+          "OPG",
+          "LAPSE"
+        ],
+        "sequential_order": [
+          "recharge",
+          "et",
+          "surface_runoff",
+          "percolation",
+          "interflow",
+          "baseflow"
+        ],
+        "state_names": [
+          "WATR_1",
+          "WATR_2"
+        ],
+        "topology": [
+          [
+            "lower",
+            [
+              [
+                "WATR_2",
+                [
+                  [
+                    "EVAP_2",
+                    -1
+                  ],
+                  [
+                    "OFLOW_2",
+                    -1
+                  ],
+                  [
+                    "QBASE_2",
+                    -1
+                  ],
+                  [
+                    "QPERC_12",
+                    1
+                  ]
+                ]
+              ]
+            ]
+          ],
+          [
+            "upper",
+            [
+              [
+                "WATR_1",
+                [
+                  [
+                    "EFF_PPT",
+                    1
+                  ],
+                  [
+                    "EVAP_1",
+                    -1
+                  ],
+                  [
+                    "OFLOW_1",
+                    -1
+                  ],
+                  [
+                    "QINTF_1",
+                    -1
+                  ],
+                  [
+                    "QPERC_12",
+                    -1
+                  ],
+                  [
+                    "QSURF",
+                    -1
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ]
+      },
+      "input_shapes": [
+        [
+          510
+        ],
+        [
+          6
+        ],
+        [
+          37
+        ],
+        [],
+        [],
+        [
+          500
+        ]
+      ]
+    },
+    "recompilations": 0,
+    "unique_graphs": 1
+  },
+  "dynamo_counters": {
+    "aot_autograd": {
+      "autograd_cache_hit": 2,
+      "ok": 2,
+      "total": 2
+    },
+    "inductor": {
+      "async_compile_cache_hit": 187,
+      "async_compile_cache_miss": 282,
+      "fxgraph_cache_hit": 3,
+      "triton_bundler_load_static_autotuner": 93
+    },
+    "stats": {
+      "calls_captured": 1892,
+      "unique_graphs": 2
+    }
+  },
+  "elapsed_seconds": 4.460333796989289,
+  "model_id": 108,
+  "q": 2.0880377119622104,
+  "resource": {
+    "gpu": {
+      "allocated_bytes": 47616,
+      "peak_allocated_bytes": 491008,
+      "peak_reserved_bytes": 2097152,
+      "reserved_bytes": 2097152
+    },
+    "host_peak_rss_kb": 1358648,
+    "host_rss_kb": 1348172
+  },
+  "schema": "dfuse-runtime-step-cache-probe-v1",
+  "signature_digest": "f343e482bf22468b"
+}

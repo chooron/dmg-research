@@ -1,0 +1,21 @@
+{
+  "catalogue_count": 78,
+  "result": "not encountered: frozen 78-structure catalogue contains no ARCH2=topmdexp_2 rows",
+  "schema_version": "coupled-rk2-unsupported-path-audit-v1",
+  "scope": {
+    "calibration_modified": false,
+    "catalogue_modified": false,
+    "equations_modified": false
+  },
+  "source_catalogue": "/home/jingxin/orca/workspaces/dmg-research/autofuse/dfuse/specs/structures_78.json",
+  "source_catalogue_sha256": "457b232b71c870fd3cb698fd9bb517e58844c5e9bba5f0c4ac4ad0bcc971d6fc",
+  "source_contract": {
+    "audit_artifact": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/fortran_fix_states_dependency_audit.json",
+    "audit_artifact_sha256": "9b1e32bb8ee0c6a936d02cd04ae49d8e07fa9f1a68764f7276210b099a23ee66",
+    "handling": "no silent bypass; any source STOP path remains unsupported"
+  },
+  "status": "complete",
+  "topmdexp_2_structure_count": 0,
+  "topmdexp_2_structure_ids": [],
+  "triggered_in_frozen_78_catalogue": false
+}

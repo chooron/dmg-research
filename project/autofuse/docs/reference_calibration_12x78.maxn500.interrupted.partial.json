@@ -1,0 +1,2580 @@
+{
+  "case_count_completed": 43,
+  "case_count_expected": 936,
+  "case_results": [
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.47225841879844666,
+        "kgecomp": 0.5434173345565796,
+        "kgep": 0.48155051469802856,
+        "log_rmse": 0.9819968938827515,
+        "metric_val": 0.5434173345565796,
+        "raw_rmse": 1.4728635549545288
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 2,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "AXV_BEXP": 0.025540024042129517,
+        "FPRIMQB": 0.23171859979629517,
+        "FRACTEN": 0.6182651519775391,
+        "LAPSE": -4.225071907043457,
+        "MAXWATR_1": 90.87191009521484,
+        "MAXWATR_2": 2301.408935546875,
+        "MBASE": 1.579578161239624,
+        "MFMAX": 2.1947221755981445,
+        "MFMIN": 1.1507930755615234,
+        "OPG": 0.8936789631843567,
+        "PERCEXP": 6.261843204498291,
+        "PERCFRAC": 0.5086389780044556,
+        "PERCRTE": 6.225826263427734,
+        "PXTEMP": 4.516318321228027,
+        "QBRATE_2A": 0.1190418004989624,
+        "QBRATE_2B": 0.20996983349323273,
+        "RFERR_MLT": 1.0004782676696777,
+        "TIMEDELAY": 4.678970813751221
+      },
+      "runtime": {
+        "calib_sce_seconds": 46.26906622599927,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.48591774501255713
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.6531589031219482,
+        "kgecomp": 0.5074686408042908,
+        "kgep": 0.6605167388916016,
+        "log_rmse": 0.9028111100196838,
+        "metric_val": 0.5074686408042908,
+        "raw_rmse": 1.0064005851745605
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 6,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "AXV_BEXP": 0.6130194664001465,
+        "FPRIMQB": 0.690314531326294,
+        "FRACTEN": 0.11584557592868805,
+        "LAPSE": -6.350216865539551,
+        "MAXWATR_1": 150.41162109375,
+        "MAXWATR_2": 1178.27197265625,
+        "MBASE": 2.7619338035583496,
+        "MFMAX": 3.751323699951172,
+        "MFMIN": 3.772374391555786,
+        "OPG": 1.3304798603057861,
+        "PERCEXP": 6.260584831237793,
+        "PERCFRAC": 0.8023801445960999,
+        "PERCRTE": 322.01470947265625,
+        "PXTEMP": -0.5506624579429626,
+        "QBRATE_2A": 0.008794749155640602,
+        "QBRATE_2B": 0.05956561118364334,
+        "RFERR_MLT": 1.00080144405365,
+        "TIMEDELAY": 2.3842549324035645
+      },
+      "runtime": {
+        "calib_sce_seconds": 37.77559299499262,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.4272227609762922
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.547779381275177,
+        "kgecomp": 0.5457227826118469,
+        "kgep": 0.4739755392074585,
+        "log_rmse": 0.9026840329170227,
+        "metric_val": 0.5457227826118469,
+        "raw_rmse": 1.209649682044983
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 8,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "AXV_BEXP": 0.14858709275722504,
+        "FRACTEN": 0.6176978349685669,
+        "LAPSE": -4.5827555656433105,
+        "MAXWATR_1": 260.4827575683594,
+        "MAXWATR_2": 3563.3759765625,
+        "MBASE": 0.498527467250824,
+        "MFMAX": 3.2957348823547363,
+        "MFMIN": 2.5763118267059326,
+        "OPG": 0.6180973052978516,
+        "PERCEXP": 14.50117301940918,
+        "PERCRTE": 758.2379150390625,
+        "PXTEMP": 0.25931817293167114,
+        "QB_PRMS": 0.13091610372066498,
+        "RFERR_MLT": 1.0005155801773071,
+        "TIMEDELAY": 2.947258710861206
+      },
+      "runtime": {
+        "calib_sce_seconds": 33.14795978201437,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.4487433409958612
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.626089334487915,
+        "kgecomp": 0.5665701031684875,
+        "kgep": 0.5515947341918945,
+        "log_rmse": 0.9938831329345703,
+        "metric_val": 0.5665701031684875,
+        "raw_rmse": 1.1740201711654663
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 10,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "AXV_BEXP": 0.2951628863811493,
+        "FRACLOWZ": 0.4991380572319031,
+        "FRACTEN": 0.3564589321613312,
+        "FRCHZNE": 0.6619768142700195,
+        "LAPSE": -4.205595016479492,
+        "MAXWATR_1": 156.06097412109375,
+        "MAXWATR_2": 1725.2764892578125,
+        "MBASE": 2.076193332672119,
+        "MFMAX": 7.46235466003418,
+        "MFMIN": 1.863606572151184,
+        "OPG": 0.20933374762535095,
+        "PERCEXP": 3.884023666381836,
+        "PERCRTE": 634.2105712890625,
+        "PXTEMP": -0.4738389551639557,
+        "QB_PRMS": 0.1922769844532013,
+        "RFERR_MLT": 1.0009630918502808,
+        "TIMEDELAY": 1.1503756046295166
+      },
+      "runtime": {
+        "calib_sce_seconds": 43.738380149006844,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.638184529991122
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.5484067797660828,
+        "kgecomp": 0.4968388080596924,
+        "kgep": 0.5108657479286194,
+        "log_rmse": 1.0136696100234985,
+        "metric_val": 0.4968388080596924,
+        "raw_rmse": 1.2764438390731812
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 12,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "AXV_BEXP": 0.7341840267181396,
+        "FRACTEN": 0.09133139252662659,
+        "LAPSE": -5.9520263671875,
+        "MAXWATR_1": 123.49935150146484,
+        "MAXWATR_2": 1405.25537109375,
+        "MBASE": 1.977492094039917,
+        "MFMAX": 7.13517951965332,
+        "MFMIN": 5.393743991851807,
+        "OPG": 1.2205405235290527,
+        "PERCEXP": 11.544875144958496,
+        "PERCRTE": 11.979864120483398,
+        "PXTEMP": 2.2968478202819824,
+        "QB_PRMS": 0.002136064227670431,
+        "RFERR_MLT": 1.000156283378601,
+        "TIMEDELAY": 4.610837459564209
+      },
+      "runtime": {
+        "calib_sce_seconds": 24.99138158498681,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.39126808900618926
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.5783507227897644,
+        "kgecomp": 0.3180674910545349,
+        "kgep": 0.5762923955917358,
+        "log_rmse": 1.2532799243927002,
+        "metric_val": 0.3180674910545349,
+        "raw_rmse": 1.2584620714187622
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 14,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "AXV_BEXP": 1.2354662418365479,
+        "BASERTE": 929.0205078125,
+        "FRACTEN": 0.14498823881149292,
+        "LAPSE": -5.349608421325684,
+        "LOGLAMB": 6.979719161987305,
+        "MAXWATR_1": 209.0552978515625,
+        "MAXWATR_2": 3479.742919921875,
+        "MBASE": 2.6638567447662354,
+        "MFMAX": 4.286142349243164,
+        "MFMIN": 3.714853525161743,
+        "OPG": 1.4186785221099854,
+        "PERCEXP": 2.4903316497802734,
+        "PERCRTE": 758.7613525390625,
+        "PXTEMP": 3.269097089767456,
+        "QB_POWR": 2.8961846828460693,
+        "RFERR_MLT": 1.0004665851593018,
+        "TIMEDELAY": 1.6808061599731445,
+        "TISHAPE": 2.960186004638672
+      },
+      "runtime": {
+        "calib_sce_seconds": 33.17770280499826,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.4380443969857879
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.4857129752635956,
+        "kgecomp": 0.40409812331199646,
+        "kgep": 0.3740790784358978,
+        "log_rmse": 1.2204828262329102,
+        "metric_val": 0.40409812331199646,
+        "raw_rmse": 1.2204432487487793
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 16,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "AXV_BEXP": 1.8629368543624878,
+        "BASERTE": 379.2450866699219,
+        "FRACLOWZ": 0.25140777230262756,
+        "FRACTEN": 0.6349320411682129,
+        "FRCHZNE": 0.1168012022972107,
+        "LAPSE": -4.259408473968506,
+        "LOGLAMB": 6.105922222137451,
+        "MAXWATR_1": 455.86700439453125,
+        "MAXWATR_2": 3927.67919921875,
+        "MBASE": 1.6551178693771362,
+        "MFMAX": 2.1974663734436035,
+        "MFMIN": 2.9671828746795654,
+        "OPG": 2.019308567047119,
+        "PERCEXP": 1.0342644453048706,
+        "PERCRTE": 392.28253173828125,
+        "PXTEMP": 0.9506697654724121,
+        "QB_POWR": 2.8085408210754395,
+        "RFERR_MLT": 1.000625491142273,
+        "TIMEDELAY": 3.2568061351776123,
+        "TISHAPE": 3.5274648666381836
+      },
+      "runtime": {
+        "calib_sce_seconds": 41.4946238679986,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.464383644022746
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.7105593085289001,
+        "kgecomp": 0.5663684606552124,
+        "kgep": 0.6528921127319336,
+        "log_rmse": 1.069850206375122,
+        "metric_val": 0.5663684606552124,
+        "raw_rmse": 0.9743402004241943
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 18,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "AXV_BEXP": 0.22590884566307068,
+        "BASERTE": 650.6051635742188,
+        "FRACTEN": 0.9350177049636841,
+        "LAPSE": -4.134331703186035,
+        "LOGLAMB": 6.365315914154053,
+        "MAXWATR_1": 393.4986572265625,
+        "MAXWATR_2": 3427.41943359375,
+        "MBASE": 1.2726194858551025,
+        "MFMAX": 7.537614822387695,
+        "MFMIN": 2.0124876499176025,
+        "OPG": 2.4106101989746094,
+        "PERCEXP": 7.875637531280518,
+        "PERCRTE": 601.7249755859375,
+        "PXTEMP": 0.43805068731307983,
+        "QB_POWR": 1.386361002922058,
+        "RFERR_MLT": 1.0003209114074707,
+        "TIMEDELAY": 2.5642824172973633,
+        "TISHAPE": 3.7111566066741943
+      },
+      "runtime": {
+        "calib_sce_seconds": 25.76882544500404,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.43805323299602605
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.4811210036277771,
+        "kgecomp": 0.5218765735626221,
+        "kgep": 0.4240044057369232,
+        "log_rmse": 0.9516426920890808,
+        "metric_val": 0.5218765735626221,
+        "raw_rmse": 1.4844133853912354
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 20,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "AXV_BEXP": 0.18845891952514648,
+        "BASERTE": 671.302490234375,
+        "FRACTEN": 0.7134220600128174,
+        "LAPSE": -5.011388301849365,
+        "MAXWATR_1": 176.80279541015625,
+        "MAXWATR_2": 601.40283203125,
+        "MBASE": 0.47701308131217957,
+        "MFMAX": 5.287603378295898,
+        "MFMIN": 3.965815305709839,
+        "OPG": 1.100831151008606,
+        "PERCEXP": 4.051479339599609,
+        "PERCRTE": 455.7123107910156,
+        "PXTEMP": 2.5936431884765625,
+        "QB_POWR": 1.0310077667236328,
+        "RFERR_MLT": 1.0004048347473145,
+        "TIMEDELAY": 4.305881977081299
+      },
+      "runtime": {
+        "calib_sce_seconds": 35.3274572440132,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.46396399501827545
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.6397280693054199,
+        "kgecomp": 0.5600783824920654,
+        "kgep": 0.5488585829734802,
+        "log_rmse": 1.151824951171875,
+        "metric_val": 0.5600783824920654,
+        "raw_rmse": 1.0620214939117432
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 22,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "AXV_BEXP": 0.785873532295227,
+        "BASERTE": 753.6217041015625,
+        "FRACLOWZ": 0.09655051678419113,
+        "FRACTEN": 0.6922497749328613,
+        "FRCHZNE": 0.30654269456863403,
+        "LAPSE": -4.701653003692627,
+        "MAXWATR_1": 338.3776550292969,
+        "MAXWATR_2": 3025.9990234375,
+        "MBASE": 1.5024280548095703,
+        "MFMAX": 6.5964508056640625,
+        "MFMIN": 0.875377893447876,
+        "OPG": 1.4785596132278442,
+        "PERCEXP": 19.525476455688477,
+        "PERCRTE": 763.8445434570312,
+        "PXTEMP": 1.6752406358718872,
+        "QB_POWR": 4.979526519775391,
+        "RFERR_MLT": 1.0003811120986938,
+        "TIMEDELAY": 2.2888591289520264
+      },
+      "runtime": {
+        "calib_sce_seconds": 41.91387359297369,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.43110035799327306
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.6183258891105652,
+        "kgecomp": 0.5251519680023193,
+        "kgep": 0.6578589081764221,
+        "log_rmse": 1.0689001083374023,
+        "metric_val": 0.5251519680023193,
+        "raw_rmse": 1.0094990730285645
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 24,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "AXV_BEXP": 0.20755907893180847,
+        "BASERTE": 535.4653930664062,
+        "FRACTEN": 0.8393052816390991,
+        "LAPSE": -5.2659807205200195,
+        "MAXWATR_1": 357.1365661621094,
+        "MAXWATR_2": 4791.2724609375,
+        "MBASE": 0.39247339963912964,
+        "MFMAX": 6.199360370635986,
+        "MFMIN": 2.6383047103881836,
+        "OPG": 1.977510690689087,
+        "PERCEXP": 5.236170768737793,
+        "PERCRTE": 713.9923706054688,
+        "PXTEMP": 2.5854454040527344,
+        "QB_POWR": 3.3795318603515625,
+        "RFERR_MLT": 1.000067114830017,
+        "TIMEDELAY": 1.9928780794143677
+      },
+      "runtime": {
+        "calib_sce_seconds": 30.824952260998543,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.4269306669884827
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.5895950794219971,
+        "kgecomp": 0.5547410249710083,
+        "kgep": 0.4964412450790405,
+        "log_rmse": 1.0285013914108276,
+        "metric_val": 0.5547410249710083,
+        "raw_rmse": 1.1235287189483643
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 26,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "FPRIMQB": 0.23700706660747528,
+        "FRACTEN": 0.3226962983608246,
+        "LAPSE": -6.810967445373535,
+        "MAXWATR_1": 286.3167724609375,
+        "MAXWATR_2": 222.53929138183594,
+        "MBASE": 2.4532651901245117,
+        "MFMAX": 2.6503655910491943,
+        "MFMIN": 2.6103334426879883,
+        "OPG": 1.2161355018615723,
+        "PERCEXP": 19.148305892944336,
+        "PERCFRAC": 0.6232184171676636,
+        "PERCRTE": 144.68614196777344,
+        "PXTEMP": 1.865921974182129,
+        "QBRATE_2A": 0.07609358429908752,
+        "QBRATE_2B": 0.1886589080095291,
+        "RFERR_MLT": 1.000487208366394,
+        "SAREAMAX": 0.31291499733924866,
+        "TIMEDELAY": 1.8596216440200806
+      },
+      "runtime": {
+        "calib_sce_seconds": 49.71522877801908,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.4675120679894462
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.7142329812049866,
+        "kgecomp": 0.5880608558654785,
+        "kgep": 0.6686967611312866,
+        "log_rmse": 0.9288743138313293,
+        "metric_val": 0.5880608558654785,
+        "raw_rmse": 1.1540262699127197
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 30,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "FPRIMQB": 0.12372039258480072,
+        "FRACTEN": 0.687967836856842,
+        "LAPSE": -6.138347625732422,
+        "MAXWATR_1": 69.08875274658203,
+        "MAXWATR_2": 274.0389404296875,
+        "MBASE": 0.2871554493904114,
+        "MFMAX": 5.155035495758057,
+        "MFMIN": 0.4390064477920532,
+        "OPG": 0.7224228382110596,
+        "PERCEXP": 14.809345245361328,
+        "PERCFRAC": 0.48223188519477844,
+        "PERCRTE": 64.31411743164062,
+        "PXTEMP": 1.4060916900634766,
+        "QBRATE_2A": 0.030381858348846436,
+        "QBRATE_2B": 0.010566823184490204,
+        "RFERR_MLT": 1.0006412267684937,
+        "SAREAMAX": 0.015546947717666626,
+        "TIMEDELAY": 2.496330499649048
+      },
+      "runtime": {
+        "calib_sce_seconds": 38.57794010601356,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.4734487889800221
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.4937109649181366,
+        "kgecomp": 0.5879505276679993,
+        "kgep": 0.46389663219451904,
+        "log_rmse": 0.8506934642791748,
+        "metric_val": 0.5879505276679993,
+        "raw_rmse": 1.4289109706878662
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 32,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "FRACTEN": 0.6198945641517639,
+        "LAPSE": -4.154473781585693,
+        "MAXWATR_1": 225.9161834716797,
+        "MAXWATR_2": 3359.353515625,
+        "MBASE": 1.0254709720611572,
+        "MFMAX": 5.122983932495117,
+        "MFMIN": 0.5865278244018555,
+        "OPG": 1.5081487894058228,
+        "PERCEXP": 10.042997360229492,
+        "PERCRTE": 632.9833984375,
+        "PXTEMP": 2.7742273807525635,
+        "QB_PRMS": 0.17818662524223328,
+        "RFERR_MLT": 1.000409483909607,
+        "SAREAMAX": 0.061052799224853516,
+        "TIMEDELAY": 2.1684300899505615
+      },
+      "runtime": {
+        "calib_sce_seconds": 39.83663501200499,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.5580055130121764
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.6176409721374512,
+        "kgecomp": 0.5859975218772888,
+        "kgep": 0.5598879456520081,
+        "log_rmse": 0.9703390598297119,
+        "metric_val": 0.5859975218772888,
+        "raw_rmse": 1.2315729856491089
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 34,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "FRACLOWZ": 0.4096418023109436,
+        "FRACTEN": 0.28429484367370605,
+        "FRCHZNE": 0.2963506281375885,
+        "LAPSE": -4.4352803230285645,
+        "MAXWATR_1": 234.6540069580078,
+        "MAXWATR_2": 3348.60400390625,
+        "MBASE": 1.406887173652649,
+        "MFMAX": 7.442600727081299,
+        "MFMIN": 2.7625410556793213,
+        "OPG": 1.4364371299743652,
+        "PERCEXP": 12.575654983520508,
+        "PERCRTE": 793.9662475585938,
+        "PXTEMP": 0.48167741298675537,
+        "QB_PRMS": 0.1363338977098465,
+        "RFERR_MLT": 1.0009799003601074,
+        "SAREAMAX": 0.23074249923229218,
+        "TIMEDELAY": 0.9314464926719666
+      },
+      "runtime": {
+        "calib_sce_seconds": 51.63309064498753,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.5124067470023874
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.6831873059272766,
+        "kgecomp": 0.5305837392807007,
+        "kgep": 0.7211290597915649,
+        "log_rmse": 1.12062668800354,
+        "metric_val": 0.5305837392807007,
+        "raw_rmse": 1.2692700624465942
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 36,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "FRACTEN": 0.9396340250968933,
+        "LAPSE": -4.537214756011963,
+        "MAXWATR_1": 250.02894592285156,
+        "MAXWATR_2": 2747.2041015625,
+        "MBASE": 1.3518903255462646,
+        "MFMAX": 6.3640313148498535,
+        "MFMIN": 2.9564709663391113,
+        "OPG": 0.592657744884491,
+        "PERCEXP": 3.9238011837005615,
+        "PERCRTE": 550.8382568359375,
+        "PXTEMP": 1.060302495956421,
+        "QB_PRMS": 0.0016231946647167206,
+        "RFERR_MLT": 1.0009520053863525,
+        "SAREAMAX": 0.18864884972572327,
+        "TIMEDELAY": 1.2591521739959717
+      },
+      "runtime": {
+        "calib_sce_seconds": 23.612851587007754,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.4025437420059461
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.5898511409759521,
+        "kgecomp": 0.47291165590286255,
+        "kgep": 0.506878137588501,
+        "log_rmse": 1.231208086013794,
+        "metric_val": 0.47291165590286255,
+        "raw_rmse": 1.135722279548645
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 38,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "BASERTE": 294.631591796875,
+        "FRACTEN": 0.8782521486282349,
+        "LAPSE": -4.680326461791992,
+        "LOGLAMB": 5.695354461669922,
+        "MAXWATR_1": 380.8304748535156,
+        "MAXWATR_2": 4495.18603515625,
+        "MBASE": 0.6653363704681396,
+        "MFMAX": 2.8528666496276855,
+        "MFMIN": 1.2668616771697998,
+        "OPG": 2.3661856651306152,
+        "PERCEXP": 4.985505104064941,
+        "PERCRTE": 17.445344924926758,
+        "PXTEMP": 0.22678232192993164,
+        "QB_POWR": 2.4412128925323486,
+        "RFERR_MLT": 1.0007978677749634,
+        "SAREAMAX": 0.42567378282546997,
+        "TIMEDELAY": 2.3998501300811768,
+        "TISHAPE": 2.745225667953491
+      },
+      "runtime": {
+        "calib_sce_seconds": 34.49562921898905,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.41901985500589944
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.48056745529174805,
+        "kgecomp": 0.45894020795822144,
+        "kgep": 0.3961503505706787,
+        "log_rmse": 1.1559548377990723,
+        "metric_val": 0.45894020795822144,
+        "raw_rmse": 1.3687540292739868
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 40,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "BASERTE": 639.01708984375,
+        "FRACLOWZ": 0.48605450987815857,
+        "FRACTEN": 0.6870404481887817,
+        "FRCHZNE": 0.2820471227169037,
+        "LAPSE": -4.012820720672607,
+        "LOGLAMB": 6.344618797302246,
+        "MAXWATR_1": 164.07875061035156,
+        "MAXWATR_2": 2951.416259765625,
+        "MBASE": 2.7409191131591797,
+        "MFMAX": 3.8448007106781006,
+        "MFMIN": 5.907730579376221,
+        "OPG": 0.6141980290412903,
+        "PERCEXP": 3.616952896118164,
+        "PERCRTE": 919.2971801757812,
+        "PXTEMP": 4.832561016082764,
+        "QB_POWR": 1.7550528049468994,
+        "RFERR_MLT": 1.0002120733261108,
+        "SAREAMAX": 0.6809723377227783,
+        "TIMEDELAY": 3.302863359451294,
+        "TISHAPE": 3.4975457191467285
+      },
+      "runtime": {
+        "calib_sce_seconds": 43.62251011902117,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.4232626160082873
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.5917130708694458,
+        "kgecomp": 0.46814483404159546,
+        "kgep": 0.5196914672851562,
+        "log_rmse": 1.295502781867981,
+        "metric_val": 0.46814483404159546,
+        "raw_rmse": 1.2505615949630737
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 42,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "BASERTE": 315.05657958984375,
+        "FRACTEN": 0.3146415948867798,
+        "LAPSE": -6.282092094421387,
+        "LOGLAMB": 6.1309661865234375,
+        "MAXWATR_1": 403.90374755859375,
+        "MAXWATR_2": 3848.474853515625,
+        "MBASE": 1.2156083583831787,
+        "MFMAX": 3.2415311336517334,
+        "MFMIN": 4.283699035644531,
+        "OPG": 1.918691635131836,
+        "PERCEXP": 4.413036823272705,
+        "PERCRTE": 259.8385009765625,
+        "PXTEMP": 3.086277723312378,
+        "QB_POWR": 1.1373387575149536,
+        "RFERR_MLT": 1.0005455017089844,
+        "SAREAMAX": 0.4030548334121704,
+        "TIMEDELAY": 1.9216077327728271,
+        "TISHAPE": 3.7060396671295166
+      },
+      "runtime": {
+        "calib_sce_seconds": 24.847373822005466,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.40693041498889215
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.625565767288208,
+        "kgecomp": 0.4656674563884735,
+        "kgep": 0.5774620175361633,
+        "log_rmse": 1.1746281385421753,
+        "metric_val": 0.4656674563884735,
+        "raw_rmse": 1.2174514532089233
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 44,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "BASERTE": 553.2708740234375,
+        "FRACTEN": 0.6647078990936279,
+        "LAPSE": -5.416990280151367,
+        "MAXWATR_1": 205.06222534179688,
+        "MAXWATR_2": 2704.009033203125,
+        "MBASE": 1.4560928344726562,
+        "MFMAX": 3.0759410858154297,
+        "MFMIN": 3.088758945465088,
+        "OPG": 0.5235182642936707,
+        "PERCEXP": 15.72169017791748,
+        "PERCRTE": 998.1807250976562,
+        "PXTEMP": -0.14216971397399902,
+        "QB_POWR": 3.715865135192871,
+        "RFERR_MLT": 1.0008864402770996,
+        "SAREAMAX": 0.34526699781417847,
+        "TIMEDELAY": 1.4317255020141602
+      },
+      "runtime": {
+        "calib_sce_seconds": 36.117761011992116,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.4192167569999583
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.6594997048377991,
+        "kgecomp": 0.5568400025367737,
+        "kgep": 0.594230055809021,
+        "log_rmse": 1.1553857326507568,
+        "metric_val": 0.5568400025367737,
+        "raw_rmse": 1.1433823108673096
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 46,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "BASERTE": 474.9176025390625,
+        "FRACLOWZ": 0.6443846225738525,
+        "FRACTEN": 0.6039280295372009,
+        "FRCHZNE": 0.3500291407108307,
+        "LAPSE": -4.742186546325684,
+        "MAXWATR_1": 425.1504821777344,
+        "MAXWATR_2": 2858.384033203125,
+        "MBASE": 0.08804392069578171,
+        "MFMAX": 2.562211036682129,
+        "MFMIN": 2.9285287857055664,
+        "OPG": 2.257795572280884,
+        "PERCEXP": 1.3439480066299438,
+        "PERCRTE": 864.5026245117188,
+        "PXTEMP": 4.800840377807617,
+        "QB_POWR": 4.405023574829102,
+        "RFERR_MLT": 1.0006213188171387,
+        "SAREAMAX": 0.6499218940734863,
+        "TIMEDELAY": 1.947905421257019
+      },
+      "runtime": {
+        "calib_sce_seconds": 41.79709285797435,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.4155514199810568
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.6873946189880371,
+        "kgecomp": 0.516485869884491,
+        "kgep": 0.6248319149017334,
+        "log_rmse": 1.0567152500152588,
+        "metric_val": 0.516485869884491,
+        "raw_rmse": 1.1586129665374756
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 48,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "BASERTE": 882.5736694335938,
+        "FRACTEN": 0.8749210834503174,
+        "LAPSE": -6.697579860687256,
+        "MAXWATR_1": 209.014892578125,
+        "MAXWATR_2": 4880.84521484375,
+        "MBASE": 2.5732743740081787,
+        "MFMAX": 5.830697536468506,
+        "MFMIN": 0.7791575193405151,
+        "OPG": 0.6759802103042603,
+        "PERCEXP": 14.259194374084473,
+        "PERCRTE": 607.0689086914062,
+        "PXTEMP": 1.065316081047058,
+        "QB_POWR": 2.8102774620056152,
+        "RFERR_MLT": 1.0006084442138672,
+        "SAREAMAX": 0.03489542007446289,
+        "TIMEDELAY": 2.8479766845703125
+      },
+      "runtime": {
+        "calib_sce_seconds": 28.07014281101874,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.41387564901378937
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.6807365417480469,
+        "kgecomp": 0.5451892614364624,
+        "kgep": 0.6685678958892822,
+        "log_rmse": 0.9674113988876343,
+        "metric_val": 0.5451892614364624,
+        "raw_rmse": 1.2940860986709595
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 50,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "FPRIMQB": 0.33162957429885864,
+        "FRACTEN": 0.12466399371623993,
+        "LAPSE": -4.6959686279296875,
+        "LOGLAMB": 8.242023468017578,
+        "MAXWATR_1": 316.7076416015625,
+        "MAXWATR_2": 4664.724609375,
+        "MBASE": 0.5482978224754333,
+        "MFMAX": 2.0560083389282227,
+        "MFMIN": 3.1122419834136963,
+        "OPG": 1.7446155548095703,
+        "PERCEXP": 7.027352809906006,
+        "PERCFRAC": 0.2409559190273285,
+        "PERCRTE": 1.2429800033569336,
+        "PXTEMP": -0.28492647409439087,
+        "QBRATE_2A": 0.15732134878635406,
+        "QBRATE_2B": 0.08229643851518631,
+        "QB_POWR": 6.2635345458984375,
+        "RFERR_MLT": 1.0005016326904297,
+        "TIMEDELAY": 3.2456672191619873,
+        "TISHAPE": 3.5077788829803467
+      },
+      "runtime": {
+        "calib_sce_seconds": 92.36571981999441,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.7236179590108804
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.3567560315132141,
+        "kgecomp": 0.33073747158050537,
+        "kgep": 0.4350990653038025,
+        "log_rmse": 0.9936078190803528,
+        "metric_val": 0.33073747158050537,
+        "raw_rmse": 1.2658475637435913
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 54,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "FPRIMQB": 0.5402961373329163,
+        "FRACTEN": 0.5047179460525513,
+        "LAPSE": -4.111320972442627,
+        "LOGLAMB": 7.976759910583496,
+        "MAXWATR_1": 28.316986083984375,
+        "MAXWATR_2": 1668.2989501953125,
+        "MBASE": 0.7583025097846985,
+        "MFMAX": 2.6023287773132324,
+        "MFMIN": 3.4863266944885254,
+        "OPG": 0.826398491859436,
+        "PERCEXP": 15.04882526397705,
+        "PERCFRAC": 0.5844932794570923,
+        "PERCRTE": 913.449462890625,
+        "PXTEMP": -0.36035680770874023,
+        "QBRATE_2A": 0.047164127230644226,
+        "QBRATE_2B": 0.2148752063512802,
+        "QB_POWR": 7.3958330154418945,
+        "RFERR_MLT": 1.0006438493728638,
+        "TIMEDELAY": 0.9910621047019958,
+        "TISHAPE": 3.027515411376953
+      },
+      "runtime": {
+        "calib_sce_seconds": 66.8891797719989,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.6869405949837528
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.5616317987442017,
+        "kgecomp": 0.5308130979537964,
+        "kgep": 0.5282398462295532,
+        "log_rmse": 1.0163403749465942,
+        "metric_val": 0.5308130979537964,
+        "raw_rmse": 1.3683667182922363
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 56,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "FRACTEN": 0.5158437490463257,
+        "LAPSE": -5.594323635101318,
+        "LOGLAMB": 5.983339309692383,
+        "MAXWATR_1": 217.0916748046875,
+        "MAXWATR_2": 2190.33154296875,
+        "MBASE": 0.7673430442810059,
+        "MFMAX": 5.089102268218994,
+        "MFMIN": 2.9782209396362305,
+        "OPG": 1.259888768196106,
+        "PERCEXP": 10.585147857666016,
+        "PERCRTE": 615.4913330078125,
+        "PXTEMP": 0.9235579967498779,
+        "QB_POWR": 6.483926773071289,
+        "QB_PRMS": 0.1955229938030243,
+        "RFERR_MLT": 1.0002281665802002,
+        "TIMEDELAY": 0.6848514080047607,
+        "TISHAPE": 3.1721725463867188
+      },
+      "runtime": {
+        "calib_sce_seconds": 66.62656720299856,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.5982928719895426
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.4602992534637451,
+        "kgecomp": 0.5048295855522156,
+        "kgep": 0.47215571999549866,
+        "log_rmse": 0.9946842193603516,
+        "metric_val": 0.5048295855522156,
+        "raw_rmse": 1.4384217262268066
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 58,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "FRACLOWZ": 0.5380090475082397,
+        "FRACTEN": 0.27985069155693054,
+        "FRCHZNE": 0.4021136164665222,
+        "LAPSE": -4.450529098510742,
+        "LOGLAMB": 7.904028415679932,
+        "MAXWATR_1": 267.7590026855469,
+        "MAXWATR_2": 4327.73193359375,
+        "MBASE": 1.1054754257202148,
+        "MFMAX": 4.303454399108887,
+        "MFMIN": 0.42170512676239014,
+        "OPG": 0.7072175741195679,
+        "PERCEXP": 17.384126663208008,
+        "PERCRTE": 992.8172607421875,
+        "PXTEMP": 2.559950828552246,
+        "QB_POWR": 8.551323890686035,
+        "QB_PRMS": 0.15609191358089447,
+        "RFERR_MLT": 1.0000349283218384,
+        "TIMEDELAY": 0.8606442213058472,
+        "TISHAPE": 3.714350461959839
+      },
+      "runtime": {
+        "calib_sce_seconds": 80.2855727589922,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.577085311000701
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.7594312429428101,
+        "kgecomp": 0.5630828738212585,
+        "kgep": 0.7512741684913635,
+        "log_rmse": 0.7877382040023804,
+        "metric_val": 0.5630828738212585,
+        "raw_rmse": 1.0067791938781738
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 60,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "FRACTEN": 0.7419163584709167,
+        "LAPSE": -5.634889602661133,
+        "LOGLAMB": 8.969676971435547,
+        "MAXWATR_1": 78.58877563476562,
+        "MAXWATR_2": 3448.3232421875,
+        "MBASE": 1.362066626548767,
+        "MFMAX": 7.933289051055908,
+        "MFMIN": 1.504722237586975,
+        "OPG": 1.4155596494674683,
+        "PERCEXP": 17.262903213500977,
+        "PERCRTE": 537.2341918945312,
+        "PXTEMP": 0.877697229385376,
+        "QB_POWR": 5.600242614746094,
+        "QB_PRMS": 0.017822718247771263,
+        "RFERR_MLT": 1.0008552074432373,
+        "TIMEDELAY": 2.100989580154419,
+        "TISHAPE": 3.949963331222534
+      },
+      "runtime": {
+        "calib_sce_seconds": 40.99504915002035,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.5120979550119955
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.4541662037372589,
+        "kgecomp": 0.3079302906990051,
+        "kgep": 0.45369067788124084,
+        "log_rmse": 1.3515089750289917,
+        "metric_val": 0.3079302906990051,
+        "raw_rmse": 1.3034168481826782
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 62,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "BASERTE": 582.4833984375,
+        "FRACTEN": 0.8742160797119141,
+        "LAPSE": -5.782404899597168,
+        "LOGLAMB": 7.390674591064453,
+        "MAXWATR_1": 219.8815155029297,
+        "MAXWATR_2": 1067.3245849609375,
+        "MBASE": 2.1833362579345703,
+        "MFMAX": 4.389737129211426,
+        "MFMIN": 4.951926231384277,
+        "OPG": 1.489568829536438,
+        "PERCEXP": 6.507594585418701,
+        "PERCRTE": 612.7579345703125,
+        "PXTEMP": 0.7636418342590332,
+        "QB_POWR": 2.282843589782715,
+        "RFERR_MLT": 1.000116229057312,
+        "TIMEDELAY": 2.2591357231140137,
+        "TISHAPE": 3.8921661376953125
+      },
+      "runtime": {
+        "calib_sce_seconds": 70.90645201600273,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.7174946380255278
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.4423937201499939,
+        "kgecomp": 0.29368579387664795,
+        "kgep": 0.41101551055908203,
+        "log_rmse": 1.350163221359253,
+        "metric_val": 0.29368579387664795,
+        "raw_rmse": 1.3563332557678223
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 64,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "BASERTE": 660.1652221679688,
+        "FRACLOWZ": 0.8209997415542603,
+        "FRACTEN": 0.8091553449630737,
+        "FRCHZNE": 0.08681139349937439,
+        "LAPSE": -5.623434066772461,
+        "LOGLAMB": 6.012298583984375,
+        "MAXWATR_1": 319.1221008300781,
+        "MAXWATR_2": 564.443359375,
+        "MBASE": 0.32470595836639404,
+        "MFMAX": 7.025321006774902,
+        "MFMIN": 3.4133074283599854,
+        "OPG": 0.44692397117614746,
+        "PERCEXP": 6.490533828735352,
+        "PERCRTE": 667.479736328125,
+        "PXTEMP": 0.30765020847320557,
+        "QB_POWR": 7.739058971405029,
+        "RFERR_MLT": 1.0000606775283813,
+        "TIMEDELAY": 2.330479145050049,
+        "TISHAPE": 4.59456729888916
+      },
+      "runtime": {
+        "calib_sce_seconds": 67.19181467502494,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.4739760039956309
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.6013023257255554,
+        "kgecomp": 0.47287076711654663,
+        "kgep": 0.5582146048545837,
+        "log_rmse": 1.0778361558914185,
+        "metric_val": 0.47287076711654663,
+        "raw_rmse": 1.3859572410583496
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 66,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "BASERTE": 816.9488525390625,
+        "FRACTEN": 0.9072657227516174,
+        "LAPSE": -4.1821513175964355,
+        "LOGLAMB": 5.273573875427246,
+        "MAXWATR_1": 319.81005859375,
+        "MAXWATR_2": 3491.744140625,
+        "MBASE": 1.2136647701263428,
+        "MFMAX": 4.055508613586426,
+        "MFMIN": 1.903931975364685,
+        "OPG": 2.1986727714538574,
+        "PERCEXP": 15.078434944152832,
+        "PERCRTE": 301.1026916503906,
+        "PXTEMP": 4.0696001052856445,
+        "QB_POWR": 1.493255615234375,
+        "RFERR_MLT": 1.0006855726242065,
+        "TIMEDELAY": 3.0394623279571533,
+        "TISHAPE": 2.7691922187805176
+      },
+      "runtime": {
+        "calib_sce_seconds": 37.22386878202087,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.4240646940015722
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.5902265906333923,
+        "kgecomp": 0.5376803874969482,
+        "kgep": 0.529208242893219,
+        "log_rmse": 0.9950586557388306,
+        "metric_val": 0.5376803874969482,
+        "raw_rmse": 1.2861130237579346
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 68,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "BASERTE": 865.0955810546875,
+        "FRACTEN": 0.6461771726608276,
+        "LAPSE": -5.265916347503662,
+        "LOGLAMB": 9.520575523376465,
+        "MAXWATR_1": 130.49571228027344,
+        "MAXWATR_2": 4065.731201171875,
+        "MBASE": 2.6247127056121826,
+        "MFMAX": 6.844738483428955,
+        "MFMIN": 2.436408758163452,
+        "OPG": 0.2853148281574249,
+        "PERCEXP": 7.589765548706055,
+        "PERCRTE": 10.600037574768066,
+        "PXTEMP": 1.2360434532165527,
+        "QB_POWR": 1.2141094207763672,
+        "RFERR_MLT": 1.000955581665039,
+        "TIMEDELAY": 2.81538987159729,
+        "TISHAPE": 2.8714516162872314
+      },
+      "runtime": {
+        "calib_sce_seconds": 60.343850889999885,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.5281397479993757
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.6466934084892273,
+        "kgecomp": 0.5763688087463379,
+        "kgep": 0.6511529684066772,
+        "log_rmse": 0.9605609178543091,
+        "metric_val": 0.5763688087463379,
+        "raw_rmse": 1.3047795295715332
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 70,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "BASERTE": 469.63726806640625,
+        "FRACLOWZ": 0.17959339916706085,
+        "FRACTEN": 0.7691324949264526,
+        "FRCHZNE": 0.5564382672309875,
+        "LAPSE": -6.198348045349121,
+        "LOGLAMB": 5.199789524078369,
+        "MAXWATR_1": 100.95670318603516,
+        "MAXWATR_2": 180.96780395507812,
+        "MBASE": 2.0575101375579834,
+        "MFMAX": 7.345432281494141,
+        "MFMIN": 5.161484241485596,
+        "OPG": 0.6298445463180542,
+        "PERCEXP": 3.1680636405944824,
+        "PERCRTE": 878.3321533203125,
+        "PXTEMP": 4.180157661437988,
+        "QB_POWR": 3.8076744079589844,
+        "RFERR_MLT": 1.0004899501800537,
+        "TIMEDELAY": 0.2097184658050537,
+        "TISHAPE": 3.71942400932312
+      },
+      "runtime": {
+        "calib_sce_seconds": 80.67277206399012,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.5577748510113452
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.6793214082717896,
+        "kgecomp": 0.5126792788505554,
+        "kgep": 0.5894359946250916,
+        "log_rmse": 0.9934876561164856,
+        "metric_val": 0.5126792788505554,
+        "raw_rmse": 1.2018932104110718
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 72,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "BASERTE": 660.11376953125,
+        "FRACTEN": 0.410427451133728,
+        "LAPSE": -4.785382270812988,
+        "LOGLAMB": 7.928350925445557,
+        "MAXWATR_1": 87.726806640625,
+        "MAXWATR_2": 2526.73779296875,
+        "MBASE": 2.9423611164093018,
+        "MFMAX": 3.838411331176758,
+        "MFMIN": 4.49193000793457,
+        "OPG": 2.0017411708831787,
+        "PERCEXP": 8.034356117248535,
+        "PERCRTE": 3.2370405197143555,
+        "PXTEMP": 2.0365636348724365,
+        "QB_POWR": 1.8907277584075928,
+        "RFERR_MLT": 1.000605821609497,
+        "TIMEDELAY": 2.5611958503723145,
+        "TISHAPE": 4.568033218383789
+      },
+      "runtime": {
+        "calib_sce_seconds": 45.3290932670061,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.4410097680229228
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.5789222717285156,
+        "kgecomp": 0.5438756942749023,
+        "kgep": 0.5326367020606995,
+        "log_rmse": 1.1495323181152344,
+        "metric_val": 0.5438756942749023,
+        "raw_rmse": 1.2564526796340942
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 78,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "AXV_BEXP": 2.780629873275757,
+        "FPRIMQB": 0.27521392703056335,
+        "FRACTEN": 0.10925459861755371,
+        "LAPSE": -5.7606706619262695,
+        "MAXWATR_1": 236.12954711914062,
+        "MAXWATR_2": 2425.719970703125,
+        "MBASE": 0.8804416656494141,
+        "MFMAX": 4.224985599517822,
+        "MFMIN": 1.0334821939468384,
+        "OPG": 0.02348075434565544,
+        "PERCEXP": 2.1616411209106445,
+        "PERCFRAC": 0.09339027106761932,
+        "PERCRTE": 162.469970703125,
+        "PXTEMP": -0.054440319538116455,
+        "QBRATE_2A": 0.04249807819724083,
+        "QBRATE_2B": 0.12381166964769363,
+        "RFERR_MLT": 1.0007987022399902,
+        "TIMEDELAY": 2.9544167518615723
+      },
+      "runtime": {
+        "calib_sce_seconds": 40.56518234300893,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.43944589199963957
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.4917851984500885,
+        "kgecomp": 0.4813872277736664,
+        "kgep": 0.4184551239013672,
+        "log_rmse": 0.9305251836776733,
+        "metric_val": 0.4813872277736664,
+        "raw_rmse": 1.224647045135498
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 84,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "AXV_BEXP": 0.9155184626579285,
+        "FRACTEN": 0.22531968355178833,
+        "LAPSE": -4.0845136642456055,
+        "MAXWATR_1": 449.2654724121094,
+        "MAXWATR_2": 3545.695068359375,
+        "MBASE": 0.1720373034477234,
+        "MFMAX": 4.297333240509033,
+        "MFMIN": 5.388208866119385,
+        "OPG": 1.0889558792114258,
+        "PERCEXP": 4.019650459289551,
+        "PERCRTE": 221.06112670898438,
+        "PXTEMP": 4.5980143547058105,
+        "QB_PRMS": 0.2432369738817215,
+        "RFERR_MLT": 1.0008059740066528,
+        "TIMEDELAY": 3.050250291824341
+      },
+      "runtime": {
+        "calib_sce_seconds": 29.177305673016235,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.40646060701692477
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.748734712600708,
+        "kgecomp": 0.5945935845375061,
+        "kgep": 0.7076014876365662,
+        "log_rmse": 1.095902681350708,
+        "metric_val": 0.5945935845375061,
+        "raw_rmse": 0.993026852607727
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 90,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "AXV_BEXP": 2.4411070346832275,
+        "BASERTE": 420.0138244628906,
+        "FRACTEN": 0.06581370532512665,
+        "LAPSE": -6.103885173797607,
+        "LOGLAMB": 6.212440013885498,
+        "MAXWATR_1": 456.79168701171875,
+        "MAXWATR_2": 2769.1513671875,
+        "MBASE": 1.7053214311599731,
+        "MFMAX": 3.1093785762786865,
+        "MFMIN": 1.9728755950927734,
+        "OPG": 2.208451509475708,
+        "PERCEXP": 16.556320190429688,
+        "PERCRTE": 352.29754638671875,
+        "PXTEMP": 0.9247466325759888,
+        "QB_POWR": 1.4360718727111816,
+        "RFERR_MLT": 1.000829815864563,
+        "TIMEDELAY": 2.3316612243652344,
+        "TISHAPE": 3.7762231826782227
+      },
+      "runtime": {
+        "calib_sce_seconds": 29.13490784697933,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.40409227600321174
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.5597672462463379,
+        "kgecomp": 0.5445218086242676,
+        "kgep": 0.5128538608551025,
+        "log_rmse": 0.8477647304534912,
+        "metric_val": 0.5445218086242676,
+        "raw_rmse": 1.0645140409469604
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 96,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "AXV_BEXP": 0.26503172516822815,
+        "BASERTE": 443.7207336425781,
+        "FRACTEN": 0.616910457611084,
+        "LAPSE": -5.095463275909424,
+        "MAXWATR_1": 370.08001708984375,
+        "MAXWATR_2": 837.1573486328125,
+        "MBASE": 2.4217023849487305,
+        "MFMAX": 4.381105899810791,
+        "MFMIN": 2.076508045196533,
+        "OPG": 0.20679906010627747,
+        "PERCEXP": 9.12482738494873,
+        "PERCRTE": 290.96636962890625,
+        "PXTEMP": -0.23696286976337433,
+        "QB_POWR": 2.5602028369903564,
+        "RFERR_MLT": 1.000873327255249,
+        "TIMEDELAY": 1.534651517868042
+      },
+      "runtime": {
+        "calib_sce_seconds": 31.704359185998328,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.41870000402559526
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.5415872931480408,
+        "kgecomp": 0.5103146433830261,
+        "kgep": 0.43905869126319885,
+        "log_rmse": 1.0535598993301392,
+        "metric_val": 0.5103146433830261,
+        "raw_rmse": 1.1842718124389648
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 102,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "FPRIMQB": 0.7473568916320801,
+        "FRACTEN": 0.4168035387992859,
+        "LAPSE": -5.220771789550781,
+        "MAXWATR_1": 118.79499053955078,
+        "MAXWATR_2": 2381.4501953125,
+        "MBASE": 2.2411208152770996,
+        "MFMAX": 6.916578769683838,
+        "MFMIN": 4.286822319030762,
+        "OPG": 0.9916226863861084,
+        "PERCEXP": 5.682980537414551,
+        "PERCFRAC": 0.5671225190162659,
+        "PERCRTE": 568.8223876953125,
+        "PXTEMP": 1.4450697898864746,
+        "QBRATE_2A": 0.1474113017320633,
+        "QBRATE_2B": 0.093102365732193,
+        "RFERR_MLT": 1.000558614730835,
+        "SAREAMAX": 0.25537562370300293,
+        "TIMEDELAY": 1.5441240072250366
+      },
+      "runtime": {
+        "calib_sce_seconds": 40.68708675800008,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.4421409519854933
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.46315768361091614,
+        "kgecomp": 0.5068870782852173,
+        "kgep": 0.40349331498146057,
+        "log_rmse": 0.9496224522590637,
+        "metric_val": 0.5068870782852173,
+        "raw_rmse": 1.2038609981536865
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 108,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "FRACTEN": 0.22334232926368713,
+        "LAPSE": -5.584560394287109,
+        "MAXWATR_1": 424.02459716796875,
+        "MAXWATR_2": 1536.73193359375,
+        "MBASE": 0.7852767705917358,
+        "MFMAX": 6.417172431945801,
+        "MFMIN": 4.371224880218506,
+        "OPG": 0.8678956627845764,
+        "PERCEXP": 4.252241134643555,
+        "PERCRTE": 109.08999633789062,
+        "PXTEMP": 1.3702561855316162,
+        "QB_PRMS": 0.05505560338497162,
+        "RFERR_MLT": 1.000312328338623,
+        "SAREAMAX": 0.26705533266067505,
+        "TIMEDELAY": 3.2568790912628174
+      },
+      "runtime": {
+        "calib_sce_seconds": 29.256604847003473,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.4362013060017489
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.40572389960289,
+        "kgecomp": 0.3955215811729431,
+        "kgep": 0.2973283529281616,
+        "log_rmse": 1.2546920776367188,
+        "metric_val": 0.3955215811729431,
+        "raw_rmse": 1.384791612625122
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 114,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "BASERTE": 171.23834228515625,
+        "FRACTEN": 0.2520673871040344,
+        "LAPSE": -4.744934558868408,
+        "LOGLAMB": 5.045016288757324,
+        "MAXWATR_1": 287.5362548828125,
+        "MAXWATR_2": 642.4251708984375,
+        "MBASE": 2.1370604038238525,
+        "MFMAX": 5.791011810302734,
+        "MFMIN": 5.141741752624512,
+        "OPG": 0.7369834780693054,
+        "PERCEXP": 11.660482406616211,
+        "PERCRTE": 833.638671875,
+        "PXTEMP": 2.8810524940490723,
+        "QB_POWR": 1.8664630651474,
+        "RFERR_MLT": 1.0009558200836182,
+        "SAREAMAX": 0.4592903256416321,
+        "TIMEDELAY": 3.600504159927368,
+        "TISHAPE": 4.900152683258057
+      },
+      "runtime": {
+        "calib_sce_seconds": 28.309170138003537,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.39837564100162126
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.5043582916259766,
+        "kgecomp": 0.49381670355796814,
+        "kgep": 0.4646683633327484,
+        "log_rmse": 1.0394892692565918,
+        "metric_val": 0.49381670355796814,
+        "raw_rmse": 1.2353711128234863
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 120,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "BASERTE": 931.7548828125,
+        "FRACTEN": 0.81227046251297,
+        "LAPSE": -5.314944267272949,
+        "MAXWATR_1": 60.80129623413086,
+        "MAXWATR_2": 1430.77978515625,
+        "MBASE": 0.14863614737987518,
+        "MFMAX": 5.8226423263549805,
+        "MFMIN": 4.423886775970459,
+        "OPG": 1.4914464950561523,
+        "PERCEXP": 15.882242202758789,
+        "PERCRTE": 818.589599609375,
+        "PXTEMP": 4.360772132873535,
+        "QB_POWR": 7.048134803771973,
+        "RFERR_MLT": 1.000671148300171,
+        "SAREAMAX": 0.3126239776611328,
+        "TIMEDELAY": 2.4754831790924072
+      },
+      "runtime": {
+        "calib_sce_seconds": 29.86535994001315,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.41435237901168875
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.5230472087860107,
+        "kgecomp": 0.4908032715320587,
+        "kgep": 0.5132630467414856,
+        "log_rmse": 1.043967843055725,
+        "metric_val": 0.4908032715320587,
+        "raw_rmse": 1.45978581905365
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 126,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "FPRIMQB": 0.5452128648757935,
+        "FRACTEN": 0.37770286202430725,
+        "LAPSE": -6.168245315551758,
+        "LOGLAMB": 7.3463616371154785,
+        "MAXWATR_1": 25.223770141601562,
+        "MAXWATR_2": 113.8766098022461,
+        "MBASE": 1.2198954820632935,
+        "MFMAX": 6.7307024002075195,
+        "MFMIN": 0.5583083033561707,
+        "OPG": 1.0864206552505493,
+        "PERCEXP": 14.945094108581543,
+        "PERCFRAC": 0.8922019600868225,
+        "PERCRTE": 22.72618865966797,
+        "PXTEMP": 3.385521650314331,
+        "QBRATE_2A": 0.04129324108362198,
+        "QBRATE_2B": 0.23801268637180328,
+        "QB_POWR": 9.096282005310059,
+        "RFERR_MLT": 1.0006370544433594,
+        "TIMEDELAY": 2.3647148609161377,
+        "TISHAPE": 2.9402921199798584
+      },
+      "runtime": {
+        "calib_sce_seconds": 59.32998709398089,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.46968510799342766
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    },
+    {
+      "basin_id": "USA_02082950",
+      "config": {
+        "initial_fraction": 0.25,
+        "kstop": 3,
+        "maxn": 500,
+        "metric": "KGECOMP",
+        "pcento": 0.001,
+        "seed": null,
+        "seed_note": "pinned driver does not expose an external seed argument",
+        "transform": 1.0
+      },
+      "diagnostics": {
+        "kge": 0.7542691230773926,
+        "kgecomp": 0.5626432299613953,
+        "kgep": 0.7689995765686035,
+        "log_rmse": 0.7319189310073853,
+        "metric_val": 0.5626432299613953,
+        "raw_rmse": 1.137930154800415
+      },
+      "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+      "forcing_protocol": {
+        "calibration_end": "1998-12-31",
+        "calibration_start": "1989-01-01",
+        "elevation_band_count": 2,
+        "forcing_kind": "CAMELS bundle with basin-mean Daymet-equivalent P/Tmean/Oudin-PET",
+        "forcing_start": "1987-01-01",
+        "simulation_end": "2009-12-31"
+      },
+      "hru_id": 2082950,
+      "model_id": 132,
+      "parameter_output_format": "Fortran *_para_best.nc; active structure parameter_names extracted by model ID",
+      "parameter_vector": {
+        "FRACTEN": 0.6808444857597351,
+        "LAPSE": -5.521790504455566,
+        "LOGLAMB": 5.005278587341309,
+        "MAXWATR_1": 73.2337875366211,
+        "MAXWATR_2": 132.14404296875,
+        "MBASE": 2.698085308074951,
+        "MFMAX": 2.0517754554748535,
+        "MFMIN": 2.831146717071533,
+        "OPG": 2.217336416244507,
+        "PERCEXP": 17.12113380432129,
+        "PERCRTE": 11.293094635009766,
+        "PXTEMP": 0.014438092708587646,
+        "QB_POWR": 3.7562179565429688,
+        "QB_PRMS": 0.018323061987757683,
+        "RFERR_MLT": 1.0007364749908447,
+        "TIMEDELAY": 1.8553156852722168,
+        "TISHAPE": 2.4019880294799805
+      },
+      "runtime": {
+        "calib_sce_seconds": 36.880617560003884,
+        "child_ru_maxrss_kb": 802360,
+        "run_best_seconds": 0.427038199006347
+      },
+      "source_label": "bounded local original-Fortran SCE",
+      "status": "passed"
+    }
+  ],
+  "catchment_manifest": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/landscape_12catchment_manifest.json",
+  "catchment_manifest_sha256": "f90bce9d0e9d5f261ebf5e472ce4e766f3177804b42a0369d4982030f468cd1f",
+  "configuration": {
+    "kstop": 3,
+    "maxn": 500,
+    "metric": "KGECOMP",
+    "paper_budget_maxn": 10000,
+    "pcento": 0.001,
+    "threads": 1,
+    "transform": 1.0
+  },
+  "data_path": "/mnt/f/python/generic_deltamodel/data/camels_dataset",
+  "data_sha256": "2c4666e2ca5ece74028d5d2aa898754abf25e9a877701b218826547cb4e7a264",
+  "executable": "/tmp/autofuse-reference-toolchain/repro-build/bin/fuse.exe",
+  "executable_sha256": "e887f4f2794117dcff7fa721211cb9949dc98c1b7d69e5ba3a4a464f85608806",
+  "gage_path": "/mnt/f/python/generic_deltamodel/data/gage_id.npy",
+  "gage_sha256": "81117b75abf870fbc9195a17d663307dba482621b4d81493ddeb282c437a8144",
+  "schema_version": "reference-calibration-12x78-v1",
+  "started_unix": 1788437814.1793284,
+  "status": "partial"
+}

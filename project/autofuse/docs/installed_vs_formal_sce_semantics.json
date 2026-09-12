@@ -1,0 +1,88 @@
+{
+  "schema_version": "installed-vs-formal-sce-semantics-v1",
+  "status": "completed",
+  "protocol_id": "formal-experiment-protocol-v1-db53091e6e222066",
+  "generated_at_utc": "2026-09-07T00:00:00+00:00",
+  "algorithmic_comparison": [
+    {
+      "dimension": "Algorithm family",
+      "formal_sce": "SCE-UA (Shuffled Complex Evolution, Duan et al. 1992, 1993)",
+      "cma_es": "CMA-ES (Covariance Matrix Adaptation Evolution Strategy, Hansen 2001)",
+      "scipy_de": "Differential Evolution (Storn & Price 1997)",
+      "evotorch": "PyTorch EA / PGPE / SNES / CEM / GA",
+      "classification": "different and scientifically material"
+    },
+    {
+      "dimension": "Population generation & structure",
+      "formal_sce": "Uniform random sampling partitioned into q complexes of size m = 2p + 1",
+      "cma_es": "Multivariate Gaussian sampling around mean vector with adapted covariance C and step sigma",
+      "scipy_de": "Uniform random population of size popsize * N",
+      "evotorch": "SolutionBatch initialized via uniform/Gaussian bounds",
+      "classification": "different and scientifically material"
+    },
+    {
+      "dimension": "Candidate generation & evolution",
+      "formal_sce": "Triangular probability simplex selection, reflection, contraction, random replacement per complex",
+      "cma_es": "Weighted recombination of mu best candidates, cumulation path update for sigma and C",
+      "scipy_de": "Vector difference mutation (v = r1 + F*(r2 - r3)) with binomial/exponential crossover",
+      "evotorch": "Genetic crossover/mutation or policy gradients (PGPE/SNES)",
+      "classification": "different and scientifically material"
+    },
+    {
+      "dimension": "Shuffling & inter-complex sharing",
+      "formal_sce": "Periodic shuffling of all complexes into a single sorted population",
+      "cma_es": "Single adaptive distribution; no complexes or shuffling",
+      "scipy_de": "Single population with pairwise differential updates; no complexes",
+      "evotorch": "Depends on algorithm; no SCE shuffling",
+      "classification": "different and scientifically material"
+    },
+    {
+      "dimension": "Stopping rules & convergence criteria",
+      "formal_sce": "kstop loops with relative change <= pcento or max_evaluations",
+      "cma_es": "tolx, tofun, tofunhist, tolflatfitness, maxfevals, maxiter",
+      "scipy_de": "relative tolerance tol, absolute tolerance atol, maxiter",
+      "evotorch": "max_evaluations, max_generations, target_fitness",
+      "classification": "different but configurable"
+    },
+    {
+      "dimension": "Seed & RNG contract",
+      "formal_sce": "torch.Generator(device=cpu) explicit manual_seed; strictly reproducible candidate sequence",
+      "cma_es": "CMAOptions seed parameter; internal NumPy RNG",
+      "scipy_de": "seed parameter (int or np.random.Generator)",
+      "evotorch": "torch.manual_seed / problem.seed",
+      "classification": "different but configurable"
+    },
+    {
+      "dimension": "Objective vectorization / GPU candidate batching",
+      "formal_sce": "Native candidate batching along leading GPU tensor dimension [C, time, 3]",
+      "cma_es": "Ask-and-tell interface allows user to batch-evaluate lambda candidates",
+      "scipy_de": "vectorized=True passes 2D matrix [N, dim] to objective",
+      "evotorch": "SolutionBatch._evaluate_batch natively supports PyTorch GPU batch tensors",
+      "classification": "equivalent but implemented differently"
+    }
+  ],
+  "inheritance_feasibility_assessment": {
+    "level_a_direct_inheritance": {
+      "feasible": false,
+      "verdict": "rejected",
+      "reason": "No installed package contains an SCE-UA class to inherit from. Subclassing CMA-ES or DifferentialEvolution would replace the required SCE-UA search algorithm with a completely different mathematical method."
+    },
+    "level_b_composition_wrapper": {
+      "feasible": true,
+      "verdict": "suitable for experimental ablation only; prohibited for formal SCE protocol baseline",
+      "reason": "CMA-ES or DE can easily be wrapped to call UnifiedEvaluator.score_batched as experimental calibration alternatives, but cannot serve as the paper-mandated SCE-UA baseline."
+    },
+    "level_c_partial_internals_reuse": {
+      "feasible": false,
+      "verdict": "not applicable",
+      "reason": "The SCE-UA algorithm logic (complex partitioning, simplex evolution, shuffling) is already concisely implemented in project/autofuse/sce.py in ~150 lines of clean PyTorch code without external dependency baggage."
+    },
+    "level_d_maintain_in_repo_sce": {
+      "feasible": true,
+      "verdict": "strongly recommended",
+      "reason": "In-repo SCEBaseline guarantees 100% adherence to Duan et al. (1992, 1993) SCE-UA, exact seed reproducibility, and zero-overhead coupling to the frozen Torch-FUSE v1 GPU batch kernel."
+    }
+  },
+  "recommended_integration_level": "D",
+  "recommendation_summary": "Maintain and use the optimized in-repo SCEBaseline (Level D). It strictly implements the intended SCE-UA algorithm specified by the FUSE paper protocol, achieves bitwise parity with frozen references, and exploits GPU candidate batching directly."
+}

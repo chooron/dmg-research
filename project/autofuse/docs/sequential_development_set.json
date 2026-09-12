@@ -1,0 +1,18 @@
+{
+  "schema": "autofuse-sequential-development-v1",
+  "selection_locked_before_results": true,
+  "selection_rule": "Fixed paper catalogue order: include four mother models and all six known sensitive IDs, then append the first catalogue rows until 18 total. Verify coverage of every ARCH1, ARCH2, QPERC, QSURF option and fixedsiz_2+perc_lower.",
+  "catalogue": "FUSE-78 structures_78.json",
+  "model_ids": [2, 108, 178, 210, 164, 188, 212, 214, 166, 190, 168, 6, 8, 10, 12, 14, 16, 18],
+  "mother_models": [2, 108, 178, 210],
+  "sensitive_models": [164, 188, 212, 214, 166, 190],
+  "coverage": {
+    "ARCH1": ["tension1_1", "tension2_1", "onestate_1"],
+    "ARCH2": ["tens2pll_2", "unlimfrc_2", "unlimpow_2", "fixedsiz_2"],
+    "QPERC": ["perc_f2sat", "perc_w2sat", "perc_lower"],
+    "QSURF": ["arno_x_vic", "prms_varnt", "tmdl_param"],
+    "fixedsiz_2_plus_perc_lower": [164, 188, 212, 214, 166, 190, 168]
+  },
+  "held_out_rule": "All other catalogue rows, validated only after freezing order and substeps.",
+  "formal_training_started": false
+}
