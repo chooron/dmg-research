@@ -137,13 +137,13 @@ def test_dpl_parameterizer_independent_heads_and_inactive_optimizer_semantics():
     param_nn = StructureConditionedParameterizer(DPLConfig(attribute_dim=35, hidden_dim=64)).to(dtype=torch.float64)
     optimizer = torch.optim.Adam(param_nn.parameters(), lr=1e-2, weight_decay=0.0)
 
-    percrte_idx = PARAMETER_NAMES.index("PERCRTE")  # Active in Model 2, Inactive in Model 190
-    sacpmlt_idx = PARAMETER_NAMES.index("SACPMLT")  # Inactive in Model 2, Active in Model 190
+    percrte_idx = PARAMETER_NAMES.index("PERCRTE") # Active in Model 2, Inactive in Model 190
+    baserte_idx = PARAMETER_NAMES.index("BASERTE") # Inactive in Model 2, Active in Model 190
     attrs = torch.randn(2, 35, dtype=torch.float64)
     forcing = torch.rand(2, 4, 3, dtype=torch.float64) + 1.0
     obs = torch.rand(2, 4, dtype=torch.float64) + 1.0
 
-    # Step 1: Model 2 (PERCRTE active, SACPMLT inactive)
+    # Step 1: Model 2 (PERCRTE active, BASERTE inactive)
     optimizer.zero_grad(set_to_none=True)
     p1 = param_nn(attrs, 2)
     res1 = simulate_coupled_rk2_batched(2, forcing, p1, basin_ids=("b1", "b2"), compile_step=False, output_mode="q_only")
@@ -151,36 +151,36 @@ def test_dpl_parameterizer_independent_heads_and_inactive_optimizer_semantics():
     loss1.backward()
 
     assert param_nn.heads[percrte_idx].weight.grad is not None
-    assert param_nn.heads[sacpmlt_idx].weight.grad is None
-    assert param_nn.heads[sacpmlt_idx].bias.grad is None
+    assert param_nn.heads[baserte_idx].weight.grad is None
+    assert param_nn.heads[baserte_idx].bias.grad is None
 
     w_percrte_0 = param_nn.heads[percrte_idx].weight.clone()
-    w_sacpmlt_0 = param_nn.heads[sacpmlt_idx].weight.clone()
+    w_baserte_0 = param_nn.heads[baserte_idx].weight.clone()
     optimizer.step()
     w_percrte_1 = param_nn.heads[percrte_idx].weight.clone()
-    w_sacpmlt_1 = param_nn.heads[sacpmlt_idx].weight.clone()
+    w_baserte_1 = param_nn.heads[baserte_idx].weight.clone()
 
     assert (w_percrte_1 - w_percrte_0).norm().item() > 0
-    assert (w_sacpmlt_1 - w_sacpmlt_0).norm().item() == 0.0
-    assert len(optimizer.state[param_nn.heads[sacpmlt_idx].weight]) == 0
+    assert (w_baserte_1 - w_baserte_0).norm().item() == 0.0
+    assert len(optimizer.state[param_nn.heads[baserte_idx].weight]) == 0
 
-    # Step 2: Model 190 (PERCRTE inactive, SACPMLT active)
+    # Step 2: Model 190 (PERCRTE inactive, BASERTE active)
     optimizer.zero_grad(set_to_none=True)
     p2 = param_nn(attrs, 190)
     res2 = simulate_coupled_rk2_batched(190, forcing, p2, basin_ids=("b1", "b2"), compile_step=False, output_mode="q_only")
     loss2 = torch.mean((res2.q - obs) ** 2)
     loss2.backward()
 
-    assert param_nn.heads[sacpmlt_idx].weight.grad is not None
+    assert param_nn.heads[baserte_idx].weight.grad is not None
     assert param_nn.heads[percrte_idx].weight.grad is None
 
     opt_step_percrte_1 = optimizer.state[param_nn.heads[percrte_idx].weight]["step"].item()
     optimizer.step()
     w_percrte_2 = param_nn.heads[percrte_idx].weight.clone()
-    w_sacpmlt_2 = param_nn.heads[sacpmlt_idx].weight.clone()
+    w_baserte_2 = param_nn.heads[baserte_idx].weight.clone()
 
     assert (w_percrte_2 - w_percrte_1).norm().item() == 0.0
-    assert (w_sacpmlt_2 - w_sacpmlt_1).norm().item() > 0
+    assert (w_baserte_2 - w_baserte_1).norm().item() > 0
     # Step counter for inactive PERCRTE must not advance
     assert optimizer.state[param_nn.heads[percrte_idx].weight]["step"].item() == opt_step_percrte_1
 
