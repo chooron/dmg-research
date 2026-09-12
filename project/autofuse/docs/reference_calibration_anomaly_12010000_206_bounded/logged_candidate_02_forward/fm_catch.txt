@@ -1,0 +1,29 @@
+FUSE_FILEMANAGER_V1.5
+! *** paths
+'/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/reference_calibration_anomaly_12010000_206_bounded/logged_candidate_02_forward/settings/' ! SETNGS_PATH
+'/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/reference_calibration_anomaly_12010000_206_bounded/logged_candidate_02_forward/input/' ! INPUT_PATH
+'/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/reference_calibration_anomaly_12010000_206_bounded/logged_candidate_02_forward/output/' ! OUTPUT_PATH
+! *** suffixes for input files
+'_input.nc' ! suffix_forcing
+'_elev_bands.nc' ! suffix_elev_bands
+! *** settings files
+'input_info.txt' ! FORCING INFO
+'fuse_zConstraints_snow.txt' ! CONSTRAINTS
+'fuse_zNumerix.txt' ! MOD_NUMERIX
+'fuse_zDecisions_206.txt' ! M_DECISIONS
+! *** output files
+'206' ! FMODEL_ID
+'FALSE' ! Q_ONLY
+! *** dates
+'1987-01-01' ! date_start_sim
+'2009-12-31' ! date_end_sim
+'1989-01-01' ! date_start_eval
+'1998-12-31' ! date_end_eval
+'-9999' ! numtim_sub
+! *** evaluation metrics and transformation
+'KGECOMP' ! METRIC
+'1' ! TRANSFO
+! *** SCE parameters
+'100' ! MAXN
+'3' ! KSTOP
+'0.001' ! PCENTO

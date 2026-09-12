@@ -1,0 +1,57 @@
+{
+  "schema_version": "coupled-rk2-trajectory-subset-v1",
+  "status": "frozen_before_trajectory_results",
+  "selection_basis": {
+    "source_real_artifact": "project/autofuse/docs/coupled_rk2_real_diagnostic_4x12.json",
+    "source_real_artifact_sha256": "942f573bfeb44e08d48033ffcb4e5763c1919c887de050a5bc63aaa39f90c016",
+    "catchment_selection_artifact": "project/autofuse/docs/s4_diagnostic_catchments.json",
+    "catchment_selection_sha256": "1490443df969b086e561d4d42a9b9685e48261f097be81086fc87fa17fe2da1f",
+    "structure_selection_artifact": "project/autofuse/docs/s4_diagnostic_structures.json",
+    "structure_selection_sha256": "8fd27d74f1ddb4c33f6cdf521f6b1f76feadaea8d1e396955efdaac448bb8976",
+    "selection_rule": "one frozen best-S3-representative catchment plus the predeclared normal controls and sensitive perc_lower/tension2_1/fixedsiz_2 representatives; no coupled-RK2 result was used to select the subset",
+    "not_a_new_sample_selection": true
+  },
+  "catchments": [
+    {
+      "basin_id": "USA_09447800",
+      "hru_id": 9447800,
+      "frozen_selection_role": ["best_completed_s3_spearman", "dry", "low_snow"],
+      "diagnostic_role": "frozen ranking reference with the observed QPERC_12 activation anomaly"
+    }
+  ],
+  "structures": [
+    {
+      "model_id": 2,
+      "frozen_selection_role": "normal_topology_control",
+      "diagnostic_role": "control"
+    },
+    {
+      "model_id": 8,
+      "frozen_selection_role": "normal_topology_control",
+      "diagnostic_role": "unlimfrc_2 control"
+    },
+    {
+      "model_id": 190,
+      "frozen_selection_role": "sensitive_qperc_lower",
+      "diagnostic_role": "perc_lower + tension2_1 + fixedsiz_2; high-ranking anomaly case"
+    },
+    {
+      "model_id": 214,
+      "frozen_selection_role": "sensitive_qperc_lower",
+      "diagnostic_role": "perc_lower + tension2_1 + fixedsiz_2"
+    }
+  ],
+  "expected_case_count": 4,
+  "protocol": {
+    "forcing_period": ["1987-01-01", "2009-12-31"],
+    "calibration_period": ["1989-01-01", "1998-12-31"],
+    "evaluation_period": ["1999-01-01", "2009-12-31"],
+    "initial_fraction": 0.25,
+    "dt_days": 1.0,
+    "same_forcing_qobs_theta": true,
+    "teacher_forced_state_source": "original Fortran run_pre state at the start of day t",
+    "free_running_state_source": "each solver's own accepted state",
+    "no_recalibration": true,
+    "no_solver_equation_changes": true
+  }
+}

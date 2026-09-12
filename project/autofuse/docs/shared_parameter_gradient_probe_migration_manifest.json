@@ -1,0 +1,50 @@
+{
+  "schema_version": "shared-parameter-gradient-probe-migration-manifest-v1",
+  "created_at_utc": "2026-09-09T12:12:54.327568+00:00",
+  "migration_reason": "Migrate long-running 390-step FP64 shared-parameter gradient probe to remote GPU server for high-throughput execution",
+  "local_environment": {
+    "device": "NVIDIA GeForce RTX 4080 (12GB VRAM)",
+    "cuda": "12.4",
+    "pytorch": "2.6.0+cu124",
+    "dtype": "torch.float64"
+  },
+  "remote_target": {
+    "ssh_host": "connect.westb.seetacloud.com:12478",
+    "user": "root",
+    "gpu": "NVIDIA GeForce RTX 3080 Ti (12GB VRAM)",
+    "cuda": "12.8",
+    "pytorch": "2.8.0+cu128",
+    "remote_workspace": "/root/dmg-research/autofuse",
+    "remote_data_dir": "/autodl-fs/data"
+  },
+  "git": {
+    "sha": "3caca37a4243ae0a95ebe9cc4f22998672ddf464",
+    "is_dirty": true,
+    "working_tree_diff_hash": "d2889e9e166e89b78d72e22b51a95b7e7acc2e3a8dbf696a6b09a004358e69d0"
+  },
+  "numerical_core_hashes": {
+    "kernel.py": "4a79b4caa8d93881c849476e2ffe5aa304c8033cf271bd7e11073d7f7227faff",
+    "runtime.py": "f6b9f066489929479ccabb2035e50bed146e536af24a641cae68e11c37e9ad13",
+    "batched.py": "c4d17cb9e91a2358c415b3d43665a1f4e5534a1a3c37b5545eda7fd20a331fe5",
+    "structures_78.json": "457b232b71c870fd3cb698fd9bb517e58844c5e9bba5f0c4ac4ad0bcc971d6fc"
+  },
+  "probe_doc_hashes": {
+    "protocol.json": "ca16bf9d6c4517c48fb52ccea8a4842a1f60798faf093287a1507529c88fb6d0",
+    "diagnostic_batch.json": "2a2614be915f53c4635f691f187adadaebe4cf55f6c17e3b25497cc2bc5f56ed",
+    "ownership_78.json": "3962c923ef72b1aac8b853d4f244a27fa1f1e0e1d4442168cf87dfc7ad3345ec",
+    "ownership_78.csv": "ab6eee65306042f4fca11a719dbc63c744e7bb6d9a69db06cb2f605a1fc10e40",
+    "12catchment_manifest.json": "f90bce9d0e9d5f261ebf5e472ce4e766f3177804b42a0369d4982030f468cd1f"
+  },
+  "run_state_at_migration": {
+    "run_directory": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/runs/shared_parameter_gradient_probe",
+    "latest_completed_global_step": 56,
+    "training_jsonl_line_count": 56,
+    "diagnostic_jsonl_line_count": 78,
+    "checkpoints": {
+      "model_D0.pt": "5dc8031a06b710d31e8d4ee59ed7d135e6f11fabb9ae0f15161ee941dd3d8454"
+    },
+    "raw_gradients": {
+      "gradients_D0.pt": "2e1f7645c70daf58b89300eca8e219dd31ef32c383192295e68706ba003df6d3"
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "schema_version": "migration-cross-environment-parity-v1",
+  "evaluated_at_utc": "2026-09-10T06:31:37.144511+00:00",
+  "local_environment": "RTX 4080 / PyTorch 2.6.0+cu124 / CUDA 12.4",
+  "remote_execution_reference": "RTX 3080 Ti / PyTorch 2.8.0+cu128 / CUDA 12.8",
+  "batch_size_small": 8,
+  "window_days": 730,
+  "structures_evaluated": [
+    2,
+    8,
+    190,
+    214
+  ],
+  "all_finite": true,
+  "parity_status": "PASS",
+  "structure_records": [
+    {
+      "structure_id": 2,
+      "loss": 2.864482891692384,
+      "q_mean": 1.9980750434916912,
+      "theta_mean": 90.00664881726696,
+      "finite": true
+    },
+    {
+      "structure_id": 8,
+      "loss": 2.6681636912119,
+      "q_mean": 2.3771631553236663,
+      "theta_mean": 90.00434460760616,
+      "finite": true
+    },
+    {
+      "structure_id": 190,
+      "loss": 0.5929488540652025,
+      "q_mean": 1.0539440484507938,
+      "theta_mean": 93.96660825651506,
+      "finite": true
+    },
+    {
+      "structure_id": 214,
+      "loss": 1.093208485963211,
+      "q_mean": 0.5887942929958929,
+      "theta_mean": 93.98193183464522,
+      "finite": true
+    }
+  ]
+}

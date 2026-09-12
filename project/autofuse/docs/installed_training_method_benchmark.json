@@ -1,0 +1,89 @@
+{
+  "apples_to_apples_assessment": {
+    "is_strictly_apples_to_apples": false,
+    "reason": "CMA-ES and Differential Evolution are mathematically different algorithms with distinct sampling distributions, population sizes, and convergence rates. While execution speed per candidate evaluation on GPU is identical (~1.0s/eval at C=16), their search paths, objective progression, and parameter selections diverge from the formal SCE-UA paper baseline."
+  },
+  "benchmark_records": [
+    {
+      "catchment": "USA_09447800",
+      "methods": {
+        "formal_sce_baseline": {
+          "algorithm": "SCE-UA (Shuffled Complex Evolution)",
+          "algorithm_fidelity_vs_paper": "100% exact (intended paper protocol algorithm)",
+          "best_objective": 3.874594755865129,
+          "candidate_batch_size": 16,
+          "evaluations": 16,
+          "speed_evaluations_per_second": 0.6762374878409841,
+          "wall_clock_seconds": 23.660326863988303
+        },
+        "installed_cma_es": {
+          "algorithm": "CMA-ES",
+          "algorithm_fidelity_vs_paper": "Non-equivalent algorithm (CMA-ES is not SCE-UA)",
+          "best_objective": 7.964203102863944,
+          "candidate_batch_size": 16,
+          "evaluations": 16,
+          "package": "cma (4.4.4)",
+          "speed_evaluations_per_second": 0.9417787984019425,
+          "wall_clock_seconds": 16.98912741203094
+        },
+        "installed_scipy_de": {
+          "algorithm": "Differential Evolution (vectorized)",
+          "algorithm_fidelity_vs_paper": "Non-equivalent algorithm (DE is not SCE-UA)",
+          "best_objective": 4.0479878372944915,
+          "candidate_batch_size": 18,
+          "evaluations": 18,
+          "package": "scipy.optimize (1.15.3)",
+          "speed_evaluations_per_second": 0.7647236966238773,
+          "wall_clock_seconds": 23.537913209002
+        }
+      },
+      "model_id": 2,
+      "simulated_days": 4383
+    },
+    {
+      "catchment": "USA_09447800",
+      "methods": {
+        "formal_sce_baseline": {
+          "algorithm": "SCE-UA (Shuffled Complex Evolution)",
+          "algorithm_fidelity_vs_paper": "100% exact (intended paper protocol algorithm)",
+          "best_objective": 3.099741725944395,
+          "candidate_batch_size": 16,
+          "evaluations": 16,
+          "speed_evaluations_per_second": 0.8207072765382306,
+          "wall_clock_seconds": 19.495379725995008
+        },
+        "installed_cma_es": {
+          "algorithm": "CMA-ES",
+          "algorithm_fidelity_vs_paper": "Non-equivalent algorithm (CMA-ES is not SCE-UA)",
+          "best_objective": 7.4979674149856725,
+          "candidate_batch_size": 16,
+          "evaluations": 16,
+          "package": "cma (4.4.4)",
+          "speed_evaluations_per_second": 1.1559444980211653,
+          "wall_clock_seconds": 13.841495008964557
+        },
+        "installed_scipy_de": {
+          "algorithm": "Differential Evolution (vectorized)",
+          "algorithm_fidelity_vs_paper": "Non-equivalent algorithm (DE is not SCE-UA)",
+          "best_objective": 2.532667522693891,
+          "candidate_batch_size": 15,
+          "evaluations": 15,
+          "package": "scipy.optimize (1.15.3)",
+          "speed_evaluations_per_second": 0.8035631222256597,
+          "wall_clock_seconds": 18.66685962199699
+        }
+      },
+      "model_id": 8,
+      "simulated_days": 4383
+    }
+  ],
+  "comparative_insights": {
+    "algorithmic_fidelity": "Only SCEBaseline conforms to Duan et al. SCE-UA required by the FUSE benchmark protocol.",
+    "execution_efficiency": "All three algorithms achieve comparable per-candidate execution throughput (~1.0 candidate/s at C=16) because all evaluate the same compiled GPU Torch-FUSE kernel via candidate batching.",
+    "recommendation": "Retain in-repo SCEBaseline for the formal baseline. CMA-ES and SciPy DE are suitable only for exploratory ablation studies."
+  },
+  "generated_at_utc": "2026-09-07T05:40:39.951785+00:00",
+  "protocol_id": "formal-experiment-protocol-v1-db53091e6e222066",
+  "schema_version": "installed-training-method-benchmark-v1",
+  "status": "completed"
+}

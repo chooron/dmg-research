@@ -1,0 +1,1468 @@
+{
+  "schema_version": "gate-recomputed-from-raw-gradients-v1",
+  "recomputed_at_utc": "2026-09-10T06:17:32.566103+00:00",
+  "raw_gradient_sources": {
+    "D0": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/runs/shared_parameter_gradient_probe/raw_gradients/gradients_D0.pt",
+    "D1": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/runs/shared_parameter_gradient_probe/raw_gradients/gradients_D1.pt",
+    "D3": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/runs/shared_parameter_gradient_probe/raw_gradients/gradients_D3.pt",
+    "D5": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/runs/shared_parameter_gradient_probe/raw_gradients/gradients_D5.pt"
+  },
+  "protocol_thresholds_used": {
+    "signal_support_threshold": 0.25,
+    "sign_conflict_threshold": 0.3,
+    "normalized_N_eff_threshold": 0.2,
+    "noise_floor_epsilon_grad": 1e-12
+  },
+  "evaluable_parameter_count": 28,
+  "persistent_strong_conflict_count": 1,
+  "persistent_strong_conflict_names": [
+    "PERCRTE"
+  ],
+  "conflict_fraction": 0.03571428571428571,
+  "insufficient_signal_count": 4,
+  "insufficient_signal_names": [
+    "FRACLOWZ",
+    "PXTEMP",
+    "OPG",
+    "LAPSE"
+  ],
+  "insufficient_signal_fraction": 0.14285714285714285,
+  "recomputed_gate": "A",
+  "parameters": {
+    "RFERR_ADD": {
+      "name": "RFERR_ADD",
+      "index": 0,
+      "active_structures": 0,
+      "evaluable": false,
+      "status": "NOT_SHARED_OR_INACTIVE"
+    },
+    "RFERR_MLT": {
+      "name": "RFERR_MLT",
+      "index": 1,
+      "active_structures": 78,
+      "evaluable": true,
+      "status": "CONSISTENT_OR_NEGLIGIBLE_CONFLICT",
+      "checkpoints": {
+        "D0": {
+          "signal_support": 0.9966666666666667,
+          "sufficient_signal": true,
+          "median_abs_grad": 3.7869194471065754e-06,
+          "max_abs_grad": 6676889481.973689,
+          "median_conflict_C": 0.22295382680038767,
+          "iqr_conflict_C": 0.47892388442466993,
+          "median_norm_N_eff": 0.2696311082664597,
+          "strong_conflict": false
+        },
+        "D1": {
+          "signal_support": 0.9962820512820513,
+          "sufficient_signal": true,
+          "median_abs_grad": 3.506560811782974e-06,
+          "max_abs_grad": 3331.237785224443,
+          "median_conflict_C": 0.3035565497535616,
+          "iqr_conflict_C": 0.5208320302628769,
+          "median_norm_N_eff": 0.2161704216468624,
+          "strong_conflict": true
+        },
+        "D3": {
+          "signal_support": 0.9898717948717949,
+          "sufficient_signal": true,
+          "median_abs_grad": NaN,
+          "max_abs_grad": NaN,
+          "median_conflict_C": 0.239204635208077,
+          "iqr_conflict_C": 0.44563994147215946,
+          "median_norm_N_eff": 0.03558959143127695,
+          "strong_conflict": false
+        },
+        "D5": {
+          "signal_support": 0.9708974358974359,
+          "sufficient_signal": true,
+          "median_abs_grad": NaN,
+          "max_abs_grad": NaN,
+          "median_conflict_C": 0.18631823255501684,
+          "iqr_conflict_C": 0.5415845459169957,
+          "median_norm_N_eff": 0.027643908128233297,
+          "strong_conflict": false
+        }
+      }
+    },
+    "RFH1_MEAN": {
+      "name": "RFH1_MEAN",
+      "index": 2,
+      "active_structures": 0,
+      "evaluable": false,
+      "status": "NOT_SHARED_OR_INACTIVE"
+    },
+    "RFH2_SDEV": {
+      "name": "RFH2_SDEV",
+      "index": 3,
+      "active_structures": 0,
+      "evaluable": false,
+      "status": "NOT_SHARED_OR_INACTIVE"
+    },
+    "RH1P_MEAN": {
+      "name": "RH1P_MEAN",
+      "index": 4,
+      "active_structures": 0,
+      "evaluable": false,
+      "status": "NOT_SHARED_OR_INACTIVE"
+    },
+    "RH1P_SDEV": {
+      "name": "RH1P_SDEV",
+      "index": 5,
+      "active_structures": 0,
+      "evaluable": false,
+      "status": "NOT_SHARED_OR_INACTIVE"
+    },
+    "RH2P_MEAN": {
+      "name": "RH2P_MEAN",
+      "index": 6,
+      "active_structures": 0,
+      "evaluable": false,
+      "status": "NOT_SHARED_OR_INACTIVE"
+    },
+    "RH2P_SDEV": {
+      "name": "RH2P_SDEV",
+      "index": 7,
+      "active_structures": 0,
+      "evaluable": false,
+      "status": "NOT_SHARED_OR_INACTIVE"
+    },
+    "MAXWATR_1": {
+      "name": "MAXWATR_1",
+      "index": 8,
+      "active_structures": 78,
+      "evaluable": true,
+      "status": "CONSISTENT_OR_NEGLIGIBLE_CONFLICT",
+      "checkpoints": {
+        "D0": {
+          "signal_support": 0.9974358974358974,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.0012251928806116797,
+          "max_abs_grad": 20076335170349.01,
+          "median_conflict_C": 0.4881117541765324,
+          "iqr_conflict_C": 0.5274018214210876,
+          "median_norm_N_eff": 0.10735462015286919,
+          "strong_conflict": false
+        },
+        "D1": {
+          "signal_support": 0.9961538461538462,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.0008313019422711838,
+          "max_abs_grad": 7184255.371319177,
+          "median_conflict_C": 0.38237150831205646,
+          "iqr_conflict_C": 0.5260950551419876,
+          "median_norm_N_eff": 0.07620307270530013,
+          "strong_conflict": false
+        },
+        "D3": {
+          "signal_support": 0.9915384615384616,
+          "sufficient_signal": true,
+          "median_abs_grad": NaN,
+          "max_abs_grad": NaN,
+          "median_conflict_C": 0.15528333661735563,
+          "iqr_conflict_C": 0.5488574515300896,
+          "median_norm_N_eff": 0.028382122094066514,
+          "strong_conflict": false
+        },
+        "D5": {
+          "signal_support": 0.9726923076923077,
+          "sufficient_signal": true,
+          "median_abs_grad": NaN,
+          "max_abs_grad": NaN,
+          "median_conflict_C": 0.25580679146512963,
+          "iqr_conflict_C": 0.6975812143498757,
+          "median_norm_N_eff": 0.028110509079697185,
+          "strong_conflict": false
+        }
+      }
+    },
+    "MAXWATR_2": {
+      "name": "MAXWATR_2",
+      "index": 9,
+      "active_structures": 78,
+      "evaluable": true,
+      "status": "CONSISTENT_OR_NEGLIGIBLE_CONFLICT",
+      "checkpoints": {
+        "D0": {
+          "signal_support": 0.8655128205128205,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.0001459752806456889,
+          "max_abs_grad": 6686234309676.4375,
+          "median_conflict_C": 0.2856312036523768,
+          "iqr_conflict_C": 0.6620547395684888,
+          "median_norm_N_eff": 0.21184963333544088,
+          "strong_conflict": false
+        },
+        "D1": {
+          "signal_support": 0.8648717948717949,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.0003517957562896143,
+          "max_abs_grad": 938974.0173597283,
+          "median_conflict_C": 0.2726596380840193,
+          "iqr_conflict_C": 0.4934460549019566,
+          "median_norm_N_eff": 0.2712819374053901,
+          "strong_conflict": false
+        },
+        "D3": {
+          "signal_support": 0.9565384615384616,
+          "sufficient_signal": true,
+          "median_abs_grad": NaN,
+          "max_abs_grad": NaN,
+          "median_conflict_C": 0.14046368533536388,
+          "iqr_conflict_C": 0.3042421349216463,
+          "median_norm_N_eff": 0.03287877904552313,
+          "strong_conflict": false
+        },
+        "D5": {
+          "signal_support": 0.9798717948717949,
+          "sufficient_signal": true,
+          "median_abs_grad": NaN,
+          "max_abs_grad": NaN,
+          "median_conflict_C": 0.17828340897894557,
+          "iqr_conflict_C": 0.4732992035345569,
+          "median_norm_N_eff": 0.03462645130759233,
+          "strong_conflict": false
+        }
+      }
+    },
+    "FRACTEN": {
+      "name": "FRACTEN",
+      "index": 10,
+      "active_structures": 78,
+      "evaluable": true,
+      "status": "CONSISTENT_OR_NEGLIGIBLE_CONFLICT",
+      "checkpoints": {
+        "D0": {
+          "signal_support": 0.9974358974358974,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.0018956714494777402,
+          "max_abs_grad": 15162693370819.38,
+          "median_conflict_C": 0.5534979236362965,
+          "iqr_conflict_C": 0.5550323993664972,
+          "median_norm_N_eff": 0.1638302078190993,
+          "strong_conflict": false
+        },
+        "D1": {
+          "signal_support": 0.9961538461538462,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.0017592135998467547,
+          "max_abs_grad": 8229701.5629851995,
+          "median_conflict_C": 0.5556234327589369,
+          "iqr_conflict_C": 0.6055028931853996,
+          "median_norm_N_eff": 0.11998612608029334,
+          "strong_conflict": false
+        },
+        "D3": {
+          "signal_support": 0.9915384615384616,
+          "sufficient_signal": true,
+          "median_abs_grad": NaN,
+          "max_abs_grad": NaN,
+          "median_conflict_C": 0.1824981959615378,
+          "iqr_conflict_C": 0.5240706256339263,
+          "median_norm_N_eff": 0.030900535854756706,
+          "strong_conflict": false
+        },
+        "D5": {
+          "signal_support": 0.9726923076923077,
+          "sufficient_signal": true,
+          "median_abs_grad": NaN,
+          "max_abs_grad": NaN,
+          "median_conflict_C": 0.28827064855504025,
+          "iqr_conflict_C": 0.6039757758069307,
+          "median_norm_N_eff": 0.026939205020122845,
+          "strong_conflict": false
+        }
+      }
+    },
+    "FRCHZNE": {
+      "name": "FRCHZNE",
+      "index": 11,
+      "active_structures": 18,
+      "evaluable": true,
+      "status": "CONSISTENT_OR_NEGLIGIBLE_CONFLICT",
+      "checkpoints": {
+        "D0": {
+          "signal_support": 0.9805555555555555,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.0001850306096474798,
+          "max_abs_grad": 1.6430471299202596,
+          "median_conflict_C": 0.504173810691533,
+          "iqr_conflict_C": 0.4960032675428978,
+          "median_norm_N_eff": 0.5010261962416133,
+          "strong_conflict": true
+        },
+        "D1": {
+          "signal_support": 0.98,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.0002743848220728227,
+          "max_abs_grad": 0.0726073803495114,
+          "median_conflict_C": 0.2922632353419652,
+          "iqr_conflict_C": 0.4688660212234045,
+          "median_norm_N_eff": 0.533503453639613,
+          "strong_conflict": false
+        },
+        "D3": {
+          "signal_support": 0.9588888888888889,
+          "sufficient_signal": true,
+          "median_abs_grad": NaN,
+          "max_abs_grad": NaN,
+          "median_conflict_C": 0.27308922504142874,
+          "iqr_conflict_C": 0.6371794482518334,
+          "median_norm_N_eff": 0.528192093013527,
+          "strong_conflict": false
+        },
+        "D5": {
+          "signal_support": 0.9261111111111111,
+          "sufficient_signal": true,
+          "median_abs_grad": NaN,
+          "max_abs_grad": NaN,
+          "median_conflict_C": 0.17073347245897247,
+          "iqr_conflict_C": 0.4028856748532589,
+          "median_norm_N_eff": 0.651194026636458,
+          "strong_conflict": false
+        }
+      }
+    },
+    "FPRIMQB": {
+      "name": "FPRIMQB",
+      "index": 12,
+      "active_structures": 15,
+      "evaluable": true,
+      "status": "CONSISTENT_OR_NEGLIGIBLE_CONFLICT",
+      "checkpoints": {
+        "D0": {
+          "signal_support": 0.6846666666666666,
+          "sufficient_signal": true,
+          "median_abs_grad": 4.4257097213490165e-10,
+          "max_abs_grad": 25236273256.031624,
+          "median_conflict_C": 0.06620817289676394,
+          "iqr_conflict_C": 0.49008448318457354,
+          "median_norm_N_eff": 0.0813951311275701,
+          "strong_conflict": false
+        },
+        "D1": {
+          "signal_support": 0.7133333333333334,
+          "sufficient_signal": true,
+          "median_abs_grad": 2.36333648915668e-09,
+          "max_abs_grad": 12881.097263351243,
+          "median_conflict_C": 0.08823722773182241,
+          "iqr_conflict_C": 0.5526593723571644,
+          "median_norm_N_eff": 0.0968001767430687,
+          "strong_conflict": false
+        },
+        "D3": {
+          "signal_support": 0.716,
+          "sufficient_signal": true,
+          "median_abs_grad": 2.722339922854889e-09,
+          "max_abs_grad": 3.496781440844833e+31,
+          "median_conflict_C": 0.003322817980284953,
+          "iqr_conflict_C": 0.20418523320418447,
+          "median_norm_N_eff": 0.07801138576775002,
+          "strong_conflict": false
+        },
+        "D5": {
+          "signal_support": 0.9853333333333333,
+          "sufficient_signal": true,
+          "median_abs_grad": NaN,
+          "max_abs_grad": NaN,
+          "median_conflict_C": 0.049101483640825866,
+          "iqr_conflict_C": 0.35578805249593154,
+          "median_norm_N_eff": 0.12127768833020569,
+          "strong_conflict": false
+        }
+      }
+    },
+    "RTFRAC1": {
+      "name": "RTFRAC1",
+      "index": 13,
+      "active_structures": 0,
+      "evaluable": false,
+      "status": "NOT_SHARED_OR_INACTIVE"
+    },
+    "PERCRTE": {
+      "name": "PERCRTE",
+      "index": 14,
+      "active_structures": 45,
+      "evaluable": true,
+      "status": "PERSISTENT_STRONG_CONFLICT",
+      "checkpoints": {
+        "D0": {
+          "signal_support": 0.9542222222222222,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.00012215353133686555,
+          "max_abs_grad": 0.984268653076257,
+          "median_conflict_C": 0.35273632182731474,
+          "iqr_conflict_C": 0.5211675125336754,
+          "median_norm_N_eff": 0.2983231466496732,
+          "strong_conflict": true
+        },
+        "D1": {
+          "signal_support": 0.9753333333333334,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.0001377726602147251,
+          "max_abs_grad": 0.08589939914725878,
+          "median_conflict_C": 0.6149657414551711,
+          "iqr_conflict_C": 0.44547816555277103,
+          "median_norm_N_eff": 0.38036107377042433,
+          "strong_conflict": true
+        },
+        "D3": {
+          "signal_support": 0.9702222222222222,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.00011443011934509677,
+          "max_abs_grad": 0.04633298547439042,
+          "median_conflict_C": 0.640818294092515,
+          "iqr_conflict_C": 0.30534072942396173,
+          "median_norm_N_eff": 0.39054087902804047,
+          "strong_conflict": true
+        },
+        "D5": {
+          "signal_support": 0.9371111111111111,
+          "sufficient_signal": true,
+          "median_abs_grad": NaN,
+          "max_abs_grad": NaN,
+          "median_conflict_C": 0.5799222701236777,
+          "iqr_conflict_C": 0.5167943800674037,
+          "median_norm_N_eff": 0.2918590878833061,
+          "strong_conflict": true
+        }
+      }
+    },
+    "PERCEXP": {
+      "name": "PERCEXP",
+      "index": 15,
+      "active_structures": 45,
+      "evaluable": true,
+      "status": "CONSISTENT_OR_NEGLIGIBLE_CONFLICT",
+      "checkpoints": {
+        "D0": {
+          "signal_support": 0.9591111111111111,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.0007061275236367019,
+          "max_abs_grad": 5.493408565234848,
+          "median_conflict_C": 0.05375233915855594,
+          "iqr_conflict_C": 0.22416180521888351,
+          "median_norm_N_eff": 0.255853949987246,
+          "strong_conflict": false
+        },
+        "D1": {
+          "signal_support": 0.9764444444444444,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.0010166827706883895,
+          "max_abs_grad": 1.743920380797563,
+          "median_conflict_C": 0.18402384965550317,
+          "iqr_conflict_C": 0.5126906796667949,
+          "median_norm_N_eff": 0.29740781443621245,
+          "strong_conflict": false
+        },
+        "D3": {
+          "signal_support": 0.9711111111111111,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.0006784560790378223,
+          "max_abs_grad": 0.391434913911811,
+          "median_conflict_C": 0.46198046429915635,
+          "iqr_conflict_C": 0.35791307341397527,
+          "median_norm_N_eff": 0.26737479628641764,
+          "strong_conflict": true
+        },
+        "D5": {
+          "signal_support": 0.9371111111111111,
+          "sufficient_signal": true,
+          "median_abs_grad": NaN,
+          "max_abs_grad": NaN,
+          "median_conflict_C": 0.4207809665733534,
+          "iqr_conflict_C": 0.6272178055886015,
+          "median_norm_N_eff": 0.2413488288184943,
+          "strong_conflict": true
+        }
+      }
+    },
+    "SACPMLT": {
+      "name": "SACPMLT",
+      "index": 16,
+      "active_structures": 33,
+      "evaluable": true,
+      "status": "CONSISTENT_OR_NEGLIGIBLE_CONFLICT",
+      "checkpoints": {
+        "D0": {
+          "signal_support": 0.9193939393939394,
+          "sufficient_signal": true,
+          "median_abs_grad": 3.07766996274807e-06,
+          "max_abs_grad": 1291068500608.114,
+          "median_conflict_C": 0.19077997442226788,
+          "iqr_conflict_C": 0.39077675832440495,
+          "median_norm_N_eff": 0.1283406682943974,
+          "strong_conflict": false
+        },
+        "D1": {
+          "signal_support": 0.9409090909090909,
+          "sufficient_signal": true,
+          "median_abs_grad": 3.919292192067661e-06,
+          "max_abs_grad": 705733.6899556118,
+          "median_conflict_C": 0.2183268986590717,
+          "iqr_conflict_C": 0.46558293471891643,
+          "median_norm_N_eff": 0.132455957903893,
+          "strong_conflict": false
+        },
+        "D3": {
+          "signal_support": 0.9142424242424242,
+          "sufficient_signal": true,
+          "median_abs_grad": NaN,
+          "max_abs_grad": NaN,
+          "median_conflict_C": 0.03279275044565505,
+          "iqr_conflict_C": 0.3675845188202519,
+          "median_norm_N_eff": 0.04623043937177222,
+          "strong_conflict": false
+        },
+        "D5": {
+          "signal_support": 0.8812121212121212,
+          "sufficient_signal": true,
+          "median_abs_grad": NaN,
+          "max_abs_grad": NaN,
+          "median_conflict_C": 0.09167788686355792,
+          "iqr_conflict_C": 0.49784738147206553,
+          "median_norm_N_eff": 0.046610465561909814,
+          "strong_conflict": false
+        }
+      }
+    },
+    "SACPEXP": {
+      "name": "SACPEXP",
+      "index": 17,
+      "active_structures": 33,
+      "evaluable": true,
+      "status": "CONSISTENT_OR_NEGLIGIBLE_CONFLICT",
+      "checkpoints": {
+        "D0": {
+          "signal_support": 0.8809090909090909,
+          "sufficient_signal": true,
+          "median_abs_grad": 2.247825192830551e-07,
+          "max_abs_grad": 1716909009796.9338,
+          "median_conflict_C": 0.13433924653755336,
+          "iqr_conflict_C": 0.412683200226852,
+          "median_norm_N_eff": 0.10963017943865322,
+          "strong_conflict": false
+        },
+        "D1": {
+          "signal_support": 0.906969696969697,
+          "sufficient_signal": true,
+          "median_abs_grad": 2.253831269347477e-07,
+          "max_abs_grad": 931954.6714721879,
+          "median_conflict_C": 0.09290973185941914,
+          "iqr_conflict_C": 0.29392689874271,
+          "median_norm_N_eff": 0.11114523669420634,
+          "strong_conflict": false
+        },
+        "D3": {
+          "signal_support": 0.9006060606060606,
+          "sufficient_signal": true,
+          "median_abs_grad": NaN,
+          "max_abs_grad": NaN,
+          "median_conflict_C": 0.05736926869249587,
+          "iqr_conflict_C": 0.29089635413188625,
+          "median_norm_N_eff": 0.04076411667279327,
+          "strong_conflict": false
+        },
+        "D5": {
+          "signal_support": 0.8672727272727273,
+          "sufficient_signal": true,
+          "median_abs_grad": NaN,
+          "max_abs_grad": NaN,
+          "median_conflict_C": 0.1274766829183936,
+          "iqr_conflict_C": 0.5611424542228967,
+          "median_norm_N_eff": 0.04277961855609744,
+          "strong_conflict": false
+        }
+      }
+    },
+    "PERCFRAC": {
+      "name": "PERCFRAC",
+      "index": 18,
+      "active_structures": 15,
+      "evaluable": true,
+      "status": "CONSISTENT_OR_NEGLIGIBLE_CONFLICT",
+      "checkpoints": {
+        "D0": {
+          "signal_support": 0.9313333333333333,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.000760438196559598,
+          "max_abs_grad": 3408625795435.96,
+          "median_conflict_C": 0.2994718446020959,
+          "iqr_conflict_C": 0.6061092424986549,
+          "median_norm_N_eff": 0.3759068310612139,
+          "strong_conflict": false
+        },
+        "D1": {
+          "signal_support": 0.956,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.0008368344871261249,
+          "max_abs_grad": 48089.89796774877,
+          "median_conflict_C": 0.32559461830070957,
+          "iqr_conflict_C": 0.635962644248584,
+          "median_norm_N_eff": 0.4426046232862376,
+          "strong_conflict": true
+        },
+        "D3": {
+          "signal_support": 0.9486666666666667,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.0009810539214432945,
+          "max_abs_grad": 3.9662894432279683e+30,
+          "median_conflict_C": 0.24559759076811735,
+          "iqr_conflict_C": 0.5608999488340082,
+          "median_norm_N_eff": 0.3414212420863223,
+          "strong_conflict": false
+        },
+        "D5": {
+          "signal_support": 0.9293333333333333,
+          "sufficient_signal": true,
+          "median_abs_grad": NaN,
+          "max_abs_grad": NaN,
+          "median_conflict_C": 0.21408339292567735,
+          "iqr_conflict_C": 0.4969165098958844,
+          "median_norm_N_eff": 0.2816161533350069,
+          "strong_conflict": false
+        }
+      }
+    },
+    "FRACLOWZ": {
+      "name": "FRACLOWZ",
+      "index": 19,
+      "active_structures": 18,
+      "evaluable": true,
+      "status": "INSUFFICIENT_SIGNAL",
+      "checkpoints": {
+        "D0": {
+          "signal_support": 0.0,
+          "sufficient_signal": false,
+          "median_abs_grad": 0.0,
+          "max_abs_grad": 0.0,
+          "median_conflict_C": 0.0,
+          "iqr_conflict_C": 0.0,
+          "median_norm_N_eff": 0.0,
+          "strong_conflict": false
+        },
+        "D1": {
+          "signal_support": 0.0,
+          "sufficient_signal": false,
+          "median_abs_grad": 0.0,
+          "max_abs_grad": 0.0,
+          "median_conflict_C": 0.0,
+          "iqr_conflict_C": 0.0,
+          "median_norm_N_eff": 0.0,
+          "strong_conflict": false
+        },
+        "D3": {
+          "signal_support": 0.0,
+          "sufficient_signal": false,
+          "median_abs_grad": 0.0,
+          "max_abs_grad": 0.0,
+          "median_conflict_C": 0.0,
+          "iqr_conflict_C": 0.0,
+          "median_norm_N_eff": 0.0,
+          "strong_conflict": false
+        },
+        "D5": {
+          "signal_support": 0.0,
+          "sufficient_signal": false,
+          "median_abs_grad": 0.0,
+          "max_abs_grad": 0.0,
+          "median_conflict_C": 0.0,
+          "iqr_conflict_C": 0.0,
+          "median_norm_N_eff": 0.0,
+          "strong_conflict": false
+        }
+      }
+    },
+    "IFLWRTE": {
+      "name": "IFLWRTE",
+      "index": 20,
+      "active_structures": 0,
+      "evaluable": false,
+      "status": "NOT_SHARED_OR_INACTIVE"
+    },
+    "BASERTE": {
+      "name": "BASERTE",
+      "index": 21,
+      "active_structures": 42,
+      "evaluable": true,
+      "status": "CONSISTENT_OR_NEGLIGIBLE_CONFLICT",
+      "checkpoints": {
+        "D0": {
+          "signal_support": 1.0,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.0005307673274741652,
+          "max_abs_grad": 270.3684020951617,
+          "median_conflict_C": 0.13551288827330904,
+          "iqr_conflict_C": 0.2542591149364414,
+          "median_norm_N_eff": 0.4526081569509448,
+          "strong_conflict": false
+        },
+        "D1": {
+          "signal_support": 1.0,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.0003345048612134516,
+          "max_abs_grad": 0.04321500518353078,
+          "median_conflict_C": 0.06418664591764348,
+          "iqr_conflict_C": 0.1497677589874683,
+          "median_norm_N_eff": 0.4484635777138031,
+          "strong_conflict": false
+        },
+        "D3": {
+          "signal_support": 0.9938095238095238,
+          "sufficient_signal": true,
+          "median_abs_grad": NaN,
+          "max_abs_grad": NaN,
+          "median_conflict_C": 0.5379859913848984,
+          "iqr_conflict_C": 0.5740868798265641,
+          "median_norm_N_eff": 0.6970176785554595,
+          "strong_conflict": true
+        },
+        "D5": {
+          "signal_support": 0.9752380952380952,
+          "sufficient_signal": true,
+          "median_abs_grad": NaN,
+          "max_abs_grad": NaN,
+          "median_conflict_C": 0.5821852815408411,
+          "iqr_conflict_C": 0.31848917086082873,
+          "median_norm_N_eff": 0.66048605687078,
+          "strong_conflict": true
+        }
+      }
+    },
+    "QB_POWR": {
+      "name": "QB_POWR",
+      "index": 22,
+      "active_structures": 54,
+      "evaluable": true,
+      "status": "CONSISTENT_OR_NEGLIGIBLE_CONFLICT",
+      "checkpoints": {
+        "D0": {
+          "signal_support": 0.9914814814814815,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.0022500523875858,
+          "max_abs_grad": 985605302205.3058,
+          "median_conflict_C": 0.07291199208373064,
+          "iqr_conflict_C": 0.2202258172850147,
+          "median_norm_N_eff": 0.38106758044828737,
+          "strong_conflict": false
+        },
+        "D1": {
+          "signal_support": 0.9944444444444445,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.001991754666723496,
+          "max_abs_grad": 29440.324423495542,
+          "median_conflict_C": 0.11785599708918301,
+          "iqr_conflict_C": 0.3037901497577508,
+          "median_norm_N_eff": 0.44643872560288816,
+          "strong_conflict": false
+        },
+        "D3": {
+          "signal_support": 0.9864814814814815,
+          "sufficient_signal": true,
+          "median_abs_grad": NaN,
+          "max_abs_grad": NaN,
+          "median_conflict_C": 0.4430425957177364,
+          "iqr_conflict_C": 0.6048426296983404,
+          "median_norm_N_eff": 0.27905664075144676,
+          "strong_conflict": true
+        },
+        "D5": {
+          "signal_support": 0.9794444444444445,
+          "sufficient_signal": true,
+          "median_abs_grad": NaN,
+          "max_abs_grad": NaN,
+          "median_conflict_C": 0.43838802306224045,
+          "iqr_conflict_C": 0.7421120901538194,
+          "median_norm_N_eff": 0.2006455694096588,
+          "strong_conflict": true
+        }
+      }
+    },
+    "QB_PRMS": {
+      "name": "QB_PRMS",
+      "index": 23,
+      "active_structures": 21,
+      "evaluable": true,
+      "status": "CONSISTENT_OR_NEGLIGIBLE_CONFLICT",
+      "checkpoints": {
+        "D0": {
+          "signal_support": 0.9380952380952381,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.0008783071503316996,
+          "max_abs_grad": 0.06466716774721797,
+          "median_conflict_C": 0.00023206343218942524,
+          "iqr_conflict_C": 0.09184736167965996,
+          "median_norm_N_eff": 0.4117922144748286,
+          "strong_conflict": false
+        },
+        "D1": {
+          "signal_support": 0.9580952380952381,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.001845776191935993,
+          "max_abs_grad": 0.7686839065563845,
+          "median_conflict_C": 0.0007417269773323844,
+          "iqr_conflict_C": 0.05207652448613369,
+          "median_norm_N_eff": 0.47043999702898115,
+          "strong_conflict": false
+        },
+        "D3": {
+          "signal_support": 1.0,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.004305581791803445,
+          "max_abs_grad": 3.7869570841729334e+27,
+          "median_conflict_C": 0.039325842362940094,
+          "iqr_conflict_C": 0.26574023188713564,
+          "median_norm_N_eff": 0.09119147567409594,
+          "strong_conflict": false
+        },
+        "D5": {
+          "signal_support": 0.9852380952380952,
+          "sufficient_signal": true,
+          "median_abs_grad": NaN,
+          "max_abs_grad": NaN,
+          "median_conflict_C": 0.07017963847445288,
+          "iqr_conflict_C": 0.4690665873697638,
+          "median_norm_N_eff": 0.0968353605559453,
+          "strong_conflict": false
+        }
+      }
+    },
+    "QBRATE_2A": {
+      "name": "QBRATE_2A",
+      "index": 24,
+      "active_structures": 15,
+      "evaluable": true,
+      "status": "CONSISTENT_OR_NEGLIGIBLE_CONFLICT",
+      "checkpoints": {
+        "D0": {
+          "signal_support": 0.9386666666666666,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.00043127136370130963,
+          "max_abs_grad": 856194190760.4636,
+          "median_conflict_C": 0.0005475268093150163,
+          "iqr_conflict_C": 0.1236307053331835,
+          "median_norm_N_eff": 0.3260891898165691,
+          "strong_conflict": false
+        },
+        "D1": {
+          "signal_support": 0.9626666666666667,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.00034380952056813736,
+          "max_abs_grad": 395370.66720960045,
+          "median_conflict_C": 0.005271242456600198,
+          "iqr_conflict_C": 0.2719597586913709,
+          "median_norm_N_eff": 0.29546150600950993,
+          "strong_conflict": false
+        },
+        "D3": {
+          "signal_support": 0.9613333333333334,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.0008636730459701677,
+          "max_abs_grad": 6.515323878766149e+32,
+          "median_conflict_C": 0.008175398775434987,
+          "iqr_conflict_C": 0.18241426842170666,
+          "median_norm_N_eff": 0.1987465911383215,
+          "strong_conflict": false
+        },
+        "D5": {
+          "signal_support": 0.9853333333333333,
+          "sufficient_signal": true,
+          "median_abs_grad": NaN,
+          "max_abs_grad": NaN,
+          "median_conflict_C": 0.06387003233447285,
+          "iqr_conflict_C": 0.31196031372810357,
+          "median_norm_N_eff": 0.2348820623948531,
+          "strong_conflict": false
+        }
+      }
+    },
+    "QBRATE_2B": {
+      "name": "QBRATE_2B",
+      "index": 25,
+      "active_structures": 15,
+      "evaluable": true,
+      "status": "CONSISTENT_OR_NEGLIGIBLE_CONFLICT",
+      "checkpoints": {
+        "D0": {
+          "signal_support": 0.9393333333333334,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.00047889301111039915,
+          "max_abs_grad": 926176381053.1621,
+          "median_conflict_C": 8.20260489978383e-05,
+          "iqr_conflict_C": 0.0929993214575482,
+          "median_norm_N_eff": 0.3397932065985507,
+          "strong_conflict": false
+        },
+        "D1": {
+          "signal_support": 0.9626666666666667,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.0005345390878999458,
+          "max_abs_grad": 477127.6749553324,
+          "median_conflict_C": 0.0023821073745518458,
+          "iqr_conflict_C": 0.2553276443781568,
+          "median_norm_N_eff": 0.3229815262125909,
+          "strong_conflict": false
+        },
+        "D3": {
+          "signal_support": 0.9613333333333334,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.0012404356555992223,
+          "max_abs_grad": 8.666620691139624e+32,
+          "median_conflict_C": 0.008454034289558775,
+          "iqr_conflict_C": 0.1985101942969325,
+          "median_norm_N_eff": 0.19700498698609786,
+          "strong_conflict": false
+        },
+        "D5": {
+          "signal_support": 0.9853333333333333,
+          "sufficient_signal": true,
+          "median_abs_grad": NaN,
+          "max_abs_grad": NaN,
+          "median_conflict_C": 0.05451285376290896,
+          "iqr_conflict_C": 0.28533623852337986,
+          "median_norm_N_eff": 0.32837500741907333,
+          "strong_conflict": false
+        }
+      }
+    },
+    "SAREAMAX": {
+      "name": "SAREAMAX",
+      "index": 26,
+      "active_structures": 26,
+      "evaluable": true,
+      "status": "CONSISTENT_OR_NEGLIGIBLE_CONFLICT",
+      "checkpoints": {
+        "D0": {
+          "signal_support": 1.0,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.0027974457847772774,
+          "max_abs_grad": 61400481921.3129,
+          "median_conflict_C": 0.10862749916693178,
+          "iqr_conflict_C": 0.3788852610711405,
+          "median_norm_N_eff": 0.37127427637962646,
+          "strong_conflict": false
+        },
+        "D1": {
+          "signal_support": 1.0,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.002250061079155717,
+          "max_abs_grad": 2380570.029974639,
+          "median_conflict_C": 0.14739121382910303,
+          "iqr_conflict_C": 0.5696464558936568,
+          "median_norm_N_eff": 0.5544071084439721,
+          "strong_conflict": false
+        },
+        "D3": {
+          "signal_support": 1.0,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.0009926244155857762,
+          "max_abs_grad": 4.330956567217087e+27,
+          "median_conflict_C": 0.0538077736657574,
+          "iqr_conflict_C": 0.3465767209570177,
+          "median_norm_N_eff": 0.08904918322651849,
+          "strong_conflict": false
+        },
+        "D5": {
+          "signal_support": 1.0,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.0008202342062430114,
+          "max_abs_grad": 1.3649338383539607e+32,
+          "median_conflict_C": 0.013415224155539404,
+          "iqr_conflict_C": 0.31133513725799916,
+          "median_norm_N_eff": 0.06105617499811339,
+          "strong_conflict": false
+        }
+      }
+    },
+    "AXV_BEXP": {
+      "name": "AXV_BEXP",
+      "index": 27,
+      "active_structures": 26,
+      "evaluable": true,
+      "status": "CONSISTENT_OR_NEGLIGIBLE_CONFLICT",
+      "checkpoints": {
+        "D0": {
+          "signal_support": 1.0,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.002157333685506107,
+          "max_abs_grad": 4597366726.861248,
+          "median_conflict_C": 0.05153447186954681,
+          "iqr_conflict_C": 0.2864642156463741,
+          "median_norm_N_eff": 0.3247954925173938,
+          "strong_conflict": false
+        },
+        "D1": {
+          "signal_support": 1.0,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.002239683480081381,
+          "max_abs_grad": 1065318.391646483,
+          "median_conflict_C": 0.21121479874001592,
+          "iqr_conflict_C": 0.5359469118715148,
+          "median_norm_N_eff": 0.42008720433531377,
+          "strong_conflict": false
+        },
+        "D3": {
+          "signal_support": 0.99,
+          "sufficient_signal": true,
+          "median_abs_grad": NaN,
+          "max_abs_grad": NaN,
+          "median_conflict_C": 0.11681350803109923,
+          "iqr_conflict_C": 0.463284075099294,
+          "median_norm_N_eff": 0.1535588957013121,
+          "strong_conflict": false
+        },
+        "D5": {
+          "signal_support": 0.9396153846153846,
+          "sufficient_signal": true,
+          "median_abs_grad": NaN,
+          "max_abs_grad": NaN,
+          "median_conflict_C": 0.07583773811393335,
+          "iqr_conflict_C": 0.5208093414489214,
+          "median_norm_N_eff": 0.16023447757490045,
+          "strong_conflict": false
+        }
+      }
+    },
+    "LOGLAMB": {
+      "name": "LOGLAMB",
+      "index": 28,
+      "active_structures": 40,
+      "evaluable": true,
+      "status": "CONSISTENT_OR_NEGLIGIBLE_CONFLICT",
+      "checkpoints": {
+        "D0": {
+          "signal_support": 0.9885,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.0005574500914204481,
+          "max_abs_grad": 628561639202.7058,
+          "median_conflict_C": 0.25011084214083235,
+          "iqr_conflict_C": 0.39686322502330773,
+          "median_norm_N_eff": 0.29884612156269075,
+          "strong_conflict": false
+        },
+        "D1": {
+          "signal_support": 0.9925,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.0014438789053170555,
+          "max_abs_grad": 16981.131063336517,
+          "median_conflict_C": 0.11750029892970298,
+          "iqr_conflict_C": 0.2617741325418963,
+          "median_norm_N_eff": 0.44314697236756484,
+          "strong_conflict": false
+        },
+        "D3": {
+          "signal_support": 0.98175,
+          "sufficient_signal": true,
+          "median_abs_grad": NaN,
+          "max_abs_grad": NaN,
+          "median_conflict_C": 0.015701404163132753,
+          "iqr_conflict_C": 0.15974800469006603,
+          "median_norm_N_eff": 0.23428836270966696,
+          "strong_conflict": false
+        },
+        "D5": {
+          "signal_support": 0.97925,
+          "sufficient_signal": true,
+          "median_abs_grad": NaN,
+          "max_abs_grad": NaN,
+          "median_conflict_C": 0.0439997248739812,
+          "iqr_conflict_C": 0.4312944730308754,
+          "median_norm_N_eff": 0.16904902466589367,
+          "strong_conflict": false
+        }
+      }
+    },
+    "TISHAPE": {
+      "name": "TISHAPE",
+      "index": 29,
+      "active_structures": 40,
+      "evaluable": true,
+      "status": "CONSISTENT_OR_NEGLIGIBLE_CONFLICT",
+      "checkpoints": {
+        "D0": {
+          "signal_support": 0.98775,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.00012300141789132208,
+          "max_abs_grad": 302737222871.1356,
+          "median_conflict_C": 0.19273032588538258,
+          "iqr_conflict_C": 0.4263870043963622,
+          "median_norm_N_eff": 0.26730352776084537,
+          "strong_conflict": false
+        },
+        "D1": {
+          "signal_support": 0.9925,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.0003275391651058828,
+          "max_abs_grad": 5967.6199044772,
+          "median_conflict_C": 0.26087719868090675,
+          "iqr_conflict_C": 0.3398178773870506,
+          "median_norm_N_eff": 0.4041786015023137,
+          "strong_conflict": false
+        },
+        "D3": {
+          "signal_support": 0.9815,
+          "sufficient_signal": true,
+          "median_abs_grad": NaN,
+          "max_abs_grad": NaN,
+          "median_conflict_C": 0.019734115108995875,
+          "iqr_conflict_C": 0.16116423377715577,
+          "median_norm_N_eff": 0.11872386365961847,
+          "strong_conflict": false
+        },
+        "D5": {
+          "signal_support": 0.97725,
+          "sufficient_signal": true,
+          "median_abs_grad": NaN,
+          "max_abs_grad": NaN,
+          "median_conflict_C": 0.036979665182862304,
+          "iqr_conflict_C": 0.3195828798568047,
+          "median_norm_N_eff": 0.10394755088474822,
+          "strong_conflict": false
+        }
+      }
+    },
+    "TIMEDELAY": {
+      "name": "TIMEDELAY",
+      "index": 30,
+      "active_structures": 78,
+      "evaluable": true,
+      "status": "CONSISTENT_OR_NEGLIGIBLE_CONFLICT",
+      "checkpoints": {
+        "D0": {
+          "signal_support": 0.9974358974358974,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.0033893371373285774,
+          "max_abs_grad": 0.25303827995567596,
+          "median_conflict_C": 0.012979202800959731,
+          "iqr_conflict_C": 0.027105406720711742,
+          "median_norm_N_eff": 0.6515339663629707,
+          "strong_conflict": false
+        },
+        "D1": {
+          "signal_support": 0.9976923076923077,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.0010098900856629484,
+          "max_abs_grad": 0.07308407816689928,
+          "median_conflict_C": 0.04268370825293596,
+          "iqr_conflict_C": 0.12372071069341421,
+          "median_norm_N_eff": 0.5538921218069677,
+          "strong_conflict": false
+        },
+        "D3": {
+          "signal_support": 1.0,
+          "sufficient_signal": true,
+          "median_abs_grad": 5.352404490690008e-05,
+          "max_abs_grad": 0.006924883761418135,
+          "median_conflict_C": 0.13445865352685785,
+          "iqr_conflict_C": 0.40577045646510346,
+          "median_norm_N_eff": 0.3468173942267234,
+          "strong_conflict": false
+        },
+        "D5": {
+          "signal_support": 1.0,
+          "sufficient_signal": true,
+          "median_abs_grad": 3.0224804088993022e-05,
+          "max_abs_grad": 0.00540767256778882,
+          "median_conflict_C": 0.1272808493734839,
+          "iqr_conflict_C": 0.29509002682072666,
+          "median_norm_N_eff": 0.6757884603146433,
+          "strong_conflict": false
+        }
+      }
+    },
+    "MBASE": {
+      "name": "MBASE",
+      "index": 31,
+      "active_structures": 78,
+      "evaluable": true,
+      "status": "CONSISTENT_OR_NEGLIGIBLE_CONFLICT",
+      "checkpoints": {
+        "D0": {
+          "signal_support": 0.9952564102564102,
+          "sufficient_signal": true,
+          "median_abs_grad": 0.00010703069820698292,
+          "max_abs_grad": 322911062018.76245,
+          "median_conflict_C": 0.243248187392435,
+          "iqr_conflict_C": 0.5672885362701873,
+          "median_norm_N_eff": 0.08068277950459207,
+          "strong_conflict": false
+        },
+        "D1": {
+          "signal_support": 0.9956410256410256,
+          "sufficient_signal": true,
+          "median_abs_grad": 7.00413395310741e-05,
+          "max_abs_grad": 646582.7917520398,
+          "median_conflict_C": 0.3992149650983141,
+          "iqr_conflict_C": 0.5957463581059661,
+          "median_norm_N_eff": 0.09237100277155899,
+          "strong_conflict": false
+        },
+        "D3": {
+          "signal_support": 0.9893589743589744,
+          "sufficient_signal": true,
+          "median_abs_grad": NaN,
+          "max_abs_grad": NaN,
+          "median_conflict_C": 0.1683463144813342,
+          "iqr_conflict_C": 0.46942078015295363,
+          "median_norm_N_eff": 0.034775668375756755,
+          "strong_conflict": false
+        },
+        "D5": {
+          "signal_support": 0.9520512820512821,
+          "sufficient_signal": true,
+          "median_abs_grad": NaN,
+          "max_abs_grad": NaN,
+          "median_conflict_C": 0.22635106097285318,
+          "iqr_conflict_C": 0.5747322549856188,
+          "median_norm_N_eff": 0.03323835905740054,
+          "strong_conflict": false
+        }
+      }
+    },
+    "MFMAX": {
+      "name": "MFMAX",
+      "index": 32,
+      "active_structures": 78,
+      "evaluable": true,
+      "status": "CONSISTENT_OR_NEGLIGIBLE_CONFLICT",
+      "checkpoints": {
+        "D0": {
+          "signal_support": 0.9924358974358974,
+          "sufficient_signal": true,
+          "median_abs_grad": 2.1744084771097538e-05,
+          "max_abs_grad": 444995415165.0464,
+          "median_conflict_C": 0.3848313611876464,
+          "iqr_conflict_C": 0.5773994584179,
+          "median_norm_N_eff": 0.09055035016735552,
+          "strong_conflict": false
+        },
+        "D1": {
+          "signal_support": 0.9953846153846154,
+          "sufficient_signal": true,
+          "median_abs_grad": 1.5605853660854337e-05,
+          "max_abs_grad": 318653.81877475954,
+          "median_conflict_C": 0.3671759517966713,
+          "iqr_conflict_C": 0.44394115335664,
+          "median_norm_N_eff": 0.06862270127378992,
+          "strong_conflict": false
+        },
+        "D3": {
+          "signal_support": 0.9892307692307692,
+          "sufficient_signal": true,
+          "median_abs_grad": NaN,
+          "max_abs_grad": NaN,
+          "median_conflict_C": 0.13660172592905773,
+          "iqr_conflict_C": 0.4415220368517242,
+          "median_norm_N_eff": 0.027145415029271137,
+          "strong_conflict": false
+        },
+        "D5": {
+          "signal_support": 0.9519230769230769,
+          "sufficient_signal": true,
+          "median_abs_grad": NaN,
+          "max_abs_grad": NaN,
+          "median_conflict_C": 0.29954536842294277,
+          "iqr_conflict_C": 0.45129489768016295,
+          "median_norm_N_eff": 0.028103890951010284,
+          "strong_conflict": false
+        }
+      }
+    },
+    "MFMIN": {
+      "name": "MFMIN",
+      "index": 33,
+      "active_structures": 78,
+      "evaluable": true,
+      "status": "CONSISTENT_OR_NEGLIGIBLE_CONFLICT",
+      "checkpoints": {
+        "D0": {
+          "signal_support": 0.9914102564102564,
+          "sufficient_signal": true,
+          "median_abs_grad": 6.78415435114642e-05,
+          "max_abs_grad": 193596355812.58035,
+          "median_conflict_C": 0.24271278625767448,
+          "iqr_conflict_C": 0.5407759840351075,
+          "median_norm_N_eff": 0.08469837581955468,
+          "strong_conflict": false
+        },
+        "D1": {
+          "signal_support": 0.9916666666666667,
+          "sufficient_signal": true,
+          "median_abs_grad": 4.311657884416412e-05,
+          "max_abs_grad": 778916.8151952828,
+          "median_conflict_C": 0.371019824909803,
+          "iqr_conflict_C": 0.5686067724261811,
+          "median_norm_N_eff": 0.10259062665293522,
+          "strong_conflict": false
+        },
+        "D3": {
+          "signal_support": 0.9880769230769231,
+          "sufficient_signal": true,
+          "median_abs_grad": NaN,
+          "max_abs_grad": NaN,
+          "median_conflict_C": 0.10282451597675064,
+          "iqr_conflict_C": 0.48857176772629907,
+          "median_norm_N_eff": 0.025135623729902974,
+          "strong_conflict": false
+        },
+        "D5": {
+          "signal_support": 0.9535897435897436,
+          "sufficient_signal": true,
+          "median_abs_grad": NaN,
+          "max_abs_grad": NaN,
+          "median_conflict_C": 0.1423370146514854,
+          "iqr_conflict_C": 0.4371051372274803,
+          "median_norm_N_eff": 0.02701472502059477,
+          "strong_conflict": false
+        }
+      }
+    },
+    "PXTEMP": {
+      "name": "PXTEMP",
+      "index": 34,
+      "active_structures": 78,
+      "evaluable": true,
+      "status": "INSUFFICIENT_SIGNAL",
+      "checkpoints": {
+        "D0": {
+          "signal_support": 0.0,
+          "sufficient_signal": false,
+          "median_abs_grad": 0.0,
+          "max_abs_grad": 0.0,
+          "median_conflict_C": 0.0,
+          "iqr_conflict_C": 0.0,
+          "median_norm_N_eff": 0.0,
+          "strong_conflict": false
+        },
+        "D1": {
+          "signal_support": 0.0,
+          "sufficient_signal": false,
+          "median_abs_grad": 0.0,
+          "max_abs_grad": 0.0,
+          "median_conflict_C": 0.0,
+          "iqr_conflict_C": 0.0,
+          "median_norm_N_eff": 0.0,
+          "strong_conflict": false
+        },
+        "D3": {
+          "signal_support": 0.0,
+          "sufficient_signal": false,
+          "median_abs_grad": 0.0,
+          "max_abs_grad": 0.0,
+          "median_conflict_C": 0.0,
+          "iqr_conflict_C": 0.0,
+          "median_norm_N_eff": 0.0,
+          "strong_conflict": false
+        },
+        "D5": {
+          "signal_support": 0.0,
+          "sufficient_signal": false,
+          "median_abs_grad": 0.0,
+          "max_abs_grad": 0.0,
+          "median_conflict_C": 0.0,
+          "iqr_conflict_C": 0.0,
+          "median_norm_N_eff": 0.0,
+          "strong_conflict": false
+        }
+      }
+    },
+    "OPG": {
+      "name": "OPG",
+      "index": 35,
+      "active_structures": 78,
+      "evaluable": true,
+      "status": "INSUFFICIENT_SIGNAL",
+      "checkpoints": {
+        "D0": {
+          "signal_support": 0.0,
+          "sufficient_signal": false,
+          "median_abs_grad": 0.0,
+          "max_abs_grad": 0.0,
+          "median_conflict_C": 0.0,
+          "iqr_conflict_C": 0.0,
+          "median_norm_N_eff": 0.0,
+          "strong_conflict": false
+        },
+        "D1": {
+          "signal_support": 0.0,
+          "sufficient_signal": false,
+          "median_abs_grad": 0.0,
+          "max_abs_grad": 0.0,
+          "median_conflict_C": 0.0,
+          "iqr_conflict_C": 0.0,
+          "median_norm_N_eff": 0.0,
+          "strong_conflict": false
+        },
+        "D3": {
+          "signal_support": 0.0,
+          "sufficient_signal": false,
+          "median_abs_grad": 0.0,
+          "max_abs_grad": 0.0,
+          "median_conflict_C": 0.0,
+          "iqr_conflict_C": 0.0,
+          "median_norm_N_eff": 0.0,
+          "strong_conflict": false
+        },
+        "D5": {
+          "signal_support": 0.0,
+          "sufficient_signal": false,
+          "median_abs_grad": 0.0,
+          "max_abs_grad": 0.0,
+          "median_conflict_C": 0.0,
+          "iqr_conflict_C": 0.0,
+          "median_norm_N_eff": 0.0,
+          "strong_conflict": false
+        }
+      }
+    },
+    "LAPSE": {
+      "name": "LAPSE",
+      "index": 36,
+      "active_structures": 78,
+      "evaluable": true,
+      "status": "INSUFFICIENT_SIGNAL",
+      "checkpoints": {
+        "D0": {
+          "signal_support": 0.0,
+          "sufficient_signal": false,
+          "median_abs_grad": 0.0,
+          "max_abs_grad": 0.0,
+          "median_conflict_C": 0.0,
+          "iqr_conflict_C": 0.0,
+          "median_norm_N_eff": 0.0,
+          "strong_conflict": false
+        },
+        "D1": {
+          "signal_support": 0.0,
+          "sufficient_signal": false,
+          "median_abs_grad": 0.0,
+          "max_abs_grad": 0.0,
+          "median_conflict_C": 0.0,
+          "iqr_conflict_C": 0.0,
+          "median_norm_N_eff": 0.0,
+          "strong_conflict": false
+        },
+        "D3": {
+          "signal_support": 0.0,
+          "sufficient_signal": false,
+          "median_abs_grad": 0.0,
+          "max_abs_grad": 0.0,
+          "median_conflict_C": 0.0,
+          "iqr_conflict_C": 0.0,
+          "median_norm_N_eff": 0.0,
+          "strong_conflict": false
+        },
+        "D5": {
+          "signal_support": 0.0,
+          "sufficient_signal": false,
+          "median_abs_grad": 0.0,
+          "max_abs_grad": 0.0,
+          "median_conflict_C": 0.0,
+          "iqr_conflict_C": 0.0,
+          "median_norm_N_eff": 0.0,
+          "strong_conflict": false
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,323 @@
+{
+  "cache_after": {
+    "bytes": 2475987269,
+    "files": 19316
+  },
+  "cache_before": {
+    "bytes": 2466908782,
+    "files": 19314
+  },
+  "cache_dir": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/.cache/runtime-validation-78-safe",
+  "compile_record": {
+    "autograd_recompilations": 0,
+    "autograd_unique_graphs": 1,
+    "calls": 4,
+    "code_object_id": 125462384603744,
+    "code_object_name": "generated_step_d0d65bec23a7a873",
+    "cold_compile_seconds": [
+      2.092292022003676
+    ],
+    "compile_attempts": 1,
+    "compile_successes": 1,
+    "dynamo_counters": {
+      "aot_autograd": {
+        "autograd_cache_bypass": 1,
+        "autograd_cache_hit": 1,
+        "ok": 2,
+        "total": 2
+      },
+      "inductor": {
+        "async_compile_cache_hit": 128,
+        "async_compile_cache_miss": 192,
+        "extern_calls": 4,
+        "fxgraph_cache_hit": 2,
+        "pattern_matcher_count": 6,
+        "pattern_matcher_nodes": 6,
+        "triton_bundler_load_static_autotuner": 64
+      },
+      "stats": {
+        "calls_captured": 2064,
+        "unique_graphs": 2
+      }
+    },
+    "failures": [],
+    "fallbacks": 0,
+    "forward_unique_graphs": 1,
+    "graph_breaks": 0,
+    "graph_signature": {
+      "decisions": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "unlimpow_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "n_substeps": 1,
+      "parameter_names": [
+        "RFERR_MLT",
+        "FRACTEN",
+        "MAXWATR_1",
+        "MAXWATR_2",
+        "BASERTE",
+        "LOGLAMB",
+        "TISHAPE",
+        "QB_POWR",
+        "SACPMLT",
+        "SACPEXP",
+        "TIMEDELAY",
+        "MBASE",
+        "MFMAX",
+        "MFMIN",
+        "PXTEMP",
+        "OPG",
+        "LAPSE"
+      ],
+      "sequential_order": [
+        "recharge",
+        "et",
+        "surface_runoff",
+        "percolation",
+        "interflow",
+        "baseflow"
+      ],
+      "state_names": [
+        "WATR_1",
+        "WATR_2"
+      ],
+      "topology": [
+        [
+          "lower",
+          [
+            [
+              "WATR_2",
+              [
+                [
+                  "EVAP_2",
+                  -1
+                ],
+                [
+                  "OFLOW_2",
+                  -1
+                ],
+                [
+                  "QBASE_2",
+                  -1
+                ],
+                [
+                  "QPERC_12",
+                  1
+                ]
+              ]
+            ]
+          ]
+        ],
+        [
+          "upper",
+          [
+            [
+              "WATR_1",
+              [
+                [
+                  "EFF_PPT",
+                  1
+                ],
+                [
+                  "EVAP_1",
+                  -1
+                ],
+                [
+                  "OFLOW_1",
+                  -1
+                ],
+                [
+                  "QINTF_1",
+                  -1
+                ],
+                [
+                  "QPERC_12",
+                  -1
+                ],
+                [
+                  "QSURF",
+                  -1
+                ]
+              ]
+            ]
+          ]
+        ]
+      ]
+    },
+    "guard_failure_reasons": {},
+    "key": {
+      "backend": "inductor",
+      "device": "cuda:0",
+      "dtype": "torch.float64",
+      "fullgraph": true,
+      "graph_signature": {
+        "decisions": {
+          "ARCH1": "onestate_1",
+          "ARCH2": "unlimpow_2",
+          "ESOIL": "sequential",
+          "QINTF": "intflwnone",
+          "QPERC": "perc_lower",
+          "QSURF": "tmdl_param",
+          "Q_TDH": "rout_gamma",
+          "RFERR": "multiplc_e",
+          "SNOWM": "temp_index"
+        },
+        "n_substeps": 1,
+        "parameter_names": [
+          "RFERR_MLT",
+          "FRACTEN",
+          "MAXWATR_1",
+          "MAXWATR_2",
+          "BASERTE",
+          "LOGLAMB",
+          "TISHAPE",
+          "QB_POWR",
+          "SACPMLT",
+          "SACPEXP",
+          "TIMEDELAY",
+          "MBASE",
+          "MFMAX",
+          "MFMIN",
+          "PXTEMP",
+          "OPG",
+          "LAPSE"
+        ],
+        "sequential_order": [
+          "recharge",
+          "et",
+          "surface_runoff",
+          "percolation",
+          "interflow",
+          "baseflow"
+        ],
+        "state_names": [
+          "WATR_1",
+          "WATR_2"
+        ],
+        "topology": [
+          [
+            "lower",
+            [
+              [
+                "WATR_2",
+                [
+                  [
+                    "EVAP_2",
+                    -1
+                  ],
+                  [
+                    "OFLOW_2",
+                    -1
+                  ],
+                  [
+                    "QBASE_2",
+                    -1
+                  ],
+                  [
+                    "QPERC_12",
+                    1
+                  ]
+                ]
+              ]
+            ]
+          ],
+          [
+            "upper",
+            [
+              [
+                "WATR_1",
+                [
+                  [
+                    "EFF_PPT",
+                    1
+                  ],
+                  [
+                    "EVAP_1",
+                    -1
+                  ],
+                  [
+                    "OFLOW_1",
+                    -1
+                  ],
+                  [
+                    "QINTF_1",
+                    -1
+                  ],
+                  [
+                    "QPERC_12",
+                    -1
+                  ],
+                  [
+                    "QSURF",
+                    -1
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ]
+      },
+      "input_shapes": [
+        [
+          510
+        ],
+        [
+          6
+        ],
+        [
+          37
+        ],
+        [],
+        [],
+        [
+          500
+        ]
+      ]
+    },
+    "recompilations": 0,
+    "unique_graphs": 1
+  },
+  "dynamo_counters": {
+    "aot_autograd": {
+      "autograd_cache_bypass": 1,
+      "autograd_cache_hit": 1,
+      "ok": 2,
+      "total": 2
+    },
+    "inductor": {
+      "async_compile_cache_hit": 128,
+      "async_compile_cache_miss": 192,
+      "extern_calls": 4,
+      "fxgraph_cache_hit": 2,
+      "pattern_matcher_count": 6,
+      "pattern_matcher_nodes": 6,
+      "triton_bundler_load_static_autotuner": 64
+    },
+    "stats": {
+      "calls_captured": 2064,
+      "unique_graphs": 2
+    }
+  },
+  "elapsed_seconds": 13.526844128005905,
+  "model_id": 210,
+  "q": 0.03848112358075483,
+  "resource": {
+    "gpu": {
+      "allocated_bytes": 63488,
+      "peak_allocated_bytes": 712704,
+      "peak_reserved_bytes": 2097152,
+      "reserved_bytes": 2097152
+    },
+    "host_peak_rss_kb": 1431356,
+    "host_rss_kb": 1421364
+  },
+  "schema": "dfuse-runtime-step-cache-probe-v1",
+  "signature_digest": "d0d65bec23a7a873"
+}

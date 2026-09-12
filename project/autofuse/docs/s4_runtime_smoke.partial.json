@@ -1,0 +1,948 @@
+{
+  "cache": {
+    "bytes": 869240758,
+    "files": 13435
+  },
+  "cache_dir": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/.cache/runtime-validation-78",
+  "failures": [],
+  "mother_models": [
+    2,
+    108,
+    178,
+    210
+  ],
+  "order": [
+    "recharge",
+    "percolation",
+    "baseflow",
+    "et",
+    "interflow",
+    "surface_runoff"
+  ],
+  "resource": {
+    "current_host_rss_kb": 1620740,
+    "initial_host_rss_kb": 519848
+  },
+  "rows": [
+    {
+      "benchmark": {
+        "backward": {
+          "compiled": {
+            "max_seconds": 0.11559812200721353,
+            "median_seconds": 0.10950306299491785,
+            "min_seconds": 0.10340800398262218
+          },
+          "generated_eager": {
+            "max_seconds": 2.0015529450029135,
+            "median_seconds": 1.8492822415137198,
+            "min_seconds": 1.697011538024526
+          },
+          "speedup": 16.887949897799178
+        },
+        "forward": {
+          "compiled": {
+            "max_seconds": 0.17776794702513143,
+            "median_seconds": 0.167529218015261,
+            "min_seconds": 0.15729048900539055
+          },
+          "generated_eager": {
+            "max_seconds": 0.8178773180115968,
+            "median_seconds": 0.8157384324877057,
+            "min_seconds": 0.8135995469638146
+          },
+          "speedup": 4.869230825236684
+        },
+        "peak_gpu_allocated_bytes": {
+          "compiled": 10461696,
+          "generated_eager": 14501888
+        },
+        "steps": 64
+      },
+      "compile_audit": {
+        "autograd_recompilations": 0,
+        "autograd_unique_graphs": [
+          1
+        ],
+        "calls": 68,
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "dynamo_counters": [
+          {
+            "aot_autograd": {
+              "autograd_cache_hit": 3,
+              "ok": 3,
+              "total": 3
+            },
+            "inductor": {
+              "async_compile_cache_hit": 292,
+              "async_compile_cache_miss": 441,
+              "fxgraph_cache_hit": 4,
+              "triton_bundler_load_static_autotuner": 145
+            },
+            "stats": {
+              "calls_captured": 3576,
+              "unique_graphs": 3
+            }
+          }
+        ],
+        "fallbacks": 0,
+        "forward_unique_graphs": [
+          1
+        ],
+        "graph_breaks": 0,
+        "recompilations": 0,
+        "record_count": 1
+      },
+      "decisions": {
+        "ARCH1": "tension1_1",
+        "ARCH2": "tens2pll_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_f2sat",
+        "QSURF": "arno_x_vic",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "graph_signature": {
+        "decisions": {
+          "ARCH1": "tension1_1",
+          "ARCH2": "tens2pll_2",
+          "ESOIL": "sequential",
+          "QINTF": "intflwnone",
+          "QPERC": "perc_f2sat",
+          "QSURF": "arno_x_vic",
+          "Q_TDH": "rout_gamma",
+          "RFERR": "multiplc_e",
+          "SNOWM": "temp_index"
+        },
+        "execution_mode": "sequential",
+        "n_substeps": 1,
+        "parameter_names": [
+          "RFERR_MLT",
+          "FRACTEN",
+          "MAXWATR_1",
+          "PERCFRAC",
+          "FPRIMQB",
+          "MAXWATR_2",
+          "QBRATE_2A",
+          "QBRATE_2B",
+          "PERCRTE",
+          "PERCEXP",
+          "AXV_BEXP",
+          "TIMEDELAY",
+          "MBASE",
+          "MFMAX",
+          "MFMIN",
+          "PXTEMP",
+          "OPG",
+          "LAPSE"
+        ],
+        "sequential_order": [
+          "recharge",
+          "percolation",
+          "baseflow",
+          "et",
+          "interflow",
+          "surface_runoff"
+        ],
+        "state_names": [
+          "TENS_1",
+          "FREE_1",
+          "TENS_2",
+          "FREE_2A",
+          "FREE_2B"
+        ],
+        "topology": [
+          [
+            "lower",
+            [
+              [
+                "FREE_2A",
+                [
+                  [
+                    "OFLOW_2A",
+                    -1
+                  ],
+                  [
+                    "QBASE_2A",
+                    -1
+                  ],
+                  [
+                    "QPERC_12*PERCFRAC/2",
+                    1
+                  ],
+                  [
+                    "TENS2FREE_2/2",
+                    1
+                  ]
+                ]
+              ],
+              [
+                "FREE_2B",
+                [
+                  [
+                    "OFLOW_2B",
+                    -1
+                  ],
+                  [
+                    "QBASE_2B",
+                    -1
+                  ],
+                  [
+                    "QPERC_12*PERCFRAC/2",
+                    1
+                  ],
+                  [
+                    "TENS2FREE_2/2",
+                    1
+                  ]
+                ]
+              ],
+              [
+                "TENS_2",
+                [
+                  [
+                    "EVAP_2",
+                    -1
+                  ],
+                  [
+                    "QPERC_12*(1-PERCFRAC)",
+                    1
+                  ],
+                  [
+                    "TENS2FREE_2",
+                    -1
+                  ]
+                ]
+              ]
+            ]
+          ],
+          [
+            "upper",
+            [
+              [
+                "FREE_1",
+                [
+                  [
+                    "OFLOW_1",
+                    -1
+                  ],
+                  [
+                    "QINTF_1",
+                    -1
+                  ],
+                  [
+                    "QPERC_12",
+                    -1
+                  ],
+                  [
+                    "TENS2FREE_1",
+                    1
+                  ]
+                ]
+              ],
+              [
+                "TENS_1",
+                [
+                  [
+                    "EFF_PPT",
+                    1
+                  ],
+                  [
+                    "EVAP_1",
+                    -1
+                  ],
+                  [
+                    "QSURF",
+                    -1
+                  ],
+                  [
+                    "TENS2FREE_1",
+                    -1
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ]
+      },
+      "model_id": 2,
+      "parity": {
+        "current_vs_generated_diagnostics_max_abs": 0.0,
+        "current_vs_generated_packed_max_abs": 0.0,
+        "current_vs_generated_q_max_abs": 0.0,
+        "finite": true,
+        "generated_vs_compiled_diagnostics_max_abs": 5.684341886080802e-14,
+        "generated_vs_compiled_packed_max_abs": 1.1102230246251565e-16,
+        "generated_vs_compiled_q_max_abs": 4.440892098500626e-16
+      },
+      "resource": {
+        "gpu_peak_allocated_bytes": 10461696,
+        "gpu_peak_reserved_bytes": 14680064,
+        "host_peak_rss_kb": 1488448,
+        "host_rss_kb": 1488960
+      },
+      "signature_digest": "1d86fc52c4bebd72",
+      "status": "passed"
+    },
+    {
+      "benchmark": {
+        "backward": {
+          "compiled": {
+            "max_seconds": 0.11577868199674413,
+            "median_seconds": 0.09504180098883808,
+            "min_seconds": 0.07430491998093203
+          },
+          "generated_eager": {
+            "max_seconds": 1.0652554940315895,
+            "median_seconds": 1.0126873650006019,
+            "min_seconds": 0.9601192359696142
+          },
+          "speedup": 10.655178610509855
+        },
+        "forward": {
+          "compiled": {
+            "max_seconds": 0.1886965970043093,
+            "median_seconds": 0.1801315445045475,
+            "min_seconds": 0.1715664920047857
+          },
+          "generated_eager": {
+            "max_seconds": 0.6729496970074251,
+            "median_seconds": 0.6362794974993449,
+            "min_seconds": 0.5996092979912646
+          },
+          "speedup": 3.53230467905793
+        },
+        "peak_gpu_allocated_bytes": {
+          "compiled": 5197312,
+          "generated_eager": 5534720
+        },
+        "steps": 64
+      },
+      "compile_audit": {
+        "autograd_recompilations": 0,
+        "autograd_unique_graphs": [
+          1
+        ],
+        "calls": 68,
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "dynamo_counters": [
+          {
+            "aot_autograd": {
+              "autograd_cache_hit": 3,
+              "ok": 3,
+              "total": 3
+            },
+            "inductor": {
+              "async_compile_cache_hit": 243,
+              "async_compile_cache_miss": 366,
+              "fxgraph_cache_hit": 4,
+              "triton_bundler_load_static_autotuner": 121
+            },
+            "stats": {
+              "calls_captured": 2838,
+              "unique_graphs": 3
+            }
+          }
+        ],
+        "fallbacks": 0,
+        "forward_unique_graphs": [
+          1
+        ],
+        "graph_breaks": 0,
+        "recompilations": 0,
+        "record_count": 1
+      },
+      "decisions": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "unlimfrc_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_w2sat",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "graph_signature": {
+        "decisions": {
+          "ARCH1": "onestate_1",
+          "ARCH2": "unlimfrc_2",
+          "ESOIL": "sequential",
+          "QINTF": "intflwnone",
+          "QPERC": "perc_w2sat",
+          "QSURF": "prms_varnt",
+          "Q_TDH": "rout_gamma",
+          "RFERR": "multiplc_e",
+          "SNOWM": "temp_index"
+        },
+        "execution_mode": "sequential",
+        "n_substeps": 1,
+        "parameter_names": [
+          "RFERR_MLT",
+          "FRACTEN",
+          "MAXWATR_1",
+          "MAXWATR_2",
+          "QB_PRMS",
+          "PERCRTE",
+          "PERCEXP",
+          "SAREAMAX",
+          "TIMEDELAY",
+          "MBASE",
+          "MFMAX",
+          "MFMIN",
+          "PXTEMP",
+          "OPG",
+          "LAPSE"
+        ],
+        "sequential_order": [
+          "recharge",
+          "percolation",
+          "baseflow",
+          "et",
+          "interflow",
+          "surface_runoff"
+        ],
+        "state_names": [
+          "WATR_1",
+          "WATR_2"
+        ],
+        "topology": [
+          [
+            "lower",
+            [
+              [
+                "WATR_2",
+                [
+                  [
+                    "EVAP_2",
+                    -1
+                  ],
+                  [
+                    "OFLOW_2",
+                    -1
+                  ],
+                  [
+                    "QBASE_2",
+                    -1
+                  ],
+                  [
+                    "QPERC_12",
+                    1
+                  ]
+                ]
+              ]
+            ]
+          ],
+          [
+            "upper",
+            [
+              [
+                "WATR_1",
+                [
+                  [
+                    "EFF_PPT",
+                    1
+                  ],
+                  [
+                    "EVAP_1",
+                    -1
+                  ],
+                  [
+                    "OFLOW_1",
+                    -1
+                  ],
+                  [
+                    "QINTF_1",
+                    -1
+                  ],
+                  [
+                    "QPERC_12",
+                    -1
+                  ],
+                  [
+                    "QSURF",
+                    -1
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ]
+      },
+      "model_id": 108,
+      "parity": {
+        "current_vs_generated_diagnostics_max_abs": 1.2065050638793285e-42,
+        "current_vs_generated_packed_max_abs": 0.0,
+        "current_vs_generated_q_max_abs": 0.0,
+        "finite": true,
+        "generated_vs_compiled_diagnostics_max_abs": 0.0,
+        "generated_vs_compiled_packed_max_abs": 2.7755575615628914e-17,
+        "generated_vs_compiled_q_max_abs": 4.440892098500626e-16
+      },
+      "resource": {
+        "gpu_peak_allocated_bytes": 5197312,
+        "gpu_peak_reserved_bytes": 6291456,
+        "host_peak_rss_kb": 1531052,
+        "host_rss_kb": 1499176
+      },
+      "signature_digest": "942ffeb8fc370ba0",
+      "status": "passed"
+    },
+    {
+      "benchmark": {
+        "backward": {
+          "compiled": {
+            "max_seconds": 0.09511512401513755,
+            "median_seconds": 0.09488674101885408,
+            "min_seconds": 0.09465835802257061
+          },
+          "generated_eager": {
+            "max_seconds": 1.6266610479797237,
+            "median_seconds": 1.4787879909854382,
+            "min_seconds": 1.3309149339911528
+          },
+          "speedup": 15.584769537944208
+        },
+        "forward": {
+          "compiled": {
+            "max_seconds": 0.1606075240415521,
+            "median_seconds": 0.15799297552439384,
+            "min_seconds": 0.1553784270072356
+          },
+          "generated_eager": {
+            "max_seconds": 0.743694527016487,
+            "median_seconds": 0.722222670505289,
+            "min_seconds": 0.700750813994091
+          },
+          "speedup": 4.571232791256463
+        },
+        "peak_gpu_allocated_bytes": {
+          "compiled": 8093184,
+          "generated_eager": 10891264
+        },
+        "steps": 64
+      },
+      "compile_audit": {
+        "autograd_recompilations": 0,
+        "autograd_unique_graphs": [
+          1
+        ],
+        "calls": 68,
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "dynamo_counters": [
+          {
+            "aot_autograd": {
+              "autograd_cache_hit": 3,
+              "ok": 3,
+              "total": 3
+            },
+            "inductor": {
+              "async_compile_cache_hit": 288,
+              "async_compile_cache_miss": 432,
+              "fxgraph_cache_hit": 4,
+              "triton_bundler_load_static_autotuner": 144
+            },
+            "stats": {
+              "calls_captured": 3402,
+              "unique_graphs": 3
+            }
+          }
+        ],
+        "fallbacks": 0,
+        "forward_unique_graphs": [
+          1
+        ],
+        "graph_breaks": 0,
+        "recompilations": 0,
+        "record_count": 1
+      },
+      "decisions": {
+        "ARCH1": "tension2_1",
+        "ARCH2": "unlimfrc_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "prms_varnt",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "graph_signature": {
+        "decisions": {
+          "ARCH1": "tension2_1",
+          "ARCH2": "unlimfrc_2",
+          "ESOIL": "sequential",
+          "QINTF": "intflwnone",
+          "QPERC": "perc_lower",
+          "QSURF": "prms_varnt",
+          "Q_TDH": "rout_gamma",
+          "RFERR": "multiplc_e",
+          "SNOWM": "temp_index"
+        },
+        "execution_mode": "sequential",
+        "n_substeps": 1,
+        "parameter_names": [
+          "RFERR_MLT",
+          "FRCHZNE",
+          "FRACTEN",
+          "MAXWATR_1",
+          "FRACLOWZ",
+          "MAXWATR_2",
+          "QB_PRMS",
+          "SACPMLT",
+          "SACPEXP",
+          "SAREAMAX",
+          "TIMEDELAY",
+          "MBASE",
+          "MFMAX",
+          "MFMIN",
+          "PXTEMP",
+          "OPG",
+          "LAPSE"
+        ],
+        "sequential_order": [
+          "recharge",
+          "percolation",
+          "baseflow",
+          "et",
+          "interflow",
+          "surface_runoff"
+        ],
+        "state_names": [
+          "TENS_1A",
+          "TENS_1B",
+          "FREE_1",
+          "WATR_2"
+        ],
+        "topology": [
+          [
+            "lower",
+            [
+              [
+                "WATR_2",
+                [
+                  [
+                    "EVAP_2",
+                    -1
+                  ],
+                  [
+                    "OFLOW_2",
+                    -1
+                  ],
+                  [
+                    "QBASE_2",
+                    -1
+                  ],
+                  [
+                    "QPERC_12",
+                    1
+                  ]
+                ]
+              ]
+            ]
+          ],
+          [
+            "upper",
+            [
+              [
+                "FREE_1",
+                [
+                  [
+                    "OFLOW_1",
+                    -1
+                  ],
+                  [
+                    "QINTF_1",
+                    -1
+                  ],
+                  [
+                    "QPERC_12",
+                    -1
+                  ],
+                  [
+                    "TENS2FREE_1",
+                    1
+                  ]
+                ]
+              ],
+              [
+                "TENS_1A",
+                [
+                  [
+                    "EFF_PPT",
+                    1
+                  ],
+                  [
+                    "EVAP_1A",
+                    -1
+                  ],
+                  [
+                    "QSURF",
+                    -1
+                  ],
+                  [
+                    "RCHR2EXCS",
+                    -1
+                  ]
+                ]
+              ],
+              [
+                "TENS_1B",
+                [
+                  [
+                    "EVAP_1B",
+                    -1
+                  ],
+                  [
+                    "RCHR2EXCS",
+                    1
+                  ],
+                  [
+                    "TENS2FREE_1",
+                    -1
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ]
+      },
+      "model_id": 178,
+      "parity": {
+        "current_vs_generated_diagnostics_max_abs": 3.640856281582978e-42,
+        "current_vs_generated_packed_max_abs": 0.0,
+        "current_vs_generated_q_max_abs": 0.0,
+        "finite": true,
+        "generated_vs_compiled_diagnostics_max_abs": 5.684341886080802e-14,
+        "generated_vs_compiled_packed_max_abs": 1.1102230246251565e-16,
+        "generated_vs_compiled_q_max_abs": 4.440892098500626e-16
+      },
+      "resource": {
+        "gpu_peak_allocated_bytes": 8093184,
+        "gpu_peak_reserved_bytes": 12582912,
+        "host_peak_rss_kb": 1565864,
+        "host_rss_kb": 1566448
+      },
+      "signature_digest": "1d5bad1cc3718f0b",
+      "status": "passed"
+    },
+    {
+      "benchmark": {
+        "backward": {
+          "compiled": {
+            "max_seconds": 0.08565953996730968,
+            "median_seconds": 0.08552879048511386,
+            "min_seconds": 0.08539804100291803
+          },
+          "generated_eager": {
+            "max_seconds": 1.2128239329904318,
+            "median_seconds": 1.0924569435010199,
+            "min_seconds": 0.9720899540116079
+          },
+          "speedup": 12.772973139274782
+        },
+        "forward": {
+          "compiled": {
+            "max_seconds": 0.1873080320074223,
+            "median_seconds": 0.18252867352566682,
+            "min_seconds": 0.17774931504391134
+          },
+          "generated_eager": {
+            "max_seconds": 0.7487189740058966,
+            "median_seconds": 0.7414220304926857,
+            "min_seconds": 0.7341250869794749
+          },
+          "speedup": 4.06194827460042
+        },
+        "peak_gpu_allocated_bytes": {
+          "compiled": 5518848,
+          "generated_eager": 6773760
+        },
+        "steps": 64
+      },
+      "compile_audit": {
+        "autograd_recompilations": 0,
+        "autograd_unique_graphs": [
+          1
+        ],
+        "calls": 68,
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "dynamo_counters": [
+          {
+            "aot_autograd": {
+              "autograd_cache_bypass": 1,
+              "autograd_cache_hit": 2,
+              "ok": 3,
+              "total": 3
+            },
+            "inductor": {
+              "async_compile_cache_hit": 192,
+              "async_compile_cache_miss": 288,
+              "extern_calls": 6,
+              "fxgraph_cache_hit": 3,
+              "pattern_matcher_count": 6,
+              "pattern_matcher_nodes": 6,
+              "triton_bundler_load_static_autotuner": 96
+            },
+            "stats": {
+              "calls_captured": 3096,
+              "unique_graphs": 3
+            }
+          }
+        ],
+        "fallbacks": 0,
+        "forward_unique_graphs": [
+          1
+        ],
+        "graph_breaks": 0,
+        "recompilations": 0,
+        "record_count": 1
+      },
+      "decisions": {
+        "ARCH1": "onestate_1",
+        "ARCH2": "unlimpow_2",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "QPERC": "perc_lower",
+        "QSURF": "tmdl_param",
+        "Q_TDH": "rout_gamma",
+        "RFERR": "multiplc_e",
+        "SNOWM": "temp_index"
+      },
+      "graph_signature": {
+        "decisions": {
+          "ARCH1": "onestate_1",
+          "ARCH2": "unlimpow_2",
+          "ESOIL": "sequential",
+          "QINTF": "intflwnone",
+          "QPERC": "perc_lower",
+          "QSURF": "tmdl_param",
+          "Q_TDH": "rout_gamma",
+          "RFERR": "multiplc_e",
+          "SNOWM": "temp_index"
+        },
+        "execution_mode": "sequential",
+        "n_substeps": 1,
+        "parameter_names": [
+          "RFERR_MLT",
+          "FRACTEN",
+          "MAXWATR_1",
+          "MAXWATR_2",
+          "BASERTE",
+          "LOGLAMB",
+          "TISHAPE",
+          "QB_POWR",
+          "SACPMLT",
+          "SACPEXP",
+          "TIMEDELAY",
+          "MBASE",
+          "MFMAX",
+          "MFMIN",
+          "PXTEMP",
+          "OPG",
+          "LAPSE"
+        ],
+        "sequential_order": [
+          "recharge",
+          "percolation",
+          "baseflow",
+          "et",
+          "interflow",
+          "surface_runoff"
+        ],
+        "state_names": [
+          "WATR_1",
+          "WATR_2"
+        ],
+        "topology": [
+          [
+            "lower",
+            [
+              [
+                "WATR_2",
+                [
+                  [
+                    "EVAP_2",
+                    -1
+                  ],
+                  [
+                    "OFLOW_2",
+                    -1
+                  ],
+                  [
+                    "QBASE_2",
+                    -1
+                  ],
+                  [
+                    "QPERC_12",
+                    1
+                  ]
+                ]
+              ]
+            ]
+          ],
+          [
+            "upper",
+            [
+              [
+                "WATR_1",
+                [
+                  [
+                    "EFF_PPT",
+                    1
+                  ],
+                  [
+                    "EVAP_1",
+                    -1
+                  ],
+                  [
+                    "OFLOW_1",
+                    -1
+                  ],
+                  [
+                    "QINTF_1",
+                    -1
+                  ],
+                  [
+                    "QPERC_12",
+                    -1
+                  ],
+                  [
+                    "QSURF",
+                    -1
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ]
+      },
+      "model_id": 210,
+      "parity": {
+        "current_vs_generated_diagnostics_max_abs": 0.0,
+        "current_vs_generated_packed_max_abs": 0.0,
+        "current_vs_generated_q_max_abs": 0.0,
+        "finite": true,
+        "generated_vs_compiled_diagnostics_max_abs": 0.0,
+        "generated_vs_compiled_packed_max_abs": 1.6543612251060553e-24,
+        "generated_vs_compiled_q_max_abs": 6.938893903907228e-18
+      },
+      "resource": {
+        "gpu_peak_allocated_bytes": 5518848,
+        "gpu_peak_reserved_bytes": 8388608,
+        "host_peak_rss_kb": 1653084,
+        "host_rss_kb": 1620740
+      },
+      "signature_digest": "be870621d2e5846c",
+      "status": "passed"
+    }
+  ],
+  "schema_version": "s4-runtime-smoke-v1",
+  "status": "partial",
+  "stopped_early": false
+}

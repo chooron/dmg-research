@@ -1,0 +1,84 @@
+{
+  "benchmark_environment": {
+    "catchment": "USA_09447800",
+    "device": "cuda",
+    "device_name": "NVIDIA GeForce RTX 3060",
+    "dtype": "torch.float64",
+    "model_id": 2,
+    "simulation_horizon_days": 4383
+  },
+  "generated_at_utc": "2026-09-07T04:02:14.217532+00:00",
+  "protocol_id": "formal-experiment-protocol-v1-db53091e6e222066",
+  "recommendation_rationale": "C=16 provides near-peak throughput (~7.8x speedup over C=1) while maintaining a large VRAM safety margin (< 200MB allocated on 12GB GPU).",
+  "scaling_benchmark": [
+    {
+      "candidate_batch_size": 1,
+      "candidate_days_per_second": 164.30265511795136,
+      "candidates_per_second": 0.03748634613688144,
+      "elapsed_seconds": 26.676379616954364,
+      "gpu_peak_allocated_bytes": 54596608,
+      "gpu_peak_reserved_bytes": 56623104,
+      "host_peak_rss_kb": 1633064,
+      "speedup_vs_c1": 1.0,
+      "timesteps": 4383
+    },
+    {
+      "candidate_batch_size": 2,
+      "candidate_days_per_second": 535.4035445081586,
+      "candidates_per_second": 0.12215458464708158,
+      "elapsed_seconds": 16.37269698700402,
+      "gpu_peak_allocated_bytes": 54596608,
+      "gpu_peak_reserved_bytes": 56623104,
+      "host_peak_rss_kb": 1633192,
+      "speedup_vs_c1": 3.2586420719969333,
+      "timesteps": 4383
+    },
+    {
+      "candidate_batch_size": 4,
+      "candidate_days_per_second": 1131.0203327598433,
+      "candidates_per_second": 0.25804707569241236,
+      "elapsed_seconds": 15.501047587022185,
+      "gpu_peak_allocated_bytes": 54596608,
+      "gpu_peak_reserved_bytes": 56623104,
+      "host_peak_rss_kb": 1680552,
+      "speedup_vs_c1": 6.883761750215748,
+      "timesteps": 4383
+    },
+    {
+      "candidate_batch_size": 8,
+      "candidate_days_per_second": 2308.318539063981,
+      "candidates_per_second": 0.5266526440939951,
+      "elapsed_seconds": 15.19027786096558,
+      "gpu_peak_allocated_bytes": 54596608,
+      "gpu_peak_reserved_bytes": 56623104,
+      "host_peak_rss_kb": 1711076,
+      "speedup_vs_c1": 14.049185860124174,
+      "timesteps": 4383
+    },
+    {
+      "candidate_batch_size": 16,
+      "candidate_days_per_second": 4362.5195388132215,
+      "candidates_per_second": 0.9953272961015791,
+      "elapsed_seconds": 16.075114249018952,
+      "gpu_peak_allocated_bytes": 54596608,
+      "gpu_peak_reserved_bytes": 77594624,
+      "host_peak_rss_kb": 1772952,
+      "speedup_vs_c1": 26.551728793922464,
+      "timesteps": 4383
+    },
+    {
+      "candidate_batch_size": 32,
+      "candidate_days_per_second": 8321.836067938684,
+      "candidates_per_second": 1.89866211908252,
+      "elapsed_seconds": 16.853972951998003,
+      "gpu_peak_allocated_bytes": 54596608,
+      "gpu_peak_reserved_bytes": 77594624,
+      "host_peak_rss_kb": 1842528,
+      "speedup_vs_c1": 50.64943145297631,
+      "timesteps": 4383
+    }
+  ],
+  "schema_version": "sce-candidate-batch-scaling-v1",
+  "selected_safe_default_candidate_batch_size": 16,
+  "status": "completed"
+}

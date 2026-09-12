@@ -1,0 +1,73 @@
+"""Independent, tensor-friendly FUSE 78-structure kernel."""
+
+from .spec import (
+    DECISION_ORDER,
+    PARAMETER_NAMES,
+    STATE_NAMES,
+    StructureSpec,
+    enumerate_structures,
+    get_structure,
+    validate_catalog,
+)
+from .kernel import (
+    SimulationResult,
+    compile_diagnostics,
+    evaluate_implicit_residual,
+    reset_compile_diagnostics,
+    simulate,
+    simulate_explicit,
+    simulate_sequential,
+    simulate_coupled_rk2,
+    simulate_storage_block,
+    SEQUENTIAL_ORDERS,
+ )
+from .batched import (
+    BatchedSimulationResult,
+    batched_compile_diagnostics,
+    reset_batched_compile_diagnostics,
+    simulate_coupled_rk2_batched,
+)
+
+from .runtime import (
+    COMPILED_STEP_REGISTRY,
+    GENERATED_STEP_REGISTRY,
+    CompiledStepKey,
+    GraphSignature,
+    RuntimeStepBuilder,
+    get_compiled_step,
+    get_generated_step,
+    reset_runtime_registries,
+    runtime_compile_diagnostics,
+ )
+__all__ = [
+    "DECISION_ORDER",
+    "PARAMETER_NAMES",
+    "STATE_NAMES",
+    "StructureSpec",
+    "SimulationResult",
+    "compile_diagnostics",
+    "evaluate_implicit_residual",
+    "reset_compile_diagnostics",
+    "enumerate_structures",
+    "get_structure",
+    "simulate",
+    "simulate_explicit",
+    "simulate_sequential",
+    "simulate_storage_block",
+    "simulate_coupled_rk2",
+    "BatchedSimulationResult",
+    "simulate_coupled_rk2_batched",
+    "batched_compile_diagnostics",
+    "reset_batched_compile_diagnostics",
+    "SEQUENTIAL_ORDERS",
+    "GraphSignature",
+    "CompiledStepKey",
+    "RuntimeStepBuilder",
+    "GENERATED_STEP_REGISTRY",
+    "COMPILED_STEP_REGISTRY",
+    "get_generated_step",
+    "get_compiled_step",
+    "runtime_compile_diagnostics",
+    "reset_runtime_registries",
+    "validate_catalog",
+]

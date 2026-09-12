@@ -1,0 +1,54 @@
+{
+  "cases": [
+    {
+      "catchment": "USA_09447800",
+      "kge_diff": 0.0,
+      "kge_full": -3.740068069426399,
+      "kge_truncated": -3.740068069426399,
+      "pass": true,
+      "q_diff_max": 0.0,
+      "structure": 2
+    },
+    {
+      "catchment": "USA_09447800",
+      "kge_diff": 0.0,
+      "kge_full": -2.536245312317727,
+      "kge_truncated": -2.536245312317727,
+      "pass": true,
+      "q_diff_max": 0.0,
+      "structure": 8
+    },
+    {
+      "catchment": "USA_14138900",
+      "kge_diff": 0.0,
+      "kge_full": 0.548273445709921,
+      "kge_truncated": 0.548273445709921,
+      "pass": true,
+      "q_diff_max": 0.0,
+      "structure": 2
+    },
+    {
+      "catchment": "USA_14138900",
+      "kge_diff": 0.0,
+      "kge_full": 0.6005419173007067,
+      "kge_truncated": 0.6005419173007067,
+      "pass": true,
+      "q_diff_max": 0.0,
+      "structure": 8
+    }
+  ],
+  "generated_at_utc": "2026-09-07T03:50:23.683501+00:00",
+  "protocol_id": "formal-experiment-protocol-v1-db53091e6e222066",
+  "schema_version": "sce-calibration-horizon-validation-v1",
+  "status": "passed",
+  "summary": {
+    "all_passed": true,
+    "calibration_horizon_steps": 4383,
+    "cases_tested": 4,
+    "full_horizon_steps": 8401,
+    "max_kge_difference": 0.0,
+    "max_q_difference": 0.0,
+    "saved_timesteps_per_evaluation": 4018,
+    "speedup_ratio_theoretical": 1.916723705224732
+  }
+}

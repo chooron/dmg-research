@@ -1,0 +1,104 @@
+{
+  "case": {
+    "basin_id": "USA_14138900",
+    "hru_id": 14138900,
+    "model_id": 8,
+    "target": {
+      "corrected_checker_residual": 0.0,
+      "date": "1989-01-21",
+      "effective_precipitation": 0.0,
+      "forcing": {
+        "pet": 0.50258476,
+        "ppt": 15.45,
+        "temp": 1.0
+      },
+      "index": 751,
+      "kernel_reported_residual": 0.0,
+      "parameters": {
+        "MBASE": 1.0,
+        "PXTEMP": 1.0,
+        "RFERR_MLT": 1.0
+      },
+      "raw_checker_input_precipitation": 15.45,
+      "raw_checker_residual": 15.45,
+      "snow_next": 775.0226770276034,
+      "snow_start": 775.0226770276034,
+      "source_participating_precipitation": 0.0,
+      "temperature_partition": "exact PXTEMP equality: source UPDATE_SWE takes neither snow accumulation (TEMP_Z < PXTEMP) nor rain contribution (TEMP_Z > PXTEMP)"
+    }
+  },
+  "checker_definitions": {
+    "current_raw": "ppt*RFERR_MLT - effective_precipitation - (snow_next-snow_start)",
+    "source_consistent": "precipitation_participating_in_source_partition - effective_precipitation - (snow_next-snow_start); participating precipitation is ppt*RFERR_MLT when temp<PXTEMP or temp>PXTEMP, and zero at exact equality",
+    "why_not_effective_only": "effective precipitation includes rainfall, while the SWE state balance must remove the corresponding rainfall input before comparing SWE change"
+  },
+  "conclusion": {
+    "classification": "checker_definition_bug",
+    "explanation": "The 15.45 residual is raw ppt at exact PXTEMP equality, where the source intentionally contributes neither snow accumulation nor rainfall. Across the full Torch snow path, the source-consistent checker removes the residual to numerical precision; no snow equation/state implementation change is supported by the trace.",
+    "implementation_change_required": false
+  },
+  "long_horizon": {
+    "corrected_first_violation": null,
+    "corrected_max_abs": 1.1368683772161603e-13,
+    "corrected_nonfinite": 0,
+    "kernel_reported_first_violation": null,
+    "kernel_reported_max_abs": 1.1368683772161603e-13,
+    "kernel_reported_nonfinite": 0,
+    "n_steps": 8401,
+    "raw_checker_max_abs": 45.61,
+    "raw_first_violation": {
+      "date": "1989-01-21",
+      "index": 751,
+      "residual": 15.45,
+      "threshold": 1e-08
+    },
+    "raw_nonfinite": 0
+  },
+  "protocol": {
+    "compile_backend": "inductor",
+    "compile_fullgraph": true,
+    "device": "cuda",
+    "dt_days": 1.0,
+    "dtype": "torch.float64",
+    "forcing_start": "1987-01-01",
+    "initial_snow": 0.0,
+    "simulation_end": "2009-12-31"
+  },
+  "schema_version": "snow-balance-long-horizon-audit-v1",
+  "source": {
+    "runtime": "/home/jingxin/orca/workspaces/dmg-research/autofuse/dfuse/runtime.py",
+    "runtime_sha256": "93e1e81c87375c27649c9f9fa3e6f6f4aa79816e65bd3926947b7deca6af50b6",
+    "update_swe": "/home/jingxin/orca/workspaces/dmg-research/autofuse/vendor/upstream/cyrilthebault-fuse/build/FUSE_SRC/FUSE_ENGINE/update_swe.f90",
+    "update_swe_sha256": "6809989e754da9373d433497f8bb4691a0140c497d10e1b50dc76740738d9e6b"
+  },
+  "source_contract": {
+    "accumulation": "UPDATE_SWE: only TEMP_Z < PXTEMP contributes SNOWACCMLTN; multiplicative RFERR uses PRECIP_Z*RFERR_MLT",
+    "current_torch_lumped_path": "_runtime_snow_step uses the same strict < and > partition for lumped ppt/temp and tracks one SWE scalar",
+    "effective_precipitation": "TEMP_Z > PXTEMP contributes rainfall plus snowmelt; otherwise only snowmelt contributes",
+    "melt": "UPDATE_SWE: SWE>0 and TEMP_Z>MBASE gives SNOWMELT; melt is capped when SWE would become negative"
+  },
+  "status": "complete",
+  "target_trace": {
+    "corrected_checker_residual": 0.0,
+    "date": "1989-01-21",
+    "effective_precipitation": 0.0,
+    "forcing": {
+      "pet": 0.50258476,
+      "ppt": 15.45,
+      "temp": 1.0
+    },
+    "index": 751,
+    "kernel_reported_residual": 0.0,
+    "parameters": {
+      "MBASE": 1.0,
+      "PXTEMP": 1.0,
+      "RFERR_MLT": 1.0
+    },
+    "raw_checker_input_precipitation": 15.45,
+    "raw_checker_residual": 15.45,
+    "snow_next": 775.0226770276034,
+    "snow_start": 775.0226770276034,
+    "source_participating_precipitation": 0.0,
+    "temperature_partition": "exact PXTEMP equality: source UPDATE_SWE takes neither snow accumulation (TEMP_Z < PXTEMP) nor rain contribution (TEMP_Z > PXTEMP)"
+  }
+}

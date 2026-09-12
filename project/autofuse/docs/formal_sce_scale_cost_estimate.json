@@ -1,0 +1,68 @@
+{
+  "architectural_recommendation": {
+    "bottleneck_diagnosis": "Because >90% of evaluations in full calibration runs occur during post-initial simplex evolution at C=1, serial evaluation scales linearly with evaluation count (~26s / eval).",
+    "cross_basin_batching_recommendation": "Implementing a cross-basin ready-candidate batch scheduler (grouping C=16 ready candidates across 16 independent basins for the same structure into 1 GPU batch) would reduce sequential evaluation time from ~26s/eval to ~1.0s/eval, providing an additional 15x\u201325x speedup for the full 12x78 and 544x78 campaigns.",
+    "current_status": "Ready for 12x78 bounded/preflight calibration runs."
+  },
+  "campaign_estimates": {
+    "full_544x78": {
+      "capped_campaign_500_evals": {
+        "cases": 42432,
+        "estimated_gpu_days_total": 5982.7155555555555,
+        "estimated_gpu_hours_total": 143585.17333333334,
+        "estimated_seconds_per_case": 12182.0,
+        "evaluations_per_case": 500
+      },
+      "formal_campaign_10000_evals_upper": {
+        "cases": 42432,
+        "estimated_gpu_days_total": 127287.15999999999,
+        "estimated_gpu_hours_total": 3054891.84,
+        "estimated_seconds_per_case": 259182.0,
+        "evaluations_per_case": 10000
+      },
+      "preflight_budget_50_evals": {
+        "cases": 42432,
+        "estimated_gpu_days_total": 236.71555555555554,
+        "estimated_gpu_hours_total": 5681.173333333333,
+        "estimated_seconds_per_case": 482.0,
+        "evaluations_per_case": 50
+      },
+      "total_cases": 42432
+    },
+    "landscape_12x78": {
+      "capped_campaign_500_evals": {
+        "cases": 936,
+        "estimated_gpu_days_total": 131.97166666666666,
+        "estimated_gpu_hours_total": 3167.32,
+        "estimated_seconds_per_case": 12182.0,
+        "evaluations_per_case": 500
+      },
+      "formal_campaign_10000_evals_upper": {
+        "cases": 936,
+        "estimated_gpu_days_total": 2807.8050000000003,
+        "estimated_gpu_hours_total": 67387.32,
+        "estimated_seconds_per_case": 259182.0,
+        "evaluations_per_case": 10000
+      },
+      "preflight_budget_50_evals": {
+        "cases": 936,
+        "estimated_gpu_days_total": 5.221666666666667,
+        "estimated_gpu_hours_total": 125.32,
+        "estimated_seconds_per_case": 482.0,
+        "evaluations_per_case": 50
+      },
+      "total_cases": 936
+    }
+  },
+  "empirical_basis": {
+    "empirical_median_case_seconds_at_50_evals": 257.56890216248576,
+    "final_full_forward_seconds": 60.0,
+    "initial_population_batch_seconds": 32.0,
+    "preflight_cases_analyzed": 8,
+    "sequential_c1_seconds_per_evaluation": 26.0
+  },
+  "generated_at_utc": "2026-09-07T07:13:51.910015+00:00",
+  "protocol_id": "formal-experiment-protocol-v1-db53091e6e222066",
+  "schema_version": "formal-sce-scale-cost-estimate-v1",
+  "status": "completed"
+}

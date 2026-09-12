@@ -1,0 +1,108 @@
+{
+  "artifacts": {
+    "torch_fuse_chunked_temporal_compile_probe.json": "25895ee70af9ae30f84eeca3765fc0903123d866988300175aa923bb4647575e",
+    "torch_fuse_full_temporal_compile_probe.json": "08a119c3499e4c33391b0ab73c3cac3e77a99fa57789bd7d25673ad7b60b211b",
+    "torch_fuse_lite_full_b100_benchmark.json": "e90612f36477a0d015bff65f53ad4fb57626543828ca291465410d635388db90",
+    "torch_fuse_lite_full_parity.json": "c232e4de0ce483f6b705d94521607927018fd7d80891d0b13f30b22fba46ea3b",
+    "torch_fuse_temporal_execution_audit.json": "80cfc9cf6d67ecbe2edf2f6db3403f480115d73435a6979acce0a5f02fa8ec51",
+    "torch_fuse_temporal_optimization_decision.json": "404dee48d160fc1e51709cecf4494cb950c7e0f7d0b9bcb3d680b987a4f72aae",
+    "torch_fuse_wide_compile_boundary_probe.json": "f7125fc72a57ed2aed439538abcf7bfa1b927f7b20eeb847fb0e6c25a0df81af"
+  },
+  "execution_contract": {
+    "compile_boundary": "structure-specific torch.vmap(generated coupled-RK2 step) -> torch.compile(fullgraph=True)",
+    "diagnostic_default": "Full",
+    "temporal": "one-step compiled kernel + Python time loop retained",
+    "training_default": "Lite"
+  },
+  "formal_dpl_campaign_started": false,
+  "full": {
+    "artifact": "project/autofuse/docs/torch_fuse_lite_full_parity.json",
+    "retained": [
+      "routed Q",
+      "instantaneous Q",
+      "active state history",
+      "flux histories",
+      "water/snow balance",
+      "coupled diagnostics"
+    ],
+    "status": "preserved"
+  },
+  "generated_at_utc": "2026-09-08T06:39:18.381898+00:00",
+  "git_sha": "3caca37a4243ae0a95ebe9cc4f22998672ddf464",
+  "lite": {
+    "not_retained": [
+      "state history",
+      "flux history",
+      "balance history",
+      "snow history",
+      "coupled diagnostic history",
+      "hidden monitoring autograd graph"
+    ],
+    "optional_fields": {
+      "q_instantaneous": null,
+      "snow": null
+    },
+    "parity_artifact": "project/autofuse/docs/torch_fuse_lite_full_parity.json",
+    "retained": [
+      "routed Q history",
+      "final active state"
+    ],
+    "status": "validated"
+  },
+  "numerical_core": {
+    "contract": [
+      "float64",
+      "coupled RK2/Heun",
+      "FIX_STATES",
+      "parameter definitions/bounds",
+      "structure catalogue",
+      "warm-up=365",
+      "scored=365",
+      "loss definition"
+    ],
+    "hashes": {
+      "dfuse/kernel.py": "4a79b4caa8d93881c849476e2ffe5aa304c8033cf271bd7e11073d7f7227faff",
+      "dfuse/runtime.py": "f6b9f066489929479ccabb2035e50bed146e536af24a641cae68e11c37e9ad13",
+      "dfuse/spec.py": "0e7c569260e11acd49b8b61174934afbbccf9d1c0ec46c4a3bae561b2491d2bb"
+    },
+    "paths": [
+      "dfuse/kernel.py",
+      "dfuse/runtime.py",
+      "dfuse/spec.py"
+    ],
+    "status": "unchanged"
+  },
+  "schema_version": "torch-fuse-execution-layer-v1-2-v1",
+  "site_packages_modified": false,
+  "source_hashes": {
+    "dfuse/batched.py": "c4d17cb9e91a2358c415b3d43665a1f4e5534a1a3c37b5545eda7fd20a331fe5",
+    "dfuse/kernel.py": "4a79b4caa8d93881c849476e2ffe5aa304c8033cf271bd7e11073d7f7227faff",
+    "dfuse/runtime.py": "f6b9f066489929479ccabb2035e50bed146e536af24a641cae68e11c37e9ad13",
+    "dfuse/spec.py": "0e7c569260e11acd49b8b61174934afbbccf9d1c0ec46c4a3bae561b2491d2bb",
+    "project/autofuse/dpl.py": "c653a6d5f701d4d01c440dd5526c485384227faeef3c46dee67825f808603ca4",
+    "project/autofuse/torch_fuse_temporal_closeout.py": "3e4568e4000d0c09cd1e6327ccedecacb59f34feece7bcf087355ddeda1d1c1d",
+    "project/autofuse/torch_fuse_temporal_optimization.py": "3792111c84ac79eb0b1f090f3b56774d228995d493eac0bc43e1a565ee768f57"
+  },
+  "status": "frozen",
+  "structure_robustness": {
+    "existing_78_structure_smoke": "project/autofuse/docs/runtime_step_validation_78.json",
+    "status": "78 structures passed with no failures"
+  },
+  "temporal_compile": {
+    "chunked": "investigated for K=7/30/60/90; not adopted because no validated B=100 result",
+    "full_temporal": "investigated; long-horizon adoption not eligible because practical evaluation did not complete",
+    "not_claimed": [
+      "not proven slower",
+      "not mathematically impossible"
+    ],
+    "probe_artifacts": [
+      "project/autofuse/docs/torch_fuse_full_temporal_compile_probe.json",
+      "project/autofuse/docs/torch_fuse_chunked_temporal_compile_probe.json"
+    ]
+  },
+  "wide_compile_boundary": {
+    "artifact": "project/autofuse/docs/torch_fuse_wide_compile_boundary_probe.json",
+    "finding": "fullgraph capture blocked by Python registry / Encoder path",
+    "status": "not adopted"
+  }
+}

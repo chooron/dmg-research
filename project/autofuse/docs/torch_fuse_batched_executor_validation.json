@@ -1,0 +1,382 @@
+{
+  "compile": {
+    "passed": true,
+    "rows": [
+      {
+        "audit": {
+          "cold_compile_seconds": [
+            2.753983029979281
+          ],
+          "compile_attempts": 1,
+          "compile_successes": 1,
+          "fallbacks": 0,
+          "forward_unique_graphs": 1,
+          "graph_breaks": 0,
+          "recompilations": 0
+        },
+        "model_id": 2,
+        "passed": true
+      },
+      {
+        "audit": {
+          "cold_compile_seconds": [
+            1.4973127249977551
+          ],
+          "compile_attempts": 1,
+          "compile_successes": 1,
+          "fallbacks": 0,
+          "forward_unique_graphs": 1,
+          "graph_breaks": 0,
+          "recompilations": 0
+        },
+        "model_id": 8,
+        "passed": true
+      }
+    ]
+  },
+  "conservation_observed": {
+    "note": "model 8 USA_09447800 retains the pre-existing WATR_2 lower-floor residual; this is intentionally reported and not hidden by batched parity",
+    "rows": [
+      {
+        "basin_id": "USA_09447800",
+        "model_id": 2,
+        "snow_balance_max_abs": 3.552713678800501e-15,
+        "water_balance_max_abs": 9.769962616701378e-14
+      },
+      {
+        "basin_id": "USA_14138900",
+        "model_id": 2,
+        "snow_balance_max_abs": 5.684341886080802e-14,
+        "water_balance_max_abs": 4.476419235288631e-13
+      },
+      {
+        "basin_id": "USA_09447800",
+        "model_id": 8,
+        "snow_balance_max_abs": 6.217248937900877e-15,
+        "water_balance_max_abs": 9.237055564881302e-14
+      },
+      {
+        "basin_id": "USA_14138900",
+        "model_id": 8,
+        "snow_balance_max_abs": 1.1368683772161603e-13,
+        "water_balance_max_abs": 2.540190280342358e-13
+      }
+    ]
+  },
+  "execution": {
+    "batch_dimension": "leading basin dimension",
+    "executor": "simulate_coupled_rk2_batched",
+    "implementation": "torch.vmap over generated scalar coupled-RK2 step, then torch.compile(fullgraph=True)",
+    "monitoring": "GPU first-failure masks and extrema, host synchronization only at configurable chunk boundaries",
+    "structure_policy": "one structure-specialized GraphSignature per batch",
+    "timestep_policy": "one Python time loop; no catchment loop inside timestep"
+  },
+  "gate_decision": {
+    "batched_compile_passed": true,
+    "batched_parity_passed": true,
+    "executor_validation_passed": true,
+    "science_conservation_gate_passed": true
+  },
+  "monitoring_chunk_probe": {
+    "chunk_size": 64,
+    "model_id": 8,
+    "purpose": "verify per-basin first-failure detection and chunk-boundary stop without daily host synchronization",
+    "summary": {
+      "actual_steps": 8401,
+      "capacity_violation_count": [
+        0,
+        0
+      ],
+      "completed_full_period": true,
+      "monitor_chunk_size": 64,
+      "negative_active_state_count": [
+        0,
+        0
+      ],
+      "nonfinite_count": [
+        0,
+        0
+      ],
+      "per_basin": [
+        {
+          "basin_id": "USA_09447800",
+          "first_failure_category": null,
+          "first_failure_index": null
+        },
+        {
+          "basin_id": "USA_14138900",
+          "first_failure_category": null,
+          "first_failure_index": null
+        }
+      ],
+      "snow_balance_max_abs": [
+        6.217248937900877e-15,
+        1.1368683772161603e-13
+      ],
+      "stopped_on_failure": false,
+      "water_balance_max_abs": [
+        9.237055564881302e-14,
+        2.540190280342358e-13
+      ]
+    }
+  },
+  "parity": {
+    "max_abs_by_field": {
+      "flux_max_abs": 0.0,
+      "q_instantaneous_max_abs": 0.0,
+      "q_max_abs": 0.0,
+      "snow_balance_max_abs": 0.0,
+      "states_max_abs": 0.0,
+      "water_balance_max_abs": 0.0
+    },
+    "passed": true,
+    "rows": [
+      {
+        "basin_id": "USA_09447800",
+        "batched_monitoring": {
+          "basin_id": "USA_09447800",
+          "first_failure_category": null,
+          "first_failure_index": null
+        },
+        "model_id": 2,
+        "parity": {
+          "flux_max_abs": 0.0,
+          "q_instantaneous_max_abs": 0.0,
+          "q_max_abs": 0.0,
+          "snow_balance_max_abs": 0.0,
+          "states_max_abs": 0.0,
+          "water_balance_max_abs": 0.0
+        },
+        "passed": true,
+        "serial_first_failure": {
+          "category": null,
+          "index": null
+        }
+      },
+      {
+        "basin_id": "USA_14138900",
+        "batched_monitoring": {
+          "basin_id": "USA_14138900",
+          "first_failure_category": null,
+          "first_failure_index": null
+        },
+        "model_id": 2,
+        "parity": {
+          "flux_max_abs": 0.0,
+          "q_instantaneous_max_abs": 0.0,
+          "q_max_abs": 0.0,
+          "snow_balance_max_abs": 0.0,
+          "states_max_abs": 0.0,
+          "water_balance_max_abs": 0.0
+        },
+        "passed": true,
+        "serial_first_failure": {
+          "category": null,
+          "index": null
+        }
+      },
+      {
+        "basin_id": "USA_09447800",
+        "batched_monitoring": {
+          "basin_id": "USA_09447800",
+          "first_failure_category": null,
+          "first_failure_index": null
+        },
+        "model_id": 8,
+        "parity": {
+          "flux_max_abs": 0.0,
+          "q_instantaneous_max_abs": 0.0,
+          "q_max_abs": 0.0,
+          "snow_balance_max_abs": 0.0,
+          "states_max_abs": 0.0,
+          "water_balance_max_abs": 0.0
+        },
+        "passed": true,
+        "serial_first_failure": {
+          "category": null,
+          "index": null
+        }
+      },
+      {
+        "basin_id": "USA_14138900",
+        "batched_monitoring": {
+          "basin_id": "USA_14138900",
+          "first_failure_category": null,
+          "first_failure_index": null
+        },
+        "model_id": 8,
+        "parity": {
+          "flux_max_abs": 0.0,
+          "q_instantaneous_max_abs": 0.0,
+          "q_max_abs": 0.0,
+          "snow_balance_max_abs": 0.0,
+          "states_max_abs": 0.0,
+          "water_balance_max_abs": 0.0
+        },
+        "passed": true,
+        "serial_first_failure": {
+          "category": null,
+          "index": null
+        }
+      }
+    ]
+  },
+  "protocol": {
+    "basins": [
+      "USA_09447800",
+      "USA_14138900"
+    ],
+    "cpu_interop_threads": 1,
+    "cpu_threads": 1,
+    "device": "cuda",
+    "dtype": "torch.float64",
+    "forcing_start": "1987-01-01",
+    "monitor_chunk_size_for_parity": 8401,
+    "n_steps": 8401,
+    "simulation_end": "2009-12-31",
+    "structures": [
+      2,
+      8
+    ]
+  },
+  "resource": {
+    "cache_dir": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/.cache/torch-fuse-batched",
+    "gpu_peak_allocated_bytes": 87968768,
+    "gpu_peak_reserved_bytes": 90177536,
+    "host_peak_rss_kb": 1572184
+  },
+  "schema_version": "torch-fuse-batched-executor-validation-v1",
+  "source": {
+    "batched_source": "/home/jingxin/orca/workspaces/dmg-research/autofuse/dfuse/batched.py",
+    "batched_source_sha256": "2a536aef8ab3e536765428a6c152f441f5066776da244c82bb69a67f2b529160",
+    "calibration_archive": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/reference_calibration_12x78.json",
+    "catalogue": "/home/jingxin/orca/workspaces/dmg-research/autofuse/dfuse/specs/structures_78.json",
+    "catalogue_sha256": "457b232b71c870fd3cb698fd9bb517e58844c5e9bba5f0c4ac4ad0bcc971d6fc",
+    "input_index": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/landscape_inputs/index.json",
+    "runtime_source": "/home/jingxin/orca/workspaces/dmg-research/autofuse/dfuse/runtime.py",
+    "runtime_source_sha256": "f6b9f066489929479ccabb2035e50bed146e536af24a641cae68e11c37e9ad13"
+  },
+  "status": "passed",
+  "throughput_benchmark": {
+    "gpu_total_memory_bytes": 12884377600,
+    "model_id": 2,
+    "safe_default_basin_batch_size": 2,
+    "tested_batch_sizes": [
+      {
+        "basin_days_per_second": 138.73262347802873,
+        "basin_ids": [
+          "USA_09447800"
+        ],
+        "batch_size": 1,
+        "compile": {
+          "cold_compile_seconds": [
+            2.7077982340124436
+          ],
+          "compile_attempts": 1,
+          "compile_successes": 1,
+          "fallbacks": 0,
+          "forward_unique_graphs": 1,
+          "graph_breaks": 0,
+          "recompilations": 0
+        },
+        "days": 8401,
+        "days_per_second": 138.73262347802873,
+        "elapsed_seconds": 60.55533146701055,
+        "gpu_peak_allocated_bytes": 50780160,
+        "gpu_peak_reserved_bytes": 52428800,
+        "monitoring": {
+          "actual_steps": 8401,
+          "capacity_violation_count": [
+            0
+          ],
+          "completed_full_period": true,
+          "monitor_chunk_size": 8401,
+          "negative_active_state_count": [
+            0
+          ],
+          "nonfinite_count": [
+            0
+          ],
+          "per_basin": [
+            {
+              "basin_id": "USA_09447800",
+              "first_failure_category": null,
+              "first_failure_index": null
+            }
+          ],
+          "snow_balance_max_abs": [
+            3.552713678800501e-15
+          ],
+          "stopped_on_failure": false,
+          "water_balance_max_abs": [
+            9.769962616701378e-14
+          ]
+        },
+        "safe": true
+      },
+      {
+        "basin_days_per_second": 467.87587282084155,
+        "basin_ids": [
+          "USA_09447800",
+          "USA_14138900"
+        ],
+        "batch_size": 2,
+        "compile": {
+          "cold_compile_seconds": [
+            0.005505698034539819
+          ],
+          "compile_attempts": 1,
+          "compile_successes": 1,
+          "fallbacks": 0,
+          "forward_unique_graphs": 0,
+          "graph_breaks": 0,
+          "recompilations": 0
+        },
+        "days": 8401,
+        "days_per_second": 233.93793641042078,
+        "elapsed_seconds": 35.91123410296859,
+        "gpu_peak_allocated_bytes": 87968768,
+        "gpu_peak_reserved_bytes": 90177536,
+        "monitoring": {
+          "actual_steps": 8401,
+          "capacity_violation_count": [
+            0,
+            0
+          ],
+          "completed_full_period": true,
+          "monitor_chunk_size": 8401,
+          "negative_active_state_count": [
+            0,
+            0
+          ],
+          "nonfinite_count": [
+            0,
+            0
+          ],
+          "per_basin": [
+            {
+              "basin_id": "USA_09447800",
+              "first_failure_category": null,
+              "first_failure_index": null
+            },
+            {
+              "basin_id": "USA_14138900",
+              "first_failure_category": null,
+              "first_failure_index": null
+            }
+          ],
+          "snow_balance_max_abs": [
+            3.552713678800501e-15,
+            5.684341886080802e-14
+          ],
+          "stopped_on_failure": false,
+          "water_balance_max_abs": [
+            9.769962616701378e-14,
+            4.476419235288631e-13
+          ]
+        },
+        "safe": true
+      }
+    ]
+  }
+}

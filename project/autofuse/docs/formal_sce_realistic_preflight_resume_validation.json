@@ -1,0 +1,22 @@
+{
+  "checkpoint_resume_verification": {
+    "atomic_case_write_verified": true,
+    "completed_case_skip_verified": true,
+    "deterministic_restart_verified": true,
+    "level": "case_level_restart_and_skip",
+    "skip_elapsed_seconds": 0.00036089500645175576
+  },
+  "generated_at_utc": "2026-09-07T07:11:45.904090+00:00",
+  "protocol_id": "formal-experiment-protocol-v1-db53091e6e222066",
+  "reproducibility": {
+    "different_seed": 20260909,
+    "different_seed_trajectory_differs": true,
+    "same_seed": 20260901,
+    "same_seed_best_objective_identical": true,
+    "same_seed_best_parameters_identical": true,
+    "same_seed_trajectories_identical": true,
+    "tested_case": "USA_09447800_model_2"
+  },
+  "schema_version": "formal-sce-realistic-preflight-resume-validation-v1",
+  "status": "passed"
+}

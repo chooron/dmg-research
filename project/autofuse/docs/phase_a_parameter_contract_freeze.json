@@ -1,0 +1,24 @@
+{
+  "artifacts": {
+    "dpl_loss_and_regularization_audit": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/dpl_loss_and_regularization_audit.json",
+    "dpl_optimizer_inactive_gradient_audit": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/dpl_optimizer_inactive_gradient_audit.json",
+    "fuse_option_parameter_exposure_audit": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/fuse_option_parameter_exposure_audit.json",
+    "fuse_parameter_contract_audit": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/fuse_parameter_contract_audit.json"
+  },
+  "freeze_summary": {
+    "all_consumed_equal_declared_active": true,
+    "authoritative_source": "dfuse.spec.get_structure, dfuse.spec._parameter_names, dfuse/specs/parameter_catalog.json",
+    "catalogue_structures_validated": 78,
+    "fixed_dimensional_interface": "project/autofuse/parameter_interface.py (FUSEParameterInterface)",
+    "inactive_gradient_invariant_passed": true,
+    "inactive_optimizer_step_frozen": true,
+    "inactive_parameter_delta_strictly_zero": true,
+    "regularization_rule_frozen": true,
+    "union_parameter_dimension": 37
+  },
+  "generated_at_utc": "2026-09-08T08:08:48.985462+00:00",
+  "protocol_id": "formal-experiment-protocol-v1-db53091e6e222066",
+  "schema_version": "phase-a-parameter-contract-freeze-v1",
+  "status": "frozen",
+  "torch_fuse_freeze_id": "torch-fuse-v1-freeze-v1"
+}

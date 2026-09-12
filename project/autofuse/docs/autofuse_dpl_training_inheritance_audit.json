@@ -1,0 +1,41 @@
+{
+  "schema_version": "autofuse-dpl-training-inheritance-audit-v1",
+  "status": "completed",
+  "protocol_id": "formal-experiment-protocol-v1-db53091e6e222066",
+  "generated_at_utc": "2026-09-07T00:00:00+00:00",
+  "reusability_matrix": {
+    "basin_time_window_sampler": {
+      "status": "directly reusable",
+      "rationale": "dmg.core.data.data.random_index and select_subset cleanly handle 730-day window slicing across CAMELS forcing/target arrays."
+    },
+    "warmup_scored_split": {
+      "status": "directly reusable",
+      "rationale": "The 365d warmup + 365d scored period partition aligns with standard hydrological dPL training practice."
+    },
+    "mini_batch_organization": {
+      "status": "directly reusable",
+      "rationale": "Batch tensor shape [730, B=100, features] directly maps to [B=100, 730, features] on GPU."
+    },
+    "loss_masking": {
+      "status": "directly reusable",
+      "rationale": "Criterion classes (KgeBatchLoss, NseBatchLoss, MSELoss) handle missing target observations with boolean masks."
+    },
+    "training_loop": {
+      "status": "reusable with adapter",
+      "rationale": "Trainer.train_one_epoch provides standard epoch/batch iteration, loss logging, backward, and optimizer stepping."
+    },
+    "optimizer_and_checkpointing": {
+      "status": "directly reusable",
+      "rationale": "Standard PyTorch optimizers (Adam, Adadelta) and torch.save/load state dict checkpointing."
+    },
+    "validation_loop": {
+      "status": "directly reusable",
+      "rationale": "Full-horizon continuous evaluation under with torch.no_grad(): across held-out basins."
+    }
+  },
+  "structure_dimension_organization_strategy": {
+    "recommended_strategy": "Fixed structure s per mini-batch with 100 parallel basin-time windows",
+    "rationale": "Each FUSE structure has a unique GraphSignature and compiled Inductor step function (_compiled_step). Fixing the structure per mini-batch allows all 100 basin-time windows to execute the single compiled vmap step at maximum GPU saturation with zero graph recompilations. Structures are sampled or alternated across mini-batches/epochs.",
+    "rejected_alternative": "Mixing multiple structures within a single batch would break vmap/Inductor fullgraph compilation and require slow dynamic branching inside the Python timestep loop."
+  }
+}

@@ -1,0 +1,141 @@
+{
+  "schema_version": "phase0-pilot-v1",
+  "stage": "P0-E",
+  "status": "PASS",
+  "total_steps": 2,
+  "cycles": 1,
+  "structures": [
+    2,
+    8
+  ],
+  "total_wall_clock_seconds": 15.338827064000725,
+  "loss_summary": {
+    "initial": 18.78410052742347,
+    "final": 30.02064638344913,
+    "min": 18.78410052742347,
+    "max": 30.02064638344913,
+    "median": 24.402373455436297
+  },
+  "gradient_norm_summary": {
+    "median": 123.25123131239303,
+    "p90": 205.4411242509414,
+    "max": 225.9885974855785
+  },
+  "clipping_overall": {
+    "total_triggers": 2,
+    "trigger_rate": 1.0
+  },
+  "clipping_by_structure": {
+    "2": {
+      "steps": 1,
+      "clips": 1,
+      "rate": 1.0
+    },
+    "8": {
+      "steps": 1,
+      "clips": 1,
+      "rate": 1.0
+    }
+  },
+  "clipping_by_option": {
+    "RFERR=multiplc_e": {
+      "steps": 2,
+      "clips": 2,
+      "clipping_rate": 1.0
+    },
+    "ARCH1=tension1_1": {
+      "steps": 2,
+      "clips": 2,
+      "clipping_rate": 1.0
+    },
+    "ARCH2=tens2pll_2": {
+      "steps": 1,
+      "clips": 1,
+      "clipping_rate": 1.0
+    },
+    "QSURF=arno_x_vic": {
+      "steps": 2,
+      "clips": 2,
+      "clipping_rate": 1.0
+    },
+    "QPERC=perc_f2sat": {
+      "steps": 2,
+      "clips": 2,
+      "clipping_rate": 1.0
+    },
+    "ESOIL=sequential": {
+      "steps": 2,
+      "clips": 2,
+      "clipping_rate": 1.0
+    },
+    "QINTF=intflwnone": {
+      "steps": 2,
+      "clips": 2,
+      "clipping_rate": 1.0
+    },
+    "Q_TDH=rout_gamma": {
+      "steps": 2,
+      "clips": 2,
+      "clipping_rate": 1.0
+    },
+    "SNOWM=temp_index": {
+      "steps": 2,
+      "clips": 2,
+      "clipping_rate": 1.0
+    },
+    "ARCH2=unlimfrc_2": {
+      "steps": 1,
+      "clips": 1,
+      "clipping_rate": 1.0
+    }
+  },
+  "diagnostics": {
+    "structure_exposure": {
+      "2": 1,
+      "8": 1
+    },
+    "basin_exposure": {
+      "USA_09447800": 2,
+      "USA_14138900": 2
+    },
+    "head_activation_count": {
+      "RFERR_ADD": 0,
+      "RFERR_MLT": 2,
+      "RFH1_MEAN": 0,
+      "RFH2_SDEV": 0,
+      "RH1P_MEAN": 0,
+      "RH1P_SDEV": 0,
+      "RH2P_MEAN": 0,
+      "RH2P_SDEV": 0,
+      "MAXWATR_1": 2,
+      "MAXWATR_2": 2,
+      "FRACTEN": 2,
+      "FRCHZNE": 0,
+      "FPRIMQB": 1,
+      "RTFRAC1": 0,
+      "PERCRTE": 2,
+      "PERCEXP": 2,
+      "SACPMLT": 0,
+      "SACPEXP": 0,
+      "PERCFRAC": 1,
+      "FRACLOWZ": 0,
+      "IFLWRTE": 0,
+      "BASERTE": 0,
+      "QB_POWR": 0,
+      "QB_PRMS": 1,
+      "QBRATE_2A": 1,
+      "QBRATE_2B": 1,
+      "SAREAMAX": 0,
+      "AXV_BEXP": 2,
+      "LOGLAMB": 0,
+      "TISHAPE": 0,
+      "TIMEDELAY": 2,
+      "MBASE": 2,
+      "MFMAX": 2,
+      "MFMIN": 2,
+      "PXTEMP": 2,
+      "OPG": 2,
+      "LAPSE": 2
+    }
+  }
+}

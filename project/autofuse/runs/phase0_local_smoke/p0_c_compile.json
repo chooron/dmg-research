@@ -1,0 +1,23 @@
+{
+  "schema_version": "phase0-compile-v1",
+  "stage": "P0-C",
+  "status": "PASS",
+  "batch_size": 2,
+  "cache_dir": "project/autofuse/.cache/torch-fuse-phase0-smoke",
+  "cache_file_count": 2219,
+  "cache_size_kb": 97055.7900390625,
+  "records": [
+    {
+      "structure_id": 2,
+      "eager_step_seconds": 78.13070257399886,
+      "cold_compile_seconds": 5.775750444998266,
+      "warm_compiled_seconds": 3.9740058799998224,
+      "speedup_ratio": 19.660439600054733,
+      "loss_difference": 0.0,
+      "q_difference": 1.4210854715202004e-14,
+      "parity_verified": true
+    }
+  ],
+  "overall_parity_pass": true,
+  "median_speedup": 19.660439600054733
+}

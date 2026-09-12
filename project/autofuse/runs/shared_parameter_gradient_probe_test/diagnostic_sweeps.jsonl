@@ -1,0 +1,14 @@
+{"checkpoint": "D0", "structure_id": 2, "loss": 10.425607189854128, "kge_mean": -9.425607189854126, "kge_median": -2.6721111580760057, "active_parameter_count": 18, "is_finite": true}
+{"checkpoint": "D0", "structure_id": 6, "loss": 12.220552111075666, "kge_mean": -11.220552111075662, "kge_median": -3.546762347370981, "active_parameter_count": 18, "is_finite": true}
+{"checkpoint": "D0", "structure_id": 8, "loss": 9.293888610852923, "kge_mean": -8.293888610852923, "kge_median": -2.245223569868177, "active_parameter_count": 15, "is_finite": true}
+{"checkpoint": "D0", "structure_id": 10, "loss": 8.998321351962495, "kge_mean": -7.998321351962494, "kge_median": -2.3528160866390437, "active_parameter_count": 17, "is_finite": true}
+{"checkpoint": "D0", "structure_id": 12, "loss": 12.201356049950487, "kge_mean": -11.201356049950487, "kge_median": -3.5444342767412946, "active_parameter_count": 15, "is_finite": true}
+{"checkpoint": "D0", "structure_id": 14, "loss": 12.881296447896162, "kge_mean": -11.881296447896162, "kge_median": -3.9376972542912556, "active_parameter_count": 18, "is_finite": true}
+{"checkpoint": "D0", "structure_id": 16, "loss": 12.315602954784978, "kge_mean": -11.315602954784978, "kge_median": -3.989949814013473, "active_parameter_count": 20, "is_finite": true}
+{"checkpoint": "D0", "structure_id": 18, "loss": 11.92365181360431, "kge_mean": -10.92365181360431, "kge_median": -4.0062225803399665, "active_parameter_count": 18, "is_finite": true}
+{"checkpoint": "D0", "structure_id": 20, "loss": 11.273663841796647, "kge_mean": -10.273663841796647, "kge_median": -2.8112373856493234, "active_parameter_count": 16, "is_finite": true}
+{"checkpoint": "D0", "structure_id": 22, "loss": 4.701310996467178, "kge_mean": -3.701310996467178, "kge_median": -0.11535960984287486, "active_parameter_count": 18, "is_finite": true}
+{"checkpoint": "D0", "structure_id": 24, "loss": 9.808206990866017, "kge_mean": -8.808206990866017, "kge_median": -2.518225795364678, "active_parameter_count": 16, "is_finite": true}
+{"checkpoint": "D0", "structure_id": 26, "loss": 7.420218701353244, "kge_mean": -6.420218701353247, "kge_median": -1.5138737884620723, "active_parameter_count": 18, "is_finite": true}
+{"checkpoint": "D0", "structure_id": 30, "loss": 11.349787037432721, "kge_mean": -10.349787037432721, "kge_median": -3.2073007099622997, "active_parameter_count": 18, "is_finite": true}
+{"checkpoint": "D0", "structure_id": 32, "loss": 6.2720615408958444, "kge_mean": -5.2720615408958444, "kge_median": -0.8315945824142738, "active_parameter_count": 15, "is_finite": true}

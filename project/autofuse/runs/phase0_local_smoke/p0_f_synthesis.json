@@ -1,0 +1,126 @@
+{
+  "schema_version": "phase0-synthesis-v1",
+  "stage": "P0-F",
+  "status": "PASS",
+  "synthesized_at_utc": "2026-09-08T14:35:44.200288+00:00",
+  "environment_summary": {
+    "python_version": "3.10.20",
+    "torch_version": "2.9.1+cu128",
+    "cuda_available": true,
+    "cuda_runtime_version": "12.8",
+    "gpu_name": "NVIDIA GeForce RTX 3060",
+    "gpu_total_vram_mb": 12287.5,
+    "device": "cuda",
+    "dtype": "torch.float32",
+    "thread_policy": {
+      "OMP_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1"
+    }
+  },
+  "production_throughput": {
+    "batch_size": 2,
+    "step_seconds_median": 5.639898473998983,
+    "steps_per_hour": 638.3093625881197,
+    "peak_vram_mb": 61.2587890625
+  },
+  "compilation_evidence": {
+    "median_speedup": 19.660439600054733,
+    "cache_size_kb": 97055.7900390625,
+    "numerical_parity_verified": true,
+    "recommendation": "Use torch.compile with warm Inductor cache on persistent disk"
+  },
+  "validation_cost": {
+    "mean_seconds_per_structure": 3.776869790001001,
+    "projected_full_registry_validation_seconds": 294.5958436200781
+  },
+  "candidate_schedules": [
+    {
+      "budget_nominal_hours": 6,
+      "total_optimization_steps": 3829,
+      "eval_interval_steps": 250,
+      "evaluation_count": 15,
+      "projected_wall_hours": 7.226141364234244,
+      "validation_overhead_percent": 16.98669621695675
+    },
+    {
+      "budget_nominal_hours": 6,
+      "total_optimization_steps": 3829,
+      "eval_interval_steps": 500,
+      "evaluation_count": 7,
+      "projected_wall_hours": 6.571483933967404,
+      "validation_overhead_percent": 8.716832563838487
+    },
+    {
+      "budget_nominal_hours": 6,
+      "total_optimization_steps": 3829,
+      "eval_interval_steps": 1000,
+      "evaluation_count": 3,
+      "projected_wall_hours": 6.244155218833984,
+      "validation_overhead_percent": 3.93162129617765
+    },
+    {
+      "budget_nominal_hours": 12,
+      "total_optimization_steps": 7659,
+      "eval_interval_steps": 250,
+      "evaluation_count": 30,
+      "projected_wall_hours": 14.453849366933486,
+      "validation_overhead_percent": 16.98485504572194
+    },
+    {
+      "budget_nominal_hours": 12,
+      "total_optimization_steps": 7659,
+      "eval_interval_steps": 500,
+      "evaluation_count": 15,
+      "projected_wall_hours": 13.226366685183162,
+      "validation_overhead_percent": 9.280573501152157
+    },
+    {
+      "budget_nominal_hours": 12,
+      "total_optimization_steps": 7659,
+      "eval_interval_steps": 1000,
+      "evaluation_count": 7,
+      "projected_wall_hours": 12.571709254916321,
+      "validation_overhead_percent": 4.556462767856924
+    },
+    {
+      "budget_nominal_hours": 24,
+      "total_optimization_steps": 15319,
+      "eval_interval_steps": 250,
+      "evaluation_count": 61,
+      "projected_wall_hours": 28.991097551115327,
+      "validation_overhead_percent": 17.218261216166397
+    },
+    {
+      "budget_nominal_hours": 24,
+      "total_optimization_steps": 15319,
+      "eval_interval_steps": 500,
+      "evaluation_count": 30,
+      "projected_wall_hours": 26.454300008831325,
+      "validation_overhead_percent": 9.28002390039087
+    },
+    {
+      "budget_nominal_hours": 24,
+      "total_optimization_steps": 15319,
+      "eval_interval_steps": 1000,
+      "evaluation_count": 15,
+      "projected_wall_hours": 25.226817327081,
+      "validation_overhead_percent": 4.865784953509066
+    }
+  ],
+  "gradient_diagnostics": {
+    "overall_clipping_rate": 1.0,
+    "high_clipping_options": [
+      "RFERR=multiplc_e",
+      "ARCH1=tension1_1",
+      "ARCH2=tens2pll_2",
+      "QSURF=arno_x_vic",
+      "QPERC=perc_f2sat",
+      "ESOIL=sequential",
+      "QINTF=intflwnone",
+      "Q_TDH=rout_gamma",
+      "SNOWM=temp_index",
+      "ARCH2=unlimfrc_2"
+    ]
+  }
+}

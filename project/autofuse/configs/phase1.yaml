@@ -1,0 +1,36 @@
+# AutoFuse phase-1 protocol and fidelity validation configuration.
+# The explicit 544-basin manifest is recovered from HydroShare CatchmentBoundaries_544.
+seed: 20260901
+catchment_count: 544
+paper_source_catchment_count: 559
+structure_count: 78
+manifest:
+  path: project/autofuse/manifests/camels_544.json
+  sha256: 5b3e30d34799921c44e0a3c6bca2c713f89ca83f115ad1a46262defd5d745db3
+forcing_product: daymet
+spatialisation: Lumped
+metric: KGECOMP
+transform_calibration: 1
+periods:
+  forcing: [1987-01-01, 2009-12-31]
+  warmup: [1987-01-01, 1988-12-31]
+  simulation: [1989-01-01, 2009-12-31]
+  calibration: [1989-01-01, 1998-12-31]
+  evaluation: [1999-01-01, 2009-12-31]
+sce:
+  max_evaluations: 10000
+  kstop: 3
+  pcento: 0.001
+  enabled: false
+dpl:
+  enabled: false
+  attribute_dim: 35
+  hidden_dim: 64
+  learning_rate: 0.001
+kernel:
+  mother_structure_id: 84
+  forcing_columns: [ppt, pet, temp]
+  time_step_days: 1.0
+  implicit_iterations: 16
+  elevation_bands: 1
+  reference_comparison: optional_external_fuse_executable

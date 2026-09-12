@@ -1,0 +1,82 @@
+{
+  "schema_version": "python-training-environment-audit-v1",
+  "status": "completed",
+  "protocol_id": "formal-experiment-protocol-v1-db53091e6e222066",
+  "generated_at_utc": "2026-09-07T00:00:00+00:00",
+  "environment": {
+    "sys_executable": "/home/jingxin/orca/workspaces/dmg-research/autofuse/.venv/bin/python",
+    "sys_prefix": "/home/jingxin/orca/workspaces/dmg-research/autofuse/.venv",
+    "base_prefix": "/home/jingxin/.local/share/uv/python/cpython-3.10-linux-x86_64-gnu",
+    "python_version": "3.10.20",
+    "site_packages": [
+      "/home/jingxin/orca/workspaces/dmg-research/autofuse/.venv/lib/python3.10/site-packages"
+    ],
+    "cuda_available": true,
+    "cuda_device": "NVIDIA GeForce RTX 4080 (12GB/16GB VRAM visible in WSL2)",
+    "pytorch_version": "2.9.1+cu128",
+    "torch_cuda_version": "12.8"
+  },
+  "training_and_calibration_packages_installed": [
+    {
+      "name": "evotorch",
+      "version": "0.6.1",
+      "location": "/home/jingxin/orca/workspaces/dmg-research/autofuse/.venv/lib/python3.10/site-packages/evotorch",
+      "purpose": "PyTorch-based evolutionary computation framework (GA, CMA-ES, PGPE, SNES, CEM, Cosyne)",
+      "algorithms_included": ["GeneticAlgorithm", "SNES", "CEM", "PGPE", "CMAES", "Cosyne"],
+      "has_sce_ua": false
+    },
+    {
+      "name": "cma",
+      "version": "4.4.4",
+      "location": "/home/jingxin/orca/workspaces/dmg-research/autofuse/.venv/lib/python3.10/site-packages/cma",
+      "purpose": "Covariance Matrix Adaptation Evolution Strategy (CMA-ES)",
+      "algorithms_included": ["CMAEvolutionStrategy"],
+      "has_sce_ua": false
+    },
+    {
+      "name": "scipy",
+      "version": "1.15.3",
+      "location": "/home/jingxin/orca/workspaces/dmg-research/autofuse/.venv/lib/python3.10/site-packages/scipy",
+      "purpose": "Standard scientific computing optimization library (scipy.optimize)",
+      "algorithms_included": ["differential_evolution", "dual_annealing", "minimize", "shgo", "basinhopping"],
+      "has_sce_ua": false
+    },
+    {
+      "name": "dmg",
+      "version": "1.4.1",
+      "location": "/home/jingxin/orca/workspaces/dmg-research/autofuse/.venv/lib/python3.10/site-packages/dmg",
+      "purpose": "Differentiable modeling and deep learning hydrological library",
+      "algorithms_included": ["NeuralNetworks", "MtsModelHandler", "Criterion"],
+      "has_sce_ua": false
+    },
+    {
+      "name": "hydrodl2",
+      "version": "1.3.4",
+      "location": "/home/jingxin/orca/workspaces/dmg-research/autofuse/.venv/lib/python3.10/site-packages/hydrodl2",
+      "purpose": "Deep learning models for hydrology (LSTM, CNN, etc.)",
+      "algorithms_included": ["load_model", "load_module"],
+      "has_sce_ua": false
+    },
+    {
+      "name": "spotpy",
+      "version": null,
+      "location": null,
+      "purpose": "Hydrological calibration package commonly used for SCE-UA in Python",
+      "algorithms_included": [],
+      "has_sce_ua": false,
+      "installed": false
+    }
+  ],
+  "repository_import_chain": {
+    "entrypoint": "project/autofuse/sce.py",
+    "dependencies": [
+      "torch",
+      "dfuse (dfuse.spec, dfuse.batched)",
+      "project.autofuse.evaluator (UnifiedEvaluator)",
+      "project.autofuse.protocol (ExperimentProtocol)",
+      "project.autofuse.metrics (kgecomp, kgecomp_batched)"
+    ],
+    "external_optimizer_used": false,
+    "sce_implementation_nature": "In-repo standalone implementation of Duan et al. (1992, 1993) SCE-UA algorithm directly coupled to UnifiedEvaluator.score_batched."
+  }
+}

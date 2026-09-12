@@ -1,0 +1,273 @@
+{
+  "schema_version": "fortran-fix-states-dependency-audit-v1",
+  "status": "source_audited",
+  "source": {
+    "repository": "vendor/upstream/cyrilthebault-fuse",
+    "commit": "e6e23a4fc4ff4019bcab55f14537ea43b9525967",
+    "files": {
+      "fix_states.f90": {
+        "path": "vendor/upstream/cyrilthebault-fuse/build/FUSE_SRC/FUSE_ENGINE/fix_states.f90",
+        "sha256": "b0547541ed1d09df684871dbca40048263d9c3ad99ee6934f6e82f550b0f90ce",
+        "lines": "1-283"
+      },
+      "fuse_solve.f90": {
+        "path": "vendor/upstream/cyrilthebault-fuse/build/FUSE_SRC/FUSE_ENGINE/fuse_solve.f90",
+        "sha256": "89187894cae178de1240a8bcb3b418ce36f5dd342766330628e5e0116710a649",
+        "lines": "1-251"
+      },
+      "ode_int.f90": {
+        "path": "vendor/upstream/cyrilthebault-fuse/build/FUSE_SRC/FUSE_ENGINE/ode_int.f90",
+        "sha256": "0ec1176b3c547b0046d847325b6f17b0b2010197730dde68d194b402112e4806",
+        "lines": "1-360"
+      },
+      "assign_stt.f90": {
+        "path": "vendor/upstream/cyrilthebault-fuse/build/FUSE_SRC/FUSE_ENGINE/assign_stt.f90",
+        "sha256": "9a6b0da682e8e5d66a721877ee4f6e6626f56190be1540b21b4e2222ea8935de",
+        "lines": "1-60"
+      },
+      "meanfluxes.f90": {
+        "path": "vendor/upstream/cyrilthebault-fuse/build/FUSE_SRC/FUSE_ENGINE/meanfluxes.f90",
+        "sha256": "469a18b6e98b12615ad56696d7d04b711924bbc8d8b950fe3db8efc88007d1c9",
+        "lines": "1-50"
+      },
+      "mstate_eqn.f90": {
+        "path": "vendor/upstream/cyrilthebault-fuse/build/FUSE_SRC/FUSE_ENGINE/mstate_eqn.f90",
+        "sha256": "e1844842d06323a21dbf378b66e900ee72e9368062ca38d78150d492f57d8e7e",
+        "lines": "1-66"
+      },
+      "q_misscell.f90": {
+        "path": "vendor/upstream/cyrilthebault-fuse/build/FUSE_SRC/FUSE_ENGINE/q_misscell.f90",
+        "sha256": "9aafd5524b4c1d683b9d1a0394489e39dd85c06da0496de31db8e3b73b284f4a",
+        "lines": "1-171"
+      },
+      "xtry_2_str.f90": {
+        "path": "vendor/upstream/cyrilthebault-fuse/build/FUSE_SRC/FUSE_ENGINE/xtry_2_str.f90",
+        "sha256": "22571098228fd58c09610ac7398ad8ef652081da986c0a46b87097d875fd1bb6",
+        "lines": "1-84"
+      }
+    }
+  },
+  "call_graph": {
+    "explicit_heun": [
+      "ODE_INT: STATE1_LO = STATE0 + DYDT_0*DT_SUB",
+      "FUSE_SOLVE(B_IMPOSE=.TRUE., S0=STATE1_LO): BSTATE=MSTATE; ESTATE=S0; FIX_STATES(DT,ERROR_FLAG); return STATE1_LO_S",
+      "FUSE_SOLVE(CALCDSDT=.TRUE., S0=STATE1_LO_S, SOLUTION=1): FUSE_DERIV; save FLUX_1 and DYDT_1",
+      "ODE_INT: STATE1_HI = STATE0 + 0.5*(DYDT_0+DYDT_1)*DT_SUB",
+      "FUSE_SOLVE(AVG_FLUX=.TRUE.): MEANFLUXES sets M_FLUX=0.5*(FLUX_0+FLUX_1)",
+      "FUSE_SOLVE(B_IMPOSE=.TRUE., S0=STATE1_HI): BSTATE=MSTATE; FIX_STATES; return STATE1_HI_S",
+      "FUSE_SOLVE(ADD_FLUX=.TRUE.): aggregate corrected accepted fluxes",
+      "after substeps FUSE_SOLVE(NEWSTATE=.TRUE.): M_FLUX=W_FLUX; MSTATE_EQN; UPDATSTATE"
+    ],
+    "fix_states_call_placement": {
+      "predictor": true,
+      "final_raw_heun": true,
+      "before_stage2_rhs": true,
+      "after_flux_average": true,
+      "inside_fix_states": false,
+      "recompute_flux_laws": false,
+      "recompute_state_derivative": false,
+      "details": "FIX_STATES mutates ESTATE and M_FLUX only. DY_DT is not recomputed inside FIX_STATES; later accepted-flux aggregation and MSTATE_EQN provide the mass-consistent full-step state."
+    },
+    "state_order": {
+      "tension2_1": ["TENS_1A", "TENS_1B", "FREE_1", "TENS_2", "FREE_2A", "FREE_2B"],
+      "tension1_1": ["TENS_1", "FREE_1", "TENS_2", "FREE_2A", "FREE_2B"],
+      "onestate_1": ["WATR_1", "WATR_2"]
+    },
+    "state_storage": {
+      "BSTATE": "MSTATE at start of the substep",
+      "ESTATE": "candidate end state supplied through S0 to B_IMPOSE",
+      "M_FLUX": "raw or averaged fluxes, mutated in place by FIX_STATES",
+      "ERROR_FLAG": "logical output true if any state bound branch was taken",
+      "single_architecture_hidden_fields": "xtry_2_str.f90 assigns FREE_2A=missingValue twice and does not assign FREE_2B for single lower architectures; FIX_STATES WATR_2 upper test therefore reads an undefined/non-CSTATE field",
+      "diagnostic_implication": "The frozen wrapper records FREE_2B and explicitly initializes this non-CSTATE field to zero for single-state architectures after XTRY_2_STR; this makes the source's undefined upper-test input deterministic without changing active states, flux laws, or original scientific source. The source WATR_2 upper branch is therefore inactive under the documented wrapper contract."
+  }
+  },
+  "contract": {
+    "lower_bound": "FRACSTATE_MIN * state capacity; FRACSTATE_MIN=1e-9 in the pinned numerix setup",
+    "upper_bound": "state-specific DPARAM capacity",
+    "pass_order": "one nonrecursive pass over ASSIGN_STT state order; lower-layer recomputation can update later states before their own cases",
+    "state_only_clamp": false,
+    "flux_law_recall": false,
+    "mass_rule": "The state correction is represented by changing the flux that caused the excess/deficit, or proportionally changing the outgoing loss fluxes. Subsequent-state values are recomputed from BSTATE and corrected fluxes."
+  },
+  "state_rules": [
+    {
+      "state": "TENS_1A",
+      "architectures": ["tension2_1"],
+      "lower": {
+        "error_loss": "(ESTATE.TENS_1A - XMIN*DPARAM.MAXTENS_1A)/DT",
+        "flux_changes": "QSURF += QSURF/(QSURF+EVAP_1A)*ERROR_LOSS; EVAP_1A += EVAP_1A/(QSURF+EVAP_1A)*ERROR_LOSS",
+        "corrected_state": "XMIN*DPARAM.MAXTENS_1A"
+      },
+      "upper": {
+        "error_loss": "(ESTATE.TENS_1A - DPARAM.MAXTENS_1A)/DT",
+        "flux_changes": "RCHR2EXCS += ERROR_LOSS",
+        "corrected_state": "DPARAM.MAXTENS_1A",
+        "subsequent_state_recompute": "TENS_1B = BSTATE.TENS_1B + (RCHR2EXCS-EVAP_1B-TENS2FREE_1)*DT"
+      },
+      "error_field": "ERR_TENS_1A"
+    },
+    {
+      "state": "TENS_1B",
+      "architectures": ["tension2_1"],
+      "lower": {
+        "error_loss": "(ESTATE.TENS_1B - XMIN*DPARAM.MAXTENS_1B)/DT",
+        "flux_changes": "EVAP_1B += ERROR_LOSS",
+        "corrected_state": "XMIN*DPARAM.MAXTENS_1B"
+      },
+      "upper": {
+        "error_loss": "(ESTATE.TENS_1B - DPARAM.MAXTENS_1B)/DT",
+        "flux_changes": "TENS2FREE_1 += ERROR_LOSS",
+        "corrected_state": "DPARAM.MAXTENS_1B",
+        "subsequent_state_recompute": "FREE_1 = BSTATE.FREE_1 + (TENS2FREE_1-QPERC_12-QINTF_1-OFLOW_1)*DT"
+      },
+      "error_field": "ERR_TENS_1B"
+    },
+    {
+      "state": "TENS_1",
+      "architectures": ["tension1_1"],
+      "lower": {
+        "error_loss": "(ESTATE.TENS_1 - XMIN*DPARAM.MAXTENS_1)/DT",
+        "flux_changes": "QSURF and EVAP_1 are changed proportionally using their sum",
+        "corrected_state": "XMIN*DPARAM.MAXTENS_1"
+      },
+      "upper": {
+        "error_loss": "(ESTATE.TENS_1 - DPARAM.MAXTENS_1)/DT",
+        "flux_changes": "TENS2FREE_1 += ERROR_LOSS",
+        "corrected_state": "DPARAM.MAXTENS_1",
+        "subsequent_state_recompute": "FREE_1 = BSTATE.FREE_1 + (TENS2FREE_1-QPERC_12-QINTF_1-OFLOW_1)*DT"
+      },
+      "error_field": "ERR_TENS_1"
+    },
+    {
+      "state": "FREE_1",
+      "architectures": ["tension2_1", "tension1_1"],
+      "lower": {
+        "error_loss": "(ESTATE.FREE_1 - XMIN*DPARAM.MAXFREE_1)/DT",
+        "flux_changes": "QPERC_12 and QINTF_1 are changed proportionally using their sum",
+        "corrected_state": "XMIN*DPARAM.MAXFREE_1",
+        "subsequent_state_recompute": "Recompute lower layer using corrected QPERC_12"
+      },
+      "upper": {
+        "error_loss": "(ESTATE.FREE_1 - DPARAM.MAXFREE_1)/DT",
+        "flux_changes": "OFLOW_1 += ERROR_LOSS",
+        "corrected_state": "DPARAM.MAXFREE_1"
+      },
+      "error_field": "ERR_FREE_1"
+    },
+    {
+      "state": "WATR_1",
+      "architectures": ["onestate_1"],
+      "lower": {
+        "error_loss": "(ESTATE.WATR_1 - XMIN*MPARAM.MAXWATR_1)/DT",
+        "flux_changes": "QSURF, EVAP_1, QPERC_12, and QINTF_1 are changed proportionally using their sum",
+        "corrected_state": "XMIN*MPARAM.MAXWATR_1",
+        "subsequent_state_recompute": "Recompute lower layer using corrected QPERC_12"
+      },
+      "upper": {
+        "error_loss": "(ESTATE.WATR_1 - MPARAM.MAXWATR_1)/DT",
+        "flux_changes": "OFLOW_1 += ERROR_LOSS",
+        "corrected_state": "MPARAM.MAXWATR_1"
+      },
+      "error_field": "ERR_WATR_1"
+    },
+    {
+      "state": "TENS_2",
+      "architectures": ["tens2pll_2"],
+      "lower": {
+        "error_loss": "(ESTATE.TENS_2 - XMIN*DPARAM.MAXTENS_2)/DT",
+        "flux_changes": "EVAP_2 += ERROR_LOSS",
+        "corrected_state": "XMIN*DPARAM.MAXTENS_2"
+      },
+      "upper": {
+        "error_loss": "(ESTATE.TENS_2 - DPARAM.MAXTENS_2)/DT",
+        "flux_changes": "TENS2FREE_2 += ERROR_LOSS",
+        "corrected_state": "DPARAM.MAXTENS_2",
+        "subsequent_state_recompute": "Recompute OFLOW_2A/B and FREE_2A/B from BSTATE and corrected lower incoming flux"
+      },
+      "error_field": "ERR_TENS_2"
+    },
+    {
+      "state": "FREE_2A",
+      "architectures": ["tens2pll_2"],
+      "lower": {
+        "error_loss": "(ESTATE.FREE_2A - XMIN*DPARAM.MAXFREE_2A)/DT",
+        "flux_changes": "QBASE_2A += ERROR_LOSS",
+        "corrected_state": "XMIN*DPARAM.MAXFREE_2A"
+      },
+      "upper": {
+        "error_loss": "(ESTATE.FREE_2A - DPARAM.MAXFREE_2A)/DT",
+        "flux_changes": "OFLOW_2A += ERROR_LOSS",
+        "corrected_state": "DPARAM.MAXFREE_2A"
+      },
+      "error_field": "ERR_FREE_2A"
+    },
+    {
+      "state": "FREE_2B",
+      "architectures": ["tens2pll_2"],
+      "lower": {
+        "error_loss": "(ESTATE.FREE_2B - XMIN*DPARAM.MAXFREE_2B)/DT",
+        "flux_changes": "QBASE_2B += ERROR_LOSS",
+        "corrected_state": "XMIN*DPARAM.MAXFREE_2B"
+      },
+      "upper": {
+        "error_loss": "(ESTATE.FREE_2B - DPARAM.MAXFREE_2B)/DT",
+        "flux_changes": "OFLOW_2B += ERROR_LOSS",
+        "corrected_state": "DPARAM.MAXFREE_2B"
+      },
+      "error_field": "ERR_FREE_2B"
+    },
+    {
+      "state": "WATR_2",
+      "architectures": ["unlimfrc_2", "unlimpow_2", "fixedsiz_2"],
+      "lower": {
+        "error_loss": "(ESTATE.WATR_2 - XMIN*DPARAM.MAXWATR_1)/DT (source-level upper-layer MAXWATR_1 reference is preserved)",
+        "flux_changes": "EVAP_2 and QBASE_2 are changed proportionally using their sum",
+        "corrected_state": "XMIN*MPARAM.MAXWATR_2"
+      },
+      "upper": {
+        "trigger": "ESTATE.FREE_2B > DPARAM.MAXFREE_2B (source-level condition; it does not test ESTATE.WATR_2)",
+        "error_loss": "(ESTATE.WATR_2 - MPARAM.MAXWATR_2)/DT",
+        "flux_changes": "OFLOW_2 += ERROR_LOSS",
+        "corrected_state": "MPARAM.MAXWATR_2"
+      },
+      "error_field": "ERR_WATR_2",
+      "topmdexp_2": "not supported by the complete source contract: direct WATR_2 handling exists, but qperc-changing upper-layer lower-bound correction reaches the source default STOP because lower recomputation omits topmdexp_2"
+    }
+  ],
+  "lower_recompute": {
+    "trigger": ["FREE_1 lower-bound correction", "WATR_1 lower-bound correction", "TENS_2 upper-bound correction"],
+    "base_state": "BSTATE, never already-corrected ESTATE",
+    "tens2pll_2": {
+      "TENS2FREE_2": "MAX(0, QPERC_12*(1-PERCFRAC) - (MAXTENS_2-BSTATE.TENS_2)/DT)",
+      "OFLOW_2A": "MAX(0, QPERC_12*PERCFRAC/2 + TENS2FREE_2/2 - (MAXFREE_2A-BSTATE.FREE_2A)/DT)",
+      "OFLOW_2B": "MAX(0, QPERC_12*PERCFRAC/2 + TENS2FREE_2/2 - (MAXFREE_2B-BSTATE.FREE_2B)/DT)",
+      "OFLOW_2": "OFLOW_2A + OFLOW_2B",
+      "states": "TENS_2=BSTATE.TENS_2+(QPERC_12*(1-PERCFRAC)-EVAP_2-TENS2FREE_2)*DT; FREE_2A/B=BSTATE.FREE_2A/B+(QPERC_12*PERCFRAC/2+TENS2FREE_2/2-QBASE_2A/B-OFLOW_2A/B)*DT"
+    },
+    "single_state": {
+      "fixedsiz_2_overflow": "OFLOW_2=MAX(0, QPERC_12-(MAXWATR_2-BSTATE.WATR_2)/DT)",
+      "unlimfrc_2_unlimpow_2_overflow": "OFLOW_2 is not recomputed by this block",
+      "state": "WATR_2=BSTATE.WATR_2+(QPERC_12-EVAP_2-QBASE_2-OFLOW_2)*DT"
+    }
+  },
+  "flux_finalization": {
+    "parallel_architecture": "After the state loop, QBASE_2=QBASE_2A+QBASE_2B and OFLOW_2=OFLOW_2A+OFLOW_2B",
+    "derivative": "FIX_STATES does not call MSTATE_EQN; corrected M_FLUX is later consumed by WGT_FLUXES/MSTATE_EQN",
+    "snow": "Snow is updated by UPDATE_SWE and is not a CSTATE processed by FIX_STATES",
+    "routing": "Routing states are not in CSTATE and are not processed by FIX_STATES"
+  },
+  "status_flags_and_quirks": {
+    "error_flag": "initialized false, set true for any lower or upper correction, no iteration or recursion",
+    "error_fields": "one ERR_* field per state receives the last ERROR_LOSS value after that state's lower/upper checks",
+    "division": "proportional lower corrections divide by TOTAL_LOSS without a source guard; the PyTorch equivalent must define only the zero-denominator extension needed for finite compiled execution",
+    "unsupported_state_or_architecture": "source executes STOP",
+    "preserved_source_quirks": [
+      "WATR_2 lower ERROR_LOSS uses DPARAM.MAXWATR_1 while the clipped lower bound uses MPARAM.MAXWATR_2",
+      "WATR_2 upper branch tests FREE_2B instead of WATR_2 and then clips WATR_2",
+      "lower recomputation uses BSTATE rather than current ESTATE",
+      "FIX_STATES emits debug prints if QSURF is negative"
+    ]
+  },
+  "original_fortran_science_modified": false
+}

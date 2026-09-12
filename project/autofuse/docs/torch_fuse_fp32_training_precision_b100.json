@@ -1,0 +1,1901 @@
+{
+  "generated_at_utc": "2026-09-08T07:43:29.143886+00:00",
+  "protocol": {
+    "batch_size": 100,
+    "default_fp64_reference_unchanged": true,
+    "output_mode": "lite",
+    "scored_days": 365,
+    "solver": "coupled RK2/Heun",
+    "state_rule": "FIX_STATES",
+    "structures": [
+      2,
+      8,
+      190,
+      214
+    ],
+    "warmup_days": 365,
+    "window_days": 730
+  },
+  "records": [
+    {
+      "batch_size": 100,
+      "final_states": {
+        "aggregate_max_abs_diff": 0.00025261765375717005,
+        "aggregate_relative_L2_error": 4.945671454292621e-07,
+        "by_active_state": [
+          {
+            "correlation": 0.9999999999982536,
+            "max_abs_diff": 4.263539382520776e-05,
+            "mean_abs_diff": 9.496932848946926e-06,
+            "relative_L2_error": 1.3344285498281067e-07,
+            "rmse": 1.2321442059034256e-05,
+            "state_name": "TENS_1"
+          },
+          {
+            "correlation": 0.9999999999967858,
+            "max_abs_diff": 4.2118298253512876e-05,
+            "mean_abs_diff": 1.5143085072466533e-05,
+            "relative_L2_error": 2.8667776535106156e-07,
+            "rmse": 1.815239951965487e-05,
+            "state_name": "FREE_1"
+          },
+          {
+            "correlation": 0.9999999999467393,
+            "max_abs_diff": 0.00025261765375717005,
+            "mean_abs_diff": 8.454195577627388e-05,
+            "relative_L2_error": 5.612855879284925e-07,
+            "rmse": 0.00010751340623182949,
+            "state_name": "TENS_2"
+          },
+          {
+            "correlation": 0.999999999989977,
+            "max_abs_diff": 9.483436169965831e-07,
+            "mean_abs_diff": 1.0065895478483105e-07,
+            "relative_L2_error": 3.223176371961154e-06,
+            "rmse": 1.6320040196683565e-07,
+            "state_name": "FREE_2A"
+          },
+          {
+            "correlation": 0.999999999989821,
+            "max_abs_diff": 9.217780396475472e-07,
+            "mean_abs_diff": 9.543769059527744e-08,
+            "relative_L2_error": 3.2447452074348746e-06,
+            "rmse": 1.5497501342405277e-07,
+            "state_name": "FREE_2B"
+          }
+        ]
+      },
+      "finite": true,
+      "fp32_compile": {
+        "backend": "inductor",
+        "batch_size": 100,
+        "calls": 730,
+        "cold_compile_seconds": [
+          4.281798942014575
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "dynamo_counters": {
+          "aot_autograd": {
+            "autograd_cache_hit": 1,
+            "ok": 1,
+            "total": 1
+          },
+          "inductor": {
+            "async_compile_cache_hit": 205,
+            "async_compile_cache_miss": 315,
+            "fxgraph_cache_hit": 2,
+            "triton_bundler_load_static_autotuner": 100
+          },
+          "stats": {
+            "calls_captured": 1887,
+            "unique_graphs": 1
+          }
+        },
+        "failures": [],
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "fullgraph": true,
+        "graph_breaks": 0,
+        "graph_signature": {
+          "decisions": {
+            "ARCH1": "tension1_1",
+            "ARCH2": "tens2pll_2",
+            "ESOIL": "sequential",
+            "QINTF": "intflwnone",
+            "QPERC": "perc_f2sat",
+            "QSURF": "arno_x_vic",
+            "Q_TDH": "rout_gamma",
+            "RFERR": "multiplc_e",
+            "SNOWM": "temp_index"
+          },
+          "execution_mode": "coupled_rk2",
+          "n_substeps": 1,
+          "parameter_names": [
+            "RFERR_MLT",
+            "FRACTEN",
+            "MAXWATR_1",
+            "PERCFRAC",
+            "FPRIMQB",
+            "MAXWATR_2",
+            "QBRATE_2A",
+            "QBRATE_2B",
+            "PERCRTE",
+            "PERCEXP",
+            "AXV_BEXP",
+            "TIMEDELAY",
+            "MBASE",
+            "MFMAX",
+            "MFMIN",
+            "PXTEMP",
+            "OPG",
+            "LAPSE"
+          ],
+          "sequential_order": [
+            "coupled_rhs"
+          ],
+          "state_names": [
+            "TENS_1",
+            "FREE_1",
+            "TENS_2",
+            "FREE_2A",
+            "FREE_2B"
+          ],
+          "topology": [
+            [
+              "lower",
+              [
+                [
+                  "FREE_2A",
+                  [
+                    [
+                      "OFLOW_2A",
+                      -1
+                    ],
+                    [
+                      "QBASE_2A",
+                      -1
+                    ],
+                    [
+                      "QPERC_12*PERCFRAC/2",
+                      1
+                    ],
+                    [
+                      "TENS2FREE_2/2",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "FREE_2B",
+                  [
+                    [
+                      "OFLOW_2B",
+                      -1
+                    ],
+                    [
+                      "QBASE_2B",
+                      -1
+                    ],
+                    [
+                      "QPERC_12*PERCFRAC/2",
+                      1
+                    ],
+                    [
+                      "TENS2FREE_2/2",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "TENS_2",
+                  [
+                    [
+                      "EVAP_2",
+                      -1
+                    ],
+                    [
+                      "QPERC_12*(1-PERCFRAC)",
+                      1
+                    ],
+                    [
+                      "TENS2FREE_2",
+                      -1
+                    ]
+                  ]
+                ]
+              ]
+            ],
+            [
+              "upper",
+              [
+                [
+                  "FREE_1",
+                  [
+                    [
+                      "OFLOW_1",
+                      -1
+                    ],
+                    [
+                      "QINTF_1",
+                      -1
+                    ],
+                    [
+                      "QPERC_12",
+                      -1
+                    ],
+                    [
+                      "TENS2FREE_1",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "TENS_1",
+                  [
+                    [
+                      "EFF_PPT",
+                      1
+                    ],
+                    [
+                      "EVAP_1",
+                      -1
+                    ],
+                    [
+                      "QSURF",
+                      -1
+                    ],
+                    [
+                      "TENS2FREE_1",
+                      -1
+                    ]
+                  ]
+                ]
+              ]
+            ]
+          ]
+        },
+        "graph_signature_digest": "71c2d011de746521",
+        "model_id": 2,
+        "recompilations": 0
+      },
+      "fp32_dtype_inventory": {
+        "all_physics_tensors_requested_dtype": true,
+        "loss_dtype": "float32",
+        "no_physics_float64_cast_in_experiment": true,
+        "parameterizer_parameter_dtypes": [
+          "float32"
+        ],
+        "physics_tensor_dtypes": [
+          "float32"
+        ],
+        "reporting_only_float64": "error statistics, NumPy comparisons, norms, and JSON serialization cast detached values to float64 after the simulation/loss run",
+        "theta_dtype": "float32"
+      },
+      "fp64_compile": {
+        "backend": "inductor",
+        "batch_size": 100,
+        "calls": 730,
+        "cold_compile_seconds": [
+          8.281817259965464
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "dynamo_counters": {
+          "aot_autograd": {
+            "autograd_cache_hit": 1,
+            "ok": 1,
+            "total": 1
+          },
+          "inductor": {
+            "async_compile_cache_hit": 212,
+            "async_compile_cache_miss": 324,
+            "fxgraph_cache_hit": 2,
+            "triton_bundler_load_static_autotuner": 104
+          },
+          "stats": {
+            "calls_captured": 1887,
+            "unique_graphs": 1
+          }
+        },
+        "failures": [],
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "fullgraph": true,
+        "graph_breaks": 0,
+        "graph_signature": {
+          "decisions": {
+            "ARCH1": "tension1_1",
+            "ARCH2": "tens2pll_2",
+            "ESOIL": "sequential",
+            "QINTF": "intflwnone",
+            "QPERC": "perc_f2sat",
+            "QSURF": "arno_x_vic",
+            "Q_TDH": "rout_gamma",
+            "RFERR": "multiplc_e",
+            "SNOWM": "temp_index"
+          },
+          "execution_mode": "coupled_rk2",
+          "n_substeps": 1,
+          "parameter_names": [
+            "RFERR_MLT",
+            "FRACTEN",
+            "MAXWATR_1",
+            "PERCFRAC",
+            "FPRIMQB",
+            "MAXWATR_2",
+            "QBRATE_2A",
+            "QBRATE_2B",
+            "PERCRTE",
+            "PERCEXP",
+            "AXV_BEXP",
+            "TIMEDELAY",
+            "MBASE",
+            "MFMAX",
+            "MFMIN",
+            "PXTEMP",
+            "OPG",
+            "LAPSE"
+          ],
+          "sequential_order": [
+            "coupled_rhs"
+          ],
+          "state_names": [
+            "TENS_1",
+            "FREE_1",
+            "TENS_2",
+            "FREE_2A",
+            "FREE_2B"
+          ],
+          "topology": [
+            [
+              "lower",
+              [
+                [
+                  "FREE_2A",
+                  [
+                    [
+                      "OFLOW_2A",
+                      -1
+                    ],
+                    [
+                      "QBASE_2A",
+                      -1
+                    ],
+                    [
+                      "QPERC_12*PERCFRAC/2",
+                      1
+                    ],
+                    [
+                      "TENS2FREE_2/2",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "FREE_2B",
+                  [
+                    [
+                      "OFLOW_2B",
+                      -1
+                    ],
+                    [
+                      "QBASE_2B",
+                      -1
+                    ],
+                    [
+                      "QPERC_12*PERCFRAC/2",
+                      1
+                    ],
+                    [
+                      "TENS2FREE_2/2",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "TENS_2",
+                  [
+                    [
+                      "EVAP_2",
+                      -1
+                    ],
+                    [
+                      "QPERC_12*(1-PERCFRAC)",
+                      1
+                    ],
+                    [
+                      "TENS2FREE_2",
+                      -1
+                    ]
+                  ]
+                ]
+              ]
+            ],
+            [
+              "upper",
+              [
+                [
+                  "FREE_1",
+                  [
+                    [
+                      "OFLOW_1",
+                      -1
+                    ],
+                    [
+                      "QINTF_1",
+                      -1
+                    ],
+                    [
+                      "QPERC_12",
+                      -1
+                    ],
+                    [
+                      "TENS2FREE_1",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "TENS_1",
+                  [
+                    [
+                      "EFF_PPT",
+                      1
+                    ],
+                    [
+                      "EVAP_1",
+                      -1
+                    ],
+                    [
+                      "QSURF",
+                      -1
+                    ],
+                    [
+                      "TENS2FREE_1",
+                      -1
+                    ]
+                  ]
+                ]
+              ]
+            ]
+          ]
+        },
+        "graph_signature_digest": "71c2d011de746521",
+        "model_id": 2,
+        "recompilations": 0
+      },
+      "fp64_dtype_inventory": {
+        "all_physics_tensors_requested_dtype": true,
+        "loss_dtype": "float64",
+        "no_physics_float64_cast_in_experiment": true,
+        "parameterizer_parameter_dtypes": [
+          "float64"
+        ],
+        "physics_tensor_dtypes": [
+          "float64"
+        ],
+        "reporting_only_float64": "error statistics, NumPy comparisons, norms, and JSON serialization cast detached values to float64 after the simulation/loss run",
+        "theta_dtype": "float64"
+      },
+      "input_identity": "same frozen-v1.2 synthetic _inputs(model_id) tensors; FP32 is an explicit cast of the saved FP64 batch",
+      "loss": {
+        "abs_diff": 1.3917905583582524e-06,
+        "fp32": 12.911128044128418,
+        "fp64": 12.91112665233786,
+        "relative_diff": 1.0779776202615411e-07
+      },
+      "model_id": 2,
+      "parameterizer_gradients": {
+        "cosine_similarity": 0.9999999999998141,
+        "finite_fp32": true,
+        "finite_fp64": true,
+        "gradient_norm_fp32": 11.211502537413386,
+        "gradient_norm_fp64": 11.211507517486803,
+        "inf_count_fp32": 0,
+        "max_abs_diff": 1.270870331193663e-06,
+        "nan_count_fp32": 0,
+        "none_in_both": false,
+        "relative_L2_error": 7.544992130235325e-07,
+        "sign_flip_count": 0,
+        "sign_flip_non_negligible_fp64_count": 0,
+        "zero_where_fp64_nonzero_count": 0
+      },
+      "parameterizer_identity": "same initial FP64 state_dict copied to each dtype; same attributes and structure ID",
+      "q": {
+        "correlation": 0.9999999999999354,
+        "max_abs_diff": 1.539379894310855e-05,
+        "mean_abs_diff": 8.116690818703237e-07,
+        "relative_L2_error": 1.7050878720699884e-07,
+        "rmse": 1.105911565579909e-06
+      },
+      "scored_days": 365,
+      "theta_gradients": {
+        "cosine_similarity": 0.9999999999998168,
+        "finite_fp32": true,
+        "finite_fp64": true,
+        "gradient_norm_fp32": 4.799379285158565,
+        "gradient_norm_fp64": 4.799378813355071,
+        "inf_count_fp32": 0,
+        "max_abs_diff": 6.862854118327988e-07,
+        "nan_count_fp32": 0,
+        "none_in_both": false,
+        "relative_L2_error": 6.131559661046972e-07,
+        "sign_flip_count": 0,
+        "sign_flip_non_negligible_fp64_count": 0,
+        "zero_where_fp64_nonzero_count": 0
+      },
+      "unexpected_gradient_checks": {
+        "fp32_zero_where_fp64_nonzero_parameterizer": 0,
+        "fp32_zero_where_fp64_nonzero_theta": 0,
+        "nan_or_inf": false,
+        "parameterizer_none_gradient_count_fp32": 38,
+        "parameterizer_none_gradient_count_fp64": 38,
+        "parameterizer_sign_flips_non_negligible_fp64": 0,
+        "theta_sign_flips_non_negligible_fp64": 0
+      },
+      "warmup_days": 365,
+      "window_days": 730
+    },
+    {
+      "batch_size": 100,
+      "final_states": {
+        "aggregate_max_abs_diff": 6.511597049296824e-05,
+        "aggregate_relative_L2_error": 2.0506639501061745e-07,
+        "by_active_state": [
+          {
+            "correlation": 0.9999999999974447,
+            "max_abs_diff": 2.7981636975482616e-05,
+            "mean_abs_diff": 8.941280562027032e-06,
+            "relative_L2_error": 1.4041021613930686e-07,
+            "rmse": 1.0999508549493751e-05,
+            "state_name": "TENS_1"
+          },
+          {
+            "correlation": 0.9999999999955562,
+            "max_abs_diff": 6.511597049296824e-05,
+            "mean_abs_diff": 1.0735223021178796e-05,
+            "relative_L2_error": 3.541817602526511e-07,
+            "rmse": 1.4354830361584793e-05,
+            "state_name": "FREE_1"
+          },
+          {
+            "correlation": 0.9999999999957568,
+            "max_abs_diff": 1.6578082443485798e-06,
+            "mean_abs_diff": 2.085242499743809e-07,
+            "relative_L2_error": 2.402331250780616e-06,
+            "rmse": 3.124423060020349e-07,
+            "state_name": "WATR_2"
+          }
+        ]
+      },
+      "finite": true,
+      "fp32_compile": {
+        "backend": "inductor",
+        "batch_size": 100,
+        "calls": 730,
+        "cold_compile_seconds": [
+          3.4325266469968483
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "dynamo_counters": {
+          "aot_autograd": {
+            "autograd_cache_hit": 1,
+            "ok": 1,
+            "total": 1
+          },
+          "inductor": {
+            "async_compile_cache_hit": 164,
+            "async_compile_cache_miss": 252,
+            "fxgraph_cache_hit": 2,
+            "triton_bundler_load_static_autotuner": 80
+          },
+          "stats": {
+            "calls_captured": 1165,
+            "unique_graphs": 1
+          }
+        },
+        "failures": [],
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "fullgraph": true,
+        "graph_breaks": 0,
+        "graph_signature": {
+          "decisions": {
+            "ARCH1": "tension1_1",
+            "ARCH2": "unlimfrc_2",
+            "ESOIL": "sequential",
+            "QINTF": "intflwnone",
+            "QPERC": "perc_f2sat",
+            "QSURF": "arno_x_vic",
+            "Q_TDH": "rout_gamma",
+            "RFERR": "multiplc_e",
+            "SNOWM": "temp_index"
+          },
+          "execution_mode": "coupled_rk2",
+          "n_substeps": 1,
+          "parameter_names": [
+            "RFERR_MLT",
+            "FRACTEN",
+            "MAXWATR_1",
+            "MAXWATR_2",
+            "QB_PRMS",
+            "PERCRTE",
+            "PERCEXP",
+            "AXV_BEXP",
+            "TIMEDELAY",
+            "MBASE",
+            "MFMAX",
+            "MFMIN",
+            "PXTEMP",
+            "OPG",
+            "LAPSE"
+          ],
+          "sequential_order": [
+            "coupled_rhs"
+          ],
+          "state_names": [
+            "TENS_1",
+            "FREE_1",
+            "WATR_2"
+          ],
+          "topology": [
+            [
+              "lower",
+              [
+                [
+                  "WATR_2",
+                  [
+                    [
+                      "EVAP_2",
+                      -1
+                    ],
+                    [
+                      "OFLOW_2",
+                      -1
+                    ],
+                    [
+                      "QBASE_2",
+                      -1
+                    ],
+                    [
+                      "QPERC_12",
+                      1
+                    ]
+                  ]
+                ]
+              ]
+            ],
+            [
+              "upper",
+              [
+                [
+                  "FREE_1",
+                  [
+                    [
+                      "OFLOW_1",
+                      -1
+                    ],
+                    [
+                      "QINTF_1",
+                      -1
+                    ],
+                    [
+                      "QPERC_12",
+                      -1
+                    ],
+                    [
+                      "TENS2FREE_1",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "TENS_1",
+                  [
+                    [
+                      "EFF_PPT",
+                      1
+                    ],
+                    [
+                      "EVAP_1",
+                      -1
+                    ],
+                    [
+                      "QSURF",
+                      -1
+                    ],
+                    [
+                      "TENS2FREE_1",
+                      -1
+                    ]
+                  ]
+                ]
+              ]
+            ]
+          ]
+        },
+        "graph_signature_digest": "251e95e0421ee495",
+        "model_id": 8,
+        "recompilations": 0
+      },
+      "fp32_dtype_inventory": {
+        "all_physics_tensors_requested_dtype": true,
+        "loss_dtype": "float32",
+        "no_physics_float64_cast_in_experiment": true,
+        "parameterizer_parameter_dtypes": [
+          "float32"
+        ],
+        "physics_tensor_dtypes": [
+          "float32"
+        ],
+        "reporting_only_float64": "error statistics, NumPy comparisons, norms, and JSON serialization cast detached values to float64 after the simulation/loss run",
+        "theta_dtype": "float32"
+      },
+      "fp64_compile": {
+        "backend": "inductor",
+        "batch_size": 100,
+        "calls": 730,
+        "cold_compile_seconds": [
+          3.4857792960247025
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "dynamo_counters": {
+          "aot_autograd": {
+            "autograd_cache_hit": 1,
+            "ok": 1,
+            "total": 1
+          },
+          "inductor": {
+            "async_compile_cache_hit": 170,
+            "async_compile_cache_miss": 261,
+            "fxgraph_cache_hit": 2,
+            "triton_bundler_load_static_autotuner": 83
+          },
+          "stats": {
+            "calls_captured": 1165,
+            "unique_graphs": 1
+          }
+        },
+        "failures": [],
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "fullgraph": true,
+        "graph_breaks": 0,
+        "graph_signature": {
+          "decisions": {
+            "ARCH1": "tension1_1",
+            "ARCH2": "unlimfrc_2",
+            "ESOIL": "sequential",
+            "QINTF": "intflwnone",
+            "QPERC": "perc_f2sat",
+            "QSURF": "arno_x_vic",
+            "Q_TDH": "rout_gamma",
+            "RFERR": "multiplc_e",
+            "SNOWM": "temp_index"
+          },
+          "execution_mode": "coupled_rk2",
+          "n_substeps": 1,
+          "parameter_names": [
+            "RFERR_MLT",
+            "FRACTEN",
+            "MAXWATR_1",
+            "MAXWATR_2",
+            "QB_PRMS",
+            "PERCRTE",
+            "PERCEXP",
+            "AXV_BEXP",
+            "TIMEDELAY",
+            "MBASE",
+            "MFMAX",
+            "MFMIN",
+            "PXTEMP",
+            "OPG",
+            "LAPSE"
+          ],
+          "sequential_order": [
+            "coupled_rhs"
+          ],
+          "state_names": [
+            "TENS_1",
+            "FREE_1",
+            "WATR_2"
+          ],
+          "topology": [
+            [
+              "lower",
+              [
+                [
+                  "WATR_2",
+                  [
+                    [
+                      "EVAP_2",
+                      -1
+                    ],
+                    [
+                      "OFLOW_2",
+                      -1
+                    ],
+                    [
+                      "QBASE_2",
+                      -1
+                    ],
+                    [
+                      "QPERC_12",
+                      1
+                    ]
+                  ]
+                ]
+              ]
+            ],
+            [
+              "upper",
+              [
+                [
+                  "FREE_1",
+                  [
+                    [
+                      "OFLOW_1",
+                      -1
+                    ],
+                    [
+                      "QINTF_1",
+                      -1
+                    ],
+                    [
+                      "QPERC_12",
+                      -1
+                    ],
+                    [
+                      "TENS2FREE_1",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "TENS_1",
+                  [
+                    [
+                      "EFF_PPT",
+                      1
+                    ],
+                    [
+                      "EVAP_1",
+                      -1
+                    ],
+                    [
+                      "QSURF",
+                      -1
+                    ],
+                    [
+                      "TENS2FREE_1",
+                      -1
+                    ]
+                  ]
+                ]
+              ]
+            ]
+          ]
+        },
+        "graph_signature_digest": "251e95e0421ee495",
+        "model_id": 8,
+        "recompilations": 0
+      },
+      "fp64_dtype_inventory": {
+        "all_physics_tensors_requested_dtype": true,
+        "loss_dtype": "float64",
+        "no_physics_float64_cast_in_experiment": true,
+        "parameterizer_parameter_dtypes": [
+          "float64"
+        ],
+        "physics_tensor_dtypes": [
+          "float64"
+        ],
+        "reporting_only_float64": "error statistics, NumPy comparisons, norms, and JSON serialization cast detached values to float64 after the simulation/loss run",
+        "theta_dtype": "float64"
+      },
+      "input_identity": "same frozen-v1.2 synthetic _inputs(model_id) tensors; FP32 is an explicit cast of the saved FP64 batch",
+      "loss": {
+        "abs_diff": 6.617467551706113e-07,
+        "fp32": 13.34856128692627,
+        "fp64": 13.348560625179514,
+        "relative_diff": 4.957439035953826e-08
+      },
+      "model_id": 8,
+      "parameterizer_gradients": {
+        "cosine_similarity": 0.9999999999993974,
+        "finite_fp32": true,
+        "finite_fp64": true,
+        "gradient_norm_fp32": 9.088723209141145,
+        "gradient_norm_fp64": 9.08872665846553,
+        "inf_count_fp32": 0,
+        "max_abs_diff": 1.3888084132163137e-06,
+        "nan_count_fp32": 0,
+        "none_in_both": false,
+        "relative_L2_error": 1.1621083529833748e-06,
+        "sign_flip_count": 0,
+        "sign_flip_non_negligible_fp64_count": 0,
+        "zero_where_fp64_nonzero_count": 0
+      },
+      "parameterizer_identity": "same initial FP64 state_dict copied to each dtype; same attributes and structure ID",
+      "q": {
+        "correlation": 0.9999999999999782,
+        "max_abs_diff": 2.469692631734688e-05,
+        "mean_abs_diff": 8.867618885167206e-07,
+        "relative_L2_error": 1.4973960228375307e-07,
+        "rmse": 1.3344532600534295e-06
+      },
+      "scored_days": 365,
+      "theta_gradients": {
+        "cosine_similarity": 0.9999999999998074,
+        "finite_fp32": true,
+        "finite_fp64": true,
+        "gradient_norm_fp32": 4.960604617840382,
+        "gradient_norm_fp64": 4.960603849828662,
+        "inf_count_fp32": 0,
+        "max_abs_diff": 9.135506749968769e-07,
+        "nan_count_fp32": 0,
+        "none_in_both": false,
+        "relative_L2_error": 6.402764181304438e-07,
+        "sign_flip_count": 0,
+        "sign_flip_non_negligible_fp64_count": 0,
+        "zero_where_fp64_nonzero_count": 0
+      },
+      "unexpected_gradient_checks": {
+        "fp32_zero_where_fp64_nonzero_parameterizer": 0,
+        "fp32_zero_where_fp64_nonzero_theta": 0,
+        "nan_or_inf": false,
+        "parameterizer_none_gradient_count_fp32": 44,
+        "parameterizer_none_gradient_count_fp64": 44,
+        "parameterizer_sign_flips_non_negligible_fp64": 0,
+        "theta_sign_flips_non_negligible_fp64": 0
+      },
+      "warmup_days": 365,
+      "window_days": 730
+    },
+    {
+      "batch_size": 100,
+      "final_states": {
+        "aggregate_max_abs_diff": 0.0008462985812229817,
+        "aggregate_relative_L2_error": 2.6685879452455005e-07,
+        "by_active_state": [
+          {
+            "correlation": 0.9999999999986163,
+            "max_abs_diff": 1.978511717481979e-05,
+            "mean_abs_diff": 7.265912420848508e-06,
+            "relative_L2_error": 1.2144005333745627e-07,
+            "rmse": 8.587682735553747e-06,
+            "state_name": "TENS_1A"
+          },
+          {
+            "correlation": 0.9999999999967611,
+            "max_abs_diff": 1.7906894740349344e-05,
+            "mean_abs_diff": 5.679271660383733e-06,
+            "relative_L2_error": 1.1456133707624304e-07,
+            "rmse": 6.923270961088471e-06,
+            "state_name": "TENS_1B"
+          },
+          {
+            "correlation": 0.9999999827163306,
+            "max_abs_diff": 0.0007609481549241126,
+            "mean_abs_diff": 1.0550914103229815e-05,
+            "relative_L2_error": 0.00018417049580778545,
+            "rmse": 8.028698930672024e-05,
+            "state_name": "FREE_1"
+          },
+          {
+            "correlation": 0.9999999999868677,
+            "max_abs_diff": 0.0008462985812229817,
+            "mean_abs_diff": 0.0001577970152254693,
+            "relative_L2_error": 2.508956399057496e-07,
+            "rmse": 0.0002129040676240774,
+            "state_name": "WATR_2"
+          }
+        ]
+      },
+      "finite": true,
+      "fp32_compile": {
+        "backend": "inductor",
+        "batch_size": 100,
+        "calls": 730,
+        "cold_compile_seconds": [
+          3.6677777420263737
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "dynamo_counters": {
+          "aot_autograd": {
+            "autograd_cache_hit": 1,
+            "ok": 1,
+            "total": 1
+          },
+          "inductor": {
+            "async_compile_cache_hit": 191,
+            "async_compile_cache_miss": 294,
+            "fxgraph_cache_hit": 2,
+            "triton_bundler_load_static_autotuner": 93
+          },
+          "stats": {
+            "calls_captured": 1563,
+            "unique_graphs": 1
+          }
+        },
+        "failures": [],
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "fullgraph": true,
+        "graph_breaks": 0,
+        "graph_signature": {
+          "decisions": {
+            "ARCH1": "tension2_1",
+            "ARCH2": "fixedsiz_2",
+            "ESOIL": "sequential",
+            "QINTF": "intflwnone",
+            "QPERC": "perc_lower",
+            "QSURF": "prms_varnt",
+            "Q_TDH": "rout_gamma",
+            "RFERR": "multiplc_e",
+            "SNOWM": "temp_index"
+          },
+          "execution_mode": "coupled_rk2",
+          "n_substeps": 1,
+          "parameter_names": [
+            "RFERR_MLT",
+            "FRCHZNE",
+            "FRACTEN",
+            "MAXWATR_1",
+            "FRACLOWZ",
+            "MAXWATR_2",
+            "BASERTE",
+            "QB_POWR",
+            "SACPMLT",
+            "SACPEXP",
+            "SAREAMAX",
+            "TIMEDELAY",
+            "MBASE",
+            "MFMAX",
+            "MFMIN",
+            "PXTEMP",
+            "OPG",
+            "LAPSE"
+          ],
+          "sequential_order": [
+            "coupled_rhs"
+          ],
+          "state_names": [
+            "TENS_1A",
+            "TENS_1B",
+            "FREE_1",
+            "WATR_2"
+          ],
+          "topology": [
+            [
+              "lower",
+              [
+                [
+                  "WATR_2",
+                  [
+                    [
+                      "EVAP_2",
+                      -1
+                    ],
+                    [
+                      "OFLOW_2",
+                      -1
+                    ],
+                    [
+                      "QBASE_2",
+                      -1
+                    ],
+                    [
+                      "QPERC_12",
+                      1
+                    ]
+                  ]
+                ]
+              ]
+            ],
+            [
+              "upper",
+              [
+                [
+                  "FREE_1",
+                  [
+                    [
+                      "OFLOW_1",
+                      -1
+                    ],
+                    [
+                      "QINTF_1",
+                      -1
+                    ],
+                    [
+                      "QPERC_12",
+                      -1
+                    ],
+                    [
+                      "TENS2FREE_1",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "TENS_1A",
+                  [
+                    [
+                      "EFF_PPT",
+                      1
+                    ],
+                    [
+                      "EVAP_1A",
+                      -1
+                    ],
+                    [
+                      "QSURF",
+                      -1
+                    ],
+                    [
+                      "RCHR2EXCS",
+                      -1
+                    ]
+                  ]
+                ],
+                [
+                  "TENS_1B",
+                  [
+                    [
+                      "EVAP_1B",
+                      -1
+                    ],
+                    [
+                      "RCHR2EXCS",
+                      1
+                    ],
+                    [
+                      "TENS2FREE_1",
+                      -1
+                    ]
+                  ]
+                ]
+              ]
+            ]
+          ]
+        },
+        "graph_signature_digest": "ae7d7e053cd6b4b5",
+        "model_id": 190,
+        "recompilations": 0
+      },
+      "fp32_dtype_inventory": {
+        "all_physics_tensors_requested_dtype": true,
+        "loss_dtype": "float32",
+        "no_physics_float64_cast_in_experiment": true,
+        "parameterizer_parameter_dtypes": [
+          "float32"
+        ],
+        "physics_tensor_dtypes": [
+          "float32"
+        ],
+        "reporting_only_float64": "error statistics, NumPy comparisons, norms, and JSON serialization cast detached values to float64 after the simulation/loss run",
+        "theta_dtype": "float32"
+      },
+      "fp64_compile": {
+        "backend": "inductor",
+        "batch_size": 100,
+        "calls": 730,
+        "cold_compile_seconds": [
+          3.7917031060205773
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "dynamo_counters": {
+          "aot_autograd": {
+            "autograd_cache_hit": 1,
+            "ok": 1,
+            "total": 1
+          },
+          "inductor": {
+            "async_compile_cache_hit": 195,
+            "async_compile_cache_miss": 297,
+            "fxgraph_cache_hit": 2,
+            "triton_bundler_load_static_autotuner": 96
+          },
+          "stats": {
+            "calls_captured": 1563,
+            "unique_graphs": 1
+          }
+        },
+        "failures": [],
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "fullgraph": true,
+        "graph_breaks": 0,
+        "graph_signature": {
+          "decisions": {
+            "ARCH1": "tension2_1",
+            "ARCH2": "fixedsiz_2",
+            "ESOIL": "sequential",
+            "QINTF": "intflwnone",
+            "QPERC": "perc_lower",
+            "QSURF": "prms_varnt",
+            "Q_TDH": "rout_gamma",
+            "RFERR": "multiplc_e",
+            "SNOWM": "temp_index"
+          },
+          "execution_mode": "coupled_rk2",
+          "n_substeps": 1,
+          "parameter_names": [
+            "RFERR_MLT",
+            "FRCHZNE",
+            "FRACTEN",
+            "MAXWATR_1",
+            "FRACLOWZ",
+            "MAXWATR_2",
+            "BASERTE",
+            "QB_POWR",
+            "SACPMLT",
+            "SACPEXP",
+            "SAREAMAX",
+            "TIMEDELAY",
+            "MBASE",
+            "MFMAX",
+            "MFMIN",
+            "PXTEMP",
+            "OPG",
+            "LAPSE"
+          ],
+          "sequential_order": [
+            "coupled_rhs"
+          ],
+          "state_names": [
+            "TENS_1A",
+            "TENS_1B",
+            "FREE_1",
+            "WATR_2"
+          ],
+          "topology": [
+            [
+              "lower",
+              [
+                [
+                  "WATR_2",
+                  [
+                    [
+                      "EVAP_2",
+                      -1
+                    ],
+                    [
+                      "OFLOW_2",
+                      -1
+                    ],
+                    [
+                      "QBASE_2",
+                      -1
+                    ],
+                    [
+                      "QPERC_12",
+                      1
+                    ]
+                  ]
+                ]
+              ]
+            ],
+            [
+              "upper",
+              [
+                [
+                  "FREE_1",
+                  [
+                    [
+                      "OFLOW_1",
+                      -1
+                    ],
+                    [
+                      "QINTF_1",
+                      -1
+                    ],
+                    [
+                      "QPERC_12",
+                      -1
+                    ],
+                    [
+                      "TENS2FREE_1",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "TENS_1A",
+                  [
+                    [
+                      "EFF_PPT",
+                      1
+                    ],
+                    [
+                      "EVAP_1A",
+                      -1
+                    ],
+                    [
+                      "QSURF",
+                      -1
+                    ],
+                    [
+                      "RCHR2EXCS",
+                      -1
+                    ]
+                  ]
+                ],
+                [
+                  "TENS_1B",
+                  [
+                    [
+                      "EVAP_1B",
+                      -1
+                    ],
+                    [
+                      "RCHR2EXCS",
+                      1
+                    ],
+                    [
+                      "TENS2FREE_1",
+                      -1
+                    ]
+                  ]
+                ]
+              ]
+            ]
+          ]
+        },
+        "graph_signature_digest": "ae7d7e053cd6b4b5",
+        "model_id": 190,
+        "recompilations": 0
+      },
+      "fp64_dtype_inventory": {
+        "all_physics_tensors_requested_dtype": true,
+        "loss_dtype": "float64",
+        "no_physics_float64_cast_in_experiment": true,
+        "parameterizer_parameter_dtypes": [
+          "float64"
+        ],
+        "physics_tensor_dtypes": [
+          "float64"
+        ],
+        "reporting_only_float64": "error statistics, NumPy comparisons, norms, and JSON serialization cast detached values to float64 after the simulation/loss run",
+        "theta_dtype": "float64"
+      },
+      "input_identity": "same frozen-v1.2 synthetic _inputs(model_id) tensors; FP32 is an explicit cast of the saved FP64 batch",
+      "loss": {
+        "abs_diff": 2.9557257708034967e-06,
+        "fp32": 9.15550422668457,
+        "fp64": 9.1555012709588,
+        "relative_diff": 3.22836039592834e-07
+      },
+      "model_id": 190,
+      "parameterizer_gradients": {
+        "cosine_similarity": 0.9999999999876895,
+        "finite_fp32": true,
+        "finite_fp64": true,
+        "gradient_norm_fp32": 5.753294457352132,
+        "gradient_norm_fp64": 5.753290670078278,
+        "inf_count_fp32": 0,
+        "max_abs_diff": 3.3533455826018077e-06,
+        "nan_count_fp32": 0,
+        "none_in_both": false,
+        "relative_L2_error": 5.0055071478165715e-06,
+        "sign_flip_count": 1,
+        "sign_flip_non_negligible_fp64_count": 1,
+        "zero_where_fp64_nonzero_count": 0
+      },
+      "parameterizer_identity": "same initial FP64 state_dict copied to each dtype; same attributes and structure ID",
+      "q": {
+        "correlation": 0.9999999999991316,
+        "max_abs_diff": 9.063019324173638e-05,
+        "mean_abs_diff": 1.109370009971833e-06,
+        "relative_L2_error": 3.372147021999746e-07,
+        "rmse": 1.614673599540705e-06
+      },
+      "scored_days": 365,
+      "theta_gradients": {
+        "cosine_similarity": 0.9999999999825836,
+        "finite_fp32": true,
+        "finite_fp64": true,
+        "gradient_norm_fp32": 4.003043113709153,
+        "gradient_norm_fp64": 4.003042887594394,
+        "inf_count_fp32": 0,
+        "max_abs_diff": 1.577851307055147e-05,
+        "nan_count_fp32": 0,
+        "none_in_both": false,
+        "relative_L2_error": 5.902174048623676e-06,
+        "sign_flip_count": 0,
+        "sign_flip_non_negligible_fp64_count": 0,
+        "zero_where_fp64_nonzero_count": 0
+      },
+      "unexpected_gradient_checks": {
+        "fp32_zero_where_fp64_nonzero_parameterizer": 0,
+        "fp32_zero_where_fp64_nonzero_theta": 0,
+        "nan_or_inf": false,
+        "parameterizer_none_gradient_count_fp32": 38,
+        "parameterizer_none_gradient_count_fp64": 38,
+        "parameterizer_sign_flips_non_negligible_fp64": 1,
+        "theta_sign_flips_non_negligible_fp64": 0
+      },
+      "warmup_days": 365,
+      "window_days": 730
+    },
+    {
+      "batch_size": 100,
+      "final_states": {
+        "aggregate_max_abs_diff": 0.0005340771788269194,
+        "aggregate_relative_L2_error": 1.6174569235071698e-07,
+        "by_active_state": [
+          {
+            "correlation": 0.9999999999988711,
+            "max_abs_diff": 1.7779155676578284e-05,
+            "mean_abs_diff": 5.378218393516931e-06,
+            "relative_L2_error": 1.1659313458907326e-07,
+            "rmse": 6.996129778560546e-06,
+            "state_name": "TENS_1A"
+          },
+          {
+            "correlation": 0.9999999999987916,
+            "max_abs_diff": 2.805597077326638e-05,
+            "mean_abs_diff": 5.352840086274568e-06,
+            "relative_L2_error": 1.2058436477159282e-07,
+            "rmse": 6.93234748892951e-06,
+            "state_name": "TENS_1B"
+          },
+          {
+            "correlation": 0.9999999989341739,
+            "max_abs_diff": 0.00029137350469143897,
+            "mean_abs_diff": 3.043450681721627e-06,
+            "relative_L2_error": 4.8410912219150124e-05,
+            "rmse": 2.9137677196383878e-05,
+            "state_name": "FREE_1"
+          },
+          {
+            "correlation": 0.9999999999948969,
+            "max_abs_diff": 0.0005340771788269194,
+            "mean_abs_diff": 0.00013938174992858876,
+            "relative_L2_error": 1.5990043043212264e-07,
+            "rmse": 0.00018157558219038063,
+            "state_name": "WATR_2"
+          }
+        ]
+      },
+      "finite": true,
+      "fp32_compile": {
+        "backend": "inductor",
+        "batch_size": 100,
+        "calls": 730,
+        "cold_compile_seconds": [
+          3.897733915015124
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "dynamo_counters": {
+          "aot_autograd": {
+            "autograd_cache_hit": 1,
+            "ok": 1,
+            "total": 1
+          },
+          "inductor": {
+            "async_compile_cache_hit": 198,
+            "async_compile_cache_miss": 306,
+            "extern_calls": 18,
+            "fxgraph_cache_hit": 2,
+            "triton_bundler_load_static_autotuner": 96
+          },
+          "stats": {
+            "calls_captured": 1707,
+            "unique_graphs": 1
+          }
+        },
+        "failures": [],
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "fullgraph": true,
+        "graph_breaks": 0,
+        "graph_signature": {
+          "decisions": {
+            "ARCH1": "tension2_1",
+            "ARCH2": "fixedsiz_2",
+            "ESOIL": "sequential",
+            "QINTF": "intflwnone",
+            "QPERC": "perc_lower",
+            "QSURF": "tmdl_param",
+            "Q_TDH": "rout_gamma",
+            "RFERR": "multiplc_e",
+            "SNOWM": "temp_index"
+          },
+          "execution_mode": "coupled_rk2",
+          "n_substeps": 1,
+          "parameter_names": [
+            "RFERR_MLT",
+            "FRCHZNE",
+            "FRACTEN",
+            "MAXWATR_1",
+            "FRACLOWZ",
+            "MAXWATR_2",
+            "BASERTE",
+            "QB_POWR",
+            "SACPMLT",
+            "SACPEXP",
+            "LOGLAMB",
+            "TISHAPE",
+            "TIMEDELAY",
+            "MBASE",
+            "MFMAX",
+            "MFMIN",
+            "PXTEMP",
+            "OPG",
+            "LAPSE"
+          ],
+          "sequential_order": [
+            "coupled_rhs"
+          ],
+          "state_names": [
+            "TENS_1A",
+            "TENS_1B",
+            "FREE_1",
+            "WATR_2"
+          ],
+          "topology": [
+            [
+              "lower",
+              [
+                [
+                  "WATR_2",
+                  [
+                    [
+                      "EVAP_2",
+                      -1
+                    ],
+                    [
+                      "OFLOW_2",
+                      -1
+                    ],
+                    [
+                      "QBASE_2",
+                      -1
+                    ],
+                    [
+                      "QPERC_12",
+                      1
+                    ]
+                  ]
+                ]
+              ]
+            ],
+            [
+              "upper",
+              [
+                [
+                  "FREE_1",
+                  [
+                    [
+                      "OFLOW_1",
+                      -1
+                    ],
+                    [
+                      "QINTF_1",
+                      -1
+                    ],
+                    [
+                      "QPERC_12",
+                      -1
+                    ],
+                    [
+                      "TENS2FREE_1",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "TENS_1A",
+                  [
+                    [
+                      "EFF_PPT",
+                      1
+                    ],
+                    [
+                      "EVAP_1A",
+                      -1
+                    ],
+                    [
+                      "QSURF",
+                      -1
+                    ],
+                    [
+                      "RCHR2EXCS",
+                      -1
+                    ]
+                  ]
+                ],
+                [
+                  "TENS_1B",
+                  [
+                    [
+                      "EVAP_1B",
+                      -1
+                    ],
+                    [
+                      "RCHR2EXCS",
+                      1
+                    ],
+                    [
+                      "TENS2FREE_1",
+                      -1
+                    ]
+                  ]
+                ]
+              ]
+            ]
+          ]
+        },
+        "graph_signature_digest": "91f0e2d6f24a1d5d",
+        "model_id": 214,
+        "recompilations": 0
+      },
+      "fp32_dtype_inventory": {
+        "all_physics_tensors_requested_dtype": true,
+        "loss_dtype": "float32",
+        "no_physics_float64_cast_in_experiment": true,
+        "parameterizer_parameter_dtypes": [
+          "float32"
+        ],
+        "physics_tensor_dtypes": [
+          "float32"
+        ],
+        "reporting_only_float64": "error statistics, NumPy comparisons, norms, and JSON serialization cast detached values to float64 after the simulation/loss run",
+        "theta_dtype": "float32"
+      },
+      "fp64_compile": {
+        "backend": "inductor",
+        "batch_size": 100,
+        "calls": 730,
+        "cold_compile_seconds": [
+          3.4361008520936593
+        ],
+        "compile_attempts": 1,
+        "compile_successes": 1,
+        "dynamo_counters": {
+          "aot_autograd": {
+            "autograd_cache_hit": 1,
+            "ok": 1,
+            "total": 1
+          },
+          "inductor": {
+            "async_compile_cache_hit": 201,
+            "async_compile_cache_miss": 309,
+            "extern_calls": 18,
+            "fxgraph_cache_hit": 2,
+            "triton_bundler_load_static_autotuner": 98
+          },
+          "stats": {
+            "calls_captured": 1707,
+            "unique_graphs": 1
+          }
+        },
+        "failures": [],
+        "fallbacks": 0,
+        "forward_unique_graphs": 1,
+        "fullgraph": true,
+        "graph_breaks": 0,
+        "graph_signature": {
+          "decisions": {
+            "ARCH1": "tension2_1",
+            "ARCH2": "fixedsiz_2",
+            "ESOIL": "sequential",
+            "QINTF": "intflwnone",
+            "QPERC": "perc_lower",
+            "QSURF": "tmdl_param",
+            "Q_TDH": "rout_gamma",
+            "RFERR": "multiplc_e",
+            "SNOWM": "temp_index"
+          },
+          "execution_mode": "coupled_rk2",
+          "n_substeps": 1,
+          "parameter_names": [
+            "RFERR_MLT",
+            "FRCHZNE",
+            "FRACTEN",
+            "MAXWATR_1",
+            "FRACLOWZ",
+            "MAXWATR_2",
+            "BASERTE",
+            "QB_POWR",
+            "SACPMLT",
+            "SACPEXP",
+            "LOGLAMB",
+            "TISHAPE",
+            "TIMEDELAY",
+            "MBASE",
+            "MFMAX",
+            "MFMIN",
+            "PXTEMP",
+            "OPG",
+            "LAPSE"
+          ],
+          "sequential_order": [
+            "coupled_rhs"
+          ],
+          "state_names": [
+            "TENS_1A",
+            "TENS_1B",
+            "FREE_1",
+            "WATR_2"
+          ],
+          "topology": [
+            [
+              "lower",
+              [
+                [
+                  "WATR_2",
+                  [
+                    [
+                      "EVAP_2",
+                      -1
+                    ],
+                    [
+                      "OFLOW_2",
+                      -1
+                    ],
+                    [
+                      "QBASE_2",
+                      -1
+                    ],
+                    [
+                      "QPERC_12",
+                      1
+                    ]
+                  ]
+                ]
+              ]
+            ],
+            [
+              "upper",
+              [
+                [
+                  "FREE_1",
+                  [
+                    [
+                      "OFLOW_1",
+                      -1
+                    ],
+                    [
+                      "QINTF_1",
+                      -1
+                    ],
+                    [
+                      "QPERC_12",
+                      -1
+                    ],
+                    [
+                      "TENS2FREE_1",
+                      1
+                    ]
+                  ]
+                ],
+                [
+                  "TENS_1A",
+                  [
+                    [
+                      "EFF_PPT",
+                      1
+                    ],
+                    [
+                      "EVAP_1A",
+                      -1
+                    ],
+                    [
+                      "QSURF",
+                      -1
+                    ],
+                    [
+                      "RCHR2EXCS",
+                      -1
+                    ]
+                  ]
+                ],
+                [
+                  "TENS_1B",
+                  [
+                    [
+                      "EVAP_1B",
+                      -1
+                    ],
+                    [
+                      "RCHR2EXCS",
+                      1
+                    ],
+                    [
+                      "TENS2FREE_1",
+                      -1
+                    ]
+                  ]
+                ]
+              ]
+            ]
+          ]
+        },
+        "graph_signature_digest": "91f0e2d6f24a1d5d",
+        "model_id": 214,
+        "recompilations": 0
+      },
+      "fp64_dtype_inventory": {
+        "all_physics_tensors_requested_dtype": true,
+        "loss_dtype": "float64",
+        "no_physics_float64_cast_in_experiment": true,
+        "parameterizer_parameter_dtypes": [
+          "float64"
+        ],
+        "physics_tensor_dtypes": [
+          "float64"
+        ],
+        "reporting_only_float64": "error statistics, NumPy comparisons, norms, and JSON serialization cast detached values to float64 after the simulation/loss run",
+        "theta_dtype": "float64"
+      },
+      "input_identity": "same frozen-v1.2 synthetic _inputs(model_id) tensors; FP32 is an explicit cast of the saved FP64 batch",
+      "loss": {
+        "abs_diff": 3.995521607791375e-06,
+        "fp32": 8.630602836608887,
+        "fp64": 8.630598841087279,
+        "relative_diff": 4.62948363301291e-07
+      },
+      "model_id": 214,
+      "parameterizer_gradients": {
+        "cosine_similarity": 0.9999999999474793,
+        "finite_fp32": true,
+        "finite_fp64": true,
+        "gradient_norm_fp32": 0.7174428979273894,
+        "gradient_norm_fp64": 0.7174449410995146,
+        "inf_count_fp32": 0,
+        "max_abs_diff": 1.0132904707994437e-06,
+        "nan_count_fp32": 0,
+        "none_in_both": false,
+        "relative_L2_error": 1.0637336423762554e-05,
+        "sign_flip_count": 0,
+        "sign_flip_non_negligible_fp64_count": 0,
+        "zero_where_fp64_nonzero_count": 0
+      },
+      "parameterizer_identity": "same initial FP64 state_dict copied to each dtype; same attributes and structure ID",
+      "q": {
+        "correlation": 0.9999999999965277,
+        "max_abs_diff": 0.0001272524804249997,
+        "mean_abs_diff": 3.1144277873610744e-06,
+        "relative_L2_error": 9.386991264536494e-07,
+        "rmse": 4.212617391194981e-06
+      },
+      "scored_days": 365,
+      "theta_gradients": {
+        "cosine_similarity": 0.9999999999993062,
+        "finite_fp32": true,
+        "finite_fp64": true,
+        "gradient_norm_fp32": 3.8680667428212185,
+        "gradient_norm_fp64": 3.8680657577121167,
+        "inf_count_fp32": 0,
+        "max_abs_diff": 9.166797010906613e-07,
+        "nan_count_fp32": 0,
+        "none_in_both": false,
+        "relative_L2_error": 1.2053247638110176e-06,
+        "sign_flip_count": 0,
+        "sign_flip_non_negligible_fp64_count": 0,
+        "zero_where_fp64_nonzero_count": 0
+      },
+      "unexpected_gradient_checks": {
+        "fp32_zero_where_fp64_nonzero_parameterizer": 0,
+        "fp32_zero_where_fp64_nonzero_theta": 0,
+        "nan_or_inf": false,
+        "parameterizer_none_gradient_count_fp32": 36,
+        "parameterizer_none_gradient_count_fp64": 36,
+        "parameterizer_sign_flips_non_negligible_fp64": 0,
+        "theta_sign_flips_non_negligible_fp64": 0
+      },
+      "warmup_days": 365,
+      "window_days": 730
+    }
+  ],
+  "schema_version": "torch-fuse-fp32-training-precision-b100-v1",
+  "status": "completed"
+}

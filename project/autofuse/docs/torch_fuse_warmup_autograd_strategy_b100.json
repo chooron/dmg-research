@@ -1,0 +1,30 @@
+{
+  "assessment_and_recommendation": {
+    "rationale": "At B=100, Mode A peak VRAM is only 459.8 MB (< 4% of 12GB GPU), leaving over 11.5 GB of headroom. Since VRAM is not constrained, retaining the full continuous autograd graph avoids truncating physical parameter gradients during warmup spin-up.",
+    "recommended_default": "Mode A (Continuous 730d graph)"
+  },
+  "generated_at_utc": "2026-09-07T09:50:22.761790+00:00",
+  "mode_comparison": {
+    "mode_a_continuous_730d_graph": {
+      "backward_seconds": 1.2827545210020617,
+      "description": "Full 730-day forward retains computation graph; loss computed on scored days [365:730]; gradient flows through physical state transitions across warmup.",
+      "forward_seconds": 3.4681199389742687,
+      "gradient_norm": 33.965544402945284,
+      "gradient_semantic_soundness": "Strictly continuous physical BPTT across full window",
+      "peak_vram_mb": 469.00537109375,
+      "total_step_seconds": 4.780374564987142
+    },
+    "mode_b_warmup_detached_graph": {
+      "backward_seconds": 0.6851332900114357,
+      "description": "First 365 days executed under torch.no_grad(); only scored days [365:730] build autograd graph.",
+      "forward_seconds": 5.156889641017187,
+      "gradient_norm": 125.91567596105577,
+      "gradient_semantic_soundness": "Truncates gradient flow through warmup state initialization",
+      "peak_vram_mb": 259.1708984375,
+      "total_step_seconds": 5.844437638996169
+    }
+  },
+  "protocol_id": "formal-experiment-protocol-v1-db53091e6e222066",
+  "schema_version": "torch-fuse-warmup-autograd-strategy-b100-v1",
+  "status": "completed"
+}

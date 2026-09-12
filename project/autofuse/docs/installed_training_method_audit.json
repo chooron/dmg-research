@@ -1,0 +1,65 @@
+{
+  "schema_version": "installed-training-method-audit-v1",
+  "status": "completed",
+  "protocol_id": "formal-experiment-protocol-v1-db53091e6e222066",
+  "generated_at_utc": "2026-09-07T00:00:00+00:00",
+  "audit_summary": {
+    "has_installed_sce_ua": false,
+    "installed_optimization_packages": [
+      {
+        "package_name": "cma",
+        "version": "4.4.4",
+        "entrypoint": "cma.CMAEvolutionStrategy",
+        "algorithm": "CMA-ES (Covariance Matrix Adaptation Evolution Strategy)",
+        "parameter_space": "Continuous bounded box [lower, upper] via BoundTransform / ScaleCoordinates",
+        "population_rule": "default: 4 + floor(3 * log(N))",
+        "stopping_criteria": "tolx, tofun, tofunhist, maxiter, maxfevals",
+        "seed_contract": "CMAOptions(seed=...)",
+        "vectorized_objective_support": "Semi-supported (ask-and-tell API returns list of candidates; user evaluates in batch and tells scores)",
+        "intended_fuse_protocol_algorithm": false
+      },
+      {
+        "package_name": "scipy.optimize",
+        "version": "1.15.3 (scipy)",
+        "entrypoint": "scipy.optimize.differential_evolution",
+        "algorithm": "Differential Evolution (Storn & Price)",
+        "parameter_space": "Continuous bounded box [lower, upper]",
+        "population_rule": "popsize * len(bounds)",
+        "stopping_criteria": "tol, atol, maxiter",
+        "seed_contract": "seed: int or np.random.Generator",
+        "vectorized_objective_support": "Supported via vectorized=True (passes 2D array [N, params] to objective function)",
+        "intended_fuse_protocol_algorithm": false
+      },
+      {
+        "package_name": "evotorch",
+        "version": "0.6.1",
+        "entrypoint": "evotorch.algorithms.GeneticAlgorithm / evotorch.algorithms.CMAES",
+        "algorithm": "GA, CMA-ES, PGPE, SNES, CEM",
+        "parameter_space": "PyTorch tensor bounds (bounds=(lower, upper))",
+        "population_rule": "popsize config",
+        "stopping_criteria": "max_generations, max_evaluations, target_fitness",
+        "seed_contract": "torch.manual_seed / problem.seed",
+        "vectorized_objective_support": "Native PyTorch vectorized batch evaluation (Problem._evaluate_batch)",
+        "intended_fuse_protocol_algorithm": false
+      }
+    ],
+    "in_repo_sce_implementation": {
+      "file": "project/autofuse/sce.py",
+      "class": "SCEBaseline",
+      "config_class": "SCEConfig",
+      "algorithm": "SCE-UA (Shuffled Complex Evolution - University of Arizona; Duan et al. 1992, 1993)",
+      "is_wrapper_or_custom": "Custom in-repo PyTorch implementation directly coupled to UnifiedEvaluator.score_batched",
+      "matches_paper_protocol": true
+    }
+  },
+  "answers_to_mandatory_audit_questions": {
+    "1_is_it_really_sce_ua": "No installed site-packages library contains SCE-UA. The installed packages provide CMA-ES (cma, evotorch), Differential Evolution (scipy.optimize), and Deep Learning (dmg, hydrodl2). SCE-UA is implemented directly in-repo at project/autofuse/sce.py.",
+    "2_is_it_consistent_with_sce_baseline": "The in-repo SCEBaseline is the only SCE-UA implementation. The other installed optimizers (CMA-ES, DE) are distinct evolutionary algorithms with different search dynamics, population update rules, and convergence characteristics.",
+    "3_repository_sce_origin": "Standalone in-repo implementation written specifically for the Auto-FUSE / Torch-FUSE framework to reproduce the 78-structure FUSE paper calibration protocol on PyTorch GPU without Fortran binaries.",
+    "4_advanced_features_in_installed_packages": {
+      "cma": "Ask-and-tell interface allows candidate batching, full covariance adaptation, active CMA.",
+      "scipy_de": "vectorized=True passes 2D matrix to objective, worker pool parallelization.",
+      "evotorch": "Native PyTorch SolutionBatch evaluation, ray-based multi-actor parallelization, GPU-native tensors."
+    }
+  }
+}

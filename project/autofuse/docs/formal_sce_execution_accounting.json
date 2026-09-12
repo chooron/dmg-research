@@ -1,0 +1,102 @@
+{
+  "accounting_rule": "Every hydrological simulation across all phases (setup, optimizer, recomputation, reproducibility) is explicitly accounted for.",
+  "generated_at_utc": "2026-09-06T18:46:55.015736+00:00",
+  "per_case_accounting": {
+    "case_configuration": "1 catchment x 1 structure, max_evaluations=2",
+    "forward_simulations_breakdown": [
+      {
+        "basin_count": 1,
+        "batch_shape": [
+          1,
+          8401,
+          3
+        ],
+        "call_count": 1,
+        "candidate_count": 1,
+        "effective_batch_size": 1,
+        "forcing_period": [
+          "1987-01-01",
+          "2009-12-31"
+        ],
+        "forcing_steps": 8401,
+        "phase": "optimizer_objective_eval_1",
+        "reason": "SCE initial population candidate 1 evaluation",
+        "wall_clock_seconds_typical": 67.3
+      },
+      {
+        "basin_count": 1,
+        "batch_shape": [
+          1,
+          8401,
+          3
+        ],
+        "call_count": 1,
+        "candidate_count": 1,
+        "effective_batch_size": 1,
+        "forcing_period": [
+          "1987-01-01",
+          "2009-12-31"
+        ],
+        "forcing_steps": 8401,
+        "phase": "optimizer_objective_eval_2",
+        "reason": "SCE initial population candidate 2 evaluation",
+        "wall_clock_seconds_typical": 56.2
+      },
+      {
+        "basin_count": 1,
+        "batch_shape": [
+          1,
+          8401,
+          3
+        ],
+        "call_count": 1,
+        "candidate_count": 1,
+        "effective_batch_size": 1,
+        "forcing_period": [
+          "1987-01-01",
+          "2009-12-31"
+        ],
+        "forcing_steps": 8401,
+        "phase": "post_optimization_train_metric",
+        "reason": "Recompute train KGE score and state trajectory at saved best theta",
+        "wall_clock_seconds_typical": 64.2
+      },
+      {
+        "basin_count": 1,
+        "batch_shape": [
+          1,
+          8401,
+          3
+        ],
+        "call_count": 1,
+        "candidate_count": 1,
+        "effective_batch_size": 1,
+        "forcing_period": [
+          "1987-01-01",
+          "2009-12-31"
+        ],
+        "forcing_steps": 8401,
+        "phase": "post_optimization_test_metric",
+        "reason": "Recompute test KGE score on evaluation period at saved best theta",
+        "wall_clock_seconds_typical": 64.7
+      }
+    ],
+    "simulation_to_eval_ratio": "4 full simulations for 2 SCE evaluations (2.0x multiplier)",
+    "total_simulations_per_case": 4,
+    "total_timesteps_per_case": 33604
+  },
+  "pilot_2x4_total_accounting": {
+    "average_seconds_per_8401_day_simulation": 55.62105263157895,
+    "calibration_cases": 8,
+    "calibration_simulations": 32,
+    "reproducibility_evaluations_per_run": 2,
+    "reproducibility_runs": 3,
+    "reproducibility_simulations": 6,
+    "total_8401_day_simulations_in_pilot": 38,
+    "total_timesteps_in_pilot": 319238,
+    "total_wall_clock_seconds": 2113.6
+  },
+  "protocol_id": "formal-experiment-protocol-v1-db53091e6e222066",
+  "schema_version": "formal-sce-execution-accounting-v1",
+  "status": "completed"
+}

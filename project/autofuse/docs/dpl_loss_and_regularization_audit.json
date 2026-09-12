@@ -1,0 +1,23 @@
+{
+  "loss_implementations": {
+    "alternative_losses": {
+      "MSE": "mean((Q - Q_obs)^2)",
+      "NSE": "1.0 - sum((Q - Q_obs)^2) / sum((Q_obs - mean(Q_obs))^2)",
+      "sNSE": "Square-root NSE"
+    },
+    "formal_objective": {
+      "discharge_representation": "Raw physical discharge (mm/day); no log/normalization before KGE",
+      "epsilon": "mean(Q_obs_cal) / 100.0",
+      "formula": "0.5 * (KGE(Q, Q_obs) + KGE(1/(Q + eps), 1/(Q_obs + eps)))",
+      "name": "KGECOMP",
+      "structure_dependence": "None. Epsilon and loss formula are identical across all structures."
+    }
+  },
+  "parameter_regularization": {
+    "bounds_enforcement": "Physical bounds [lower, upper] enforced via torch.sigmoid(raw) * (upper - lower) + lower.",
+    "current_status": "No global L2 or RangeBound loss is applied over the inactive union vector.",
+    "rule_for_future_regularizers": "Any parameter-space regularization or penalty mathematically intended for physical parameters must apply ONLY to active coordinates (using get_parameter_contract(s).active_mask) to prevent penalizing inactive union coordinates."
+  },
+  "schema_version": "dpl-loss-and-regularization-audit-v1",
+  "status": "completed"
+}

@@ -1,0 +1,4403 @@
+{
+  "schema_version": "1.0",
+  "status": "recovered",
+  "manifest_sha256": "5b3e30d34799921c44e0a3c6bca2c713f89ca83f115ad1a46262defd5d745db3",
+  "count": 544,
+  "source_catchment_count": 559,
+  "selection_basis": "Membership in HydroShare CatchmentBoundaries_544; basin_id is the shapefile gauge_id used by the paper workflow.",
+  "paper_execution_evidence": [
+    "01_FUSEscripts/01_FromCamelsToFUSE_Cluster.R reads BDD/liste_BV_CAMELS_559.txt for preprocessing.",
+    "01_FUSEscripts/02_FUSE_Lumped_CAMELS_Cluster.slurm and 04_EvalFUSE.R read the same 559 list.",
+    "HydroShare resource file inventory provides CatchmentBoundaries_544.* and the 559 list."
+  ],
+  "source_files": {
+    "paper_559_list": {
+      "url": "https://www.hydroshare.org/resource/53063da8fc894149b5b25f3201d1e8e8/data/contents/00_DATA/liste_BV_CAMELS_559.txt",
+      "sha256": "6e9178a67194bf9c2d23f80bffe89c7f86b608a51c13ea2375012b825c6cd491"
+    },
+    "hydroshare_544_boundaries_dbf": {
+      "url": "https://www.hydroshare.org/resource/53063da8fc894149b5b25f3201d1e8e8/data/contents/Shp/CatchmentBoundaries_544.dbf",
+      "sha256": "60db4c39ae5fa7831d0d28531915d8d962f5d66c2b2fc7415f72d19df4e93738"
+    },
+    "hydroshare_544_boundaries_shp": {
+      "url": "https://www.hydroshare.org/resource/53063da8fc894149b5b25f3201d1e8e8/data/contents/Shp/CatchmentBoundaries_544.shp",
+      "sha256": "50c7afb67f00c6ddc0450ef54637cb9fea8476ff3db7bd6af63c1a81222b0d57"
+    },
+    "hydroshare_544_boundaries_shx": {
+      "url": "https://www.hydroshare.org/resource/53063da8fc894149b5b25f3201d1e8e8/data/contents/Shp/CatchmentBoundaries_544.shx",
+      "sha256": "64ed5c5a424e18ccfd4f473e9f4b6ef926db1306e117f3dd5496ca749568188c"
+    }
+  },
+  "excluded_from_559": [
+    "USA_02427250",
+    "USA_04056500",
+    "USA_05062500",
+    "USA_05412500",
+    "USA_06354000",
+    "USA_06360500",
+    "USA_06441500",
+    "USA_06447000",
+    "USA_06452000",
+    "USA_06468250",
+    "USA_07263295",
+    "USA_07362587",
+    "USA_09484600",
+    "USA_11151300",
+    "USA_12141300"
+  ],
+  "exclusion_note": "The public code does not document a per-basin scientific exclusion reason; these 15 are exactly the 559-list IDs absent from the explicit CatchmentBoundaries_544 product. Do not infer another filter.",
+  "basins": [
+    {
+      "basin_id": "USA_01013500",
+      "hru_id": 1013500,
+      "lon_cen": -68.56551,
+      "lat_cen": 47.01169,
+      "area_m2": 2303988086.78,
+      "elev_mean_m": 277.493489583
+    },
+    {
+      "basin_id": "USA_01022500",
+      "hru_id": 1022500,
+      "lon_cen": -68.07313,
+      "lat_cen": 44.79691,
+      "area_m2": 620387273.442,
+      "elev_mean_m": 103.604200323
+    },
+    {
+      "basin_id": "USA_01030500",
+      "hru_id": 1030500,
+      "lon_cen": -68.14985,
+      "lat_cen": 45.80527,
+      "area_m2": 3676154745.1,
+      "elev_mean_m": 174.433895539
+    },
+    {
+      "basin_id": "USA_01031500",
+      "hru_id": 1031500,
+      "lon_cen": -69.58119,
+      "lat_cen": 45.23568,
+      "area_m2": 766544703.216,
+      "elev_mean_m": 304.743489583
+    },
+    {
+      "basin_id": "USA_01047000",
+      "hru_id": 1047000,
+      "lon_cen": -70.16213,
+      "lat_cen": 44.98744,
+      "area_m2": 904956194.351,
+      "elev_mean_m": 379.779977998
+    },
+    {
+      "basin_id": "USA_01052500",
+      "hru_id": 1052500,
+      "lon_cen": -71.17197,
+      "lat_cen": 44.96168,
+      "area_m2": 396110305.204,
+      "elev_mean_m": 646.073604061
+    },
+    {
+      "basin_id": "USA_01054200",
+      "hru_id": 1054200,
+      "lon_cen": -71.05872,
+      "lat_cen": 44.31072,
+      "area_m2": 181328678.257,
+      "elev_mean_m": 629.165745856
+    },
+    {
+      "basin_id": "USA_01055000",
+      "hru_id": 1055000,
+      "lon_cen": -70.62632,
+      "lat_cen": 44.75157,
+      "area_m2": 251161408.945,
+      "elev_mean_m": 565.888446215
+    },
+    {
+      "basin_id": "USA_01057000",
+      "hru_id": 1057000,
+      "lon_cen": -70.60039,
+      "lat_cen": 44.3434,
+      "area_m2": 197698791.003,
+      "elev_mean_m": 290.91959799
+    },
+    {
+      "basin_id": "USA_01073000",
+      "hru_id": 1073000,
+      "lon_cen": -71.00569,
+      "lat_cen": 43.15747,
+      "area_m2": 32114577.3576,
+      "elev_mean_m": 61.7741935484
+    },
+    {
+      "basin_id": "USA_01078000",
+      "hru_id": 1078000,
+      "lon_cen": -71.89296,
+      "lat_cen": 43.56186,
+      "area_m2": 221863559.749,
+      "elev_mean_m": 360.459090909
+    },
+    {
+      "basin_id": "USA_01123000",
+      "hru_id": 1123000,
+      "lon_cen": -72.05134,
+      "lat_cen": 41.75061,
+      "area_m2": 84211107.4076,
+      "elev_mean_m": 150.392857143
+    },
+    {
+      "basin_id": "USA_01134500",
+      "hru_id": 1134500,
+      "lon_cen": -71.80225,
+      "lat_cen": 44.57153,
+      "area_m2": 209507313.944,
+      "elev_mean_m": 535.540669856
+    },
+    {
+      "basin_id": "USA_01137500",
+      "hru_id": 1137500,
+      "lon_cen": -71.47415,
+      "lat_cen": 44.25389,
+      "area_m2": 238325090.348,
+      "elev_mean_m": 717.693617021
+    },
+    {
+      "basin_id": "USA_01139000",
+      "hru_id": 1139000,
+      "lon_cen": -72.21213,
+      "lat_cen": 44.21836,
+      "area_m2": 259505080.28,
+      "elev_mean_m": 416.471042471
+    },
+    {
+      "basin_id": "USA_01139800",
+      "hru_id": 1139800,
+      "lon_cen": -72.36594,
+      "lat_cen": 44.09478,
+      "area_m2": 24916417.9805,
+      "elev_mean_m": 545.125
+    },
+    {
+      "basin_id": "USA_01142500",
+      "hru_id": 1142500,
+      "lon_cen": -72.66255,
+      "lat_cen": 44.00276,
+      "area_m2": 79908204.8406,
+      "elev_mean_m": 405.9125
+    },
+    {
+      "basin_id": "USA_01144000",
+      "hru_id": 1144000,
+      "lon_cen": -72.66126,
+      "lat_cen": 43.88571,
+      "area_m2": 1780687700.45,
+      "elev_mean_m": 451.054085832
+    },
+    {
+      "basin_id": "USA_01169000",
+      "hru_id": 1169000,
+      "lon_cen": -72.77633,
+      "lat_cen": 42.73597,
+      "area_m2": 233886855.274,
+      "elev_mean_m": 437.119148936
+    },
+    {
+      "basin_id": "USA_01170100",
+      "hru_id": 1170100,
+      "lon_cen": -72.70524,
+      "lat_cen": 42.79432,
+      "area_m2": 109261419.008,
+      "elev_mean_m": 421.471698113
+    },
+    {
+      "basin_id": "USA_01181000",
+      "hru_id": 1181000,
+      "lon_cen": -73.03143,
+      "lat_cen": 42.30441,
+      "area_m2": 245720934.039,
+      "elev_mean_m": 435.056680162
+    },
+    {
+      "basin_id": "USA_01187300",
+      "hru_id": 1187300,
+      "lon_cen": -72.9751,
+      "lat_cen": 42.07967,
+      "area_m2": 54220783.0444,
+      "elev_mean_m": 386.309090909
+    },
+    {
+      "basin_id": "USA_01195100",
+      "hru_id": 1195100,
+      "lon_cen": -72.54759,
+      "lat_cen": 41.32971,
+      "area_m2": 15956114.1373,
+      "elev_mean_m": 60.4
+    },
+    {
+      "basin_id": "USA_01333000",
+      "hru_id": 1333000,
+      "lon_cen": -73.23597,
+      "lat_cen": 42.63857,
+      "area_m2": 111501903.578,
+      "elev_mean_m": 468.28440367
+    },
+    {
+      "basin_id": "USA_01350000",
+      "hru_id": 1350000,
+      "lon_cen": -74.26812,
+      "lat_cen": 42.25692,
+      "area_m2": 614259794.848,
+      "elev_mean_m": 653.024429967
+    },
+    {
+      "basin_id": "USA_01350080",
+      "hru_id": 1350080,
+      "lon_cen": -74.3438,
+      "lat_cen": 42.39659,
+      "area_m2": 89575210.3479,
+      "elev_mean_m": 579.096774194
+    },
+    {
+      "basin_id": "USA_01365000",
+      "hru_id": 1365000,
+      "lon_cen": -74.42639,
+      "lat_cen": 41.9147,
+      "area_m2": 102568103.076,
+      "elev_mean_m": 621.51
+    },
+    {
+      "basin_id": "USA_01411300",
+      "hru_id": 1411300,
+      "lon_cen": -74.86063,
+      "lat_cen": 39.34938,
+      "area_m2": 79370071.1579,
+      "elev_mean_m": 16.0975609756
+    },
+    {
+      "basin_id": "USA_01413500",
+      "hru_id": 1413500,
+      "lon_cen": -74.55636,
+      "lat_cen": 42.20133,
+      "area_m2": 434003694.628,
+      "elev_mean_m": 667.596330275
+    },
+    {
+      "basin_id": "USA_01414500",
+      "hru_id": 1414500,
+      "lon_cen": -74.65448,
+      "lat_cen": 42.08086,
+      "area_m2": 67077180.6708,
+      "elev_mean_m": 714.220588235
+    },
+    {
+      "basin_id": "USA_01415000",
+      "hru_id": 1415000,
+      "lon_cen": -74.80096,
+      "lat_cen": 42.18552,
+      "area_m2": 86684278.5065,
+      "elev_mean_m": 609.228915663
+    },
+    {
+      "basin_id": "USA_01423000",
+      "hru_id": 1423000,
+      "lon_cen": -74.87784,
+      "lat_cen": 42.28871,
+      "area_m2": 861798417.65,
+      "elev_mean_m": 593.92733564
+    },
+    {
+      "basin_id": "USA_01434025",
+      "hru_id": 1434025,
+      "lon_cen": -74.48483,
+      "lat_cen": 42.01478,
+      "area_m2": 9896312.06211,
+      "elev_mean_m": 893.444444444
+    },
+    {
+      "basin_id": "USA_01435000",
+      "hru_id": 1435000,
+      "lon_cen": -74.50569,
+      "lat_cen": 41.96424,
+      "area_m2": 183309341.409,
+      "elev_mean_m": 752.260115607
+    },
+    {
+      "basin_id": "USA_01439500",
+      "hru_id": 1439500,
+      "lon_cen": -75.0974,
+      "lat_cen": 41.20994,
+      "area_m2": 306094634.44,
+      "elev_mean_m": 385.624595469
+    },
+    {
+      "basin_id": "USA_01440000",
+      "hru_id": 1440000,
+      "lon_cen": -74.79817,
+      "lat_cen": 41.21119,
+      "area_m2": 171566830.736,
+      "elev_mean_m": 263.303571429
+    },
+    {
+      "basin_id": "USA_01440400",
+      "hru_id": 1440400,
+      "lon_cen": -75.24309,
+      "lat_cen": 41.18775,
+      "area_m2": 178980860.924,
+      "elev_mean_m": 423.122222222
+    },
+    {
+      "basin_id": "USA_01451800",
+      "hru_id": 1451800,
+      "lon_cen": -75.68416,
+      "lat_cen": 40.6604,
+      "area_m2": 149111212.918,
+      "elev_mean_m": 205.36
+    },
+    {
+      "basin_id": "USA_01487000",
+      "hru_id": 1487000,
+      "lon_cen": -75.56216,
+      "lat_cen": 38.8002,
+      "area_m2": 187186106.184,
+      "elev_mean_m": 14.1578947368
+    },
+    {
+      "basin_id": "USA_01491000",
+      "hru_id": 1491000,
+      "lon_cen": -75.70663,
+      "lat_cen": 39.07677,
+      "area_m2": 291805648.819,
+      "elev_mean_m": 15.0824742268
+    },
+    {
+      "basin_id": "USA_01510000",
+      "hru_id": 1510000,
+      "lon_cen": -75.80821,
+      "lat_cen": 42.68791,
+      "area_m2": 382931630.004,
+      "elev_mean_m": 484.344736842
+    },
+    {
+      "basin_id": "USA_01516500",
+      "hru_id": 1516500,
+      "lon_cen": -76.96981,
+      "lat_cen": 41.76926,
+      "area_m2": 31559512.891,
+      "elev_mean_m": 530.4375
+    },
+    {
+      "basin_id": "USA_01518862",
+      "hru_id": 1518862,
+      "lon_cen": -77.6206,
+      "lat_cen": 41.93231,
+      "area_m2": 234489445.18,
+      "elev_mean_m": 606.673640167
+    },
+    {
+      "basin_id": "USA_01532000",
+      "hru_id": 1532000,
+      "lon_cen": -76.6915,
+      "lat_cen": 41.66388,
+      "area_m2": 556695090.84,
+      "elev_mean_m": 486.784313725
+    },
+    {
+      "basin_id": "USA_01539000",
+      "hru_id": 1539000,
+      "lon_cen": -76.3416,
+      "lat_cen": 41.23694,
+      "area_m2": 705231987.754,
+      "elev_mean_m": 404.009887006
+    },
+    {
+      "basin_id": "USA_01542810",
+      "hru_id": 1542810,
+      "lon_cen": -78.2881,
+      "lat_cen": 41.6115,
+      "area_m2": 13578328.5429,
+      "elev_mean_m": 555.461538462
+    },
+    {
+      "basin_id": "USA_01543000",
+      "hru_id": 1543000,
+      "lon_cen": -78.29729,
+      "lat_cen": 41.54218,
+      "area_m2": 704485765.193,
+      "elev_mean_m": 547.577874818
+    },
+    {
+      "basin_id": "USA_01543500",
+      "hru_id": 1543500,
+      "lon_cen": -78.35836,
+      "lat_cen": 41.40397,
+      "area_m2": 1778996633.22,
+      "elev_mean_m": 533.470860315
+    },
+    {
+      "basin_id": "USA_01544500",
+      "hru_id": 1544500,
+      "lon_cen": -77.72149,
+      "lat_cen": 41.58549,
+      "area_m2": 363084293.169,
+      "elev_mean_m": 576.865546218
+    },
+    {
+      "basin_id": "USA_01545600",
+      "hru_id": 1545600,
+      "lon_cen": -77.64025,
+      "lat_cen": 41.46426,
+      "area_m2": 123626576.137,
+      "elev_mean_m": 565.023809524
+    },
+    {
+      "basin_id": "USA_01547700",
+      "hru_id": 1547700,
+      "lon_cen": -77.74363,
+      "lat_cen": 41.04534,
+      "area_m2": 115192481.727,
+      "elev_mean_m": 404.92920354
+    },
+    {
+      "basin_id": "USA_01548500",
+      "hru_id": 1548500,
+      "lon_cen": -77.50991,
+      "lat_cen": 41.71098,
+      "area_m2": 1558005419.15,
+      "elev_mean_m": 581.999357739
+    },
+    {
+      "basin_id": "USA_01549500",
+      "hru_id": 1549500,
+      "lon_cen": -77.13671,
+      "lat_cen": 41.51403,
+      "area_m2": 98915263.2096,
+      "elev_mean_m": 555.737373737
+    },
+    {
+      "basin_id": "USA_01550000",
+      "hru_id": 1550000,
+      "lon_cen": -76.9518,
+      "lat_cen": 41.53137,
+      "area_m2": 456324596.588,
+      "elev_mean_m": 529.750551876
+    },
+    {
+      "basin_id": "USA_01552000",
+      "hru_id": 1552000,
+      "lon_cen": -76.60305,
+      "lat_cen": 41.4651,
+      "area_m2": 1129571081.29,
+      "elev_mean_m": 511.527062999
+    },
+    {
+      "basin_id": "USA_01552500",
+      "hru_id": 1552500,
+      "lon_cen": -76.46825,
+      "lat_cen": 41.37431,
+      "area_m2": 62057773.5793,
+      "elev_mean_m": 548.081967213
+    },
+    {
+      "basin_id": "USA_01557500",
+      "hru_id": 1557500,
+      "lon_cen": -78.21291,
+      "lat_cen": 40.74115,
+      "area_m2": 117781988.484,
+      "elev_mean_m": 491.398305085
+    },
+    {
+      "basin_id": "USA_01567500",
+      "hru_id": 1567500,
+      "lon_cen": -77.44,
+      "lat_cen": 40.38734,
+      "area_m2": 39503808.9163,
+      "elev_mean_m": 286.378378378
+    },
+    {
+      "basin_id": "USA_01568000",
+      "hru_id": 1568000,
+      "lon_cen": -77.40676,
+      "lat_cen": 40.3193,
+      "area_m2": 536405296.097,
+      "elev_mean_m": 319.501002004
+    },
+    {
+      "basin_id": "USA_01580000",
+      "hru_id": 1580000,
+      "lon_cen": -76.53141,
+      "lat_cen": 39.693,
+      "area_m2": 246968175.38,
+      "elev_mean_m": 195.170731707
+    },
+    {
+      "basin_id": "USA_01583500",
+      "hru_id": 1583500,
+      "lon_cen": -76.76289,
+      "lat_cen": 39.53296,
+      "area_m2": 163426268.521,
+      "elev_mean_m": 167.845679012
+    },
+    {
+      "basin_id": "USA_01586610",
+      "hru_id": 1586610,
+      "lon_cen": -77.01429,
+      "lat_cen": 39.48942,
+      "area_m2": 72809190.0539,
+      "elev_mean_m": 215.718309859
+    },
+    {
+      "basin_id": "USA_01591400",
+      "hru_id": 1591400,
+      "lon_cen": -77.06386,
+      "lat_cen": 39.30656,
+      "area_m2": 59609953.9105,
+      "elev_mean_m": 171.45
+    },
+    {
+      "basin_id": "USA_01594950",
+      "hru_id": 1594950,
+      "lon_cen": -79.41151,
+      "lat_cen": 39.28331,
+      "area_m2": 6104755.46381,
+      "elev_mean_m": 847.666666667
+    },
+    {
+      "basin_id": "USA_01596500",
+      "hru_id": 1596500,
+      "lon_cen": -79.05898,
+      "lat_cen": 39.63149,
+      "area_m2": 127509184.707,
+      "elev_mean_m": 749.448818898
+    },
+    {
+      "basin_id": "USA_01605500",
+      "hru_id": 1605500,
+      "lon_cen": -79.45611,
+      "lat_cen": 38.52689,
+      "area_m2": 474384867.642,
+      "elev_mean_m": 870.905263158
+    },
+    {
+      "basin_id": "USA_01606500",
+      "hru_id": 1606500,
+      "lon_cen": -79.41803,
+      "lat_cen": 38.69911,
+      "area_m2": 1686645477.87,
+      "elev_mean_m": 833.204283361
+    },
+    {
+      "basin_id": "USA_01613050",
+      "hru_id": 1613050,
+      "lon_cen": -78.16761,
+      "lat_cen": 39.92316,
+      "area_m2": 27962014.5027,
+      "elev_mean_m": 393.464285714
+    },
+    {
+      "basin_id": "USA_01632000",
+      "hru_id": 1632000,
+      "lon_cen": -78.96078,
+      "lat_cen": 38.70073,
+      "area_m2": 547286614.258,
+      "elev_mean_m": 605.693989071
+    },
+    {
+      "basin_id": "USA_01632900",
+      "hru_id": 1632900,
+      "lon_cen": -78.72713,
+      "lat_cen": 38.5445,
+      "area_m2": 249206632.838,
+      "elev_mean_m": 410.401606426
+    },
+    {
+      "basin_id": "USA_01634500",
+      "hru_id": 1634500,
+      "lon_cen": -78.44939,
+      "lat_cen": 39.06919,
+      "area_m2": 264494916.568,
+      "elev_mean_m": 441.780769231
+    },
+    {
+      "basin_id": "USA_01638480",
+      "hru_id": 1638480,
+      "lon_cen": -77.67379,
+      "lat_cen": 39.2006,
+      "area_m2": 233835164.481,
+      "elev_mean_m": 175.122362869
+    },
+    {
+      "basin_id": "USA_01639500",
+      "hru_id": 1639500,
+      "lon_cen": -77.05279,
+      "lat_cen": 39.6456,
+      "area_m2": 267173151.362,
+      "elev_mean_m": 193.505617978
+    },
+    {
+      "basin_id": "USA_01644000",
+      "hru_id": 1644000,
+      "lon_cen": -77.80391,
+      "lat_cen": 38.99276,
+      "area_m2": 859599216.676,
+      "elev_mean_m": 187.087108014
+    },
+    {
+      "basin_id": "USA_01664000",
+      "hru_id": 1664000,
+      "lon_cen": -78.06367,
+      "lat_cen": 38.67616,
+      "area_m2": 1604664956.23,
+      "elev_mean_m": 244.768224299
+    },
+    {
+      "basin_id": "USA_01666500",
+      "hru_id": 1666500,
+      "lon_cen": -78.24173,
+      "lat_cen": 38.43387,
+      "area_m2": 466183566.846,
+      "elev_mean_m": 266.173447537
+    },
+    {
+      "basin_id": "USA_01667500",
+      "hru_id": 1667500,
+      "lon_cen": -78.2687,
+      "lat_cen": 38.35774,
+      "area_m2": 1210772625.89,
+      "elev_mean_m": 261.90616622
+    },
+    {
+      "basin_id": "USA_01669000",
+      "hru_id": 1669000,
+      "lon_cen": -76.96508,
+      "lat_cen": 37.86945,
+      "area_m2": 75314402.4682,
+      "elev_mean_m": 30.8421052632
+    },
+    {
+      "basin_id": "USA_01669520",
+      "hru_id": 1669520,
+      "lon_cen": -76.80353,
+      "lat_cen": 37.73868,
+      "area_m2": 277684100.378,
+      "elev_mean_m": 29.0324909747
+    },
+    {
+      "basin_id": "USA_02011400",
+      "hru_id": 2011400,
+      "lon_cen": -79.7187,
+      "lat_cen": 38.20913,
+      "area_m2": 409886628.683,
+      "elev_mean_m": 816.078239609
+    },
+    {
+      "basin_id": "USA_02013000",
+      "hru_id": 2013000,
+      "lon_cen": -80.18125,
+      "lat_cen": 37.75112,
+      "area_m2": 436140984.234,
+      "elev_mean_m": 691.887871854
+    },
+    {
+      "basin_id": "USA_02014000",
+      "hru_id": 2014000,
+      "lon_cen": -80.21602,
+      "lat_cen": 37.59871,
+      "area_m2": 397255814.123,
+      "elev_mean_m": 728.295165394
+    },
+    {
+      "basin_id": "USA_02015700",
+      "hru_id": 2015700,
+      "lon_cen": -79.5311,
+      "lat_cen": 38.32088,
+      "area_m2": 286338595.071,
+      "elev_mean_m": 800.263157895
+    },
+    {
+      "basin_id": "USA_02016000",
+      "hru_id": 2016000,
+      "lon_cen": -79.60087,
+      "lat_cen": 38.12175,
+      "area_m2": 1194943682.18,
+      "elev_mean_m": 612.425742574
+    },
+    {
+      "basin_id": "USA_02017500",
+      "hru_id": 2017500,
+      "lon_cen": -80.31146,
+      "lat_cen": 37.46102,
+      "area_m2": 285793027.561,
+      "elev_mean_m": 705.374125874
+    },
+    {
+      "basin_id": "USA_02018000",
+      "hru_id": 2018000,
+      "lon_cen": -80.1843,
+      "lat_cen": 37.48406,
+      "area_m2": 852547068.36,
+      "elev_mean_m": 606.842477876
+    },
+    {
+      "basin_id": "USA_02027000",
+      "hru_id": 2027000,
+      "lon_cen": -79.02662,
+      "lat_cen": 37.82809,
+      "area_m2": 241316842.293,
+      "elev_mean_m": 554.959183673
+    },
+    {
+      "basin_id": "USA_02027500",
+      "hru_id": 2027500,
+      "lon_cen": -79.10871,
+      "lat_cen": 37.76551,
+      "area_m2": 127874923.801,
+      "elev_mean_m": 626.11627907
+    },
+    {
+      "basin_id": "USA_02028500",
+      "hru_id": 2028500,
+      "lon_cen": -78.86402,
+      "lat_cen": 37.9313,
+      "area_m2": 246195629.821,
+      "elev_mean_m": 428.404
+    },
+    {
+      "basin_id": "USA_02038850",
+      "hru_id": 2038850,
+      "lon_cen": -78.66836,
+      "lat_cen": 37.43049,
+      "area_m2": 23801651.5127,
+      "elev_mean_m": 205.291666667
+    },
+    {
+      "basin_id": "USA_02046000",
+      "hru_id": 2046000,
+      "lon_cen": -77.73643,
+      "lat_cen": 37.09514,
+      "area_m2": 290882671.643,
+      "elev_mean_m": 83.7147766323
+    },
+    {
+      "basin_id": "USA_02051000",
+      "hru_id": 2051000,
+      "lon_cen": -78.37505,
+      "lat_cen": 37.05035,
+      "area_m2": 145106076.424,
+      "elev_mean_m": 148.056737589
+    },
+    {
+      "basin_id": "USA_02051500",
+      "hru_id": 2051500,
+      "lon_cen": -78.21324,
+      "lat_cen": 36.86531,
+      "area_m2": 1432434068.83,
+      "elev_mean_m": 119.143974961
+    },
+    {
+      "basin_id": "USA_02053200",
+      "hru_id": 2053200,
+      "lon_cen": -77.24109,
+      "lat_cen": 36.36082,
+      "area_m2": 581611695.663,
+      "elev_mean_m": 19.0667808219
+    },
+    {
+      "basin_id": "USA_02053800",
+      "hru_id": 2053800,
+      "lon_cen": -80.25445,
+      "lat_cen": 37.10785,
+      "area_m2": 288523921.622,
+      "elev_mean_m": 706.610921502
+    },
+    {
+      "basin_id": "USA_02055100",
+      "hru_id": 2055100,
+      "lon_cen": -79.93072,
+      "lat_cen": 37.43629,
+      "area_m2": 33335121.9873,
+      "elev_mean_m": 439.352941176
+    },
+    {
+      "basin_id": "USA_02056900",
+      "hru_id": 2056900,
+      "lon_cen": -80.00858,
+      "lat_cen": 37.06031,
+      "area_m2": 299463129.891,
+      "elev_mean_m": 472.113712375
+    },
+    {
+      "basin_id": "USA_02059500",
+      "hru_id": 2059500,
+      "lon_cen": -79.65126,
+      "lat_cen": 37.30298,
+      "area_m2": 486464640.882,
+      "elev_mean_m": 336.322245322
+    },
+    {
+      "basin_id": "USA_02064000",
+      "hru_id": 2064000,
+      "lon_cen": -78.97491,
+      "lat_cen": 37.24936,
+      "area_m2": 427987131.669,
+      "elev_mean_m": 208.20990566
+    },
+    {
+      "basin_id": "USA_02065500",
+      "hru_id": 2065500,
+      "lon_cen": -78.76502,
+      "lat_cen": 37.21614,
+      "area_m2": 252752436.914,
+      "elev_mean_m": 185.351778656
+    },
+    {
+      "basin_id": "USA_02069700",
+      "hru_id": 2069700,
+      "lon_cen": -80.24892,
+      "lat_cen": 36.62832,
+      "area_m2": 228683935.486,
+      "elev_mean_m": 452.769565217
+    },
+    {
+      "basin_id": "USA_02070000",
+      "hru_id": 2070000,
+      "lon_cen": -80.07252,
+      "lat_cen": 36.66006,
+      "area_m2": 279274202.922,
+      "elev_mean_m": 331.985611511
+    },
+    {
+      "basin_id": "USA_02074500",
+      "hru_id": 2074500,
+      "lon_cen": -79.60934,
+      "lat_cen": 36.6951,
+      "area_m2": 288797135.865,
+      "elev_mean_m": 243.847222222
+    },
+    {
+      "basin_id": "USA_02077200",
+      "hru_id": 2077200,
+      "lon_cen": -79.22655,
+      "lat_cen": 36.3001,
+      "area_m2": 126344657.224,
+      "elev_mean_m": 190.341463415
+    },
+    {
+      "basin_id": "USA_02081500",
+      "hru_id": 2081500,
+      "lon_cen": -78.71923,
+      "lat_cen": 36.30158,
+      "area_m2": 432826680.088,
+      "elev_mean_m": 147.758064516
+    },
+    {
+      "basin_id": "USA_02082950",
+      "hru_id": 2082950,
+      "lon_cen": -77.94634,
+      "lat_cen": 36.34491,
+      "area_m2": 461926825.348,
+      "elev_mean_m": 88.5172413793
+    },
+    {
+      "basin_id": "USA_02096846",
+      "hru_id": 2096846,
+      "lon_cen": -79.18314,
+      "lat_cen": 36.00844,
+      "area_m2": 19580373.962,
+      "elev_mean_m": 222.947368421
+    },
+    {
+      "basin_id": "USA_02102908",
+      "hru_id": 2102908,
+      "lon_cen": -79.20346,
+      "lat_cen": 35.15365,
+      "area_m2": 20061049.1775,
+      "elev_mean_m": 98.9444444444
+    },
+    {
+      "basin_id": "USA_02108000",
+      "hru_id": 2108000,
+      "lon_cen": -77.93157,
+      "lat_cen": 35.03089,
+      "area_m2": 1566834693.47,
+      "elev_mean_m": 32.7281429483
+    },
+    {
+      "basin_id": "USA_02111180",
+      "hru_id": 2111180,
+      "lon_cen": -81.51122,
+      "lat_cen": 36.15054,
+      "area_m2": 130872686.677,
+      "elev_mean_m": 637.284615385
+    },
+    {
+      "basin_id": "USA_02111500",
+      "hru_id": 2111500,
+      "lon_cen": -81.27746,
+      "lat_cen": 36.27627,
+      "area_m2": 233352397.709,
+      "elev_mean_m": 563.411255411
+    },
+    {
+      "basin_id": "USA_02112120",
+      "hru_id": 2112120,
+      "lon_cen": -81.09049,
+      "lat_cen": 36.34773,
+      "area_m2": 329796212.11,
+      "elev_mean_m": 527.905198777
+    },
+    {
+      "basin_id": "USA_02112360",
+      "hru_id": 2112360,
+      "lon_cen": -80.89124,
+      "lat_cen": 36.40685,
+      "area_m2": 206820611.132,
+      "elev_mean_m": 482.8
+    },
+    {
+      "basin_id": "USA_02118500",
+      "hru_id": 2118500,
+      "lon_cen": -80.90133,
+      "lat_cen": 36.08394,
+      "area_m2": 400534723.969,
+      "elev_mean_m": 359.4825
+    },
+    {
+      "basin_id": "USA_02125000",
+      "hru_id": 2125000,
+      "lon_cen": -80.35288,
+      "lat_cen": 35.39405,
+      "area_m2": 145076680.417,
+      "elev_mean_m": 196.965753425
+    },
+    {
+      "basin_id": "USA_02128000",
+      "hru_id": 2128000,
+      "lon_cen": -79.83953,
+      "lat_cen": 35.52624,
+      "area_m2": 271998550.271,
+      "elev_mean_m": 218.682656827
+    },
+    {
+      "basin_id": "USA_02137727",
+      "hru_id": 2137727,
+      "lon_cen": -82.17798,
+      "lat_cen": 35.63735,
+      "area_m2": 329306576.046,
+      "elev_mean_m": 661.701219512
+    },
+    {
+      "basin_id": "USA_02140991",
+      "hru_id": 2140991,
+      "lon_cen": -81.72571,
+      "lat_cen": 36.00279,
+      "area_m2": 522115378.496,
+      "elev_mean_m": 632.095785441
+    },
+    {
+      "basin_id": "USA_02143000",
+      "hru_id": 2143000,
+      "lon_cen": -81.57067,
+      "lat_cen": 35.66546,
+      "area_m2": 222108236.824,
+      "elev_mean_m": 448.063063063
+    },
+    {
+      "basin_id": "USA_02143040",
+      "hru_id": 2143040,
+      "lon_cen": -81.62254,
+      "lat_cen": 35.59558,
+      "area_m2": 68188558.4836,
+      "elev_mean_m": 548.910447761
+    },
+    {
+      "basin_id": "USA_02149000",
+      "hru_id": 2149000,
+      "lon_cen": -82.1143,
+      "lat_cen": 35.51801,
+      "area_m2": 203730283.722,
+      "elev_mean_m": 476.614634146
+    },
+    {
+      "basin_id": "USA_02152100",
+      "hru_id": 2152100,
+      "lon_cen": -81.75365,
+      "lat_cen": 35.54407,
+      "area_m2": 156680740.907,
+      "elev_mean_m": 466.871794872
+    },
+    {
+      "basin_id": "USA_02177000",
+      "hru_id": 2177000,
+      "lon_cen": -83.20273,
+      "lat_cen": 34.95726,
+      "area_m2": 527237715.473,
+      "elev_mean_m": 763.699432892
+    },
+    {
+      "basin_id": "USA_02178400",
+      "hru_id": 2178400,
+      "lon_cen": -83.53256,
+      "lat_cen": 34.95456,
+      "area_m2": 152124273.544,
+      "elev_mean_m": 877.5
+    },
+    {
+      "basin_id": "USA_02193340",
+      "hru_id": 2193340,
+      "lon_cen": -82.91338,
+      "lat_cen": 33.72247,
+      "area_m2": 89611854.0133,
+      "elev_mean_m": 168.636363636
+    },
+    {
+      "basin_id": "USA_02196000",
+      "hru_id": 2196000,
+      "lon_cen": -82.07636,
+      "lat_cen": 33.93154,
+      "area_m2": 1408728278.26,
+      "elev_mean_m": 141.852377573
+    },
+    {
+      "basin_id": "USA_02198100",
+      "hru_id": 2198100,
+      "lon_cen": -81.87391,
+      "lat_cen": 32.96411,
+      "area_m2": 79750791.3116,
+      "elev_mean_m": 83.141025641
+    },
+    {
+      "basin_id": "USA_02202600",
+      "hru_id": 2202600,
+      "lon_cen": -81.63132,
+      "lat_cen": 32.27786,
+      "area_m2": 623348639.725,
+      "elev_mean_m": 35.2060702875
+    },
+    {
+      "basin_id": "USA_02212600",
+      "hru_id": 2212600,
+      "lon_cen": -83.71004,
+      "lat_cen": 33.17211,
+      "area_m2": 189796987.916,
+      "elev_mean_m": 152.457446809
+    },
+    {
+      "basin_id": "USA_02215100",
+      "hru_id": 2215100,
+      "lon_cen": -83.68396,
+      "lat_cen": 32.28677,
+      "area_m2": 425519519.426,
+      "elev_mean_m": 110.269767442
+    },
+    {
+      "basin_id": "USA_02216180",
+      "hru_id": 2216180,
+      "lon_cen": -83.02374,
+      "lat_cen": 32.033,
+      "area_m2": 128084431.25,
+      "elev_mean_m": 82.2777777778
+    },
+    {
+      "basin_id": "USA_02221525",
+      "hru_id": 2221525,
+      "lon_cen": -83.63598,
+      "lat_cen": 33.35787,
+      "area_m2": 493289863.399,
+      "elev_mean_m": 167.160569106
+    },
+    {
+      "basin_id": "USA_02231000",
+      "hru_id": 2231000,
+      "lon_cen": -82.25822,
+      "lat_cen": 30.39226,
+      "area_m2": 1857401206.73,
+      "elev_mean_m": 38.2531030761
+    },
+    {
+      "basin_id": "USA_02245500",
+      "hru_id": 2245500,
+      "lon_cen": -81.87821,
+      "lat_cen": 29.90454,
+      "area_m2": 351110668.954,
+      "elev_mean_m": 36.2714285714
+    },
+    {
+      "basin_id": "USA_02246000",
+      "hru_id": 2246000,
+      "lon_cen": -81.96393,
+      "lat_cen": 30.14773,
+      "area_m2": 451226996.227,
+      "elev_mean_m": 32.6563876652
+    },
+    {
+      "basin_id": "USA_02296500",
+      "hru_id": 2296500,
+      "lon_cen": -81.62867,
+      "lat_cen": 27.46053,
+      "area_m2": 892254069.57,
+      "elev_mean_m": 27.3766816143
+    },
+    {
+      "basin_id": "USA_02297310",
+      "hru_id": 2297310,
+      "lon_cen": -82.00091,
+      "lat_cen": 27.40028,
+      "area_m2": 537076465.386,
+      "elev_mean_m": 21.5545454545
+    },
+    {
+      "basin_id": "USA_02298608",
+      "hru_id": 2298608,
+      "lon_cen": -82.13156,
+      "lat_cen": 27.40547,
+      "area_m2": 313855211.996,
+      "elev_mean_m": 21.5819935691
+    },
+    {
+      "basin_id": "USA_02299950",
+      "hru_id": 2299950,
+      "lon_cen": -82.14564,
+      "lat_cen": 27.54762,
+      "area_m2": 176805909.4,
+      "elev_mean_m": 33.0224719101
+    },
+    {
+      "basin_id": "USA_02315500",
+      "hru_id": 2315500,
+      "lon_cen": -82.5875,
+      "lat_cen": 30.78427,
+      "area_m2": 5915740803.59,
+      "elev_mean_m": 39.1215736859
+    },
+    {
+      "basin_id": "USA_02342933",
+      "hru_id": 2342933,
+      "lon_cen": -85.41945,
+      "lat_cen": 32.0259,
+      "area_m2": 290045114.961,
+      "elev_mean_m": 112.020477816
+    },
+    {
+      "basin_id": "USA_02349900",
+      "hru_id": 2349900,
+      "lon_cen": -83.83836,
+      "lat_cen": 32.24049,
+      "area_m2": 124290914.639,
+      "elev_mean_m": 109.303278689
+    },
+    {
+      "basin_id": "USA_02350900",
+      "hru_id": 2350900,
+      "lon_cen": -84.50098,
+      "lat_cen": 32.06963,
+      "area_m2": 1365618553.36,
+      "elev_mean_m": 140.629493764
+    },
+    {
+      "basin_id": "USA_02361000",
+      "hru_id": 2361000,
+      "lon_cen": -85.4648,
+      "lat_cen": 31.5878,
+      "area_m2": 1779331143.65,
+      "elev_mean_m": 115.224535734
+    },
+    {
+      "basin_id": "USA_02363000",
+      "hru_id": 2363000,
+      "lon_cen": -85.65737,
+      "lat_cen": 31.86853,
+      "area_m2": 1292639522.79,
+      "elev_mean_m": 137.30431433
+    },
+    {
+      "basin_id": "USA_02371500",
+      "hru_id": 2371500,
+      "lon_cen": -85.98757,
+      "lat_cen": 31.86585,
+      "area_m2": 1257447749.4,
+      "elev_mean_m": 135.314036479
+    },
+    {
+      "basin_id": "USA_02372250",
+      "hru_id": 2372250,
+      "lon_cen": -86.26075,
+      "lat_cen": 31.85455,
+      "area_m2": 1145578105.23,
+      "elev_mean_m": 136.955497382
+    },
+    {
+      "basin_id": "USA_02374500",
+      "hru_id": 2374500,
+      "lon_cen": -87.04522,
+      "lat_cen": 31.54226,
+      "area_m2": 458238696.577,
+      "elev_mean_m": 116.963203463
+    },
+    {
+      "basin_id": "USA_02395120",
+      "hru_id": 2395120,
+      "lon_cen": -84.85154,
+      "lat_cen": 34.29213,
+      "area_m2": 85273255.2753,
+      "elev_mean_m": 269.549450549
+    },
+    {
+      "basin_id": "USA_02408540",
+      "hru_id": 2408540,
+      "lon_cen": -86.10783,
+      "lat_cen": 33.0645,
+      "area_m2": 683870571.717,
+      "elev_mean_m": 248.085545723
+    },
+    {
+      "basin_id": "USA_02415000",
+      "hru_id": 2415000,
+      "lon_cen": -85.8773,
+      "lat_cen": 33.1761,
+      "area_m2": 491754849.773,
+      "elev_mean_m": 284.87195122
+    },
+    {
+      "basin_id": "USA_02430085",
+      "hru_id": 2430085,
+      "lon_cen": -88.24518,
+      "lat_cen": 34.47513,
+      "area_m2": 40728129.2939,
+      "elev_mean_m": 150.487804878
+    },
+    {
+      "basin_id": "USA_02450250",
+      "hru_id": 2450250,
+      "lon_cen": -87.43027,
+      "lat_cen": 34.34126,
+      "area_m2": 242698356.008,
+      "elev_mean_m": 252.142259414
+    },
+    {
+      "basin_id": "USA_02464000",
+      "hru_id": 2464000,
+      "lon_cen": -87.61254,
+      "lat_cen": 33.65248,
+      "area_m2": 581797633.537,
+      "elev_mean_m": 148.493955095
+    },
+    {
+      "basin_id": "USA_02464146",
+      "hru_id": 2464146,
+      "lon_cen": -87.49377,
+      "lat_cen": 33.40951,
+      "area_m2": 15843529.1911,
+      "elev_mean_m": 139.714285714
+    },
+    {
+      "basin_id": "USA_02464360",
+      "hru_id": 2464360,
+      "lon_cen": -87.68256,
+      "lat_cen": 33.47046,
+      "area_m2": 148988265.691,
+      "elev_mean_m": 114.527027027
+    },
+    {
+      "basin_id": "USA_02465493",
+      "hru_id": 2465493,
+      "lon_cen": -87.52709,
+      "lat_cen": 32.96997,
+      "area_m2": 86620505.0011,
+      "elev_mean_m": 110.340659341
+    },
+    {
+      "basin_id": "USA_02469800",
+      "hru_id": 2469800,
+      "lon_cen": -87.90436,
+      "lat_cen": 31.81058,
+      "area_m2": 422889492.197,
+      "elev_mean_m": 77.2635294118
+    },
+    {
+      "basin_id": "USA_02472000",
+      "hru_id": 2472000,
+      "lon_cen": -89.44991,
+      "lat_cen": 32.04441,
+      "area_m2": 1927706040.94,
+      "elev_mean_m": 116.744548287
+    },
+    {
+      "basin_id": "USA_02472500",
+      "hru_id": 2472500,
+      "lon_cen": -89.65944,
+      "lat_cen": 31.58678,
+      "area_m2": 789462347.326,
+      "elev_mean_m": 113.348600509
+    },
+    {
+      "basin_id": "USA_02479155",
+      "hru_id": 2479155,
+      "lon_cen": -89.00637,
+      "lat_cen": 31.09826,
+      "area_m2": 138174881.616,
+      "elev_mean_m": 65.4892086331
+    },
+    {
+      "basin_id": "USA_02479300",
+      "hru_id": 2479300,
+      "lon_cen": -89.16585,
+      "lat_cen": 30.86789,
+      "area_m2": 1153440416.89,
+      "elev_mean_m": 61.0574912892
+    },
+    {
+      "basin_id": "USA_02479560",
+      "hru_id": 2479560,
+      "lon_cen": -88.38732,
+      "lat_cen": 31.15039,
+      "area_m2": 1455855607.57,
+      "elev_mean_m": 65.3896907216
+    },
+    {
+      "basin_id": "USA_02481000",
+      "hru_id": 2481000,
+      "lon_cen": -89.20747,
+      "lat_cen": 30.68013,
+      "area_m2": 250493447.362,
+      "elev_mean_m": 48.1394422311
+    },
+    {
+      "basin_id": "USA_02481510",
+      "hru_id": 2481510,
+      "lon_cen": -89.41421,
+      "lat_cen": 30.76983,
+      "area_m2": 801498770.88,
+      "elev_mean_m": 66.0666666667
+    },
+    {
+      "basin_id": "USA_03010655",
+      "hru_id": 3010655,
+      "lon_cen": -78.05065,
+      "lat_cen": 41.917,
+      "area_m2": 255123891.566,
+      "elev_mean_m": 623.182170543
+    },
+    {
+      "basin_id": "USA_03011800",
+      "hru_id": 3011800,
+      "lon_cen": -78.6213,
+      "lat_cen": 41.77314,
+      "area_m2": 101159129.843,
+      "elev_mean_m": 633.069306931
+    },
+    {
+      "basin_id": "USA_03015500",
+      "hru_id": 3015500,
+      "lon_cen": -79.50262,
+      "lat_cen": 41.92132,
+      "area_m2": 831402122.192,
+      "elev_mean_m": 489.290516206
+    },
+    {
+      "basin_id": "USA_03021350",
+      "hru_id": 3021350,
+      "lon_cen": -79.65858,
+      "lat_cen": 42.08496,
+      "area_m2": 249007346.281,
+      "elev_mean_m": 485.067460317
+    },
+    {
+      "basin_id": "USA_03026500",
+      "hru_id": 3026500,
+      "lon_cen": -78.60745,
+      "lat_cen": 41.66179,
+      "area_m2": 20326424.354,
+      "elev_mean_m": 615.523809524
+    },
+    {
+      "basin_id": "USA_03028000",
+      "hru_id": 3028000,
+      "lon_cen": -78.70014,
+      "lat_cen": 41.6411,
+      "area_m2": 166219159.181,
+      "elev_mean_m": 597.085365854
+    },
+    {
+      "basin_id": "USA_03049000",
+      "hru_id": 3049000,
+      "lon_cen": -79.69503,
+      "lat_cen": 40.85365,
+      "area_m2": 356449668.562,
+      "elev_mean_m": 377.284507042
+    },
+    {
+      "basin_id": "USA_03049800",
+      "hru_id": 3049800,
+      "lon_cen": -79.92033,
+      "lat_cen": 40.54501,
+      "area_m2": 15995820.5907,
+      "elev_mean_m": 337.823529412
+    },
+    {
+      "basin_id": "USA_03050000",
+      "hru_id": 3050000,
+      "lon_cen": -79.9917,
+      "lat_cen": 38.63665,
+      "area_m2": 489502228.663,
+      "elev_mean_m": 868.042944785
+    },
+    {
+      "basin_id": "USA_03069500",
+      "hru_id": 3069500,
+      "lon_cen": -79.61928,
+      "lat_cen": 38.90714,
+      "area_m2": 1853236975.89,
+      "elev_mean_m": 989.928921569
+    },
+    {
+      "basin_id": "USA_03070500",
+      "hru_id": 3070500,
+      "lon_cen": -79.61803,
+      "lat_cen": 39.70254,
+      "area_m2": 518449760.085,
+      "elev_mean_m": 609.338491296
+    },
+    {
+      "basin_id": "USA_03076600",
+      "hru_id": 3076600,
+      "lon_cen": -79.32267,
+      "lat_cen": 39.63308,
+      "area_m2": 128328249.985,
+      "elev_mean_m": 751.346456693
+    },
+    {
+      "basin_id": "USA_03078000",
+      "hru_id": 3078000,
+      "lon_cen": -79.19674,
+      "lat_cen": 39.64484,
+      "area_m2": 165173295.378,
+      "elev_mean_m": 788.915151515
+    },
+    {
+      "basin_id": "USA_03140000",
+      "hru_id": 3140000,
+      "lon_cen": -81.82219,
+      "lat_cen": 40.41155,
+      "area_m2": 71312134.6824,
+      "elev_mean_m": 305.776315789
+    },
+    {
+      "basin_id": "USA_03144000",
+      "hru_id": 3144000,
+      "lon_cen": -82.20653,
+      "lat_cen": 40.22812,
+      "area_m2": 365106628.581,
+      "elev_mean_m": 304.969863014
+    },
+    {
+      "basin_id": "USA_03159540",
+      "hru_id": 3159540,
+      "lon_cen": -82.00967,
+      "lat_cen": 39.15754,
+      "area_m2": 400872784.518,
+      "elev_mean_m": 251.396508728
+    },
+    {
+      "basin_id": "USA_03161000",
+      "hru_id": 3161000,
+      "lon_cen": -81.56,
+      "lat_cen": 36.2835,
+      "area_m2": 533641676.993,
+      "elev_mean_m": 1028.03932584
+    },
+    {
+      "basin_id": "USA_03164000",
+      "hru_id": 3164000,
+      "lon_cen": -81.36425,
+      "lat_cen": 36.50311,
+      "area_m2": 2963752661.34,
+      "elev_mean_m": 944.020483408
+    },
+    {
+      "basin_id": "USA_03170000",
+      "hru_id": 3170000,
+      "lon_cen": -80.36053,
+      "lat_cen": 36.96028,
+      "area_m2": 800070399.924,
+      "elev_mean_m": 757.817610063
+    },
+    {
+      "basin_id": "USA_03173000",
+      "hru_id": 3173000,
+      "lon_cen": -80.94939,
+      "lat_cen": 37.15808,
+      "area_m2": 775858554.194,
+      "elev_mean_m": 785.355584082
+    },
+    {
+      "basin_id": "USA_03180500",
+      "hru_id": 3180500,
+      "lon_cen": -79.7417,
+      "lat_cen": 38.60639,
+      "area_m2": 346491412.01,
+      "elev_mean_m": 1055.53623188
+    },
+    {
+      "basin_id": "USA_03182500",
+      "hru_id": 3182500,
+      "lon_cen": -79.87662,
+      "lat_cen": 38.39219,
+      "area_m2": 1364887915.54,
+      "elev_mean_m": 905.205153617
+    },
+    {
+      "basin_id": "USA_03186500",
+      "hru_id": 3186500,
+      "lon_cen": -80.2816,
+      "lat_cen": 38.32717,
+      "area_m2": 332119946.466,
+      "elev_mean_m": 1069.04229607
+    },
+    {
+      "basin_id": "USA_03187500",
+      "hru_id": 3187500,
+      "lon_cen": -80.36093,
+      "lat_cen": 38.26585,
+      "area_m2": 207997753.163,
+      "elev_mean_m": 1073.86893204
+    },
+    {
+      "basin_id": "USA_03213700",
+      "hru_id": 3213700,
+      "lon_cen": -81.81715,
+      "lat_cen": 37.42337,
+      "area_m2": 2431417123.37,
+      "elev_mean_m": 530.446046129
+    },
+    {
+      "basin_id": "USA_03237280",
+      "hru_id": 3237280,
+      "lon_cen": -83.23609,
+      "lat_cen": 38.6753,
+      "area_m2": 33221594.0096,
+      "elev_mean_m": 294.636363636
+    },
+    {
+      "basin_id": "USA_03237500",
+      "hru_id": 3237500,
+      "lon_cen": -83.51467,
+      "lat_cen": 38.98767,
+      "area_m2": 1001433797.34,
+      "elev_mean_m": 274.354291417
+    },
+    {
+      "basin_id": "USA_03238500",
+      "hru_id": 3238500,
+      "lon_cen": -83.8235,
+      "lat_cen": 39.04821,
+      "area_m2": 564170306.222,
+      "elev_mean_m": 288.035523979
+    },
+    {
+      "basin_id": "USA_03241500",
+      "hru_id": 3241500,
+      "lon_cen": -83.73149,
+      "lat_cen": 39.75141,
+      "area_m2": 173481938.347,
+      "elev_mean_m": 321.379310345
+    },
+    {
+      "basin_id": "USA_03281500",
+      "hru_id": 3281500,
+      "lon_cen": -83.67779,
+      "lat_cen": 37.18492,
+      "area_m2": 1836744240.34,
+      "elev_mean_m": 366.36562942
+    },
+    {
+      "basin_id": "USA_03285000",
+      "hru_id": 3285000,
+      "lon_cen": -84.59942,
+      "lat_cen": 37.50358,
+      "area_m2": 823303373.646,
+      "elev_mean_m": 312.344660194
+    },
+    {
+      "basin_id": "USA_03291780",
+      "hru_id": 3291780,
+      "lon_cen": -85.28097,
+      "lat_cen": 38.93342,
+      "area_m2": 71524041.8125,
+      "elev_mean_m": 262.845070423
+    },
+    {
+      "basin_id": "USA_03300400",
+      "hru_id": 3300400,
+      "lon_cen": -85.07018,
+      "lat_cen": 37.76492,
+      "area_m2": 1128560976.3,
+      "elev_mean_m": 250.50931677
+    },
+    {
+      "basin_id": "USA_03338780",
+      "hru_id": 3338780,
+      "lon_cen": -87.57334,
+      "lat_cen": 40.4083,
+      "area_m2": 691775069.462,
+      "elev_mean_m": 218.84804631
+    },
+    {
+      "basin_id": "USA_03340800",
+      "hru_id": 3340800,
+      "lon_cen": -86.76077,
+      "lat_cen": 39.9127,
+      "area_m2": 363412201.318,
+      "elev_mean_m": 264.726775956
+    },
+    {
+      "basin_id": "USA_03346000",
+      "hru_id": 3346000,
+      "lon_cen": -87.91749,
+      "lat_cen": 39.26438,
+      "area_m2": 828751833.159,
+      "elev_mean_m": 182.028880866
+    },
+    {
+      "basin_id": "USA_03364500",
+      "hru_id": 3364500,
+      "lon_cen": -85.49655,
+      "lat_cen": 39.40363,
+      "area_m2": 242417794.98,
+      "elev_mean_m": 278.09623431
+    },
+    {
+      "basin_id": "USA_03366500",
+      "hru_id": 3366500,
+      "lon_cen": -85.47663,
+      "lat_cen": 38.87915,
+      "area_m2": 762703711.396,
+      "elev_mean_m": 242.873350923
+    },
+    {
+      "basin_id": "USA_03368000",
+      "hru_id": 3368000,
+      "lon_cen": -85.44026,
+      "lat_cen": 39.09304,
+      "area_m2": 32490643.0028,
+      "elev_mean_m": 260.09375
+    },
+    {
+      "basin_id": "USA_03384450",
+      "hru_id": 3384450,
+      "lon_cen": -88.52769,
+      "lat_cen": 37.53076,
+      "area_m2": 112284035.644,
+      "elev_mean_m": 191.72972973
+    },
+    {
+      "basin_id": "USA_03439000",
+      "hru_id": 3439000,
+      "lon_cen": -82.89101,
+      "lat_cen": 35.20181,
+      "area_m2": 178186134.979,
+      "elev_mean_m": 976.175141243
+    },
+    {
+      "basin_id": "USA_03450000",
+      "hru_id": 3450000,
+      "lon_cen": -82.39731,
+      "lat_cen": 35.67619,
+      "area_m2": 14130886.2171,
+      "elev_mean_m": 1215.33333333
+    },
+    {
+      "basin_id": "USA_03455500",
+      "hru_id": 3455500,
+      "lon_cen": -82.93173,
+      "lat_cen": 35.34507,
+      "area_m2": 71469823.085,
+      "elev_mean_m": 1453.98571429
+    },
+    {
+      "basin_id": "USA_03456500",
+      "hru_id": 3456500,
+      "lon_cen": -82.82776,
+      "lat_cen": 35.4052,
+      "area_m2": 137329072.161,
+      "elev_mean_m": 1239.2173913
+    },
+    {
+      "basin_id": "USA_03460000",
+      "hru_id": 3460000,
+      "lon_cen": -83.12672,
+      "lat_cen": 35.61913,
+      "area_m2": 127620093.073,
+      "elev_mean_m": 1233.34645669
+    },
+    {
+      "basin_id": "USA_03463300",
+      "hru_id": 3463300,
+      "lon_cen": -82.22239,
+      "lat_cen": 35.77672,
+      "area_m2": 113159756.42,
+      "elev_mean_m": 1213.28571429
+    },
+    {
+      "basin_id": "USA_03471500",
+      "hru_id": 3471500,
+      "lon_cen": -81.48407,
+      "lat_cen": 36.75424,
+      "area_m2": 198295369.242,
+      "elev_mean_m": 902.535714286
+    },
+    {
+      "basin_id": "USA_03473000",
+      "hru_id": 3473000,
+      "lon_cen": -81.67994,
+      "lat_cen": 36.65714,
+      "area_m2": 784365461.705,
+      "elev_mean_m": 887.089500861
+    },
+    {
+      "basin_id": "USA_03479000",
+      "hru_id": 3479000,
+      "lon_cen": -81.76806,
+      "lat_cen": 36.21826,
+      "area_m2": 237773414.142,
+      "elev_mean_m": 1035.37394958
+    },
+    {
+      "basin_id": "USA_03488000",
+      "hru_id": 3488000,
+      "lon_cen": -81.52858,
+      "lat_cen": 36.97149,
+      "area_m2": 573764479.121,
+      "elev_mean_m": 805.343103448
+    },
+    {
+      "basin_id": "USA_03498500",
+      "hru_id": 3498500,
+      "lon_cen": -83.7414,
+      "lat_cen": 35.68465,
+      "area_m2": 700366406.805,
+      "elev_mean_m": 628.498571429
+    },
+    {
+      "basin_id": "USA_03504000",
+      "hru_id": 3504000,
+      "lon_cen": -83.55945,
+      "lat_cen": 35.07389,
+      "area_m2": 134558801.122,
+      "elev_mean_m": 1197.80147059
+    },
+    {
+      "basin_id": "USA_03574500",
+      "hru_id": 3574500,
+      "lon_cen": -86.20704,
+      "lat_cen": 34.87494,
+      "area_m2": 859232481.294,
+      "elev_mean_m": 376.914918415
+    },
+    {
+      "basin_id": "USA_03592718",
+      "hru_id": 3592718,
+      "lon_cen": -88.25998,
+      "lat_cen": 34.79907,
+      "area_m2": 67002320.3961,
+      "elev_mean_m": 162.0
+    },
+    {
+      "basin_id": "USA_03604000",
+      "hru_id": 3604000,
+      "lon_cen": -87.56998,
+      "lat_cen": 35.4039,
+      "area_m2": 1163375084.62,
+      "elev_mean_m": 264.883361921
+    },
+    {
+      "basin_id": "USA_04015330",
+      "hru_id": 4015330,
+      "lon_cen": -91.81157,
+      "lat_cen": 47.04074,
+      "area_m2": 225841557.172,
+      "elev_mean_m": 377.122270742
+    },
+    {
+      "basin_id": "USA_04024430",
+      "hru_id": 4024430,
+      "lon_cen": -92.35951,
+      "lat_cen": 46.49096,
+      "area_m2": 1094574964.69,
+      "elev_mean_m": 326.518721461
+    },
+    {
+      "basin_id": "USA_04027000",
+      "hru_id": 4027000,
+      "lon_cen": -90.65961,
+      "lat_cen": 46.34832,
+      "area_m2": 1547181299.42,
+      "elev_mean_m": 398.523963731
+    },
+    {
+      "basin_id": "USA_04040500",
+      "hru_id": 4040500,
+      "lon_cen": -88.40539,
+      "lat_cen": 46.57021,
+      "area_m2": 421659315.725,
+      "elev_mean_m": 490.425531915
+    },
+    {
+      "basin_id": "USA_04043050",
+      "hru_id": 4043050,
+      "lon_cen": -88.35696,
+      "lat_cen": 47.27758,
+      "area_m2": 76657521.2243,
+      "elev_mean_m": 295.310810811
+    },
+    {
+      "basin_id": "USA_04045500",
+      "hru_id": 4045500,
+      "lon_cen": -85.35636,
+      "lat_cen": 46.36934,
+      "area_m2": 1967476700.89,
+      "elev_mean_m": 246.373536896
+    },
+    {
+      "basin_id": "USA_04057510",
+      "hru_id": 4057510,
+      "lon_cen": -86.71963,
+      "lat_cen": 46.11331,
+      "area_m2": 491769669.614,
+      "elev_mean_m": 242.141683778
+    },
+    {
+      "basin_id": "USA_04057800",
+      "hru_id": 4057800,
+      "lon_cen": -87.90923,
+      "lat_cen": 46.53925,
+      "area_m2": 121984376.89,
+      "elev_mean_m": 503.894308943
+    },
+    {
+      "basin_id": "USA_04059500",
+      "hru_id": 4059500,
+      "lon_cen": -87.60948,
+      "lat_cen": 46.00745,
+      "area_m2": 1188839710.43,
+      "elev_mean_m": 332.070219966
+    },
+    {
+      "basin_id": "USA_04063700",
+      "hru_id": 4063700,
+      "lon_cen": -88.66187,
+      "lat_cen": 45.75714,
+      "area_m2": 371323105.908,
+      "elev_mean_m": 470.851351351
+    },
+    {
+      "basin_id": "USA_04074950",
+      "hru_id": 4074950,
+      "lon_cen": -88.9448,
+      "lat_cen": 45.44013,
+      "area_m2": 1216308755.07,
+      "elev_mean_m": 487.813168724
+    },
+    {
+      "basin_id": "USA_04105700",
+      "hru_id": 4105700,
+      "lon_cen": -85.34681,
+      "lat_cen": 42.42235,
+      "area_m2": 100886292.318,
+      "elev_mean_m": 280.52
+    },
+    {
+      "basin_id": "USA_04115265",
+      "hru_id": 4115265,
+      "lon_cen": -84.97807,
+      "lat_cen": 43.32061,
+      "area_m2": 96121884.3598,
+      "elev_mean_m": 281.861702128
+    },
+    {
+      "basin_id": "USA_04122200",
+      "hru_id": 4122200,
+      "lon_cen": -85.97828,
+      "lat_cen": 43.57678,
+      "area_m2": 1022763587.46,
+      "elev_mean_m": 258.641601563
+    },
+    {
+      "basin_id": "USA_04122500",
+      "hru_id": 4122500,
+      "lon_cen": -85.90229,
+      "lat_cen": 43.83757,
+      "area_m2": 1800667708.86,
+      "elev_mean_m": 274.286111111
+    },
+    {
+      "basin_id": "USA_04124000",
+      "hru_id": 4124000,
+      "lon_cen": -85.18064,
+      "lat_cen": 44.59585,
+      "area_m2": 2288768417.09,
+      "elev_mean_m": 359.279790485
+    },
+    {
+      "basin_id": "USA_04127997",
+      "hru_id": 4127997,
+      "lon_cen": -84.66674,
+      "lat_cen": 45.17807,
+      "area_m2": 504199216.735,
+      "elev_mean_m": 333.800395257
+    },
+    {
+      "basin_id": "USA_04161580",
+      "hru_id": 4161580,
+      "lon_cen": -83.14737,
+      "lat_cen": 42.82868,
+      "area_m2": 66550499.2781,
+      "elev_mean_m": 306.393939394
+    },
+    {
+      "basin_id": "USA_04185000",
+      "hru_id": 4185000,
+      "lon_cen": -84.34039,
+      "lat_cen": 41.74268,
+      "area_m2": 1064235290.11,
+      "elev_mean_m": 263.018779343
+    },
+    {
+      "basin_id": "USA_04196800",
+      "hru_id": 4196800,
+      "lon_cen": -83.38813,
+      "lat_cen": 40.72635,
+      "area_m2": 608087642.997,
+      "elev_mean_m": 269.258116883
+    },
+    {
+      "basin_id": "USA_04197100",
+      "hru_id": 4197100,
+      "lon_cen": -82.89848,
+      "lat_cen": 41.00882,
+      "area_m2": 388907105.078,
+      "elev_mean_m": 289.146529563
+    },
+    {
+      "basin_id": "USA_04197170",
+      "hru_id": 4197170,
+      "lon_cen": -83.03923,
+      "lat_cen": 41.09424,
+      "area_m2": 95972357.9276,
+      "elev_mean_m": 262.316326531
+    },
+    {
+      "basin_id": "USA_04213000",
+      "hru_id": 4213000,
+      "lon_cen": -80.42422,
+      "lat_cen": 41.82698,
+      "area_m2": 466140621.254,
+      "elev_mean_m": 303.883116883
+    },
+    {
+      "basin_id": "USA_04213075",
+      "hru_id": 4213075,
+      "lon_cen": -80.25421,
+      "lat_cen": 42.00196,
+      "area_m2": 11944868.6198,
+      "elev_mean_m": 268.0
+    },
+    {
+      "basin_id": "USA_04216418",
+      "hru_id": 4216418,
+      "lon_cen": -78.29011,
+      "lat_cen": 42.75192,
+      "area_m2": 196966214.618,
+      "elev_mean_m": 465.671717172
+    },
+    {
+      "basin_id": "USA_04221000",
+      "hru_id": 4221000,
+      "lon_cen": -77.83314,
+      "lat_cen": 42.04271,
+      "area_m2": 751800745.354,
+      "elev_mean_m": 627.774365821
+    },
+    {
+      "basin_id": "USA_04224775",
+      "hru_id": 4224775,
+      "lon_cen": -77.81241,
+      "lat_cen": 42.48247,
+      "area_m2": 232592867.502,
+      "elev_mean_m": 494.712446352
+    },
+    {
+      "basin_id": "USA_04233000",
+      "hru_id": 4233000,
+      "lon_cen": -76.56091,
+      "lat_cen": 42.33949,
+      "area_m2": 92628864.3044,
+      "elev_mean_m": 374.591397849
+    },
+    {
+      "basin_id": "USA_04256000",
+      "hru_id": 4256000,
+      "lon_cen": -75.13987,
+      "lat_cen": 43.80078,
+      "area_m2": 238283975.311,
+      "elev_mean_m": 493.991525424
+    },
+    {
+      "basin_id": "USA_04296000",
+      "hru_id": 4296000,
+      "lon_cen": -72.33451,
+      "lat_cen": 44.73579,
+      "area_m2": 301130245.604,
+      "elev_mean_m": 385.735099338
+    },
+    {
+      "basin_id": "USA_05057200",
+      "hru_id": 5057200,
+      "lon_cen": -98.4633,
+      "lat_cen": 47.38532,
+      "area_m2": 1900432123.16,
+      "elev_mean_m": 452.307894737
+    },
+    {
+      "basin_id": "USA_05123400",
+      "hru_id": 5123400,
+      "lon_cen": -100.02359,
+      "lat_cen": 48.70619,
+      "area_m2": 3220714594.88,
+      "elev_mean_m": 529.234307023
+    },
+    {
+      "basin_id": "USA_05129115",
+      "hru_id": 5129115,
+      "lon_cen": -92.49377,
+      "lat_cen": 47.93253,
+      "area_m2": 2373768052.12,
+      "elev_mean_m": 432.207013097
+    },
+    {
+      "basin_id": "USA_05131500",
+      "hru_id": 5131500,
+      "lon_cen": -93.04927,
+      "lat_cen": 47.89957,
+      "area_m2": 4344210389.53,
+      "elev_mean_m": 409.834866605
+    },
+    {
+      "basin_id": "USA_05291000",
+      "hru_id": 5291000,
+      "lon_cen": -96.82433,
+      "lat_cen": 45.3101,
+      "area_m2": 1058837773.15,
+      "elev_mean_m": 419.022641509
+    },
+    {
+      "basin_id": "USA_05362000",
+      "hru_id": 5362000,
+      "lon_cen": -90.42755,
+      "lat_cen": 45.46055,
+      "area_m2": 1494342007.45,
+      "elev_mean_m": 451.836680054
+    },
+    {
+      "basin_id": "USA_05393500",
+      "hru_id": 5393500,
+      "lon_cen": -90.10102,
+      "lat_cen": 45.44003,
+      "area_m2": 225959675.403,
+      "elev_mean_m": 503.053097345
+    },
+    {
+      "basin_id": "USA_05399500",
+      "hru_id": 5399500,
+      "lon_cen": -90.21284,
+      "lat_cen": 44.93566,
+      "area_m2": 578583165.128,
+      "elev_mean_m": 422.125
+    },
+    {
+      "basin_id": "USA_05408000",
+      "hru_id": 5408000,
+      "lon_cen": -90.57475,
+      "lat_cen": 43.7423,
+      "area_m2": 689803349.697,
+      "elev_mean_m": 351.355907781
+    },
+    {
+      "basin_id": "USA_05413500",
+      "hru_id": 5413500,
+      "lon_cen": -90.83821,
+      "lat_cen": 42.86026,
+      "area_m2": 710475979.111,
+      "elev_mean_m": 298.033898305
+    },
+    {
+      "basin_id": "USA_05414000",
+      "hru_id": 5414000,
+      "lon_cen": -90.57086,
+      "lat_cen": 42.86922,
+      "area_m2": 368718302.12,
+      "elev_mean_m": 306.263586957
+    },
+    {
+      "basin_id": "USA_05444000",
+      "hru_id": 5444000,
+      "lon_cen": -89.66494,
+      "lat_cen": 42.01625,
+      "area_m2": 377293487.227,
+      "elev_mean_m": 253.466843501
+    },
+    {
+      "basin_id": "USA_05454000",
+      "hru_id": 5454000,
+      "lon_cen": -91.43576,
+      "lat_cen": 41.72616,
+      "area_m2": 68408940.2149,
+      "elev_mean_m": 244.885714286
+    },
+    {
+      "basin_id": "USA_05458000",
+      "hru_id": 5458000,
+      "lon_cen": -92.67934,
+      "lat_cen": 43.34699,
+      "area_m2": 783466553.867,
+      "elev_mean_m": 365.86928934
+    },
+    {
+      "basin_id": "USA_05466500",
+      "hru_id": 5466500,
+      "lon_cen": -90.44661,
+      "lat_cen": 41.25057,
+      "area_m2": 1163877567.13,
+      "elev_mean_m": 224.47386461
+    },
+    {
+      "basin_id": "USA_05487980",
+      "hru_id": 5487980,
+      "lon_cen": -93.48353,
+      "lat_cen": 41.07717,
+      "area_m2": 878098654.992,
+      "elev_mean_m": 301.935227273
+    },
+    {
+      "basin_id": "USA_05488200",
+      "hru_id": 5488200,
+      "lon_cen": -93.18416,
+      "lat_cen": 41.20208,
+      "area_m2": 234942197.443,
+      "elev_mean_m": 276.554112554
+    },
+    {
+      "basin_id": "USA_05489000",
+      "hru_id": 5489000,
+      "lon_cen": -93.01767,
+      "lat_cen": 41.05913,
+      "area_m2": 974949280.698,
+      "elev_mean_m": 276.724489796
+    },
+    {
+      "basin_id": "USA_05495000",
+      "hru_id": 5495000,
+      "lon_cen": -92.1206,
+      "lat_cen": 40.62587,
+      "area_m2": 1029880369.56,
+      "elev_mean_m": 236.004863813
+    },
+    {
+      "basin_id": "USA_05495500",
+      "hru_id": 5495500,
+      "lon_cen": -91.19345,
+      "lat_cen": 40.20244,
+      "area_m2": 885748060.207,
+      "elev_mean_m": 199.718644068
+    },
+    {
+      "basin_id": "USA_05501000",
+      "hru_id": 5501000,
+      "lon_cen": -91.85982,
+      "lat_cen": 39.81869,
+      "area_m2": 929876596.126,
+      "elev_mean_m": 218.227712137
+    },
+    {
+      "basin_id": "USA_05503800",
+      "hru_id": 5503800,
+      "lon_cen": -92.13309,
+      "lat_cen": 39.66386,
+      "area_m2": 212697358.484,
+      "elev_mean_m": 235.688995215
+    },
+    {
+      "basin_id": "USA_05507600",
+      "hru_id": 5507600,
+      "lon_cen": -91.66963,
+      "lat_cen": 39.3216,
+      "area_m2": 275865513.9,
+      "elev_mean_m": 227.535055351
+    },
+    {
+      "basin_id": "USA_05508805",
+      "hru_id": 5508805,
+      "lon_cen": -91.46657,
+      "lat_cen": 39.41802,
+      "area_m2": 536518715.895,
+      "elev_mean_m": 218.05893186
+    },
+    {
+      "basin_id": "USA_05514500",
+      "hru_id": 5514500,
+      "lon_cen": -91.31462,
+      "lat_cen": 39.11872,
+      "area_m2": 2410552742.91,
+      "elev_mean_m": 221.377546778
+    },
+    {
+      "basin_id": "USA_05525500",
+      "hru_id": 5525500,
+      "lon_cen": -87.69909,
+      "lat_cen": 40.56901,
+      "area_m2": 1158264597.47,
+      "elev_mean_m": 217.42118863
+    },
+    {
+      "basin_id": "USA_05556500",
+      "hru_id": 5556500,
+      "lon_cen": -89.29558,
+      "lat_cen": 41.55567,
+      "area_m2": 507094540.085,
+      "elev_mean_m": 248.71031746
+    },
+    {
+      "basin_id": "USA_05584500",
+      "hru_id": 5584500,
+      "lon_cen": -90.88143,
+      "lat_cen": 40.49562,
+      "area_m2": 1711920465.75,
+      "elev_mean_m": 205.065268065
+    },
+    {
+      "basin_id": "USA_05585000",
+      "hru_id": 5585000,
+      "lon_cen": -90.82241,
+      "lat_cen": 40.36477,
+      "area_m2": 3371445912.32,
+      "elev_mean_m": 191.144918821
+    },
+    {
+      "basin_id": "USA_05591550",
+      "hru_id": 5591550,
+      "lon_cen": -88.43897,
+      "lat_cen": 39.50988,
+      "area_m2": 97124521.6578,
+      "elev_mean_m": 209.642105263
+    },
+    {
+      "basin_id": "USA_05592050",
+      "hru_id": 5592050,
+      "lon_cen": -88.88066,
+      "lat_cen": 39.47326,
+      "area_m2": 260928964.228,
+      "elev_mean_m": 197.38697318
+    },
+    {
+      "basin_id": "USA_05592575",
+      "hru_id": 5592575,
+      "lon_cen": -88.86565,
+      "lat_cen": 38.95564,
+      "area_m2": 116331229.15,
+      "elev_mean_m": 178.264957265
+    },
+    {
+      "basin_id": "USA_05593575",
+      "hru_id": 5593575,
+      "lon_cen": -89.3658,
+      "lat_cen": 38.38621,
+      "area_m2": 220519683.713,
+      "elev_mean_m": 148.891402715
+    },
+    {
+      "basin_id": "USA_05593900",
+      "hru_id": 5593900,
+      "lon_cen": -89.32379,
+      "lat_cen": 39.24096,
+      "area_m2": 145691842.168,
+      "elev_mean_m": 203.265734266
+    },
+    {
+      "basin_id": "USA_05595730",
+      "hru_id": 5595730,
+      "lon_cen": -89.10923,
+      "lat_cen": 38.33481,
+      "area_m2": 233332891.797,
+      "elev_mean_m": 154.004291845
+    },
+    {
+      "basin_id": "USA_06037500",
+      "hru_id": 6037500,
+      "lon_cen": -110.78422,
+      "lat_cen": 44.58498,
+      "area_m2": 1127597265.31,
+      "elev_mean_m": 2408.53262787
+    },
+    {
+      "basin_id": "USA_06043500",
+      "hru_id": 6043500,
+      "lon_cen": -111.22098,
+      "lat_cen": 45.19387,
+      "area_m2": 2120495989.09,
+      "elev_mean_m": 2408.76334436
+    },
+    {
+      "basin_id": "USA_06188000",
+      "hru_id": 6188000,
+      "lon_cen": -110.10971,
+      "lat_cen": 44.90139,
+      "area_m2": 1730654633.36,
+      "elev_mean_m": 2544.55889145
+    },
+    {
+      "basin_id": "USA_06191500",
+      "hru_id": 6191500,
+      "lon_cen": -110.28805,
+      "lat_cen": 44.67042,
+      "area_m2": 6808406389.72,
+      "elev_mean_m": 2550.73334647
+    },
+    {
+      "basin_id": "USA_06221400",
+      "hru_id": 6221400,
+      "lon_cen": -109.57356,
+      "lat_cen": 43.27801,
+      "area_m2": 231933434.898,
+      "elev_mean_m": 3218.55172414
+    },
+    {
+      "basin_id": "USA_06224000",
+      "hru_id": 6224000,
+      "lon_cen": -109.42326,
+      "lat_cen": 43.08602,
+      "area_m2": 485695443.141,
+      "elev_mean_m": 3139.8447205
+    },
+    {
+      "basin_id": "USA_06278300",
+      "hru_id": 6278300,
+      "lon_cen": -107.34573,
+      "lat_cen": 44.49079,
+      "area_m2": 59234696.3457,
+      "elev_mean_m": 3055.84482759
+    },
+    {
+      "basin_id": "USA_06280300",
+      "hru_id": 6280300,
+      "lon_cen": -109.66937,
+      "lat_cen": 44.02544,
+      "area_m2": 793864342.189,
+      "elev_mean_m": 2903.78453739
+    },
+    {
+      "basin_id": "USA_06289000",
+      "hru_id": 6289000,
+      "lon_cen": -107.70408,
+      "lat_cen": 44.88307,
+      "area_m2": 472407234.684,
+      "elev_mean_m": 2416.14465409
+    },
+    {
+      "basin_id": "USA_06291500",
+      "hru_id": 6291500,
+      "lon_cen": -107.7447,
+      "lat_cen": 45.03547,
+      "area_m2": 220726783.175,
+      "elev_mean_m": 1950.98181818
+    },
+    {
+      "basin_id": "USA_06311000",
+      "hru_id": 6311000,
+      "lon_cen": -107.08611,
+      "lat_cen": 44.09419,
+      "area_m2": 62961283.6034,
+      "elev_mean_m": 2721.0483871
+    },
+    {
+      "basin_id": "USA_06332515",
+      "hru_id": 6332515,
+      "lon_cen": -102.83901,
+      "lat_cen": 47.74909,
+      "area_m2": 191549037.12,
+      "elev_mean_m": 715.056701031
+    },
+    {
+      "basin_id": "USA_06339100",
+      "hru_id": 6339100,
+      "lon_cen": -103.00956,
+      "lat_cen": 47.27559,
+      "area_m2": 529571719.092,
+      "elev_mean_m": 756.763157895
+    },
+    {
+      "basin_id": "USA_06339500",
+      "hru_id": 6339500,
+      "lon_cen": -102.5133,
+      "lat_cen": 47.11313,
+      "area_m2": 3161894873.36,
+      "elev_mean_m": 683.254656024
+    },
+    {
+      "basin_id": "USA_06344600",
+      "hru_id": 6344600,
+      "lon_cen": -103.18072,
+      "lat_cen": 47.08057,
+      "area_m2": 408922928.899,
+      "elev_mean_m": 820.110294118
+    },
+    {
+      "basin_id": "USA_06350000",
+      "hru_id": 6350000,
+      "lon_cen": -102.93482,
+      "lat_cen": 46.50567,
+      "area_m2": 1506220877.62,
+      "elev_mean_m": 830.473823724
+    },
+    {
+      "basin_id": "USA_06352000",
+      "hru_id": 6352000,
+      "lon_cen": -102.95035,
+      "lat_cen": 46.28588,
+      "area_m2": 1443161497.13,
+      "elev_mean_m": 855.583391003
+    },
+    {
+      "basin_id": "USA_06353000",
+      "hru_id": 6353000,
+      "lon_cen": -102.3129,
+      "lat_cen": 46.14055,
+      "area_m2": 4605317116.04,
+      "elev_mean_m": 747.236800506
+    },
+    {
+      "basin_id": "USA_06404000",
+      "hru_id": 6404000,
+      "lon_cen": -103.44596,
+      "lat_cen": 43.8806,
+      "area_m2": 151875851.02,
+      "elev_mean_m": 1533.5620915
+    },
+    {
+      "basin_id": "USA_06406000",
+      "hru_id": 6406000,
+      "lon_cen": -103.38353,
+      "lat_cen": 43.84779,
+      "area_m2": 437532384.98,
+      "elev_mean_m": 1311.24825175
+    },
+    {
+      "basin_id": "USA_06409000",
+      "hru_id": 6409000,
+      "lon_cen": -103.8816,
+      "lat_cen": 44.0179,
+      "area_m2": 209410406.989,
+      "elev_mean_m": 2022.69194313
+    },
+    {
+      "basin_id": "USA_06431500",
+      "hru_id": 6431500,
+      "lon_cen": -103.92124,
+      "lat_cen": 44.30712,
+      "area_m2": 427983755.7,
+      "elev_mean_m": 1784.75638051
+    },
+    {
+      "basin_id": "USA_06440200",
+      "hru_id": 6440200,
+      "lon_cen": -101.9572,
+      "lat_cen": 43.86969,
+      "area_m2": 654710263.993,
+      "elev_mean_m": 786.259484067
+    },
+    {
+      "basin_id": "USA_06447500",
+      "hru_id": 6447500,
+      "lon_cen": -101.97741,
+      "lat_cen": 43.11077,
+      "area_m2": 793167999.834,
+      "elev_mean_m": 1035.48280255
+    },
+    {
+      "basin_id": "USA_06450500",
+      "hru_id": 6450500,
+      "lon_cen": -101.27464,
+      "lat_cen": 43.22038,
+      "area_m2": 4074515183.69,
+      "elev_mean_m": 851.545010681
+    },
+    {
+      "basin_id": "USA_06453600",
+      "hru_id": 6453600,
+      "lon_cen": -99.05098,
+      "lat_cen": 43.01527,
+      "area_m2": 2104369372.0,
+      "elev_mean_m": 596.02661597
+    },
+    {
+      "basin_id": "USA_06464500",
+      "hru_id": 6464500,
+      "lon_cen": -100.25694,
+      "lat_cen": 43.11313,
+      "area_m2": 2924731951.28,
+      "elev_mean_m": 764.725102319
+    },
+    {
+      "basin_id": "USA_06468170",
+      "hru_id": 6468170,
+      "lon_cen": -99.58698,
+      "lat_cen": 47.58715,
+      "area_m2": 2833185306.39,
+      "elev_mean_m": 511.839266831
+    },
+    {
+      "basin_id": "USA_06470800",
+      "hru_id": 6470800,
+      "lon_cen": -98.14881,
+      "lat_cen": 46.53032,
+      "area_m2": 995671254.519,
+      "elev_mean_m": 431.997983871
+    },
+    {
+      "basin_id": "USA_06477500",
+      "hru_id": 6477500,
+      "lon_cen": -98.52748,
+      "lat_cen": 43.83596,
+      "area_m2": 1533658646.35,
+      "elev_mean_m": 470.287206266
+    },
+    {
+      "basin_id": "USA_06479215",
+      "hru_id": 6479215,
+      "lon_cen": -97.14514,
+      "lat_cen": 45.26566,
+      "area_m2": 178100154.739,
+      "elev_mean_m": 577.926136364
+    },
+    {
+      "basin_id": "USA_06601000",
+      "hru_id": 6601000,
+      "lon_cen": -96.54116,
+      "lat_cen": 42.21661,
+      "area_m2": 453163913.871,
+      "elev_mean_m": 411.25
+    },
+    {
+      "basin_id": "USA_06614800",
+      "hru_id": 6614800,
+      "lon_cen": -105.87174,
+      "lat_cen": 40.48575,
+      "area_m2": 4104877.72944,
+      "elev_mean_m": 3406.25
+    },
+    {
+      "basin_id": "USA_06622700",
+      "hru_id": 6622700,
+      "lon_cen": -106.45331,
+      "lat_cen": 41.39968,
+      "area_m2": 101518247.077,
+      "elev_mean_m": 2851.66666667
+    },
+    {
+      "basin_id": "USA_06623800",
+      "hru_id": 6623800,
+      "lon_cen": -106.75427,
+      "lat_cen": 40.96984,
+      "area_m2": 188701780.863,
+      "elev_mean_m": 2919.46632124
+    },
+    {
+      "basin_id": "USA_06632400",
+      "hru_id": 6632400,
+      "lon_cen": -106.23563,
+      "lat_cen": 41.47127,
+      "area_m2": 165148767.08,
+      "elev_mean_m": 2995.63855422
+    },
+    {
+      "basin_id": "USA_06784000",
+      "hru_id": 6784000,
+      "lon_cen": -99.71753,
+      "lat_cen": 41.3055,
+      "area_m2": 6386995613.11,
+      "elev_mean_m": 788.455912294
+    },
+    {
+      "basin_id": "USA_06803510",
+      "hru_id": 6803510,
+      "lon_cen": -96.7152,
+      "lat_cen": 40.95361,
+      "area_m2": 118284404.687,
+      "elev_mean_m": 385.401709402
+    },
+    {
+      "basin_id": "USA_06803530",
+      "hru_id": 6803530,
+      "lon_cen": -96.6707,
+      "lat_cen": 41.06547,
+      "area_m2": 309727747.325,
+      "elev_mean_m": 394.555194805
+    },
+    {
+      "basin_id": "USA_06814000",
+      "hru_id": 6814000,
+      "lon_cen": -96.2556,
+      "lat_cen": 40.08843,
+      "area_m2": 717301360.729,
+      "elev_mean_m": 400.8454039
+    },
+    {
+      "basin_id": "USA_06847900",
+      "hru_id": 6847900,
+      "lon_cen": -100.5942,
+      "lat_cen": 39.60205,
+      "area_m2": 1539193678.27,
+      "elev_mean_m": 855.225260417
+    },
+    {
+      "basin_id": "USA_06853800",
+      "hru_id": 6853800,
+      "lon_cen": -98.46654,
+      "lat_cen": 39.911,
+      "area_m2": 597202608.009,
+      "elev_mean_m": 566.626043406
+    },
+    {
+      "basin_id": "USA_06876700",
+      "hru_id": 6876700,
+      "lon_cen": -98.0959,
+      "lat_cen": 39.21838,
+      "area_m2": 1054070440.99,
+      "elev_mean_m": 450.568311195
+    },
+    {
+      "basin_id": "USA_06878000",
+      "hru_id": 6878000,
+      "lon_cen": -97.27578,
+      "lat_cen": 39.19349,
+      "area_m2": 777888972.979,
+      "elev_mean_m": 404.344072165
+    },
+    {
+      "basin_id": "USA_06879650",
+      "hru_id": 6879650,
+      "lon_cen": -96.57892,
+      "lat_cen": 39.09235,
+      "area_m2": 12510935.1752,
+      "elev_mean_m": 394.133333333
+    },
+    {
+      "basin_id": "USA_06885500",
+      "hru_id": 6885500,
+      "lon_cen": -96.31728,
+      "lat_cen": 39.77304,
+      "area_m2": 1075162095.28,
+      "elev_mean_m": 402.952513966
+    },
+    {
+      "basin_id": "USA_06888500",
+      "hru_id": 6888500,
+      "lon_cen": -96.31369,
+      "lat_cen": 38.95412,
+      "area_m2": 842537936.645,
+      "elev_mean_m": 401.26713948
+    },
+    {
+      "basin_id": "USA_06889200",
+      "hru_id": 6889200,
+      "lon_cen": -95.91898,
+      "lat_cen": 39.40967,
+      "area_m2": 406490528.412,
+      "elev_mean_m": 356.821686747
+    },
+    {
+      "basin_id": "USA_06889500",
+      "hru_id": 6889500,
+      "lon_cen": -95.86072,
+      "lat_cen": 39.32148,
+      "area_m2": 766042984.088,
+      "elev_mean_m": 314.033240997
+    },
+    {
+      "basin_id": "USA_06892000",
+      "hru_id": 6892000,
+      "lon_cen": -95.18342,
+      "lat_cen": 39.34979,
+      "area_m2": 1091623591.16,
+      "elev_mean_m": 317.557586837
+    },
+    {
+      "basin_id": "USA_06903400",
+      "hru_id": 6903400,
+      "lon_cen": -93.44752,
+      "lat_cen": 40.91745,
+      "area_m2": 483011128.998,
+      "elev_mean_m": 321.12526096
+    },
+    {
+      "basin_id": "USA_06906800",
+      "hru_id": 6906800,
+      "lon_cen": -93.13386,
+      "lat_cen": 38.56512,
+      "area_m2": 1411986471.8,
+      "elev_mean_m": 277.719373219
+    },
+    {
+      "basin_id": "USA_06910800",
+      "hru_id": 6910800,
+      "lon_cen": -96.08729,
+      "lat_cen": 38.69901,
+      "area_m2": 444585009.97,
+      "elev_mean_m": 390.898648649
+    },
+    {
+      "basin_id": "USA_06911900",
+      "hru_id": 6911900,
+      "lon_cen": -95.97568,
+      "lat_cen": 38.78887,
+      "area_m2": 291334266.098,
+      "elev_mean_m": 372.163265306
+    },
+    {
+      "basin_id": "USA_06917000",
+      "hru_id": 6917000,
+      "lon_cen": -94.97615,
+      "lat_cen": 38.01957,
+      "area_m2": 767516877.627,
+      "elev_mean_m": 304.428571429
+    },
+    {
+      "basin_id": "USA_06918460",
+      "hru_id": 6918460,
+      "lon_cen": -93.73992,
+      "lat_cen": 37.2418,
+      "area_m2": 650770385.198,
+      "elev_mean_m": 349.551617874
+    },
+    {
+      "basin_id": "USA_06919500",
+      "hru_id": 6919500,
+      "lon_cen": -93.99149,
+      "lat_cen": 37.64113,
+      "area_m2": 1069869437.56,
+      "elev_mean_m": 289.859795729
+    },
+    {
+      "basin_id": "USA_06921070",
+      "hru_id": 6921070,
+      "lon_cen": -93.18724,
+      "lat_cen": 37.46792,
+      "area_m2": 716892147.951,
+      "elev_mean_m": 362.29707113
+    },
+    {
+      "basin_id": "USA_06934000",
+      "hru_id": 6934000,
+      "lon_cen": -92.2172,
+      "lat_cen": 37.57759,
+      "area_m2": 8267677513.16,
+      "elev_mean_m": 350.254266005
+    },
+    {
+      "basin_id": "USA_07014500",
+      "hru_id": 7014500,
+      "lon_cen": -91.3531,
+      "lat_cen": 37.81983,
+      "area_m2": 3851255034.08,
+      "elev_mean_m": 321.016380655
+    },
+    {
+      "basin_id": "USA_07056000",
+      "hru_id": 7056000,
+      "lon_cen": -93.11556,
+      "lat_cen": 35.93055,
+      "area_m2": 2147772710.7,
+      "elev_mean_m": 452.575361643
+    },
+    {
+      "basin_id": "USA_07057500",
+      "hru_id": 7057500,
+      "lon_cen": -92.10894,
+      "lat_cen": 36.85725,
+      "area_m2": 1456489521.23,
+      "elev_mean_m": 324.52137931
+    },
+    {
+      "basin_id": "USA_07066000",
+      "hru_id": 7066000,
+      "lon_cen": -91.65536,
+      "lat_cen": 37.0933,
+      "area_m2": 1050679963.49,
+      "elev_mean_m": 339.455323194
+    },
+    {
+      "basin_id": "USA_07067000",
+      "hru_id": 7067000,
+      "lon_cen": -91.47548,
+      "lat_cen": 37.22114,
+      "area_m2": 4343288470.25,
+      "elev_mean_m": 316.222897054
+    },
+    {
+      "basin_id": "USA_07068000",
+      "hru_id": 7068000,
+      "lon_cen": -91.38675,
+      "lat_cen": 37.1495,
+      "area_m2": 5313030837.37,
+      "elev_mean_m": 202.478305785
+    },
+    {
+      "basin_id": "USA_07071500",
+      "hru_id": 7071500,
+      "lon_cen": -91.54155,
+      "lat_cen": 36.85366,
+      "area_m2": 2030337647.27,
+      "elev_mean_m": 289.782480315
+    },
+    {
+      "basin_id": "USA_07083000",
+      "hru_id": 7083000,
+      "lon_cen": -106.45968,
+      "lat_cen": 39.15028,
+      "area_m2": 66281505.182,
+      "elev_mean_m": 3562.87692308
+    },
+    {
+      "basin_id": "USA_07142300",
+      "hru_id": 7142300,
+      "lon_cen": -99.2974,
+      "lat_cen": 37.68284,
+      "area_m2": 1923430675.45,
+      "elev_mean_m": 676.478917231
+    },
+    {
+      "basin_id": "USA_07145700",
+      "hru_id": 7145700,
+      "lon_cen": -97.5656,
+      "lat_cen": 37.37125,
+      "area_m2": 400651859.928,
+      "elev_mean_m": 401.99751861
+    },
+    {
+      "basin_id": "USA_07148400",
+      "hru_id": 7148400,
+      "lon_cen": -99.03979,
+      "lat_cen": 37.10984,
+      "area_m2": 2560537335.8,
+      "elev_mean_m": 554.194520548
+    },
+    {
+      "basin_id": "USA_07149000",
+      "hru_id": 7149000,
+      "lon_cen": -98.84362,
+      "lat_cen": 37.38117,
+      "area_m2": 2263974599.58,
+      "elev_mean_m": 554.31460177
+    },
+    {
+      "basin_id": "USA_07151500",
+      "hru_id": 7151500,
+      "lon_cen": -98.08738,
+      "lat_cen": 37.39766,
+      "area_m2": 2111834323.1,
+      "elev_mean_m": 463.92745377
+    },
+    {
+      "basin_id": "USA_07167500",
+      "hru_id": 7167500,
+      "lon_cen": -96.37992,
+      "lat_cen": 37.67957,
+      "area_m2": 321130838.448,
+      "elev_mean_m": 381.681388013
+    },
+    {
+      "basin_id": "USA_07180500",
+      "hru_id": 7180500,
+      "lon_cen": -96.77742,
+      "lat_cen": 38.13105,
+      "area_m2": 275782676.134,
+      "elev_mean_m": 436.208029197
+    },
+    {
+      "basin_id": "USA_07184000",
+      "hru_id": 7184000,
+      "lon_cen": -94.91913,
+      "lat_cen": 37.4319,
+      "area_m2": 514828860.885,
+      "elev_mean_m": 280.949612403
+    },
+    {
+      "basin_id": "USA_07195800",
+      "hru_id": 7195800,
+      "lon_cen": -94.40074,
+      "lat_cen": 36.28178,
+      "area_m2": 38576518.7864,
+      "elev_mean_m": 403.815789474
+    },
+    {
+      "basin_id": "USA_07196900",
+      "hru_id": 7196900,
+      "lon_cen": -94.42183,
+      "lat_cen": 35.88244,
+      "area_m2": 106547536.289,
+      "elev_mean_m": 403.349056604
+    },
+    {
+      "basin_id": "USA_07197000",
+      "hru_id": 7197000,
+      "lon_cen": -94.59373,
+      "lat_cen": 35.92054,
+      "area_m2": 807522456.188,
+      "elev_mean_m": 336.821173104
+    },
+    {
+      "basin_id": "USA_07208500",
+      "hru_id": 7208500,
+      "lon_cen": -105.12278,
+      "lat_cen": 36.39679,
+      "area_m2": 159695279.739,
+      "elev_mean_m": 2885.31707317
+    },
+    {
+      "basin_id": "USA_07226500",
+      "hru_id": 7226500,
+      "lon_cen": -103.84928,
+      "lat_cen": 36.02758,
+      "area_m2": 5245940286.76,
+      "elev_mean_m": 1636.95447619
+    },
+    {
+      "basin_id": "USA_07261000",
+      "hru_id": 7261000,
+      "lon_cen": -92.25418,
+      "lat_cen": 35.41851,
+      "area_m2": 455948193.587,
+      "elev_mean_m": 215.522123894
+    },
+    {
+      "basin_id": "USA_07290650",
+      "hru_id": 7290650,
+      "lon_cen": -90.55026,
+      "lat_cen": 31.93773,
+      "area_m2": 1694644307.48,
+      "elev_mean_m": 93.055062167
+    },
+    {
+      "basin_id": "USA_07291000",
+      "hru_id": 7291000,
+      "lon_cen": -90.71334,
+      "lat_cen": 31.65003,
+      "area_m2": 482234700.647,
+      "elev_mean_m": 122.783057851
+    },
+    {
+      "basin_id": "USA_07292500",
+      "hru_id": 7292500,
+      "lon_cen": -90.8272,
+      "lat_cen": 31.50518,
+      "area_m2": 2076589017.62,
+      "elev_mean_m": 104.760403531
+    },
+    {
+      "basin_id": "USA_07295000",
+      "hru_id": 7295000,
+      "lon_cen": -91.18492,
+      "lat_cen": 31.17087,
+      "area_m2": 466885728.828,
+      "elev_mean_m": 82.8877118644
+    },
+    {
+      "basin_id": "USA_07299670",
+      "hru_id": 7299670,
+      "lon_cen": -99.96767,
+      "lat_cen": 34.36296,
+      "area_m2": 830727573.072,
+      "elev_mean_m": 500.616945107
+    },
+    {
+      "basin_id": "USA_07301410",
+      "hru_id": 7301410,
+      "lon_cen": -100.36455,
+      "lat_cen": 35.51673,
+      "area_m2": 773729822.117,
+      "elev_mean_m": 800.072632944
+    },
+    {
+      "basin_id": "USA_07301500",
+      "hru_id": 7301500,
+      "lon_cen": -100.49348,
+      "lat_cen": 35.36354,
+      "area_m2": 6885140193.35,
+      "elev_mean_m": 817.334694544
+    },
+    {
+      "basin_id": "USA_07315200",
+      "hru_id": 7315200,
+      "lon_cen": -98.12063,
+      "lat_cen": 33.6511,
+      "area_m2": 502713073.133,
+      "elev_mean_m": 300.833333333
+    },
+    {
+      "basin_id": "USA_07315700",
+      "hru_id": 7315700,
+      "lon_cen": -97.72738,
+      "lat_cen": 34.24329,
+      "area_m2": 1491435150.05,
+      "elev_mean_m": 286.504377104
+    },
+    {
+      "basin_id": "USA_07335700",
+      "hru_id": 7335700,
+      "lon_cen": -94.5461,
+      "lat_cen": 34.64761,
+      "area_m2": 104134545.977,
+      "elev_mean_m": 454.704761905
+    },
+    {
+      "basin_id": "USA_07340300",
+      "hru_id": 7340300,
+      "lon_cen": -94.17029,
+      "lat_cen": 34.42473,
+      "area_m2": 252137714.588,
+      "elev_mean_m": 393.64940239
+    },
+    {
+      "basin_id": "USA_07346045",
+      "hru_id": 7346045,
+      "lon_cen": -94.52671,
+      "lat_cen": 33.01187,
+      "area_m2": 963179068.139,
+      "elev_mean_m": 107.391078838
+    },
+    {
+      "basin_id": "USA_07359610",
+      "hru_id": 7359610,
+      "lon_cen": -93.70034,
+      "lat_cen": 34.44378,
+      "area_m2": 342439420.628,
+      "elev_mean_m": 300.580645161
+    },
+    {
+      "basin_id": "USA_07362100",
+      "hru_id": 7362100,
+      "lon_cen": -92.98727,
+      "lat_cen": 33.38465,
+      "area_m2": 996758150.586,
+      "elev_mean_m": 71.5447236181
+    },
+    {
+      "basin_id": "USA_07375000",
+      "hru_id": 7375000,
+      "lon_cen": -90.26352,
+      "lat_cen": 30.77443,
+      "area_m2": 253301543.964,
+      "elev_mean_m": 58.869047619
+    },
+    {
+      "basin_id": "USA_08013000",
+      "hru_id": 8013000,
+      "lon_cen": -92.94477,
+      "lat_cen": 31.22562,
+      "area_m2": 1300209043.26,
+      "elev_mean_m": 76.3100775194
+    },
+    {
+      "basin_id": "USA_08014500",
+      "hru_id": 8014500,
+      "lon_cen": -92.98258,
+      "lat_cen": 30.94477,
+      "area_m2": 1325048584.27,
+      "elev_mean_m": 60.3574115877
+    },
+    {
+      "basin_id": "USA_08023080",
+      "hru_id": 8023080,
+      "lon_cen": -93.85781,
+      "lat_cen": 32.04207,
+      "area_m2": 198912468.262,
+      "elev_mean_m": 83.0757575758
+    },
+    {
+      "basin_id": "USA_08025500",
+      "hru_id": 8025500,
+      "lon_cen": -93.4347,
+      "lat_cen": 31.42961,
+      "area_m2": 382750773.297,
+      "elev_mean_m": 89.7057291667
+    },
+    {
+      "basin_id": "USA_08050800",
+      "hru_id": 8050800,
+      "lon_cen": -96.98462,
+      "lat_cen": 33.62622,
+      "area_m2": 109211282.569,
+      "elev_mean_m": 236.140186916
+    },
+    {
+      "basin_id": "USA_08066200",
+      "hru_id": 8066200,
+      "lon_cen": -94.90495,
+      "lat_cen": 30.83703,
+      "area_m2": 374878438.555,
+      "elev_mean_m": 80.6766304348
+    },
+    {
+      "basin_id": "USA_08066300",
+      "hru_id": 8066300,
+      "lon_cen": -94.77758,
+      "lat_cen": 30.60494,
+      "area_m2": 390797746.987,
+      "elev_mean_m": 66.7525773196
+    },
+    {
+      "basin_id": "USA_08070000",
+      "hru_id": 8070000,
+      "lon_cen": -95.29394,
+      "lat_cen": 30.58203,
+      "area_m2": 844715640.315,
+      "elev_mean_m": 89.3428912784
+    },
+    {
+      "basin_id": "USA_08070200",
+      "hru_id": 8070200,
+      "lon_cen": -95.26521,
+      "lat_cen": 30.5275,
+      "area_m2": 1005993695.32,
+      "elev_mean_m": 33.5625
+    },
+    {
+      "basin_id": "USA_08079600",
+      "hru_id": 8079600,
+      "lon_cen": -101.85858,
+      "lat_cen": 33.24262,
+      "area_m2": 3512319980.06,
+      "elev_mean_m": 941.525
+    },
+    {
+      "basin_id": "USA_08082700",
+      "hru_id": 8082700,
+      "lon_cen": -99.58218,
+      "lat_cen": 33.27999,
+      "area_m2": 276840861.786,
+      "elev_mean_m": 448.48
+    },
+    {
+      "basin_id": "USA_08086212",
+      "hru_id": 8086212,
+      "lon_cen": -99.29992,
+      "lat_cen": 32.52923,
+      "area_m2": 1590129031.67,
+      "elev_mean_m": 485.808564232
+    },
+    {
+      "basin_id": "USA_08086290",
+      "hru_id": 8086290,
+      "lon_cen": -99.05131,
+      "lat_cen": 32.47544,
+      "area_m2": 733388669.52,
+      "elev_mean_m": 455.199175824
+    },
+    {
+      "basin_id": "USA_08101000",
+      "hru_id": 8101000,
+      "lon_cen": -98.15253,
+      "lat_cen": 31.50683,
+      "area_m2": 1184516649.55,
+      "elev_mean_m": 378.947368421
+    },
+    {
+      "basin_id": "USA_08103900",
+      "hru_id": 8103900,
+      "lon_cen": -98.11479,
+      "lat_cen": 30.91032,
+      "area_m2": 86263243.9405,
+      "elev_mean_m": 375.908045977
+    },
+    {
+      "basin_id": "USA_08104900",
+      "hru_id": 8104900,
+      "lon_cen": -97.97121,
+      "lat_cen": 30.66586,
+      "area_m2": 347913993.567,
+      "elev_mean_m": 339.745614035
+    },
+    {
+      "basin_id": "USA_08109700",
+      "hru_id": 8109700,
+      "lon_cen": -97.11498,
+      "lat_cen": 30.41359,
+      "area_m2": 621676995.588,
+      "elev_mean_m": 140.237942122
+    },
+    {
+      "basin_id": "USA_08150800",
+      "hru_id": 8150800,
+      "lon_cen": -99.1282,
+      "lat_cen": 30.46542,
+      "area_m2": 562139284.025,
+      "elev_mean_m": 557.687719298
+    },
+    {
+      "basin_id": "USA_08155200",
+      "hru_id": 8155200,
+      "lon_cen": -98.0296,
+      "lat_cen": 30.25722,
+      "area_m2": 241487686.834,
+      "elev_mean_m": 331.0125
+    },
+    {
+      "basin_id": "USA_08158700",
+      "hru_id": 8158700,
+      "lon_cen": -98.12048,
+      "lat_cen": 30.1453,
+      "area_m2": 321119744.874,
+      "elev_mean_m": 371.318885449
+    },
+    {
+      "basin_id": "USA_08158810",
+      "hru_id": 8158810,
+      "lon_cen": -97.97222,
+      "lat_cen": 30.16947,
+      "area_m2": 33737315.8348,
+      "elev_mean_m": 319.485714286
+    },
+    {
+      "basin_id": "USA_08164000",
+      "hru_id": 8164000,
+      "lon_cen": -97.01247,
+      "lat_cen": 29.30441,
+      "area_m2": 2120746099.61,
+      "elev_mean_m": 76.0824305228
+    },
+    {
+      "basin_id": "USA_08164300",
+      "hru_id": 8164300,
+      "lon_cen": -96.91521,
+      "lat_cen": 29.64917,
+      "area_m2": 865394144.825,
+      "elev_mean_m": 100.071925754
+    },
+    {
+      "basin_id": "USA_08165300",
+      "hru_id": 8165300,
+      "lon_cen": -99.5509,
+      "lat_cen": 30.05147,
+      "area_m2": 439984498.046,
+      "elev_mean_m": 660.66893424
+    },
+    {
+      "basin_id": "USA_08171300",
+      "hru_id": 8171300,
+      "lon_cen": -98.31502,
+      "lat_cen": 30.04894,
+      "area_m2": 1073941980.54,
+      "elev_mean_m": 399.810584958
+    },
+    {
+      "basin_id": "USA_08175000",
+      "hru_id": 8175000,
+      "lon_cen": -97.66095,
+      "lat_cen": 29.31199,
+      "area_m2": 1425291601.4,
+      "elev_mean_m": 108.006315789
+    },
+    {
+      "basin_id": "USA_08176900",
+      "hru_id": 8176900,
+      "lon_cen": -97.44086,
+      "lat_cen": 28.95212,
+      "area_m2": 925545871.665,
+      "elev_mean_m": 92.2034632035
+    },
+    {
+      "basin_id": "USA_08178880",
+      "hru_id": 8178880,
+      "lon_cen": -99.31528,
+      "lat_cen": 29.81589,
+      "area_m2": 851577263.922,
+      "elev_mean_m": 552.062279671
+    },
+    {
+      "basin_id": "USA_08189500",
+      "hru_id": 8189500,
+      "lon_cen": -97.6094,
+      "lat_cen": 28.51445,
+      "area_m2": 1816539186.04,
+      "elev_mean_m": 71.5771334792
+    },
+    {
+      "basin_id": "USA_08190000",
+      "hru_id": 8190000,
+      "lon_cen": -100.02904,
+      "lat_cen": 29.79795,
+      "area_m2": 1923160781.28,
+      "elev_mean_m": 586.512767066
+    },
+    {
+      "basin_id": "USA_08190500",
+      "hru_id": 8190500,
+      "lon_cen": -100.34543,
+      "lat_cen": 29.78435,
+      "area_m2": 1800693804.29,
+      "elev_mean_m": 613.911960133
+    },
+    {
+      "basin_id": "USA_08194200",
+      "hru_id": 8194200,
+      "lon_cen": -99.10959,
+      "lat_cen": 27.75367,
+      "area_m2": 1233462598.73,
+      "elev_mean_m": 158.411860276
+    },
+    {
+      "basin_id": "USA_08195000",
+      "hru_id": 8195000,
+      "lon_cen": -99.72608,
+      "lat_cen": 29.77502,
+      "area_m2": 1009896722.3,
+      "elev_mean_m": 596.778109453
+    },
+    {
+      "basin_id": "USA_08196000",
+      "hru_id": 8196000,
+      "lon_cen": -99.85071,
+      "lat_cen": 29.61316,
+      "area_m2": 344491186.476,
+      "elev_mean_m": 561.403458213
+    },
+    {
+      "basin_id": "USA_08198500",
+      "hru_id": 8198500,
+      "lon_cen": -99.5361,
+      "lat_cen": 29.63586,
+      "area_m2": 640770094.126,
+      "elev_mean_m": 492.031007752
+    },
+    {
+      "basin_id": "USA_08200000",
+      "hru_id": 8200000,
+      "lon_cen": -99.29425,
+      "lat_cen": 29.6567,
+      "area_m2": 249166008.974,
+      "elev_mean_m": 472.303643725
+    },
+    {
+      "basin_id": "USA_08202700",
+      "hru_id": 8202700,
+      "lon_cen": -99.3681,
+      "lat_cen": 29.54658,
+      "area_m2": 430697793.302,
+      "elev_mean_m": 424.908466819
+    },
+    {
+      "basin_id": "USA_08267500",
+      "hru_id": 8267500,
+      "lon_cen": -105.4843,
+      "lat_cen": 36.57883,
+      "area_m2": 96835450.6831,
+      "elev_mean_m": 3158.24242424
+    },
+    {
+      "basin_id": "USA_08269000",
+      "hru_id": 8269000,
+      "lon_cen": -105.41104,
+      "lat_cen": 36.46765,
+      "area_m2": 163286866.982,
+      "elev_mean_m": 2923.32926829
+    },
+    {
+      "basin_id": "USA_08271000",
+      "hru_id": 8271000,
+      "lon_cen": -105.46379,
+      "lat_cen": 36.51731,
+      "area_m2": 46391507.7987,
+      "elev_mean_m": 3184.63829787
+    },
+    {
+      "basin_id": "USA_08324000",
+      "hru_id": 8324000,
+      "lon_cen": -106.67371,
+      "lat_cen": 35.89207,
+      "area_m2": 1222219504.66,
+      "elev_mean_m": 2590.58953393
+    },
+    {
+      "basin_id": "USA_08377900",
+      "hru_id": 8377900,
+      "lon_cen": -105.56471,
+      "lat_cen": 35.8574,
+      "area_m2": 139087038.612,
+      "elev_mean_m": 3109.81428571
+    },
+    {
+      "basin_id": "USA_08380500",
+      "hru_id": 8380500,
+      "lon_cen": -105.43926,
+      "lat_cen": 35.72501,
+      "area_m2": 199617133.269,
+      "elev_mean_m": 2648.57286432
+    },
+    {
+      "basin_id": "USA_09035800",
+      "hru_id": 9035800,
+      "lon_cen": -105.98585,
+      "lat_cen": 39.81809,
+      "area_m2": 22912281.4248,
+      "elev_mean_m": 3283.72727273
+    },
+    {
+      "basin_id": "USA_09035900",
+      "hru_id": 9035900,
+      "lon_cen": -106.0091,
+      "lat_cen": 39.73013,
+      "area_m2": 71669554.9532,
+      "elev_mean_m": 3359.52777778
+    },
+    {
+      "basin_id": "USA_09047700",
+      "hru_id": 9047700,
+      "lon_cen": -105.94456,
+      "lat_cen": 39.56378,
+      "area_m2": 24371107.2571,
+      "elev_mean_m": 3257.25
+    },
+    {
+      "basin_id": "USA_09065500",
+      "hru_id": 9065500,
+      "lon_cen": -106.22102,
+      "lat_cen": 39.63208,
+      "area_m2": 37808068.7081,
+      "elev_mean_m": 3371.94871795
+    },
+    {
+      "basin_id": "USA_09066000",
+      "hru_id": 9066000,
+      "lon_cen": -106.23261,
+      "lat_cen": 39.57866,
+      "area_m2": 32628904.6596,
+      "elev_mean_m": 3249.5625
+    },
+    {
+      "basin_id": "USA_09066200",
+      "hru_id": 9066200,
+      "lon_cen": -106.31259,
+      "lat_cen": 39.67954,
+      "area_m2": 16124840.1948,
+      "elev_mean_m": 3310.375
+    },
+    {
+      "basin_id": "USA_09066300",
+      "hru_id": 9066300,
+      "lon_cen": -106.35886,
+      "lat_cen": 39.67818,
+      "area_m2": 15677968.4159,
+      "elev_mean_m": 3132.375
+    },
+    {
+      "basin_id": "USA_09081600",
+      "hru_id": 9081600,
+      "lon_cen": -107.18846,
+      "lat_cen": 39.10714,
+      "area_m2": 436883264.66,
+      "elev_mean_m": 3097.38443936
+    },
+    {
+      "basin_id": "USA_09107000",
+      "hru_id": 9107000,
+      "lon_cen": -106.62829,
+      "lat_cen": 38.95066,
+      "area_m2": 331775242.425,
+      "elev_mean_m": 3328.94817073
+    },
+    {
+      "basin_id": "USA_09210500",
+      "hru_id": 9210500,
+      "lon_cen": -110.54558,
+      "lat_cen": 42.18357,
+      "area_m2": 398503355.463,
+      "elev_mean_m": 2482.11221945
+    },
+    {
+      "basin_id": "USA_09223000",
+      "hru_id": 9223000,
+      "lon_cen": -110.72223,
+      "lat_cen": 42.23443,
+      "area_m2": 333857768.008,
+      "elev_mean_m": 2575.6
+    },
+    {
+      "basin_id": "USA_09306242",
+      "hru_id": 9306242,
+      "lon_cen": -108.54592,
+      "lat_cen": 39.89544,
+      "area_m2": 87706557.8943,
+      "elev_mean_m": 2269.97752809
+    },
+    {
+      "basin_id": "USA_09312600",
+      "hru_id": 9312600,
+      "lon_cen": -111.04445,
+      "lat_cen": 39.94972,
+      "area_m2": 198563676.948,
+      "elev_mean_m": 2497.84422111
+    },
+    {
+      "basin_id": "USA_09352900",
+      "hru_id": 9352900,
+      "lon_cen": -107.53186,
+      "lat_cen": 37.59993,
+      "area_m2": 187744647.055,
+      "elev_mean_m": 3455.23560209
+    },
+    {
+      "basin_id": "USA_09378170",
+      "hru_id": 9378170,
+      "lon_cen": -109.4215,
+      "lat_cen": 37.83662,
+      "area_m2": 21992434.3149,
+      "elev_mean_m": 2631.79166667
+    },
+    {
+      "basin_id": "USA_09386900",
+      "hru_id": 9386900,
+      "lon_cen": -108.47239,
+      "lat_cen": 35.32126,
+      "area_m2": 186229052.936,
+      "elev_mean_m": 2412.88108108
+    },
+    {
+      "basin_id": "USA_09404450",
+      "hru_id": 9404450,
+      "lon_cen": -112.586,
+      "lat_cen": 37.41291,
+      "area_m2": 195917510.542,
+      "elev_mean_m": 2213.69072165
+    },
+    {
+      "basin_id": "USA_09430500",
+      "hru_id": 9430500,
+      "lon_cen": -108.18896,
+      "lat_cen": 33.34026,
+      "area_m2": 4809579858.8,
+      "elev_mean_m": 2268.65771393
+    },
+    {
+      "basin_id": "USA_09430600",
+      "hru_id": 9430600,
+      "lon_cen": -108.59094,
+      "lat_cen": 33.2252,
+      "area_m2": 190680257.504,
+      "elev_mean_m": 2360.92021277
+    },
+    {
+      "basin_id": "USA_09447800",
+      "hru_id": 9447800,
+      "lon_cen": -109.69413,
+      "lat_cen": 33.14117,
+      "area_m2": 777154810.557,
+      "elev_mean_m": 1594.47164948
+    },
+    {
+      "basin_id": "USA_09484000",
+      "hru_id": 9484000,
+      "lon_cen": -110.77781,
+      "lat_cen": 32.38747,
+      "area_m2": 98652779.2815,
+      "elev_mean_m": 1807.9375
+    },
+    {
+      "basin_id": "USA_09494000",
+      "hru_id": 9494000,
+      "lon_cen": -109.83754,
+      "lat_cen": 33.92041,
+      "area_m2": 1628427428.24,
+      "elev_mean_m": 2175.59734219
+    },
+    {
+      "basin_id": "USA_09497800",
+      "hru_id": 9497800,
+      "lon_cen": -110.50846,
+      "lat_cen": 34.04412,
+      "area_m2": 751787902.466,
+      "elev_mean_m": 1756.07968127
+    },
+    {
+      "basin_id": "USA_09497980",
+      "hru_id": 9497980,
+      "lon_cen": -110.88509,
+      "lat_cen": 34.03231,
+      "area_m2": 516827866.117,
+      "elev_mean_m": 1689.68593449
+    },
+    {
+      "basin_id": "USA_09505200",
+      "hru_id": 9505200,
+      "lon_cen": -111.51264,
+      "lat_cen": 34.70001,
+      "area_m2": 287445654.304,
+      "elev_mean_m": 1994.6366782
+    },
+    {
+      "basin_id": "USA_09505350",
+      "hru_id": 9505350,
+      "lon_cen": -111.61534,
+      "lat_cen": 34.82415,
+      "area_m2": 369895241.139,
+      "elev_mean_m": 1870.26541555
+    },
+    {
+      "basin_id": "USA_09505800",
+      "hru_id": 9505800,
+      "lon_cen": -111.42759,
+      "lat_cen": 34.59887,
+      "area_m2": 624727315.344,
+      "elev_mean_m": 2020.96656051
+    },
+    {
+      "basin_id": "USA_09508300",
+      "hru_id": 9508300,
+      "lon_cen": -111.58172,
+      "lat_cen": 34.17229,
+      "area_m2": 97861794.3428,
+      "elev_mean_m": 1485.26041667
+    },
+    {
+      "basin_id": "USA_09510200",
+      "hru_id": 9510200,
+      "lon_cen": -111.47289,
+      "lat_cen": 33.81381,
+      "area_m2": 428195303.288,
+      "elev_mean_m": 1147.45260664
+    },
+    {
+      "basin_id": "USA_09513780",
+      "hru_id": 9513780,
+      "lon_cen": -111.98727,
+      "lat_cen": 34.01047,
+      "area_m2": 190976207.815,
+      "elev_mean_m": 1153.01515152
+    },
+    {
+      "basin_id": "USA_10173450",
+      "hru_id": 10173450,
+      "lon_cen": -112.69434,
+      "lat_cen": 37.62724,
+      "area_m2": 281686544.672,
+      "elev_mean_m": 2780.67615658
+    },
+    {
+      "basin_id": "USA_10234500",
+      "hru_id": 10234500,
+      "lon_cen": -112.43792,
+      "lat_cen": 38.28442,
+      "area_m2": 238369523.186,
+      "elev_mean_m": 2802.59414226
+    },
+    {
+      "basin_id": "USA_10244950",
+      "hru_id": 10244950,
+      "lon_cen": -114.67992,
+      "lat_cen": 39.23253,
+      "area_m2": 28924328.9076,
+      "elev_mean_m": 2712.93333333
+    },
+    {
+      "basin_id": "USA_10259000",
+      "hru_id": 10259000,
+      "lon_cen": -116.59863,
+      "lat_cen": 33.76269,
+      "area_m2": 23657464.569,
+      "elev_mean_m": 1362.23076923
+    },
+    {
+      "basin_id": "USA_10336645",
+      "hru_id": 10336645,
+      "lon_cen": -120.16849,
+      "lat_cen": 39.02197,
+      "area_m2": 20093583.5,
+      "elev_mean_m": 2216.31578947
+    },
+    {
+      "basin_id": "USA_10343500",
+      "hru_id": 10343500,
+      "lon_cen": -120.27148,
+      "lat_cen": 39.42957,
+      "area_m2": 27336565.5746,
+      "elev_mean_m": 2188.48275862
+    },
+    {
+      "basin_id": "USA_11124500",
+      "hru_id": 11124500,
+      "lon_cen": -119.78728,
+      "lat_cen": 34.65655,
+      "area_m2": 192512866.677,
+      "elev_mean_m": 1001.20526316
+    },
+    {
+      "basin_id": "USA_11141280",
+      "hru_id": 11141280,
+      "lon_cen": -120.52704,
+      "lat_cen": 35.27825,
+      "area_m2": 56053846.4608,
+      "elev_mean_m": 562.462962963
+    },
+    {
+      "basin_id": "USA_11143000",
+      "hru_id": 11143000,
+      "lon_cen": -121.68131,
+      "lat_cen": 36.24347,
+      "area_m2": 121322526.523,
+      "elev_mean_m": 770.221311475
+    },
+    {
+      "basin_id": "USA_11148900",
+      "hru_id": 11148900,
+      "lon_cen": -121.27133,
+      "lat_cen": 35.90448,
+      "area_m2": 386024582.635,
+      "elev_mean_m": 564.238461538
+    },
+    {
+      "basin_id": "USA_11162500",
+      "hru_id": 11162500,
+      "lon_cen": -122.21675,
+      "lat_cen": 37.25977,
+      "area_m2": 119204047.587,
+      "elev_mean_m": 340.366666667
+    },
+    {
+      "basin_id": "USA_11176400",
+      "hru_id": 11176400,
+      "lon_cen": -121.5492,
+      "lat_cen": 37.4268,
+      "area_m2": 336782793.812,
+      "elev_mean_m": 750.994029851
+    },
+    {
+      "basin_id": "USA_11230500",
+      "hru_id": 11230500,
+      "lon_cen": -118.86777,
+      "lat_cen": 37.34034,
+      "area_m2": 142192937.52,
+      "elev_mean_m": 3207.23239437
+    },
+    {
+      "basin_id": "USA_11237500",
+      "hru_id": 11237500,
+      "lon_cen": -119.16989,
+      "lat_cen": 37.18005,
+      "area_m2": 65206894.5875,
+      "elev_mean_m": 2377.53225806
+    },
+    {
+      "basin_id": "USA_11264500",
+      "hru_id": 11264500,
+      "lon_cen": -119.42502,
+      "lat_cen": 37.70889,
+      "area_m2": 472306667.471,
+      "elev_mean_m": 2731.96367521
+    },
+    {
+      "basin_id": "USA_11266500",
+      "hru_id": 11266500,
+      "lon_cen": -119.48658,
+      "lat_cen": 37.73825,
+      "area_m2": 836167411.953,
+      "elev_mean_m": 2351.74184783
+    },
+    {
+      "basin_id": "USA_11284400",
+      "hru_id": 11284400,
+      "lon_cen": -120.14274,
+      "lat_cen": 37.81537,
+      "area_m2": 41705013.5297,
+      "elev_mean_m": 966.785714286
+    },
+    {
+      "basin_id": "USA_11299600",
+      "hru_id": 11299600,
+      "lon_cen": -120.61621,
+      "lat_cen": 37.99671,
+      "area_m2": 41116490.2973,
+      "elev_mean_m": 424.523809524
+    },
+    {
+      "basin_id": "USA_11381500",
+      "hru_id": 11381500,
+      "lon_cen": -121.67376,
+      "lat_cen": 40.23865,
+      "area_m2": 341301971.081,
+      "elev_mean_m": 1200.00887574
+    },
+    {
+      "basin_id": "USA_11451100",
+      "hru_id": 11451100,
+      "lon_cen": -122.72945,
+      "lat_cen": 39.19985,
+      "area_m2": 155471803.497,
+      "elev_mean_m": 911.987012987
+    },
+    {
+      "basin_id": "USA_11468500",
+      "hru_id": 11468500,
+      "lon_cen": -123.56776,
+      "lat_cen": 39.43312,
+      "area_m2": 273605809.572,
+      "elev_mean_m": 283.590405904
+    },
+    {
+      "basin_id": "USA_11473900",
+      "hru_id": 11473900,
+      "lon_cen": -123.0736,
+      "lat_cen": 39.78906,
+      "area_m2": 1930441446.74,
+      "elev_mean_m": 1117.92507804
+    },
+    {
+      "basin_id": "USA_11475560",
+      "hru_id": 11475560,
+      "lon_cen": -123.60395,
+      "lat_cen": 39.71402,
+      "area_m2": 16873276.7441,
+      "elev_mean_m": 863.736842105
+    },
+    {
+      "basin_id": "USA_11476600",
+      "hru_id": 11476600,
+      "lon_cen": -124.02728,
+      "lat_cen": 40.31625,
+      "area_m2": 72285226.153,
+      "elev_mean_m": 492.657142857
+    },
+    {
+      "basin_id": "USA_11478500",
+      "hru_id": 11478500,
+      "lon_cen": -123.63329,
+      "lat_cen": 40.42245,
+      "area_m2": 574988826.125,
+      "elev_mean_m": 929.217013889
+    },
+    {
+      "basin_id": "USA_11480390",
+      "hru_id": 11480390,
+      "lon_cen": -123.24386,
+      "lat_cen": 40.19288,
+      "area_m2": 243154701.938,
+      "elev_mean_m": 1124.44628099
+    },
+    {
+      "basin_id": "USA_11481200",
+      "hru_id": 11481200,
+      "lon_cen": -123.99714,
+      "lat_cen": 41.02266,
+      "area_m2": 106845243.967,
+      "elev_mean_m": 313.875
+    },
+    {
+      "basin_id": "USA_11482500",
+      "hru_id": 11482500,
+      "lon_cen": -123.89077,
+      "lat_cen": 41.06113,
+      "area_m2": 724010078.634,
+      "elev_mean_m": 567.165075034
+    },
+    {
+      "basin_id": "USA_11522500",
+      "hru_id": 11522500,
+      "lon_cen": -123.19039,
+      "lat_cen": 41.29337,
+      "area_m2": 1946341131.07,
+      "elev_mean_m": 1292.87641026
+    },
+    {
+      "basin_id": "USA_11523200",
+      "hru_id": 11523200,
+      "lon_cen": -122.64033,
+      "lat_cen": 41.22828,
+      "area_m2": 385086063.247,
+      "elev_mean_m": 1623.57480315
+    },
+    {
+      "basin_id": "USA_11528700",
+      "hru_id": 11528700,
+      "lon_cen": -123.23007,
+      "lat_cen": 40.47025,
+      "area_m2": 1982579596.34,
+      "elev_mean_m": 1125.04828974
+    },
+    {
+      "basin_id": "USA_11532500",
+      "hru_id": 11532500,
+      "lon_cen": -123.86791,
+      "lat_cen": 41.82748,
+      "area_m2": 1590193696.08,
+      "elev_mean_m": 762.08040201
+    },
+    {
+      "basin_id": "USA_12010000",
+      "hru_id": 12010000,
+      "lon_cen": -123.6762,
+      "lat_cen": 46.46081,
+      "area_m2": 142606100.636,
+      "elev_mean_m": 279.430555556
+    },
+    {
+      "basin_id": "USA_12025000",
+      "hru_id": 12025000,
+      "lon_cen": -122.70713,
+      "lat_cen": 46.63222,
+      "area_m2": 410923563.678,
+      "elev_mean_m": 284.386308068
+    },
+    {
+      "basin_id": "USA_12025700",
+      "hru_id": 12025700,
+      "lon_cen": -122.53443,
+      "lat_cen": 46.7305,
+      "area_m2": 105485095.044,
+      "elev_mean_m": 605.148148148
+    },
+    {
+      "basin_id": "USA_12035000",
+      "hru_id": 12035000,
+      "lon_cen": -123.46073,
+      "lat_cen": 47.22589,
+      "area_m2": 768996417.086,
+      "elev_mean_m": 225.66319896
+    },
+    {
+      "basin_id": "USA_12043000",
+      "hru_id": 12043000,
+      "lon_cen": -124.17418,
+      "lat_cen": 47.97022,
+      "area_m2": 348412529.929,
+      "elev_mean_m": 440.04
+    },
+    {
+      "basin_id": "USA_12082500",
+      "hru_id": 12082500,
+      "lon_cen": -121.90131,
+      "lat_cen": 46.74625,
+      "area_m2": 360085039.437,
+      "elev_mean_m": 1155.82739726
+    },
+    {
+      "basin_id": "USA_12092000",
+      "hru_id": 12092000,
+      "lon_cen": -121.90561,
+      "lat_cen": 46.86965,
+      "area_m2": 241133151.609,
+      "elev_mean_m": 1403.53361345
+    },
+    {
+      "basin_id": "USA_12114500",
+      "hru_id": 12114500,
+      "lon_cen": -121.49688,
+      "lat_cen": 47.31609,
+      "area_m2": 66571284.5523,
+      "elev_mean_m": 1078.32835821
+    },
+    {
+      "basin_id": "USA_12115000",
+      "hru_id": 12115000,
+      "lon_cen": -121.53458,
+      "lat_cen": 47.32836,
+      "area_m2": 111007834.81,
+      "elev_mean_m": 940.146341463
+    },
+    {
+      "basin_id": "USA_12117000",
+      "hru_id": 12117000,
+      "lon_cen": -121.78525,
+      "lat_cen": 47.36518,
+      "area_m2": 45219585.4728,
+      "elev_mean_m": 661.255319149
+    },
+    {
+      "basin_id": "USA_12143600",
+      "hru_id": 12143600,
+      "lon_cen": -121.54207,
+      "lat_cen": 47.41115,
+      "area_m2": 165048040.908,
+      "elev_mean_m": 993.26035503
+    },
+    {
+      "basin_id": "USA_12144000",
+      "hru_id": 12144000,
+      "lon_cen": -121.58986,
+      "lat_cen": 47.42084,
+      "area_m2": 212768683.105,
+      "elev_mean_m": 330.729166667
+    },
+    {
+      "basin_id": "USA_12145500",
+      "hru_id": 12145500,
+      "lon_cen": -121.88298,
+      "lat_cen": 47.48509,
+      "area_m2": 83890020.1509,
+      "elev_mean_m": 440.130952381
+    },
+    {
+      "basin_id": "USA_12189500",
+      "hru_id": 12189500,
+      "lon_cen": -121.30544,
+      "lat_cen": 48.19837,
+      "area_m2": 1858620066.48,
+      "elev_mean_m": 1134.89398085
+    },
+    {
+      "basin_id": "USA_12358500",
+      "hru_id": 12358500,
+      "lon_cen": -113.52549,
+      "lat_cen": 48.33106,
+      "area_m2": 2917030346.32,
+      "elev_mean_m": 1729.76659822
+    },
+    {
+      "basin_id": "USA_12374250",
+      "hru_id": 12374250,
+      "lon_cen": -114.77652,
+      "lat_cen": 47.79958,
+      "area_m2": 53297860.3089,
+      "elev_mean_m": 1464.61538462
+    },
+    {
+      "basin_id": "USA_12375900",
+      "hru_id": 12375900,
+      "lon_cen": -113.95571,
+      "lat_cen": 47.51015,
+      "area_m2": 19728035.0233,
+      "elev_mean_m": 1868.85714286
+    },
+    {
+      "basin_id": "USA_12377150",
+      "hru_id": 12377150,
+      "lon_cen": -113.92516,
+      "lat_cen": 47.33686,
+      "area_m2": 32390101.5134,
+      "elev_mean_m": 2128.65625
+    },
+    {
+      "basin_id": "USA_12381400",
+      "hru_id": 12381400,
+      "lon_cen": -113.79674,
+      "lat_cen": 47.13612,
+      "area_m2": 148952778.202,
+      "elev_mean_m": 1828.60135135
+    },
+    {
+      "basin_id": "USA_12383500",
+      "hru_id": 12383500,
+      "lon_cen": -113.92311,
+      "lat_cen": 47.13778,
+      "area_m2": 17699380.4519,
+      "elev_mean_m": 1923.66666667
+    },
+    {
+      "basin_id": "USA_12390700",
+      "hru_id": 12390700,
+      "lon_cen": -115.51775,
+      "lat_cen": 47.54662,
+      "area_m2": 469739774.452,
+      "elev_mean_m": 1356.16772824
+    },
+    {
+      "basin_id": "USA_12411000",
+      "hru_id": 12411000,
+      "lon_cen": -116.20144,
+      "lat_cen": 47.88082,
+      "area_m2": 866120102.147,
+      "elev_mean_m": 1202.90804598
+    },
+    {
+      "basin_id": "USA_12414500",
+      "hru_id": 12414500,
+      "lon_cen": -115.73029,
+      "lat_cen": 47.20179,
+      "area_m2": 2660415935.2,
+      "elev_mean_m": 1387.41550621
+    },
+    {
+      "basin_id": "USA_12447390",
+      "hru_id": 12447390,
+      "lon_cen": -120.17706,
+      "lat_cen": 48.87455,
+      "area_m2": 58399375.4104,
+      "elev_mean_m": 1957.87719298
+    },
+    {
+      "basin_id": "USA_12451000",
+      "hru_id": 12451000,
+      "lon_cen": -120.85942,
+      "lat_cen": 48.39009,
+      "area_m2": 830333301.511,
+      "elev_mean_m": 1528.58645707
+    },
+    {
+      "basin_id": "USA_12488500",
+      "hru_id": 12488500,
+      "lon_cen": -121.37304,
+      "lat_cen": 46.91894,
+      "area_m2": 206113257.02,
+      "elev_mean_m": 1483.15165877
+    },
+    {
+      "basin_id": "USA_13011500",
+      "hru_id": 13011500,
+      "lon_cen": -110.35561,
+      "lat_cen": 43.988,
+      "area_m2": 405212478.092,
+      "elev_mean_m": 2469.091133
+    },
+    {
+      "basin_id": "USA_13011900",
+      "hru_id": 13011900,
+      "lon_cen": -110.10773,
+      "lat_cen": 43.87215,
+      "area_m2": 848011300.626,
+      "elev_mean_m": 2742.33884298
+    },
+    {
+      "basin_id": "USA_13018300",
+      "hru_id": 13018300,
+      "lon_cen": -110.65675,
+      "lat_cen": 43.44024,
+      "area_m2": 29472368.4924,
+      "elev_mean_m": 2544.86666667
+    },
+    {
+      "basin_id": "USA_13023000",
+      "hru_id": 13023000,
+      "lon_cen": -110.73945,
+      "lat_cen": 42.90541,
+      "area_m2": 1163742159.15,
+      "elev_mean_m": 2468.38242894
+    },
+    {
+      "basin_id": "USA_13161500",
+      "hru_id": 13161500,
+      "lon_cen": -115.55631,
+      "lat_cen": 41.7042,
+      "area_m2": 990358977.892,
+      "elev_mean_m": 2043.49243189
+    },
+    {
+      "basin_id": "USA_13235000",
+      "hru_id": 13235000,
+      "lon_cen": -115.30613,
+      "lat_cen": 44.14179,
+      "area_m2": 1158492402.31,
+      "elev_mean_m": 2093.44540728
+    },
+    {
+      "basin_id": "USA_13240000",
+      "hru_id": 13240000,
+      "lon_cen": -115.92988,
+      "lat_cen": 44.95118,
+      "area_m2": 126018049.189,
+      "elev_mean_m": 2131.3968254
+    },
+    {
+      "basin_id": "USA_13310700",
+      "hru_id": 13310700,
+      "lon_cen": -115.71912,
+      "lat_cen": 44.74935,
+      "area_m2": 854760487.113,
+      "elev_mean_m": 1935.78873239
+    },
+    {
+      "basin_id": "USA_13313000",
+      "hru_id": 13313000,
+      "lon_cen": -115.50648,
+      "lat_cen": 44.74458,
+      "area_m2": 564967643.138,
+      "elev_mean_m": 2182.05114638
+    },
+    {
+      "basin_id": "USA_13331500",
+      "hru_id": 13331500,
+      "lon_cen": -117.57786,
+      "lat_cen": 45.32122,
+      "area_m2": 619116823.682,
+      "elev_mean_m": 1748.0557377
+    },
+    {
+      "basin_id": "USA_13337000",
+      "hru_id": 13337000,
+      "lon_cen": -114.95985,
+      "lat_cen": 46.41229,
+      "area_m2": 3052721546.62,
+      "elev_mean_m": 1594.98135427
+    },
+    {
+      "basin_id": "USA_13338500",
+      "hru_id": 13338500,
+      "lon_cen": -115.78348,
+      "lat_cen": 45.85533,
+      "area_m2": 3025703344.64,
+      "elev_mean_m": 1397.35175381
+    },
+    {
+      "basin_id": "USA_13340000",
+      "hru_id": 13340000,
+      "lon_cen": -115.33135,
+      "lat_cen": 46.11206,
+      "area_m2": 14271028341.0,
+      "elev_mean_m": 1427.31401437
+    },
+    {
+      "basin_id": "USA_13340600",
+      "hru_id": 13340600,
+      "lon_cen": -115.27194,
+      "lat_cen": 46.70034,
+      "area_m2": 3354672306.43,
+      "elev_mean_m": 1461.88832638
+    },
+    {
+      "basin_id": "USA_14020000",
+      "hru_id": 14020000,
+      "lon_cen": -118.18835,
+      "lat_cen": 45.69477,
+      "area_m2": 343467830.95,
+      "elev_mean_m": 1207.14121037
+    },
+    {
+      "basin_id": "USA_14096850",
+      "hru_id": 14096850,
+      "lon_cen": -121.46096,
+      "lat_cen": 45.03435,
+      "area_m2": 384275551.021,
+      "elev_mean_m": 935.4933687
+    },
+    {
+      "basin_id": "USA_14137000",
+      "hru_id": 14137000,
+      "lon_cen": -121.87651,
+      "lat_cen": 45.30801,
+      "area_m2": 676455308.325,
+      "elev_mean_m": 999.869242199
+    },
+    {
+      "basin_id": "USA_14138800",
+      "hru_id": 14138800,
+      "lon_cen": -121.87952,
+      "lat_cen": 45.43958,
+      "area_m2": 21833903.6793,
+      "elev_mean_m": 1009.95454545
+    },
+    {
+      "basin_id": "USA_14138900",
+      "hru_id": 14138900,
+      "lon_cen": -122.01723,
+      "lat_cen": 45.53408,
+      "area_m2": 21990596.1006,
+      "elev_mean_m": 829.47826087
+    },
+    {
+      "basin_id": "USA_14139800",
+      "hru_id": 14139800,
+      "lon_cen": -122.01432,
+      "lat_cen": 45.44413,
+      "area_m2": 41212797.474,
+      "elev_mean_m": 786.0
+    },
+    {
+      "basin_id": "USA_14141500",
+      "hru_id": 14141500,
+      "lon_cen": -122.04301,
+      "lat_cen": 45.41544,
+      "area_m2": 60329873.7847,
+      "elev_mean_m": 725.639344262
+    },
+    {
+      "basin_id": "USA_14154500",
+      "hru_id": 14154500,
+      "lon_cen": -122.71525,
+      "lat_cen": 43.66204,
+      "area_m2": 549577802.099,
+      "elev_mean_m": 851.73540146
+    },
+    {
+      "basin_id": "USA_14158790",
+      "hru_id": 14158790,
+      "lon_cen": -122.07449,
+      "lat_cen": 44.36002,
+      "area_m2": 40765467.9517,
+      "elev_mean_m": 1225.85714286
+    },
+    {
+      "basin_id": "USA_14182500",
+      "hru_id": 14182500,
+      "lon_cen": -122.34103,
+      "lat_cen": 44.82652,
+      "area_m2": 292899386.473,
+      "elev_mean_m": 799.469178082
+    },
+    {
+      "basin_id": "USA_14185000",
+      "hru_id": 14185000,
+      "lon_cen": -122.31802,
+      "lat_cen": 44.37924,
+      "area_m2": 449695761.422,
+      "elev_mean_m": 883.191011236
+    },
+    {
+      "basin_id": "USA_14185900",
+      "hru_id": 14185900,
+      "lon_cen": -122.31096,
+      "lat_cen": 44.58919,
+      "area_m2": 258386182.149,
+      "elev_mean_m": 917.573076923
+    },
+    {
+      "basin_id": "USA_14187000",
+      "hru_id": 14187000,
+      "lon_cen": -122.53038,
+      "lat_cen": 44.32938,
+      "area_m2": 137760285.176,
+      "elev_mean_m": 718.215827338
+    },
+    {
+      "basin_id": "USA_14216500",
+      "hru_id": 14216500,
+      "lon_cen": -122.01595,
+      "lat_cen": 46.21386,
+      "area_m2": 349923849.783,
+      "elev_mean_m": 929.870317003
+    },
+    {
+      "basin_id": "USA_14236200",
+      "hru_id": 14236200,
+      "lon_cen": -122.28922,
+      "lat_cen": 46.605,
+      "area_m2": 364498136.035,
+      "elev_mean_m": 660.379501385
+    },
+    {
+      "basin_id": "USA_14303200",
+      "hru_id": 14303200,
+      "lon_cen": -123.53069,
+      "lat_cen": 45.3237,
+      "area_m2": 8074802.82379,
+      "elev_mean_m": 646.4
+    },
+    {
+      "basin_id": "USA_14305500",
+      "hru_id": 14305500,
+      "lon_cen": -123.71999,
+      "lat_cen": 44.81731,
+      "area_m2": 526423213.171,
+      "elev_mean_m": 397.574952562
+    },
+    {
+      "basin_id": "USA_14316700",
+      "hru_id": 14316700,
+      "lon_cen": -122.64677,
+      "lat_cen": 43.4529,
+      "area_m2": 588025032.966,
+      "elev_mean_m": 947.553082192
+    }
+  ]
+}

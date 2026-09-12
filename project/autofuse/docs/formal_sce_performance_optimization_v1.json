@@ -1,0 +1,55 @@
+{
+  "artifacts_generated": [
+    "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/sce_calibration_horizon_validation.json",
+    "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/q_only_calibration_mode_validation.json",
+    "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/sce_candidate_batching_validation.json",
+    "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/sce_single_final_forward_validation.json",
+    "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/sce_candidate_batch_scaling.json",
+    "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/formal_sce_pilot_2x4_optimized.json",
+    "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/docs/formal_sce_performance_optimization_v1.json"
+  ],
+  "generated_at_utc": "2026-09-07T04:11:29.847263+00:00",
+  "optimizations_implemented": [
+    {
+      "description": "SCE candidate objective simulates only from warmup through calibration_end (4383 days), omitting future evaluation days (4018 days).",
+      "error_vs_full": 0.0,
+      "name": "Calibration-period truncated forward",
+      "parity_verified": true
+    },
+    {
+      "description": "During optimization, only discharge Q is materialized/stacked; 37 groups of intermediate flux/state histories are skipped.",
+      "error_vs_full": 0.0,
+      "name": "Q-only calibration simulation mode",
+      "parity_verified": true
+    },
+    {
+      "description": "Initial population candidates are evaluated concurrently along leading GPU batch dimension.",
+      "error_vs_full": 0.0,
+      "name": "Candidate batching",
+      "parity_verified": true
+    },
+    {
+      "description": "Best theta performs exactly one full 8401-day simulation; train and test metrics are computed from the single discharge trajectory.",
+      "error_vs_full": 0.0,
+      "name": "Single final post-optimization forward",
+      "parity_verified": true
+    }
+  ],
+  "parity_summary": {
+    "all_parity_gates_passed": true,
+    "best_theta_unaltered": true,
+    "frozen_torch_fuse_kernel_unchanged": true,
+    "same_seed_trajectory_unaltered": true,
+    "scientific_objective_unaltered": true
+  },
+  "performance_results": {
+    "old_2x4_pilot_wall_clock_seconds": 2113.6067184089916,
+    "optimized_2x4_pilot_wall_clock_seconds": 555.6193706690101,
+    "overall_speedup": 3.804055131958485,
+    "safe_default_candidate_batch_size": 16
+  },
+  "protocol_id": "formal-experiment-protocol-v1-db53091e6e222066",
+  "schema_version": "formal-sce-performance-optimization-v1",
+  "status": "passed",
+  "torch_fuse_freeze_id": "torch-fuse-v1-freeze-v1"
+}

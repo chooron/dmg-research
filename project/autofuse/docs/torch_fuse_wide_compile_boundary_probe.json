@@ -1,0 +1,72 @@
+{
+  "boundary": "StructureConditionedParameterizer -> theta transforms -> FUSE Lite -> scored MSE loss",
+  "closeout_updated_at_utc": "2026-09-08T06:39:17.355108+00:00",
+  "generated_at_utc": "2026-09-08T06:22:31.373286+00:00",
+  "interpretation": "A successful fullgraph capture must demonstrate fewer graph breaks/kernel launches and a faster full step; a compile error or a fallback that retains the 730-step current loop is not whole-training fusion.",
+  "provenance": {
+    "data_status": "prior_probe_reused",
+    "final_source_checked_at_utc": "2026-09-08T06:39:17.354841+00:00",
+    "long_temporal_probe_rerun_in_closeout": false,
+    "numerical_core_hashes": {
+      "dfuse/kernel.py": "4a79b4caa8d93881c849476e2ffe5aa304c8033cf271bd7e11073d7f7227faff",
+      "dfuse/runtime.py": "f6b9f066489929479ccabb2035e50bed146e536af24a641cae68e11c37e9ad13",
+      "dfuse/spec.py": "0e7c569260e11acd49b8b61174934afbbccf9d1c0ec46c4a3bae561b2491d2bb"
+    },
+    "probe_original_generated_at_utc": "2026-09-08T06:22:31.373286+00:00",
+    "rerun": false,
+    "reuse_reason": "Closeout explicitly reuses the already executed bounded probe; no T>=30/full-730/chunk/wide compile was rerun.",
+    "source_git_sha": "3caca37a4243ae0a95ebe9cc4f22998672ddf464"
+  },
+  "records": [
+    {
+      "baseline": {
+        "kind": "compiled parameterizer separately + current compiled-step FUSE",
+        "total_forward_backward_seconds": 8.251706826034933
+      },
+      "batch_size": 100,
+      "current_step_diagnostics_after_wide_attempt": {
+        "records": {},
+        "registry_size": 0
+      },
+      "device": "cuda",
+      "dtype": "torch.float64",
+      "model_id": 2,
+      "steps": 730,
+      "wide_fullgraph": {
+        "backward_seconds": null,
+        "error": {
+          "message": "Attempted to call function marked as skipped\n  Explanation: Dynamo does not know how to trace the builtin `<unknown module>.Encoder.__new__.` This function is either a Python builtin (e.g. _warnings.warn) or a third-party C/C++ Python extension (perhaps created with pybind).\n  Hint: If it is a Python builtin, please file an issue on GitHub so the PyTorch team can add support for it and see the next case for a workaround.\n  Hint: If it is a third-party C/C++ Python extension, please either wrap it into a PyTorch-understood custom operator (see https://pytorch.org/tutorials/advanced/custom_ops_landing_page.html for more details) or, if it is traceable, use `torch.compiler.allow_in_graph`.\n\n  Developer debug context: module: <unknown module>, qualname: Encoder.__new__, skip reason: <missing reason>\n\n For more details about this graph break, please visit: https://meta-pytorch.github.io/compile-graph-break-site/gb/gb0007.html\n\nfrom user code:\n   File \"/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/torch_fuse_temporal_optimization.py\", line 444, in wrapper\n    result = simulate_coupled_rk2_batched(model_id, forcing, theta_value, basin_ids=tuple(str(i) for i in range(BATCH)), compile_step=True, monitor_chunk_size=WINDOW, output_mode=\"lite\")\n  File \"/home/jingxin/orca/workspaces/dmg-research/autofuse/dfuse/batched.py\", line 317, in simulate_coupled_rk2_batched\n    step_callable = _compiled_step(spec, batch_size=batch_size, device=device, dtype=dtype, backend=compile_backend, fullgraph=compile_fullgraph)\n  File \"/home/jingxin/orca/workspaces/dmg-research/autofuse/dfuse/batched.py\", line 150, in _compiled_step\n    signature, generated = get_generated_step(spec, order=(\"coupled_rhs\",), n_substeps=1, execution_mode=\"coupled_rk2\")\n  File \"/home/jingxin/orca/workspaces/dmg-research/autofuse/dfuse/runtime.py\", line 1313, in get_generated_step\n    step = GENERATED_STEP_REGISTRY.get(spec, order=order, n_substeps=n_substeps, execution_mode=execution_mode)\n  File",
+          "type": "Unsupported"
+        },
+        "forward_seconds": null,
+        "status": "failed"
+      }
+    },
+    {
+      "baseline": {
+        "kind": "compiled parameterizer separately + current compiled-step FUSE",
+        "total_forward_backward_seconds": 6.399617978022434
+      },
+      "batch_size": 100,
+      "current_step_diagnostics_after_wide_attempt": {
+        "records": {},
+        "registry_size": 0
+      },
+      "device": "cuda",
+      "dtype": "torch.float64",
+      "model_id": 8,
+      "steps": 730,
+      "wide_fullgraph": {
+        "backward_seconds": null,
+        "error": {
+          "message": "Attempted to call function marked as skipped\n  Explanation: Dynamo does not know how to trace the builtin `<unknown module>.Encoder.__new__.` This function is either a Python builtin (e.g. _warnings.warn) or a third-party C/C++ Python extension (perhaps created with pybind).\n  Hint: If it is a Python builtin, please file an issue on GitHub so the PyTorch team can add support for it and see the next case for a workaround.\n  Hint: If it is a third-party C/C++ Python extension, please either wrap it into a PyTorch-understood custom operator (see https://pytorch.org/tutorials/advanced/custom_ops_landing_page.html for more details) or, if it is traceable, use `torch.compiler.allow_in_graph`.\n\n  Developer debug context: module: <unknown module>, qualname: Encoder.__new__, skip reason: <missing reason>\n\n For more details about this graph break, please visit: https://meta-pytorch.github.io/compile-graph-break-site/gb/gb0007.html\n\nfrom user code:\n   File \"/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/torch_fuse_temporal_optimization.py\", line 444, in wrapper\n    result = simulate_coupled_rk2_batched(model_id, forcing, theta_value, basin_ids=tuple(str(i) for i in range(BATCH)), compile_step=True, monitor_chunk_size=WINDOW, output_mode=\"lite\")\n  File \"/home/jingxin/orca/workspaces/dmg-research/autofuse/dfuse/batched.py\", line 317, in simulate_coupled_rk2_batched\n    step_callable = _compiled_step(spec, batch_size=batch_size, device=device, dtype=dtype, backend=compile_backend, fullgraph=compile_fullgraph)\n  File \"/home/jingxin/orca/workspaces/dmg-research/autofuse/dfuse/batched.py\", line 150, in _compiled_step\n    signature, generated = get_generated_step(spec, order=(\"coupled_rhs\",), n_substeps=1, execution_mode=\"coupled_rk2\")\n  File \"/home/jingxin/orca/workspaces/dmg-research/autofuse/dfuse/runtime.py\", line 1313, in get_generated_step\n    step = GENERATED_STEP_REGISTRY.get(spec, order=order, n_substeps=n_substeps, execution_mode=execution_mode)\n  File",
+          "type": "Unsupported"
+        },
+        "forward_seconds": null,
+        "status": "failed"
+      }
+    }
+  ],
+  "schema_version": "torch-fuse-wide-compile-boundary-probe-v1",
+  "status": "completed"
+}

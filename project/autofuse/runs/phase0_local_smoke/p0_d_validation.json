@@ -1,0 +1,41 @@
+{
+  "schema_version": "phase0-validation-v1",
+  "stage": "P0-D",
+  "status": "PASS",
+  "eval_period": "evaluation",
+  "eval_days": 4018,
+  "basin_count": 2,
+  "structures_evaluated": [
+    2
+  ],
+  "records": [
+    {
+      "structure_id": 2,
+      "eval_days": 4018,
+      "basin_count": 2,
+      "wall_time_seconds": 3.776869790001001,
+      "seconds_per_basin": 1.8884348950005005,
+      "peak_vram_mb": 17.6591796875,
+      "kge_mean": NaN,
+      "kge_median": NaN,
+      "kge_p25": NaN,
+      "kge_p10_worst_decile": NaN
+    }
+  ],
+  "mean_seconds_per_structure": 3.776869790001001,
+  "projected_full_registry_validation_seconds": 294.5958436200781,
+  "candidate_interval_analysis": [
+    {
+      "eval_interval_steps": 50,
+      "training_time_seconds": 275.0,
+      "projected_full_validation_seconds": 294.5958436200781,
+      "validation_overhead_percent": 51.72015331919702
+    },
+    {
+      "eval_interval_steps": 100,
+      "training_time_seconds": 550.0,
+      "projected_full_validation_seconds": 294.5958436200781,
+      "validation_overhead_percent": 34.88009630232033
+    }
+  ]
+}

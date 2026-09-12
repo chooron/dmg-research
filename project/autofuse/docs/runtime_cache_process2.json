@@ -1,0 +1,35 @@
+{
+  "cache_after": {
+    "bytes": 10805522,
+    "files": 273
+  },
+  "cache_before": {
+    "bytes": 10805522,
+    "files": 273
+  },
+  "cache_dir": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/.cache/runtime-cache-final",
+  "cold_compile_seconds": [
+    3.874921736001852
+  ],
+  "dynamo_counters": {
+    "aot_autograd": {
+      "autograd_cache_hit": 1,
+      "ok": 1,
+      "total": 1
+    },
+    "inductor": {
+      "async_compile_cache_hit": 58,
+      "async_compile_cache_miss": 87,
+      "fxgraph_cache_hit": 1,
+      "triton_bundler_load_static_autotuner": 29
+    },
+    "stats": {
+      "calls_captured": 1190,
+      "unique_graphs": 1
+    }
+  },
+  "elapsed_seconds": 5.186698557001364,
+  "process": 2,
+  "q": 1.738422954617627,
+  "unique_graphs": 1
+}

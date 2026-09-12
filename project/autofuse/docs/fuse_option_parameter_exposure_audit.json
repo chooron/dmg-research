@@ -1,0 +1,1291 @@
+{
+  "catalogue_name": "structures_78",
+  "marginal_option_coverage": {
+    "ARCH1": {
+      "onestate_1": {
+        "count": 36,
+        "fraction": 0.46153846153846156
+      },
+      "tension1_1": {
+        "count": 24,
+        "fraction": 0.3076923076923077
+      },
+      "tension2_1": {
+        "count": 18,
+        "fraction": 0.23076923076923078
+      }
+    },
+    "ARCH2": {
+      "fixedsiz_2": {
+        "count": 21,
+        "fraction": 0.2692307692307692
+      },
+      "tens2pll_2": {
+        "count": 15,
+        "fraction": 0.19230769230769232
+      },
+      "unlimfrc_2": {
+        "count": 21,
+        "fraction": 0.2692307692307692
+      },
+      "unlimpow_2": {
+        "count": 21,
+        "fraction": 0.2692307692307692
+      }
+    },
+    "ESOIL": {
+      "sequential": {
+        "count": 78,
+        "fraction": 1.0
+      }
+    },
+    "QINTF": {
+      "intflwnone": {
+        "count": 78,
+        "fraction": 1.0
+      }
+    },
+    "QPERC": {
+      "perc_f2sat": {
+        "count": 33,
+        "fraction": 0.4230769230769231
+      },
+      "perc_lower": {
+        "count": 33,
+        "fraction": 0.4230769230769231
+      },
+      "perc_w2sat": {
+        "count": 12,
+        "fraction": 0.15384615384615385
+      }
+    },
+    "QSURF": {
+      "arno_x_vic": {
+        "count": 26,
+        "fraction": 0.3333333333333333
+      },
+      "prms_varnt": {
+        "count": 26,
+        "fraction": 0.3333333333333333
+      },
+      "tmdl_param": {
+        "count": 26,
+        "fraction": 0.3333333333333333
+      }
+    },
+    "Q_TDH": {
+      "rout_gamma": {
+        "count": 78,
+        "fraction": 1.0
+      }
+    },
+    "RFERR": {
+      "multiplc_e": {
+        "count": 78,
+        "fraction": 1.0
+      }
+    },
+    "SNOWM": {
+      "temp_index": {
+        "count": 78,
+        "fraction": 1.0
+      }
+    }
+  },
+  "pairwise_option_coverage": {
+    "dimension_pair_breakdowns": {
+      "ARCH1 x ARCH2": {
+        "arithmetic_identity_verified": true,
+        "illegal_pairs": [
+          {
+            "pair": "ARCH1=tension2_1 & ARCH2=tens2pll_2",
+            "reason": "tension2_1 cannot be paired with tens2pll_2"
+          }
+        ],
+        "n_cartesian": 15,
+        "n_illegal": 1,
+        "n_legal": 14,
+        "n_observed": 11,
+        "n_unobserved": 3,
+        "observed_pairs": [
+          {
+            "count": 6,
+            "fraction": 0.07692307692307693,
+            "pair": "ARCH1=tension2_1 & ARCH2=unlimfrc_2"
+          },
+          {
+            "count": 6,
+            "fraction": 0.07692307692307693,
+            "pair": "ARCH1=tension2_1 & ARCH2=unlimpow_2"
+          },
+          {
+            "count": 6,
+            "fraction": 0.07692307692307693,
+            "pair": "ARCH1=tension2_1 & ARCH2=fixedsiz_2"
+          },
+          {
+            "count": 6,
+            "fraction": 0.07692307692307693,
+            "pair": "ARCH1=tension1_1 & ARCH2=tens2pll_2"
+          },
+          {
+            "count": 6,
+            "fraction": 0.07692307692307693,
+            "pair": "ARCH1=tension1_1 & ARCH2=unlimfrc_2"
+          },
+          {
+            "count": 6,
+            "fraction": 0.07692307692307693,
+            "pair": "ARCH1=tension1_1 & ARCH2=unlimpow_2"
+          },
+          {
+            "count": 6,
+            "fraction": 0.07692307692307693,
+            "pair": "ARCH1=tension1_1 & ARCH2=fixedsiz_2"
+          },
+          {
+            "count": 9,
+            "fraction": 0.11538461538461539,
+            "pair": "ARCH1=onestate_1 & ARCH2=tens2pll_2"
+          },
+          {
+            "count": 9,
+            "fraction": 0.11538461538461539,
+            "pair": "ARCH1=onestate_1 & ARCH2=unlimfrc_2"
+          },
+          {
+            "count": 9,
+            "fraction": 0.11538461538461539,
+            "pair": "ARCH1=onestate_1 & ARCH2=unlimpow_2"
+          },
+          {
+            "count": 9,
+            "fraction": 0.11538461538461539,
+            "pair": "ARCH1=onestate_1 & ARCH2=fixedsiz_2"
+          }
+        ],
+        "unobserved_legal_pairs": [
+          {
+            "absent_options": [
+              "topmdexp_2"
+            ],
+            "missing_category": "absent_individual_option",
+            "pair": "ARCH1=tension2_1 & ARCH2=topmdexp_2"
+          },
+          {
+            "absent_options": [
+              "topmdexp_2"
+            ],
+            "missing_category": "absent_individual_option",
+            "pair": "ARCH1=tension1_1 & ARCH2=topmdexp_2"
+          },
+          {
+            "absent_options": [
+              "topmdexp_2"
+            ],
+            "missing_category": "absent_individual_option",
+            "pair": "ARCH1=onestate_1 & ARCH2=topmdexp_2"
+          }
+        ]
+      },
+      "ARCH1 x QPERC": {
+        "arithmetic_identity_verified": true,
+        "illegal_pairs": [
+          {
+            "pair": "ARCH1=tension2_1 & QPERC=perc_w2sat",
+            "reason": "perc_w2sat is only legal with onestate_1"
+          },
+          {
+            "pair": "ARCH1=tension1_1 & QPERC=perc_w2sat",
+            "reason": "perc_w2sat is only legal with onestate_1"
+          }
+        ],
+        "n_cartesian": 9,
+        "n_illegal": 2,
+        "n_legal": 7,
+        "n_observed": 7,
+        "n_unobserved": 0,
+        "observed_pairs": [
+          {
+            "count": 9,
+            "fraction": 0.11538461538461539,
+            "pair": "ARCH1=tension2_1 & QPERC=perc_f2sat"
+          },
+          {
+            "count": 9,
+            "fraction": 0.11538461538461539,
+            "pair": "ARCH1=tension2_1 & QPERC=perc_lower"
+          },
+          {
+            "count": 12,
+            "fraction": 0.15384615384615385,
+            "pair": "ARCH1=tension1_1 & QPERC=perc_f2sat"
+          },
+          {
+            "count": 12,
+            "fraction": 0.15384615384615385,
+            "pair": "ARCH1=tension1_1 & QPERC=perc_lower"
+          },
+          {
+            "count": 12,
+            "fraction": 0.15384615384615385,
+            "pair": "ARCH1=onestate_1 & QPERC=perc_f2sat"
+          },
+          {
+            "count": 12,
+            "fraction": 0.15384615384615385,
+            "pair": "ARCH1=onestate_1 & QPERC=perc_w2sat"
+          },
+          {
+            "count": 12,
+            "fraction": 0.15384615384615385,
+            "pair": "ARCH1=onestate_1 & QPERC=perc_lower"
+          }
+        ],
+        "unobserved_legal_pairs": []
+      },
+      "ARCH1 x QSURF": {
+        "arithmetic_identity_verified": true,
+        "illegal_pairs": [],
+        "n_cartesian": 9,
+        "n_illegal": 0,
+        "n_legal": 9,
+        "n_observed": 9,
+        "n_unobserved": 0,
+        "observed_pairs": [
+          {
+            "count": 6,
+            "fraction": 0.07692307692307693,
+            "pair": "ARCH1=tension2_1 & QSURF=arno_x_vic"
+          },
+          {
+            "count": 6,
+            "fraction": 0.07692307692307693,
+            "pair": "ARCH1=tension2_1 & QSURF=prms_varnt"
+          },
+          {
+            "count": 6,
+            "fraction": 0.07692307692307693,
+            "pair": "ARCH1=tension2_1 & QSURF=tmdl_param"
+          },
+          {
+            "count": 8,
+            "fraction": 0.10256410256410256,
+            "pair": "ARCH1=tension1_1 & QSURF=arno_x_vic"
+          },
+          {
+            "count": 8,
+            "fraction": 0.10256410256410256,
+            "pair": "ARCH1=tension1_1 & QSURF=prms_varnt"
+          },
+          {
+            "count": 8,
+            "fraction": 0.10256410256410256,
+            "pair": "ARCH1=tension1_1 & QSURF=tmdl_param"
+          },
+          {
+            "count": 12,
+            "fraction": 0.15384615384615385,
+            "pair": "ARCH1=onestate_1 & QSURF=arno_x_vic"
+          },
+          {
+            "count": 12,
+            "fraction": 0.15384615384615385,
+            "pair": "ARCH1=onestate_1 & QSURF=prms_varnt"
+          },
+          {
+            "count": 12,
+            "fraction": 0.15384615384615385,
+            "pair": "ARCH1=onestate_1 & QSURF=tmdl_param"
+          }
+        ],
+        "unobserved_legal_pairs": []
+      },
+      "ARCH2 x QPERC": {
+        "arithmetic_identity_verified": true,
+        "illegal_pairs": [],
+        "n_cartesian": 15,
+        "n_illegal": 0,
+        "n_legal": 15,
+        "n_observed": 12,
+        "n_unobserved": 3,
+        "observed_pairs": [
+          {
+            "count": 6,
+            "fraction": 0.07692307692307693,
+            "pair": "ARCH2=tens2pll_2 & QPERC=perc_f2sat"
+          },
+          {
+            "count": 3,
+            "fraction": 0.038461538461538464,
+            "pair": "ARCH2=tens2pll_2 & QPERC=perc_w2sat"
+          },
+          {
+            "count": 6,
+            "fraction": 0.07692307692307693,
+            "pair": "ARCH2=tens2pll_2 & QPERC=perc_lower"
+          },
+          {
+            "count": 9,
+            "fraction": 0.11538461538461539,
+            "pair": "ARCH2=unlimfrc_2 & QPERC=perc_f2sat"
+          },
+          {
+            "count": 3,
+            "fraction": 0.038461538461538464,
+            "pair": "ARCH2=unlimfrc_2 & QPERC=perc_w2sat"
+          },
+          {
+            "count": 9,
+            "fraction": 0.11538461538461539,
+            "pair": "ARCH2=unlimfrc_2 & QPERC=perc_lower"
+          },
+          {
+            "count": 9,
+            "fraction": 0.11538461538461539,
+            "pair": "ARCH2=unlimpow_2 & QPERC=perc_f2sat"
+          },
+          {
+            "count": 3,
+            "fraction": 0.038461538461538464,
+            "pair": "ARCH2=unlimpow_2 & QPERC=perc_w2sat"
+          },
+          {
+            "count": 9,
+            "fraction": 0.11538461538461539,
+            "pair": "ARCH2=unlimpow_2 & QPERC=perc_lower"
+          },
+          {
+            "count": 9,
+            "fraction": 0.11538461538461539,
+            "pair": "ARCH2=fixedsiz_2 & QPERC=perc_f2sat"
+          },
+          {
+            "count": 3,
+            "fraction": 0.038461538461538464,
+            "pair": "ARCH2=fixedsiz_2 & QPERC=perc_w2sat"
+          },
+          {
+            "count": 9,
+            "fraction": 0.11538461538461539,
+            "pair": "ARCH2=fixedsiz_2 & QPERC=perc_lower"
+          }
+        ],
+        "unobserved_legal_pairs": [
+          {
+            "absent_options": [
+              "topmdexp_2"
+            ],
+            "missing_category": "absent_individual_option",
+            "pair": "ARCH2=topmdexp_2 & QPERC=perc_f2sat"
+          },
+          {
+            "absent_options": [
+              "topmdexp_2"
+            ],
+            "missing_category": "absent_individual_option",
+            "pair": "ARCH2=topmdexp_2 & QPERC=perc_w2sat"
+          },
+          {
+            "absent_options": [
+              "topmdexp_2"
+            ],
+            "missing_category": "absent_individual_option",
+            "pair": "ARCH2=topmdexp_2 & QPERC=perc_lower"
+          }
+        ]
+      },
+      "ARCH2 x QSURF": {
+        "arithmetic_identity_verified": true,
+        "illegal_pairs": [],
+        "n_cartesian": 15,
+        "n_illegal": 0,
+        "n_legal": 15,
+        "n_observed": 12,
+        "n_unobserved": 3,
+        "observed_pairs": [
+          {
+            "count": 5,
+            "fraction": 0.0641025641025641,
+            "pair": "ARCH2=tens2pll_2 & QSURF=arno_x_vic"
+          },
+          {
+            "count": 5,
+            "fraction": 0.0641025641025641,
+            "pair": "ARCH2=tens2pll_2 & QSURF=prms_varnt"
+          },
+          {
+            "count": 5,
+            "fraction": 0.0641025641025641,
+            "pair": "ARCH2=tens2pll_2 & QSURF=tmdl_param"
+          },
+          {
+            "count": 7,
+            "fraction": 0.08974358974358974,
+            "pair": "ARCH2=unlimfrc_2 & QSURF=arno_x_vic"
+          },
+          {
+            "count": 7,
+            "fraction": 0.08974358974358974,
+            "pair": "ARCH2=unlimfrc_2 & QSURF=prms_varnt"
+          },
+          {
+            "count": 7,
+            "fraction": 0.08974358974358974,
+            "pair": "ARCH2=unlimfrc_2 & QSURF=tmdl_param"
+          },
+          {
+            "count": 7,
+            "fraction": 0.08974358974358974,
+            "pair": "ARCH2=unlimpow_2 & QSURF=arno_x_vic"
+          },
+          {
+            "count": 7,
+            "fraction": 0.08974358974358974,
+            "pair": "ARCH2=unlimpow_2 & QSURF=prms_varnt"
+          },
+          {
+            "count": 7,
+            "fraction": 0.08974358974358974,
+            "pair": "ARCH2=unlimpow_2 & QSURF=tmdl_param"
+          },
+          {
+            "count": 7,
+            "fraction": 0.08974358974358974,
+            "pair": "ARCH2=fixedsiz_2 & QSURF=arno_x_vic"
+          },
+          {
+            "count": 7,
+            "fraction": 0.08974358974358974,
+            "pair": "ARCH2=fixedsiz_2 & QSURF=prms_varnt"
+          },
+          {
+            "count": 7,
+            "fraction": 0.08974358974358974,
+            "pair": "ARCH2=fixedsiz_2 & QSURF=tmdl_param"
+          }
+        ],
+        "unobserved_legal_pairs": [
+          {
+            "absent_options": [
+              "topmdexp_2"
+            ],
+            "missing_category": "absent_individual_option",
+            "pair": "ARCH2=topmdexp_2 & QSURF=arno_x_vic"
+          },
+          {
+            "absent_options": [
+              "topmdexp_2"
+            ],
+            "missing_category": "absent_individual_option",
+            "pair": "ARCH2=topmdexp_2 & QSURF=prms_varnt"
+          },
+          {
+            "absent_options": [
+              "topmdexp_2"
+            ],
+            "missing_category": "absent_individual_option",
+            "pair": "ARCH2=topmdexp_2 & QSURF=tmdl_param"
+          }
+        ]
+      },
+      "QSURF x QPERC": {
+        "arithmetic_identity_verified": true,
+        "illegal_pairs": [],
+        "n_cartesian": 9,
+        "n_illegal": 0,
+        "n_legal": 9,
+        "n_observed": 9,
+        "n_unobserved": 0,
+        "observed_pairs": [
+          {
+            "count": 11,
+            "fraction": 0.14102564102564102,
+            "pair": "QSURF=arno_x_vic & QPERC=perc_f2sat"
+          },
+          {
+            "count": 4,
+            "fraction": 0.05128205128205128,
+            "pair": "QSURF=arno_x_vic & QPERC=perc_w2sat"
+          },
+          {
+            "count": 11,
+            "fraction": 0.14102564102564102,
+            "pair": "QSURF=arno_x_vic & QPERC=perc_lower"
+          },
+          {
+            "count": 11,
+            "fraction": 0.14102564102564102,
+            "pair": "QSURF=prms_varnt & QPERC=perc_f2sat"
+          },
+          {
+            "count": 4,
+            "fraction": 0.05128205128205128,
+            "pair": "QSURF=prms_varnt & QPERC=perc_w2sat"
+          },
+          {
+            "count": 11,
+            "fraction": 0.14102564102564102,
+            "pair": "QSURF=prms_varnt & QPERC=perc_lower"
+          },
+          {
+            "count": 11,
+            "fraction": 0.14102564102564102,
+            "pair": "QSURF=tmdl_param & QPERC=perc_f2sat"
+          },
+          {
+            "count": 4,
+            "fraction": 0.05128205128205128,
+            "pair": "QSURF=tmdl_param & QPERC=perc_w2sat"
+          },
+          {
+            "count": 11,
+            "fraction": 0.14102564102564102,
+            "pair": "QSURF=tmdl_param & QPERC=perc_lower"
+          }
+        ],
+        "unobserved_legal_pairs": []
+      }
+    },
+    "illegal_pairs": {
+      "ARCH1=tension1_1 & QPERC=perc_w2sat": {
+        "dimension_pair": "ARCH1 x QPERC",
+        "reason": "perc_w2sat is only legal with onestate_1"
+      },
+      "ARCH1=tension2_1 & ARCH2=tens2pll_2": {
+        "dimension_pair": "ARCH1 x ARCH2",
+        "reason": "tension2_1 cannot be paired with tens2pll_2"
+      },
+      "ARCH1=tension2_1 & QPERC=perc_w2sat": {
+        "dimension_pair": "ARCH1 x QPERC",
+        "reason": "perc_w2sat is only legal with onestate_1"
+      }
+    },
+    "individual_option_completeness": {
+      "absent_individual_options": {
+        "ARCH1": [],
+        "ARCH2": [
+          "topmdexp_2"
+        ],
+        "QPERC": [],
+        "QSURF": []
+      },
+      "every_individual_option_present": false
+    },
+    "missing_pairs_classification": {
+      "missing_due_to_absent_option_count": 9,
+      "total_missing_legal_pairs": 9,
+      "unobserved_legal_pairs": {
+        "ARCH1=onestate_1 & ARCH2=topmdexp_2": {
+          "absent_options": [
+            "topmdexp_2"
+          ],
+          "missing_category": "absent_individual_option",
+          "pair": "ARCH1=onestate_1 & ARCH2=topmdexp_2"
+        },
+        "ARCH1=tension1_1 & ARCH2=topmdexp_2": {
+          "absent_options": [
+            "topmdexp_2"
+          ],
+          "missing_category": "absent_individual_option",
+          "pair": "ARCH1=tension1_1 & ARCH2=topmdexp_2"
+        },
+        "ARCH1=tension2_1 & ARCH2=topmdexp_2": {
+          "absent_options": [
+            "topmdexp_2"
+          ],
+          "missing_category": "absent_individual_option",
+          "pair": "ARCH1=tension2_1 & ARCH2=topmdexp_2"
+        },
+        "ARCH2=topmdexp_2 & QPERC=perc_f2sat": {
+          "absent_options": [
+            "topmdexp_2"
+          ],
+          "missing_category": "absent_individual_option",
+          "pair": "ARCH2=topmdexp_2 & QPERC=perc_f2sat"
+        },
+        "ARCH2=topmdexp_2 & QPERC=perc_lower": {
+          "absent_options": [
+            "topmdexp_2"
+          ],
+          "missing_category": "absent_individual_option",
+          "pair": "ARCH2=topmdexp_2 & QPERC=perc_lower"
+        },
+        "ARCH2=topmdexp_2 & QPERC=perc_w2sat": {
+          "absent_options": [
+            "topmdexp_2"
+          ],
+          "missing_category": "absent_individual_option",
+          "pair": "ARCH2=topmdexp_2 & QPERC=perc_w2sat"
+        },
+        "ARCH2=topmdexp_2 & QSURF=arno_x_vic": {
+          "absent_options": [
+            "topmdexp_2"
+          ],
+          "missing_category": "absent_individual_option",
+          "pair": "ARCH2=topmdexp_2 & QSURF=arno_x_vic"
+        },
+        "ARCH2=topmdexp_2 & QSURF=prms_varnt": {
+          "absent_options": [
+            "topmdexp_2"
+          ],
+          "missing_category": "absent_individual_option",
+          "pair": "ARCH2=topmdexp_2 & QSURF=prms_varnt"
+        },
+        "ARCH2=topmdexp_2 & QSURF=tmdl_param": {
+          "absent_options": [
+            "topmdexp_2"
+          ],
+          "missing_category": "absent_individual_option",
+          "pair": "ARCH2=topmdexp_2 & QSURF=tmdl_param"
+        }
+      },
+      "unseen_combination_of_seen_options_count": 0
+    },
+    "observed_pairs": {
+      "ARCH1=onestate_1 & ARCH2=fixedsiz_2": {
+        "count": 9,
+        "fraction": 0.11538461538461539,
+        "pair": "ARCH1=onestate_1 & ARCH2=fixedsiz_2"
+      },
+      "ARCH1=onestate_1 & ARCH2=tens2pll_2": {
+        "count": 9,
+        "fraction": 0.11538461538461539,
+        "pair": "ARCH1=onestate_1 & ARCH2=tens2pll_2"
+      },
+      "ARCH1=onestate_1 & ARCH2=unlimfrc_2": {
+        "count": 9,
+        "fraction": 0.11538461538461539,
+        "pair": "ARCH1=onestate_1 & ARCH2=unlimfrc_2"
+      },
+      "ARCH1=onestate_1 & ARCH2=unlimpow_2": {
+        "count": 9,
+        "fraction": 0.11538461538461539,
+        "pair": "ARCH1=onestate_1 & ARCH2=unlimpow_2"
+      },
+      "ARCH1=onestate_1 & QPERC=perc_f2sat": {
+        "count": 12,
+        "fraction": 0.15384615384615385,
+        "pair": "ARCH1=onestate_1 & QPERC=perc_f2sat"
+      },
+      "ARCH1=onestate_1 & QPERC=perc_lower": {
+        "count": 12,
+        "fraction": 0.15384615384615385,
+        "pair": "ARCH1=onestate_1 & QPERC=perc_lower"
+      },
+      "ARCH1=onestate_1 & QPERC=perc_w2sat": {
+        "count": 12,
+        "fraction": 0.15384615384615385,
+        "pair": "ARCH1=onestate_1 & QPERC=perc_w2sat"
+      },
+      "ARCH1=onestate_1 & QSURF=arno_x_vic": {
+        "count": 12,
+        "fraction": 0.15384615384615385,
+        "pair": "ARCH1=onestate_1 & QSURF=arno_x_vic"
+      },
+      "ARCH1=onestate_1 & QSURF=prms_varnt": {
+        "count": 12,
+        "fraction": 0.15384615384615385,
+        "pair": "ARCH1=onestate_1 & QSURF=prms_varnt"
+      },
+      "ARCH1=onestate_1 & QSURF=tmdl_param": {
+        "count": 12,
+        "fraction": 0.15384615384615385,
+        "pair": "ARCH1=onestate_1 & QSURF=tmdl_param"
+      },
+      "ARCH1=tension1_1 & ARCH2=fixedsiz_2": {
+        "count": 6,
+        "fraction": 0.07692307692307693,
+        "pair": "ARCH1=tension1_1 & ARCH2=fixedsiz_2"
+      },
+      "ARCH1=tension1_1 & ARCH2=tens2pll_2": {
+        "count": 6,
+        "fraction": 0.07692307692307693,
+        "pair": "ARCH1=tension1_1 & ARCH2=tens2pll_2"
+      },
+      "ARCH1=tension1_1 & ARCH2=unlimfrc_2": {
+        "count": 6,
+        "fraction": 0.07692307692307693,
+        "pair": "ARCH1=tension1_1 & ARCH2=unlimfrc_2"
+      },
+      "ARCH1=tension1_1 & ARCH2=unlimpow_2": {
+        "count": 6,
+        "fraction": 0.07692307692307693,
+        "pair": "ARCH1=tension1_1 & ARCH2=unlimpow_2"
+      },
+      "ARCH1=tension1_1 & QPERC=perc_f2sat": {
+        "count": 12,
+        "fraction": 0.15384615384615385,
+        "pair": "ARCH1=tension1_1 & QPERC=perc_f2sat"
+      },
+      "ARCH1=tension1_1 & QPERC=perc_lower": {
+        "count": 12,
+        "fraction": 0.15384615384615385,
+        "pair": "ARCH1=tension1_1 & QPERC=perc_lower"
+      },
+      "ARCH1=tension1_1 & QSURF=arno_x_vic": {
+        "count": 8,
+        "fraction": 0.10256410256410256,
+        "pair": "ARCH1=tension1_1 & QSURF=arno_x_vic"
+      },
+      "ARCH1=tension1_1 & QSURF=prms_varnt": {
+        "count": 8,
+        "fraction": 0.10256410256410256,
+        "pair": "ARCH1=tension1_1 & QSURF=prms_varnt"
+      },
+      "ARCH1=tension1_1 & QSURF=tmdl_param": {
+        "count": 8,
+        "fraction": 0.10256410256410256,
+        "pair": "ARCH1=tension1_1 & QSURF=tmdl_param"
+      },
+      "ARCH1=tension2_1 & ARCH2=fixedsiz_2": {
+        "count": 6,
+        "fraction": 0.07692307692307693,
+        "pair": "ARCH1=tension2_1 & ARCH2=fixedsiz_2"
+      },
+      "ARCH1=tension2_1 & ARCH2=unlimfrc_2": {
+        "count": 6,
+        "fraction": 0.07692307692307693,
+        "pair": "ARCH1=tension2_1 & ARCH2=unlimfrc_2"
+      },
+      "ARCH1=tension2_1 & ARCH2=unlimpow_2": {
+        "count": 6,
+        "fraction": 0.07692307692307693,
+        "pair": "ARCH1=tension2_1 & ARCH2=unlimpow_2"
+      },
+      "ARCH1=tension2_1 & QPERC=perc_f2sat": {
+        "count": 9,
+        "fraction": 0.11538461538461539,
+        "pair": "ARCH1=tension2_1 & QPERC=perc_f2sat"
+      },
+      "ARCH1=tension2_1 & QPERC=perc_lower": {
+        "count": 9,
+        "fraction": 0.11538461538461539,
+        "pair": "ARCH1=tension2_1 & QPERC=perc_lower"
+      },
+      "ARCH1=tension2_1 & QSURF=arno_x_vic": {
+        "count": 6,
+        "fraction": 0.07692307692307693,
+        "pair": "ARCH1=tension2_1 & QSURF=arno_x_vic"
+      },
+      "ARCH1=tension2_1 & QSURF=prms_varnt": {
+        "count": 6,
+        "fraction": 0.07692307692307693,
+        "pair": "ARCH1=tension2_1 & QSURF=prms_varnt"
+      },
+      "ARCH1=tension2_1 & QSURF=tmdl_param": {
+        "count": 6,
+        "fraction": 0.07692307692307693,
+        "pair": "ARCH1=tension2_1 & QSURF=tmdl_param"
+      },
+      "ARCH2=fixedsiz_2 & QPERC=perc_f2sat": {
+        "count": 9,
+        "fraction": 0.11538461538461539,
+        "pair": "ARCH2=fixedsiz_2 & QPERC=perc_f2sat"
+      },
+      "ARCH2=fixedsiz_2 & QPERC=perc_lower": {
+        "count": 9,
+        "fraction": 0.11538461538461539,
+        "pair": "ARCH2=fixedsiz_2 & QPERC=perc_lower"
+      },
+      "ARCH2=fixedsiz_2 & QPERC=perc_w2sat": {
+        "count": 3,
+        "fraction": 0.038461538461538464,
+        "pair": "ARCH2=fixedsiz_2 & QPERC=perc_w2sat"
+      },
+      "ARCH2=fixedsiz_2 & QSURF=arno_x_vic": {
+        "count": 7,
+        "fraction": 0.08974358974358974,
+        "pair": "ARCH2=fixedsiz_2 & QSURF=arno_x_vic"
+      },
+      "ARCH2=fixedsiz_2 & QSURF=prms_varnt": {
+        "count": 7,
+        "fraction": 0.08974358974358974,
+        "pair": "ARCH2=fixedsiz_2 & QSURF=prms_varnt"
+      },
+      "ARCH2=fixedsiz_2 & QSURF=tmdl_param": {
+        "count": 7,
+        "fraction": 0.08974358974358974,
+        "pair": "ARCH2=fixedsiz_2 & QSURF=tmdl_param"
+      },
+      "ARCH2=tens2pll_2 & QPERC=perc_f2sat": {
+        "count": 6,
+        "fraction": 0.07692307692307693,
+        "pair": "ARCH2=tens2pll_2 & QPERC=perc_f2sat"
+      },
+      "ARCH2=tens2pll_2 & QPERC=perc_lower": {
+        "count": 6,
+        "fraction": 0.07692307692307693,
+        "pair": "ARCH2=tens2pll_2 & QPERC=perc_lower"
+      },
+      "ARCH2=tens2pll_2 & QPERC=perc_w2sat": {
+        "count": 3,
+        "fraction": 0.038461538461538464,
+        "pair": "ARCH2=tens2pll_2 & QPERC=perc_w2sat"
+      },
+      "ARCH2=tens2pll_2 & QSURF=arno_x_vic": {
+        "count": 5,
+        "fraction": 0.0641025641025641,
+        "pair": "ARCH2=tens2pll_2 & QSURF=arno_x_vic"
+      },
+      "ARCH2=tens2pll_2 & QSURF=prms_varnt": {
+        "count": 5,
+        "fraction": 0.0641025641025641,
+        "pair": "ARCH2=tens2pll_2 & QSURF=prms_varnt"
+      },
+      "ARCH2=tens2pll_2 & QSURF=tmdl_param": {
+        "count": 5,
+        "fraction": 0.0641025641025641,
+        "pair": "ARCH2=tens2pll_2 & QSURF=tmdl_param"
+      },
+      "ARCH2=unlimfrc_2 & QPERC=perc_f2sat": {
+        "count": 9,
+        "fraction": 0.11538461538461539,
+        "pair": "ARCH2=unlimfrc_2 & QPERC=perc_f2sat"
+      },
+      "ARCH2=unlimfrc_2 & QPERC=perc_lower": {
+        "count": 9,
+        "fraction": 0.11538461538461539,
+        "pair": "ARCH2=unlimfrc_2 & QPERC=perc_lower"
+      },
+      "ARCH2=unlimfrc_2 & QPERC=perc_w2sat": {
+        "count": 3,
+        "fraction": 0.038461538461538464,
+        "pair": "ARCH2=unlimfrc_2 & QPERC=perc_w2sat"
+      },
+      "ARCH2=unlimfrc_2 & QSURF=arno_x_vic": {
+        "count": 7,
+        "fraction": 0.08974358974358974,
+        "pair": "ARCH2=unlimfrc_2 & QSURF=arno_x_vic"
+      },
+      "ARCH2=unlimfrc_2 & QSURF=prms_varnt": {
+        "count": 7,
+        "fraction": 0.08974358974358974,
+        "pair": "ARCH2=unlimfrc_2 & QSURF=prms_varnt"
+      },
+      "ARCH2=unlimfrc_2 & QSURF=tmdl_param": {
+        "count": 7,
+        "fraction": 0.08974358974358974,
+        "pair": "ARCH2=unlimfrc_2 & QSURF=tmdl_param"
+      },
+      "ARCH2=unlimpow_2 & QPERC=perc_f2sat": {
+        "count": 9,
+        "fraction": 0.11538461538461539,
+        "pair": "ARCH2=unlimpow_2 & QPERC=perc_f2sat"
+      },
+      "ARCH2=unlimpow_2 & QPERC=perc_lower": {
+        "count": 9,
+        "fraction": 0.11538461538461539,
+        "pair": "ARCH2=unlimpow_2 & QPERC=perc_lower"
+      },
+      "ARCH2=unlimpow_2 & QPERC=perc_w2sat": {
+        "count": 3,
+        "fraction": 0.038461538461538464,
+        "pair": "ARCH2=unlimpow_2 & QPERC=perc_w2sat"
+      },
+      "ARCH2=unlimpow_2 & QSURF=arno_x_vic": {
+        "count": 7,
+        "fraction": 0.08974358974358974,
+        "pair": "ARCH2=unlimpow_2 & QSURF=arno_x_vic"
+      },
+      "ARCH2=unlimpow_2 & QSURF=prms_varnt": {
+        "count": 7,
+        "fraction": 0.08974358974358974,
+        "pair": "ARCH2=unlimpow_2 & QSURF=prms_varnt"
+      },
+      "ARCH2=unlimpow_2 & QSURF=tmdl_param": {
+        "count": 7,
+        "fraction": 0.08974358974358974,
+        "pair": "ARCH2=unlimpow_2 & QSURF=tmdl_param"
+      },
+      "QSURF=arno_x_vic & QPERC=perc_f2sat": {
+        "count": 11,
+        "fraction": 0.14102564102564102,
+        "pair": "QSURF=arno_x_vic & QPERC=perc_f2sat"
+      },
+      "QSURF=arno_x_vic & QPERC=perc_lower": {
+        "count": 11,
+        "fraction": 0.14102564102564102,
+        "pair": "QSURF=arno_x_vic & QPERC=perc_lower"
+      },
+      "QSURF=arno_x_vic & QPERC=perc_w2sat": {
+        "count": 4,
+        "fraction": 0.05128205128205128,
+        "pair": "QSURF=arno_x_vic & QPERC=perc_w2sat"
+      },
+      "QSURF=prms_varnt & QPERC=perc_f2sat": {
+        "count": 11,
+        "fraction": 0.14102564102564102,
+        "pair": "QSURF=prms_varnt & QPERC=perc_f2sat"
+      },
+      "QSURF=prms_varnt & QPERC=perc_lower": {
+        "count": 11,
+        "fraction": 0.14102564102564102,
+        "pair": "QSURF=prms_varnt & QPERC=perc_lower"
+      },
+      "QSURF=prms_varnt & QPERC=perc_w2sat": {
+        "count": 4,
+        "fraction": 0.05128205128205128,
+        "pair": "QSURF=prms_varnt & QPERC=perc_w2sat"
+      },
+      "QSURF=tmdl_param & QPERC=perc_f2sat": {
+        "count": 11,
+        "fraction": 0.14102564102564102,
+        "pair": "QSURF=tmdl_param & QPERC=perc_f2sat"
+      },
+      "QSURF=tmdl_param & QPERC=perc_lower": {
+        "count": 11,
+        "fraction": 0.14102564102564102,
+        "pair": "QSURF=tmdl_param & QPERC=perc_lower"
+      },
+      "QSURF=tmdl_param & QPERC=perc_w2sat": {
+        "count": 4,
+        "fraction": 0.05128205128205128,
+        "pair": "QSURF=tmdl_param & QPERC=perc_w2sat"
+      }
+    },
+    "totals": {
+      "cartesian_identity_satisfied": true,
+      "legal_identity_satisfied": true,
+      "total_cartesian_pairs": 72,
+      "total_illegal_pairs": 3,
+      "total_legal_pairs": 69,
+      "total_observed_legal_pairs": 60,
+      "total_unobserved_legal_pairs": 9
+    }
+  },
+  "parameter_exposure": {
+    "AXV_BEXP": {
+      "activating_decisions": [
+        "QSURF=arno_x_vic"
+      ],
+      "active_structure_count": 26,
+      "active_structure_fraction": 0.3333333333333333,
+      "always_active": false,
+      "never_active": false
+    },
+    "BASERTE": {
+      "activating_decisions": [
+        "ARCH2=fixedsiz_2",
+        "ARCH2=unlimpow_2"
+      ],
+      "active_structure_count": 42,
+      "active_structure_fraction": 0.5384615384615384,
+      "always_active": false,
+      "never_active": false
+    },
+    "FPRIMQB": {
+      "activating_decisions": [
+        "ARCH2=tens2pll_2"
+      ],
+      "active_structure_count": 15,
+      "active_structure_fraction": 0.19230769230769232,
+      "always_active": false,
+      "never_active": false
+    },
+    "FRACLOWZ": {
+      "activating_decisions": [
+        "ARCH1=tension2_1"
+      ],
+      "active_structure_count": 18,
+      "active_structure_fraction": 0.23076923076923078,
+      "always_active": false,
+      "never_active": false
+    },
+    "FRACTEN": {
+      "activating_decisions": [
+        "ARCH1=onestate_1",
+        "ARCH1=tension1_1",
+        "ARCH1=tension2_1"
+      ],
+      "active_structure_count": 78,
+      "active_structure_fraction": 1.0,
+      "always_active": true,
+      "never_active": false
+    },
+    "FRCHZNE": {
+      "activating_decisions": [
+        "ARCH1=tension2_1"
+      ],
+      "active_structure_count": 18,
+      "active_structure_fraction": 0.23076923076923078,
+      "always_active": false,
+      "never_active": false
+    },
+    "IFLWRTE": {
+      "activating_decisions": [],
+      "active_structure_count": 0,
+      "active_structure_fraction": 0.0,
+      "always_active": false,
+      "never_active": true
+    },
+    "LAPSE": {
+      "activating_decisions": [
+        "SNOWM=temp_index"
+      ],
+      "active_structure_count": 78,
+      "active_structure_fraction": 1.0,
+      "always_active": true,
+      "never_active": false
+    },
+    "LOGLAMB": {
+      "activating_decisions": [
+        "ARCH2=unlimpow_2",
+        "QSURF=tmdl_param"
+      ],
+      "active_structure_count": 40,
+      "active_structure_fraction": 0.5128205128205128,
+      "always_active": false,
+      "never_active": false
+    },
+    "MAXWATR_1": {
+      "activating_decisions": [
+        "ARCH1=onestate_1",
+        "ARCH1=tension1_1",
+        "ARCH1=tension2_1"
+      ],
+      "active_structure_count": 78,
+      "active_structure_fraction": 1.0,
+      "always_active": true,
+      "never_active": false
+    },
+    "MAXWATR_2": {
+      "activating_decisions": [
+        "ARCH2=fixedsiz_2",
+        "ARCH2=tens2pll_2",
+        "ARCH2=unlimfrc_2",
+        "ARCH2=unlimpow_2"
+      ],
+      "active_structure_count": 78,
+      "active_structure_fraction": 1.0,
+      "always_active": true,
+      "never_active": false
+    },
+    "MBASE": {
+      "activating_decisions": [
+        "SNOWM=temp_index"
+      ],
+      "active_structure_count": 78,
+      "active_structure_fraction": 1.0,
+      "always_active": true,
+      "never_active": false
+    },
+    "MFMAX": {
+      "activating_decisions": [
+        "SNOWM=temp_index"
+      ],
+      "active_structure_count": 78,
+      "active_structure_fraction": 1.0,
+      "always_active": true,
+      "never_active": false
+    },
+    "MFMIN": {
+      "activating_decisions": [
+        "SNOWM=temp_index"
+      ],
+      "active_structure_count": 78,
+      "active_structure_fraction": 1.0,
+      "always_active": true,
+      "never_active": false
+    },
+    "OPG": {
+      "activating_decisions": [
+        "SNOWM=temp_index"
+      ],
+      "active_structure_count": 78,
+      "active_structure_fraction": 1.0,
+      "always_active": true,
+      "never_active": false
+    },
+    "PERCEXP": {
+      "activating_decisions": [
+        "QPERC=perc_f2sat",
+        "QPERC=perc_w2sat"
+      ],
+      "active_structure_count": 45,
+      "active_structure_fraction": 0.5769230769230769,
+      "always_active": false,
+      "never_active": false
+    },
+    "PERCFRAC": {
+      "activating_decisions": [
+        "ARCH2=tens2pll_2"
+      ],
+      "active_structure_count": 15,
+      "active_structure_fraction": 0.19230769230769232,
+      "always_active": false,
+      "never_active": false
+    },
+    "PERCRTE": {
+      "activating_decisions": [
+        "QPERC=perc_f2sat",
+        "QPERC=perc_w2sat"
+      ],
+      "active_structure_count": 45,
+      "active_structure_fraction": 0.5769230769230769,
+      "always_active": false,
+      "never_active": false
+    },
+    "PXTEMP": {
+      "activating_decisions": [
+        "SNOWM=temp_index"
+      ],
+      "active_structure_count": 78,
+      "active_structure_fraction": 1.0,
+      "always_active": true,
+      "never_active": false
+    },
+    "QBRATE_2A": {
+      "activating_decisions": [
+        "ARCH2=tens2pll_2"
+      ],
+      "active_structure_count": 15,
+      "active_structure_fraction": 0.19230769230769232,
+      "always_active": false,
+      "never_active": false
+    },
+    "QBRATE_2B": {
+      "activating_decisions": [
+        "ARCH2=tens2pll_2"
+      ],
+      "active_structure_count": 15,
+      "active_structure_fraction": 0.19230769230769232,
+      "always_active": false,
+      "never_active": false
+    },
+    "QB_POWR": {
+      "activating_decisions": [
+        "ARCH2=fixedsiz_2",
+        "ARCH2=unlimpow_2",
+        "QSURF=tmdl_param"
+      ],
+      "active_structure_count": 54,
+      "active_structure_fraction": 0.6923076923076923,
+      "always_active": false,
+      "never_active": false
+    },
+    "QB_PRMS": {
+      "activating_decisions": [
+        "ARCH2=unlimfrc_2"
+      ],
+      "active_structure_count": 21,
+      "active_structure_fraction": 0.2692307692307692,
+      "always_active": false,
+      "never_active": false
+    },
+    "RFERR_ADD": {
+      "activating_decisions": [],
+      "active_structure_count": 0,
+      "active_structure_fraction": 0.0,
+      "always_active": false,
+      "never_active": true
+    },
+    "RFERR_MLT": {
+      "activating_decisions": [
+        "RFERR=multiplc_e"
+      ],
+      "active_structure_count": 78,
+      "active_structure_fraction": 1.0,
+      "always_active": true,
+      "never_active": false
+    },
+    "RFH1_MEAN": {
+      "activating_decisions": [],
+      "active_structure_count": 0,
+      "active_structure_fraction": 0.0,
+      "always_active": false,
+      "never_active": true
+    },
+    "RFH2_SDEV": {
+      "activating_decisions": [],
+      "active_structure_count": 0,
+      "active_structure_fraction": 0.0,
+      "always_active": false,
+      "never_active": true
+    },
+    "RH1P_MEAN": {
+      "activating_decisions": [],
+      "active_structure_count": 0,
+      "active_structure_fraction": 0.0,
+      "always_active": false,
+      "never_active": true
+    },
+    "RH1P_SDEV": {
+      "activating_decisions": [],
+      "active_structure_count": 0,
+      "active_structure_fraction": 0.0,
+      "always_active": false,
+      "never_active": true
+    },
+    "RH2P_MEAN": {
+      "activating_decisions": [],
+      "active_structure_count": 0,
+      "active_structure_fraction": 0.0,
+      "always_active": false,
+      "never_active": true
+    },
+    "RH2P_SDEV": {
+      "activating_decisions": [],
+      "active_structure_count": 0,
+      "active_structure_fraction": 0.0,
+      "always_active": false,
+      "never_active": true
+    },
+    "RTFRAC1": {
+      "activating_decisions": [],
+      "active_structure_count": 0,
+      "active_structure_fraction": 0.0,
+      "always_active": false,
+      "never_active": true
+    },
+    "SACPEXP": {
+      "activating_decisions": [
+        "QPERC=perc_lower"
+      ],
+      "active_structure_count": 33,
+      "active_structure_fraction": 0.4230769230769231,
+      "always_active": false,
+      "never_active": false
+    },
+    "SACPMLT": {
+      "activating_decisions": [
+        "QPERC=perc_lower"
+      ],
+      "active_structure_count": 33,
+      "active_structure_fraction": 0.4230769230769231,
+      "always_active": false,
+      "never_active": false
+    },
+    "SAREAMAX": {
+      "activating_decisions": [
+        "QSURF=prms_varnt"
+      ],
+      "active_structure_count": 26,
+      "active_structure_fraction": 0.3333333333333333,
+      "always_active": false,
+      "never_active": false
+    },
+    "TIMEDELAY": {
+      "activating_decisions": [
+        "Q_TDH=rout_gamma"
+      ],
+      "active_structure_count": 78,
+      "active_structure_fraction": 1.0,
+      "always_active": true,
+      "never_active": false
+    },
+    "TISHAPE": {
+      "activating_decisions": [
+        "ARCH2=unlimpow_2",
+        "QSURF=tmdl_param"
+      ],
+      "active_structure_count": 40,
+      "active_structure_fraction": 0.5128205128205128,
+      "always_active": false,
+      "never_active": false
+    }
+  },
+  "schema_version": "fuse-option-parameter-exposure-audit-v1",
+  "status": "completed",
+  "structure_count": 78
+}

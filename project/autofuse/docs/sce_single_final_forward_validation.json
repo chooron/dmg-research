@@ -1,0 +1,44 @@
+{
+  "cases": [
+    {
+      "catchment": "USA_09447800",
+      "pass": true,
+      "structure": 2,
+      "test_metric": -4.949922282366181,
+      "train_metric": -3.740068069426399
+    },
+    {
+      "catchment": "USA_09447800",
+      "pass": true,
+      "structure": 8,
+      "test_metric": -5.977312741744837,
+      "train_metric": -2.536245312317727
+    },
+    {
+      "catchment": "USA_14138900",
+      "pass": true,
+      "structure": 2,
+      "test_metric": 0.636034727895374,
+      "train_metric": 0.548273445709921
+    },
+    {
+      "catchment": "USA_14138900",
+      "pass": true,
+      "structure": 8,
+      "test_metric": 0.5625702168508728,
+      "train_metric": 0.6005419173007067
+    }
+  ],
+  "generated_at_utc": "2026-09-07T03:59:38.907633+00:00",
+  "protocol_id": "formal-experiment-protocol-v1-db53091e6e222066",
+  "schema_version": "sce-single-final-forward-validation-v1",
+  "status": "passed",
+  "summary": {
+    "cases_tested": 4,
+    "parity_verified": true,
+    "saved_full_forward_per_case": 1,
+    "saved_timesteps_per_case": 8401,
+    "simulations_per_case_after": 1,
+    "simulations_per_case_before": 2
+  }
+}

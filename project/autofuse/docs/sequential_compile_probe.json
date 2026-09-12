@@ -1,0 +1,83 @@
+{
+  "schema": "autofuse-sequential-compile-probe-v1",
+  "status": "blocked_before_candidate_scan",
+  "compile_boundary": "one complete hydrological macro-step",
+  "outer_time_loop": "ordinary Python",
+  "fixed_step_contents": ["snow preprocessing", "sequential process updates", "projection/spill accounting", "gamma routing"],
+  "shared_graph_contract": {
+    "state": "9-coordinate union + snow + 500 routing-future bins",
+    "context": "tensor structure flags and state/parameter masks",
+    "model_id_specialization": false,
+    "time_loop_compiled": false
+  },
+  "orders_implemented": {
+    "S1": ["recharge", "et", "surface_runoff", "percolation", "interflow", "baseflow"],
+    "S2": ["recharge", "surface_runoff", "interflow", "et", "percolation", "baseflow"],
+    "S3": ["recharge", "et", "percolation", "baseflow", "interflow", "surface_runoff"],
+    "S4": ["recharge", "percolation", "baseflow", "et", "interflow", "surface_runoff"]
+  },
+  "development_set": "project/autofuse/docs/sequential_development_set.json",
+  "scientific_kernel_audit": {
+    "all_78_process_flux_probe": true,
+    "max_selected_process_flux_abs": 5.819646662859055e-41,
+    "equation_source": "dfuse.kernel._compiled_flux_rhs-compatible process formulas",
+    "projection_spill_rule_shared": true
+  },
+  "inductor_probes": [
+    {
+      "order": "S1",
+      "n_substeps": 4,
+      "device": "cpu",
+      "dtype": "torch.float64",
+      "fullgraph": true,
+      "compile_attempts": 1,
+      "compile_successes": 1,
+      "fallbacks": 0,
+      "unique_graphs": 1,
+      "graph_breaks": 0,
+      "recompilations": 0,
+      "cold_compile_seconds": 48.70,
+      "finite": true
+    },
+    {
+      "order": "S1",
+      "n_substeps": 8,
+      "device": "cpu",
+      "dtype": "torch.float64",
+      "fullgraph": true,
+      "compile_attempts": 1,
+      "compile_successes": 1,
+      "fallbacks": 0,
+      "finite": true,
+      "cold_compile_seconds": 97.73
+    },
+    {
+      "order": "S1",
+      "n_substeps": 12,
+      "device": "cpu",
+      "dtype": "torch.float64",
+      "fullgraph": true,
+      "compile_attempts": 1,
+      "compile_successes": 0,
+      "fallbacks": 1,
+      "finite_fallback_output": true,
+      "failure": "BackendCompilerFailed: Inductor produced a file-too-short shared object",
+      "elapsed_seconds": 141.09
+    }
+  ],
+  "stop_reason": "Per the resource/stall constraint, no N=24 or broader Inductor candidate scan was started after the N=12 failure.",
+  "selection": {
+    "frozen_order": null,
+    "frozen_n_substeps": null,
+    "s5_triggered": false,
+    "formal_training_started": false,
+    "held_out_78_validation": false,
+    "real_daymet_ranking_check": false
+  },
+  "validation": {
+    "pytest": "26 passed",
+    "compileall": true,
+    "git_diff_check": true,
+    "upstream_vendor_modified": false
+  }
+}

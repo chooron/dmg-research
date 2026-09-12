@@ -1,0 +1,33 @@
+{
+  "schema_version": "phase0-throughput-v1",
+  "stage": "P0-B",
+  "status": "PASS",
+  "batch_size": 2,
+  "window_days": 730,
+  "structures_benchmarked": [
+    2
+  ],
+  "per_structure_records": [
+    {
+      "structure_id": 2,
+      "cold_step_seconds": 12.212980825999693,
+      "hot_step_seconds_median": 5.639898473998983,
+      "hot_step_seconds_p10": 5.521964838799249,
+      "hot_step_seconds_p90": 5.757832109198716,
+      "throughput_basins_per_second": 0.3546163125489554,
+      "vram_alloc_mb": 17.61279296875,
+      "vram_peak_mb": 61.2587890625,
+      "clipping_triggered_fraction": 1.0,
+      "median_grad_norm": 69.37338415486403,
+      "all_finite": true
+    }
+  ],
+  "aggregate_statistics": {
+    "step_seconds_median": 5.639898473998983,
+    "step_seconds_p10": 5.521964838799249,
+    "step_seconds_p90": 5.757832109198716,
+    "throughput_basins_per_sec_median": 0.3546163125489554,
+    "steps_per_hour_median": 638.3093625881197,
+    "peak_vram_mb": 61.2587890625
+  }
+}

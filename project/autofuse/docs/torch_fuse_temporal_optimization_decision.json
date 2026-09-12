@@ -1,0 +1,209 @@
+{
+  "cache_and_switching": {
+    "chunk_variant_rule": "one compiled variant per structure, K, and final remainder length; prior K=7/30/60/90 B=100 probes did not complete",
+    "cleanup_policy": "delete this closeout-generated temporal probe cache after recording its footprint; retain the separate validated runtime-cache evidence",
+    "cleanup_result": {
+      "action": "deleted",
+      "bytes_after": 0,
+      "files_after": 0,
+      "path": "project/autofuse/.cache/torch-fuse-temporal-optimization",
+      "reason": "temporary full/chunk temporal probe artifacts; validated one-step cache retained"
+    },
+    "closeout_probe_cache_before_cleanup": {
+      "bytes": 1151030244,
+      "classification": "temporary temporal compile probe cache; not the validated persistent one-step runtime cache",
+      "files": 15387,
+      "path": "project/autofuse/.cache/torch-fuse-temporal-optimization"
+    },
+    "current_one_step_key": "GraphSignature digest + device + dtype + batch_size + backend + fullgraph (the batched registry key; step tensor shapes are fixed by these specializations)",
+    "full_variant_rule": "one horizon-specialized graph per structure and T; timeout/failure produces no validated callable but can leave material partial Inductor cache",
+    "future_1000_structure_assessment": "current one-step cache surface is materially more scalable; chunk/full multiplication by topology and temporal shape is not accepted without measured benefit",
+    "observed_new_structure_compile_seconds": {
+      "108": 8.365729104996717,
+      "178": 7.667263514995284,
+      "2": 15.161607465000998,
+      "210": 6.855889598999056
+    },
+    "returning_structure_cache_reuse": {
+      "cache_bytes": 10805522,
+      "cache_files": 273,
+      "return_process_cold_compile_seconds": [
+        3.874921736001852
+      ],
+      "same_output": true,
+      "verified": true
+    }
+  },
+  "final_state": "Lite/Full execution frozen; retain one-step compiled temporal design",
+  "generated_at_utc": "2026-09-08T06:39:17.355842+00:00",
+  "lite_full": {
+    "benchmark": [
+      {
+        "backward_speedup": 1.054634457738467,
+        "forward_speedup": 1.0754573132691385,
+        "full_backward_seconds": 1.2566279689781368,
+        "full_forward_seconds": 3.206572716939263,
+        "full_peak_allocated_mb": 490.65478515625,
+        "full_total_step_seconds": 4.489862065995112,
+        "lite_backward_seconds": 1.1915294060017914,
+        "lite_forward_seconds": 2.9815899500390515,
+        "lite_peak_allocated_mb": 448.55859375,
+        "lite_total_step_seconds": 4.17783886496909,
+        "memory_reduction_fraction": 0.08579594590694628,
+        "model_id": 2,
+        "total_step_speedup": 1.0746853124571933
+      },
+      {
+        "backward_speedup": 1.0545432692721204,
+        "forward_speedup": 1.1457972944197488,
+        "full_backward_seconds": 0.9219802729785442,
+        "full_forward_seconds": 2.756288717035204,
+        "full_peak_allocated_mb": 406.11962890625,
+        "full_total_step_seconds": 3.773851608042605,
+        "lite_backward_seconds": 0.8742934499168769,
+        "lite_forward_seconds": 2.405563995009288,
+        "lite_peak_allocated_mb": 365.7216796875,
+        "lite_total_step_seconds": 3.311498795985244,
+        "memory_reduction_fraction": 0.09947302800297697,
+        "model_id": 8,
+        "total_step_speedup": 1.1396204077192789
+      }
+    ],
+    "default_training_mode": "lite",
+    "full_preserved": true,
+    "lite_validated": true
+  },
+  "provenance": {
+    "artifact_basis": {
+      "benchmark": "rerun",
+      "chunked_temporal_probe": "prior_probe_reused",
+      "execution_audit": "rerun",
+      "full_temporal_probe": "prior_probe_reused",
+      "parity": "rerun",
+      "wide_boundary_probe": "prior_probe_reused"
+    },
+    "closeout_scope": "No long-horizon temporal compile probe was launched during final closeout.",
+    "data_status": "rerun",
+    "final_source_checked_at_utc": "2026-09-08T06:39:17.357590+00:00",
+    "numerical_core_hashes": {
+      "dfuse/kernel.py": "4a79b4caa8d93881c849476e2ffe5aa304c8033cf271bd7e11073d7f7227faff",
+      "dfuse/runtime.py": "f6b9f066489929479ccabb2035e50bed146e536af24a641cae68e11c37e9ad13",
+      "dfuse/spec.py": "0e7c569260e11acd49b8b61174934afbbccf9d1c0ec46c4a3bae561b2491d2bb"
+    },
+    "rerun": true,
+    "source_git_sha": "3caca37a4243ae0a95ebe9cc4f22998672ddf464"
+  },
+  "scalability": {
+    "1000_structure_assessment": "full/chunk variants multiply compile artifacts by structure and horizon/chunk remainder; current one-step strategy has the smallest artifact and cold-start surface",
+    "78_structure_smoke": "existing runtime_step_validation_78.json remains the current one-step 78-structure smoke; no new numerical-core compile variant was introduced",
+    "chunk_cache_key_additions": [
+      "chunk_size",
+      "remainder_length"
+    ],
+    "current_cache_key": "GraphSignature digest/device/dtype/batch_size/backend/fullgraph",
+    "full_cache_key_additions": [
+      "horizon T"
+    ],
+    "structure_policy": "one specialization per structure GraphSignature"
+  },
+  "schema_version": "torch-fuse-temporal-optimization-decision-v1",
+  "status": "completed",
+  "temporal": {
+    "closeout_wording": "Long-horizon temporal compilation remains unevaluated for adoption: minimal T=2/4 succeeded, T>=30/B=100 full probes did not complete within the practical budget, and K=7/30/60/90 B=100 chunk probes did not complete. These are not claims of mathematical impossibility or proven slowness.",
+    "recommendation": "No safe temporal execution improvement was demonstrated. Keep the validated one-step compiled kernel + Python loop; do not infer a theoretical impossibility from bounded compile timeouts.",
+    "strategy_a_current_one_step_plus_python_loop": "recommended baseline",
+    "strategy_b_chunked": {
+      "best_success_by_model": {
+        "2": null,
+        "8": null
+      },
+      "successful_count": 0
+    },
+    "strategy_c_full_730": {
+      "adopt": false,
+      "evidence_limit": "No B=100,T=730 whole-rollout candidate completed the bounded probe; a temporal speed benefit is therefore not established and the strategy is not eligible for adoption.",
+      "passed_records": 0
+    }
+  },
+  "validation": {
+    "existing_78_structure_smoke": {
+      "artifact": "project/autofuse/docs/runtime_step_validation_78.json",
+      "failures": [],
+      "n_models": 78,
+      "status": "78-structure runtime compiler validated"
+    },
+    "final_code_has_explicit_lite_optional_fields": true,
+    "final_code_has_monitor_detach": true,
+    "fix_states": true,
+    "float64": true,
+    "formal_dpl_campaign_started": false,
+    "git_sha": "3caca37a4243ae0a95ebe9cc4f22998672ddf464",
+    "numerical_core_hashes_after": {
+      "dfuse/kernel.py": "4a79b4caa8d93881c849476e2ffe5aa304c8033cf271bd7e11073d7f7227faff",
+      "dfuse/runtime.py": "f6b9f066489929479ccabb2035e50bed146e536af24a641cae68e11c37e9ad13",
+      "dfuse/spec.py": "0e7c569260e11acd49b8b61174934afbbccf9d1c0ec46c4a3bae561b2491d2bb"
+    },
+    "numerical_core_hashes_before": {
+      "dfuse/kernel.py": "4a79b4caa8d93881c849476e2ffe5aa304c8033cf271bd7e11073d7f7227faff",
+      "dfuse/runtime.py": "f6b9f066489929479ccabb2035e50bed146e536af24a641cae68e11c37e9ad13",
+      "dfuse/spec.py": "0e7c569260e11acd49b8b61174934afbbccf9d1c0ec46c4a3bae561b2491d2bb"
+    },
+    "numerical_core_unchanged": true,
+    "rk2_heun": true,
+    "site_packages_modified": false,
+    "warmup_scored_semantics": true
+  },
+  "wider_boundary": {
+    "recommendation": "not technically suitable unless fullgraph capture passes and independently beats baseline",
+    "records": [
+      {
+        "baseline": {
+          "kind": "compiled parameterizer separately + current compiled-step FUSE",
+          "total_forward_backward_seconds": 8.251706826034933
+        },
+        "batch_size": 100,
+        "current_step_diagnostics_after_wide_attempt": {
+          "records": {},
+          "registry_size": 0
+        },
+        "device": "cuda",
+        "dtype": "torch.float64",
+        "model_id": 2,
+        "steps": 730,
+        "wide_fullgraph": {
+          "backward_seconds": null,
+          "error": {
+            "message": "Attempted to call function marked as skipped\n  Explanation: Dynamo does not know how to trace the builtin `<unknown module>.Encoder.__new__.` This function is either a Python builtin (e.g. _warnings.warn) or a third-party C/C++ Python extension (perhaps created with pybind).\n  Hint: If it is a Python builtin, please file an issue on GitHub so the PyTorch team can add support for it and see the next case for a workaround.\n  Hint: If it is a third-party C/C++ Python extension, please either wrap it into a PyTorch-understood custom operator (see https://pytorch.org/tutorials/advanced/custom_ops_landing_page.html for more details) or, if it is traceable, use `torch.compiler.allow_in_graph`.\n\n  Developer debug context: module: <unknown module>, qualname: Encoder.__new__, skip reason: <missing reason>\n\n For more details about this graph break, please visit: https://meta-pytorch.github.io/compile-graph-break-site/gb/gb0007.html\n\nfrom user code:\n   File \"/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/torch_fuse_temporal_optimization.py\", line 444, in wrapper\n    result = simulate_coupled_rk2_batched(model_id, forcing, theta_value, basin_ids=tuple(str(i) for i in range(BATCH)), compile_step=True, monitor_chunk_size=WINDOW, output_mode=\"lite\")\n  File \"/home/jingxin/orca/workspaces/dmg-research/autofuse/dfuse/batched.py\", line 317, in simulate_coupled_rk2_batched\n    step_callable = _compiled_step(spec, batch_size=batch_size, device=device, dtype=dtype, backend=compile_backend, fullgraph=compile_fullgraph)\n  File \"/home/jingxin/orca/workspaces/dmg-research/autofuse/dfuse/batched.py\", line 150, in _compiled_step\n    signature, generated = get_generated_step(spec, order=(\"coupled_rhs\",), n_substeps=1, execution_mode=\"coupled_rk2\")\n  File \"/home/jingxin/orca/workspaces/dmg-research/autofuse/dfuse/runtime.py\", line 1313, in get_generated_step\n    step = GENERATED_STEP_REGISTRY.get(spec, order=order, n_substeps=n_substeps, execution_mode=execution_mode)\n  File",
+            "type": "Unsupported"
+          },
+          "forward_seconds": null,
+          "status": "failed"
+        }
+      },
+      {
+        "baseline": {
+          "kind": "compiled parameterizer separately + current compiled-step FUSE",
+          "total_forward_backward_seconds": 6.399617978022434
+        },
+        "batch_size": 100,
+        "current_step_diagnostics_after_wide_attempt": {
+          "records": {},
+          "registry_size": 0
+        },
+        "device": "cuda",
+        "dtype": "torch.float64",
+        "model_id": 8,
+        "steps": 730,
+        "wide_fullgraph": {
+          "backward_seconds": null,
+          "error": {
+            "message": "Attempted to call function marked as skipped\n  Explanation: Dynamo does not know how to trace the builtin `<unknown module>.Encoder.__new__.` This function is either a Python builtin (e.g. _warnings.warn) or a third-party C/C++ Python extension (perhaps created with pybind).\n  Hint: If it is a Python builtin, please file an issue on GitHub so the PyTorch team can add support for it and see the next case for a workaround.\n  Hint: If it is a third-party C/C++ Python extension, please either wrap it into a PyTorch-understood custom operator (see https://pytorch.org/tutorials/advanced/custom_ops_landing_page.html for more details) or, if it is traceable, use `torch.compiler.allow_in_graph`.\n\n  Developer debug context: module: <unknown module>, qualname: Encoder.__new__, skip reason: <missing reason>\n\n For more details about this graph break, please visit: https://meta-pytorch.github.io/compile-graph-break-site/gb/gb0007.html\n\nfrom user code:\n   File \"/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/torch_fuse_temporal_optimization.py\", line 444, in wrapper\n    result = simulate_coupled_rk2_batched(model_id, forcing, theta_value, basin_ids=tuple(str(i) for i in range(BATCH)), compile_step=True, monitor_chunk_size=WINDOW, output_mode=\"lite\")\n  File \"/home/jingxin/orca/workspaces/dmg-research/autofuse/dfuse/batched.py\", line 317, in simulate_coupled_rk2_batched\n    step_callable = _compiled_step(spec, batch_size=batch_size, device=device, dtype=dtype, backend=compile_backend, fullgraph=compile_fullgraph)\n  File \"/home/jingxin/orca/workspaces/dmg-research/autofuse/dfuse/batched.py\", line 150, in _compiled_step\n    signature, generated = get_generated_step(spec, order=(\"coupled_rhs\",), n_substeps=1, execution_mode=\"coupled_rk2\")\n  File \"/home/jingxin/orca/workspaces/dmg-research/autofuse/dfuse/runtime.py\", line 1313, in get_generated_step\n    step = GENERATED_STEP_REGISTRY.get(spec, order=order, n_substeps=n_substeps, execution_mode=execution_mode)\n  File",
+            "type": "Unsupported"
+          },
+          "forward_seconds": null,
+          "status": "failed"
+        }
+      }
+    ]
+  }
+}

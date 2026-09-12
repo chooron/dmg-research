@@ -1,0 +1,86 @@
+{
+  "benchmark_constraints": {
+    "device": "cuda",
+    "dtype": "torch.float64",
+    "other_batch_sizes_tested": false,
+    "scored_days": 365,
+    "strictly_tested_batch_size": 100,
+    "warmup_days": 365,
+    "window_days": 730
+  },
+  "generated_at_utc": "2026-09-07T09:50:16.912309+00:00",
+  "protocol_id": "formal-experiment-protocol-v1-db53091e6e222066",
+  "records": [
+    {
+      "batch_size": 100,
+      "finite_gradients": true,
+      "finite_loss": true,
+      "gradient_norm": 33.965544402945284,
+      "loss_value": 13.065231856852009,
+      "memory": {
+        "gpu_headroom_fraction": 0.961830692077823,
+        "gpu_headroom_mb": 11818.49462890625,
+        "gpu_peak_allocated_mb": 469.00537109375,
+        "gpu_peak_reserved_mb": 474.0,
+        "gpu_total_visible_mb": 12287.5,
+        "host_peak_rss_kb": 1746148,
+        "oom": false
+      },
+      "model_id": 2,
+      "scored_days": 365,
+      "throughput": {
+        "basin_days_per_second": 15270.769896290827,
+        "samples_per_second": 20.91886287163127,
+        "training_steps_per_hour": 753.0790633787257
+      },
+      "timing_seconds": {
+        "backward_bptt": 1.2827545210020617,
+        "backward_to_forward_ratio": 0.36987028810239164,
+        "hydrological_forward": 3.4681199389742687,
+        "loss_calculation": 0.00042210298124700785,
+        "optimizer_step": 0.0006978070014156401,
+        "parameter_forward": 0.0012071970268152654,
+        "total_training_step": 4.780374564987142
+      },
+      "warmup_days": 365,
+      "window_days_total": 730
+    },
+    {
+      "batch_size": 100,
+      "finite_gradients": true,
+      "finite_loss": true,
+      "gradient_norm": 31.50877070510819,
+      "loss_value": 12.859712862178034,
+      "memory": {
+        "gpu_headroom_fraction": 0.9684434209689725,
+        "gpu_headroom_mb": 11899.74853515625,
+        "gpu_peak_allocated_mb": 387.75146484375,
+        "gpu_peak_reserved_mb": 494.0,
+        "gpu_total_visible_mb": 12287.5,
+        "host_peak_rss_kb": 1903856,
+        "oom": false
+      },
+      "model_id": 8,
+      "scored_days": 365,
+      "throughput": {
+        "basin_days_per_second": 20664.549802092606,
+        "samples_per_second": 28.307602468620008,
+        "training_steps_per_hour": 1019.0736888703203
+      },
+      "timing_seconds": {
+        "backward_bptt": 0.8923191990470514,
+        "backward_to_forward_ratio": 0.33939150078145314,
+        "hydrological_forward": 2.6291736740386114,
+        "loss_calculation": 0.007194387027993798,
+        "optimizer_step": 0.000780235044658184,
+        "parameter_forward": 0.0022937809699214995,
+        "total_training_step": 3.5326199069968425
+      },
+      "warmup_days": 365,
+      "window_days_total": 730
+    }
+  ],
+  "schema_version": "torch-fuse-dpl-b100-benchmark-v1",
+  "status": "completed",
+  "torch_fuse_freeze_id": "torch-fuse-v1-freeze-v1"
+}

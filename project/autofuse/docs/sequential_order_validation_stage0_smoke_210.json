@@ -1,0 +1,22 @@
+{
+  "compile": {
+    "autograd_recompilations": 0,
+    "cold_compile_seconds": [
+      2.2451100859907456
+    ],
+    "compile_attempts": 1,
+    "graph_breaks": 0,
+    "recompilations": 0
+  },
+  "elapsed_seconds": 3.627385822997894,
+  "model_id": 210,
+  "order": "S1",
+  "parity": {
+    "diagnostics_max_abs": 0.0,
+    "flux_max_abs": 0.0,
+    "q_max_abs": 0.0,
+    "state_max_abs": 0.0
+  },
+  "signature_digest": "d0d65bec23a7a873",
+  "status": "passed"
+}

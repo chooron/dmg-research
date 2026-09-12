@@ -1,0 +1,80 @@
+{
+  "audit_questions": {
+    "basin_batch_size_in_pilot": 1,
+    "candidate_batch_size_in_pilot": 1,
+    "effective_batch_size_in_pilot": 1,
+    "is_basin_batching_utilized_in_current_sce": false,
+    "is_candidate_batching_utilized_in_current_sce": false,
+    "why_b1_in_pilot": "The pilot treats each catchment calibration as an independent serial case to strictly validate per-case correctness and artifact reproducibility.",
+    "why_c1_in_pilot": "The minimal SCEBaseline runner implements the canonical simplex update loop serially without batching the initial population or reflection/contraction candidates."
+  },
+  "batching_scaling_evidence": {
+    "basin_batching_probe": [
+      {
+        "basin_days_per_second": 124.76814325800981,
+        "batch_size": 1,
+        "elapsed_seconds": 67.33289268100634,
+        "speedup_vs_b1": 1.0
+      },
+      {
+        "basin_days_per_second": 381.33605402411257,
+        "batch_size": 2,
+        "elapsed_seconds": 44.06087445101002,
+        "speedup_vs_b1": 3.0563575289851217
+      }
+    ],
+    "candidate_batching_probe": {
+      "candidates": 4,
+      "elapsed_seconds": 38.310431624995545,
+      "evaluations_per_second": 0.10441020448827859,
+      "speedup_vs_serial_c": 7.030241093611189
+    },
+    "findings": "The compiled Torch-FUSE kernel supports any batch size N along the leading dimension [N, 8401, 3] and [N, 37]. Scaling from N=1 to N=2 gives 3.06x throughput; scaling to N=4 gives 7.03x throughput on this GPU."
+  },
+  "combined_batching_feasibility_matrix": [
+    {
+      "algorithm_semantics_impact": "Zero change to SCE algorithm for initial population (evaluating all 2*P+1 initial population in 1 forward pass). For simplex reflection/contraction/random, candidates can be batched per complex.",
+      "batching_mode": "Option 1: Candidate batching within one catchment (C candidates x 1 basin)",
+      "current_runtime_support": "Supported directly without kernel modification (simulate_coupled_rk2_batched handles arbitrary batch size N)",
+      "expected_speedup": "3x to 7x per calibration case",
+      "risk_level": "low",
+      "tensor_shapes": "forcing: [C, 8401, 3] (expanded), params: [C, 37]"
+    },
+    {
+      "algorithm_semantics_impact": "Requires careful lockstep synchronization across basins or masked stepping. If complex evolution diverges, active candidates per basin must be tracked.",
+      "batching_mode": "Option 2: Multi-basin synchronized SCE batching (B basins x C candidates)",
+      "current_runtime_support": "Supported by numerical kernel; requires multi-case scheduler orchestration in Python",
+      "expected_speedup": "8x to 15x across multi-catchment campaigns",
+      "risk_level": "medium",
+      "tensor_shapes": "forcing: [B*C, 8401, 3], params: [B*C, 37]"
+    },
+    {
+      "algorithm_semantics_impact": "Zero change to science or results. The optimizer objective evaluation for the best theta already produced the exact discharge trajectory on the full 8401-day forcing. Train KGE and test KGE can be computed directly by slicing that discharge tensor without re-running 2 extra 8401-day simulations.",
+      "batching_mode": "Option 3: Eliminate redundant post-optimization simulations",
+      "current_runtime_support": "Immediately possible",
+      "expected_speedup": "2.0x speedup per case (eliminates 50% of runtime per case)",
+      "risk_level": "none",
+      "tensor_shapes": "N/A"
+    },
+    {
+      "algorithm_semantics_impact": "Zero",
+      "batching_mode": "Option 4: GPU-resident forcing and metadata",
+      "current_runtime_support": "Already partially in VRAM; can be cached across cases",
+      "expected_speedup": "Minor (< 0.1s/case)",
+      "risk_level": "none",
+      "tensor_shapes": "forcing stays in VRAM"
+    },
+    {
+      "algorithm_semantics_impact": "Zero for objective (only Q is needed for KGE). Full states/fluxes retained only for final best-theta artifact.",
+      "batching_mode": "Option 5: Lightweight simulation mode for objective (omit unused flux/state stacks)",
+      "current_runtime_support": "Requires lightweight return mode in batched simulator",
+      "expected_speedup": "10% to 15% simulation speedup (avoids 38 list appends and 38 torch.stack calls per step)",
+      "risk_level": "low",
+      "tensor_shapes": "only q [N, 8401] accumulated, fluxes/states omitted during optimization"
+    }
+  ],
+  "generated_at_utc": "2026-09-06T18:46:55.015744+00:00",
+  "protocol_id": "formal-experiment-protocol-v1-db53091e6e222066",
+  "schema_version": "formal-sce-batching-audit-v1",
+  "status": "completed"
+}

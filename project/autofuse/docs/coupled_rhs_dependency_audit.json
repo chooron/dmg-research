@@ -1,0 +1,878 @@
+{
+  "schema_version": "coupled-rhs-dependency-audit-v1",
+  "status": "frozen_before_single_step_results",
+  "scientific_equations_modified": false,
+  "fortran_source_root": "vendor/upstream/cyrilthebault-fuse/build/FUSE_SRC/FUSE_ENGINE",
+  "fortran_source_commit": "e6e23a4fc4ff4019bcab55f14537ea43b9525967",
+  "fortran_semantics": {
+    "stage_driver": "mod_derivs.f90:18-30 calls flux routines then mstate_eqn.f90:27-64; no state is updated between those calls",
+    "flux_evaluation_calls": [
+      "QSATEXCESS",
+      "EVAP_UPPER",
+      "EVAP_LOWER",
+      "QINTERFLOW",
+      "QPERCOLATE",
+      "Q_BASEFLOW",
+      "Q_MISSCELL"
+    ],
+    "state_equations": "mstate_eqn.f90:27-64 sums all active flux contributions into DY_DT after the flux stage",
+    "capacity_and_spill": "q_misscell.f90:34-124 plus fix_states.f90:37-282; residual capacity branch is explicit and state-specific",
+    "heun_reference": "ode_int.f90:158-173 computes predictor, safeguarded predictor, second RHS, average flux, and final safeguard"
+  },
+  "canonical_rhs_contract": {
+    "all_fluxes_read_one_stage_state": true,
+    "internal_transfers_enter_both_source_and_receiver_derivatives": true,
+    "competing_outflows_are_not_order_updates": true,
+    "forcing_is_fixed_across_rk2_stages": true,
+    "dynamic_process_order": false
+  },
+  "flux_dependency_records": [
+    {
+      "name": "EFF_PPT",
+      "states_read": [],
+      "forcing_read": [
+        "PPT",
+        "TEMP"
+      ],
+      "parameters_read": [
+        "RFERR_MLT",
+        "PXTEMP",
+        "OPG",
+        "LAPSE",
+        "MBASE",
+        "MFMAX",
+        "MFMIN"
+      ],
+      "source_storage": "snow bands / effective forcing",
+      "receiver_storage": [
+        "upper active storage"
+      ],
+      "kind": "source",
+      "capacity_dependency": "receiver capacity through FIX_STATES",
+      "overflow_dependency": "upper-state excess can become OFLOW_1",
+      "receiver_enters_flux_law": false
+    },
+    {
+      "name": "SATAREA",
+      "states_read": [
+        "WATR_1 or TENS_1",
+        "WATR_2 for tmdl_param"
+      ],
+      "forcing_read": [],
+      "parameters_read": [
+        "MAXWATR_1",
+        "MAXTENS_1",
+        "AXV_BEXP",
+        "SAREAMAX",
+        "LOGLAMB",
+        "TISHAPE",
+        "QB_POWR"
+      ],
+      "source_storage": "upper/lower state used by selected QSURF law",
+      "receiver_storage": [],
+      "kind": "diagnostic control",
+      "capacity_dependency": "normalizes by selected storage capacity",
+      "overflow_dependency": "QSURF competes with upper input before internal transfers",
+      "receiver_enters_flux_law": false
+    },
+    {
+      "name": "QSURF",
+      "states_read": [
+        "WATR_1 or TENS_1",
+        "WATR_2 for tmdl_param"
+      ],
+      "forcing_read": [
+        "EFF_PPT"
+      ],
+      "parameters_read": [
+        "AXV_BEXP",
+        "SAREAMAX",
+        "LOGLAMB",
+        "TISHAPE",
+        "QB_POWR"
+      ],
+      "source_storage": "upper input partition",
+      "receiver_storage": [],
+      "kind": "pure sink",
+      "capacity_dependency": "surface-law saturation state",
+      "overflow_dependency": "reduces input available to recharge/internal transfer",
+      "receiver_enters_flux_law": false
+    },
+    {
+      "name": "EVAP_1 / EVAP_1A / EVAP_1B",
+      "states_read": [
+        "upper tension storage"
+      ],
+      "forcing_read": [
+        "PET"
+      ],
+      "parameters_read": [
+        "MAXTENS_1 or MAXTENS_1A/MAXTENS_1B"
+      ],
+      "source_storage": "upper tension stores",
+      "receiver_storage": [],
+      "kind": "pure sink",
+      "capacity_dependency": "tension capacity denominator",
+      "overflow_dependency": "FIX_STATES can adjust evaporation on lower bound",
+      "receiver_enters_flux_law": false
+    },
+    {
+      "name": "EVAP_2",
+      "states_read": [
+        "TENS_2 when ARCH1 is not tension2_1"
+      ],
+      "forcing_read": [
+        "PET",
+        "EVAP_1"
+      ],
+      "parameters_read": [
+        "MAXTENS_2"
+      ],
+      "source_storage": "lower tension storage",
+      "receiver_storage": [],
+      "kind": "pure sink",
+      "capacity_dependency": "lower tension capacity denominator",
+      "overflow_dependency": "FIX_STATES can adjust evaporation on lower bound",
+      "receiver_enters_flux_law": false
+    },
+    {
+      "name": "RCHR2EXCS",
+      "states_read": [
+        "TENS_1A"
+      ],
+      "forcing_read": [
+        "EFF_PPT",
+        "QSURF"
+      ],
+      "parameters_read": [
+        "MAXTENS_1A"
+      ],
+      "source_storage": "recharge-zone tension storage",
+      "receiver_storage": [
+        "TENS_1B"
+      ],
+      "kind": "internal transfer",
+      "capacity_dependency": "source/receiver logistic smoothing",
+      "overflow_dependency": "excess transfer can feed TENS2FREE_1/OFLOW_1",
+      "receiver_enters_flux_law": false
+    },
+    {
+      "name": "TENS2FREE_1",
+      "states_read": [
+        "TENS_1B or TENS_1"
+      ],
+      "forcing_read": [
+        "EFF_PPT",
+        "QSURF",
+        "RCHR2EXCS"
+      ],
+      "parameters_read": [
+        "MAXTENS_1 or MAXTENS_1B"
+      ],
+      "source_storage": "upper tension storage",
+      "receiver_storage": [
+        "FREE_1"
+      ],
+      "kind": "internal transfer",
+      "capacity_dependency": "source/receiver logistic smoothing",
+      "overflow_dependency": "FREE_1 overflow",
+      "receiver_enters_flux_law": false
+    },
+    {
+      "name": "QPERC_12",
+      "states_read": [
+        "FREE_1 or WATR_1",
+        "WATR_2 for perc_lower demand"
+      ],
+      "forcing_read": [],
+      "parameters_read": [
+        "PERCRTE",
+        "PERCEXP",
+        "SACPMLT",
+        "SACPEXP",
+        "QBSAT",
+        "MAXFREE_1",
+        "MAXWATR_1",
+        "MAXWATR_2"
+      ],
+      "source_storage": "upper free/total storage",
+      "receiver_storage": [
+        "lower active storage"
+      ],
+      "kind": "internal transfer",
+      "capacity_dependency": "Fortran QPERC law reads lower storage for perc_lower; FIX_STATES limits downstream transfer",
+      "overflow_dependency": "lower tension/free or fixed-size overflow",
+      "receiver_enters_flux_law": true
+    },
+    {
+      "name": "QINTF_1",
+      "states_read": [
+        "FREE_1 when intflwsome; inactive in frozen family"
+      ],
+      "forcing_read": [],
+      "parameters_read": [
+        "IFLWRTE",
+        "MAXFREE_1"
+      ],
+      "source_storage": "upper free storage",
+      "receiver_storage": [],
+      "kind": "pure sink",
+      "capacity_dependency": "source free capacity",
+      "overflow_dependency": "none in frozen intflwnone family",
+      "receiver_enters_flux_law": false
+    },
+    {
+      "name": "QBASE_2 / QBASE_2A / QBASE_2B",
+      "states_read": [
+        "WATR_2 or FREE_2A/FREE_2B"
+      ],
+      "forcing_read": [],
+      "parameters_read": [
+        "QB_PRMS",
+        "BASERTE",
+        "QB_POWR",
+        "QBRATE_2A",
+        "QBRATE_2B",
+        "MAXWATR_2"
+      ],
+      "source_storage": "lower reservoir(s)",
+      "receiver_storage": [],
+      "kind": "pure sink",
+      "capacity_dependency": "lower reservoir normalization",
+      "overflow_dependency": "competes with lower overflow in fixed-size/parallel tanks",
+      "receiver_enters_flux_law": false
+    },
+    {
+      "name": "OFLOW_1 / OFLOW_2 / OFLOW_2A / OFLOW_2B",
+      "states_read": [
+        "upper FREE/WATR or lower FREE/WATR"
+      ],
+      "forcing_read": [
+        "EFF_PPT",
+        "QPERC_12",
+        "TENS2FREE_2"
+      ],
+      "parameters_read": [
+        "MAXFREE_1",
+        "MAXWATR_1",
+        "MAXTENS_2",
+        "MAXFREE_2A",
+        "MAXFREE_2B",
+        "MAXWATR_2",
+        "PERCFRAC"
+      ],
+      "source_storage": "bounded active reservoir",
+      "receiver_storage": [],
+      "kind": "pure sink / overflow",
+      "capacity_dependency": "logistic or residual capacity rule in Q_MISSCELL/FIX_STATES",
+      "overflow_dependency": "is the spill output",
+      "receiver_enters_flux_law": true
+    }
+  ],
+  "representative_structures": [
+    {
+      "model_id": 2,
+      "decisions": {
+        "RFERR": "multiplc_e",
+        "ARCH1": "tension1_1",
+        "ARCH2": "tens2pll_2",
+        "QSURF": "arno_x_vic",
+        "QPERC": "perc_f2sat",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "Q_TDH": "rout_gamma",
+        "SNOWM": "temp_index"
+      },
+      "active_states": [
+        "TENS_1",
+        "FREE_1",
+        "TENS_2",
+        "FREE_2A",
+        "FREE_2B"
+      ],
+      "active_fluxes": [
+        "EFF_PPT",
+        "EVAP_1",
+        "TENS2FREE_1",
+        "QPERC_12",
+        "QINTF_1",
+        "OFLOW_1",
+        "QSURF",
+        "EVAP_2",
+        "TENS2FREE_2",
+        "QBASE_2A",
+        "QBASE_2B",
+        "QBASE_2",
+        "OFLOW_2A",
+        "OFLOW_2B",
+        "OFLOW_2"
+      ],
+      "topology": {
+        "upper": {
+          "TENS_1": {
+            "EFF_PPT": 1,
+            "QSURF": -1,
+            "EVAP_1": -1,
+            "TENS2FREE_1": -1
+          },
+          "FREE_1": {
+            "TENS2FREE_1": 1,
+            "QPERC_12": -1,
+            "QINTF_1": -1,
+            "OFLOW_1": -1
+          }
+        },
+        "lower": {
+          "TENS_2": {
+            "QPERC_12*(1-PERCFRAC)": 1,
+            "EVAP_2": -1,
+            "TENS2FREE_2": -1
+          },
+          "FREE_2A": {
+            "QPERC_12*PERCFRAC/2": 1,
+            "TENS2FREE_2/2": 1,
+            "QBASE_2A": -1,
+            "OFLOW_2A": -1
+          },
+          "FREE_2B": {
+            "QPERC_12*PERCFRAC/2": 1,
+            "TENS2FREE_2/2": 1,
+            "QBASE_2B": -1,
+            "OFLOW_2B": -1
+          }
+        }
+      }
+    },
+    {
+      "model_id": 6,
+      "decisions": {
+        "RFERR": "multiplc_e",
+        "ARCH1": "onestate_1",
+        "ARCH2": "tens2pll_2",
+        "QSURF": "arno_x_vic",
+        "QPERC": "perc_f2sat",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "Q_TDH": "rout_gamma",
+        "SNOWM": "temp_index"
+      },
+      "active_states": [
+        "WATR_1",
+        "TENS_2",
+        "FREE_2A",
+        "FREE_2B"
+      ],
+      "active_fluxes": [
+        "EFF_PPT",
+        "EVAP_1",
+        "QPERC_12",
+        "QINTF_1",
+        "OFLOW_1",
+        "QSURF",
+        "EVAP_2",
+        "TENS2FREE_2",
+        "QBASE_2A",
+        "QBASE_2B",
+        "QBASE_2",
+        "OFLOW_2A",
+        "OFLOW_2B",
+        "OFLOW_2"
+      ],
+      "topology": {
+        "upper": {
+          "WATR_1": {
+            "EFF_PPT": 1,
+            "QSURF": -1,
+            "EVAP_1": -1,
+            "QPERC_12": -1,
+            "QINTF_1": -1,
+            "OFLOW_1": -1
+          }
+        },
+        "lower": {
+          "TENS_2": {
+            "QPERC_12*(1-PERCFRAC)": 1,
+            "EVAP_2": -1,
+            "TENS2FREE_2": -1
+          },
+          "FREE_2A": {
+            "QPERC_12*PERCFRAC/2": 1,
+            "TENS2FREE_2/2": 1,
+            "QBASE_2A": -1,
+            "OFLOW_2A": -1
+          },
+          "FREE_2B": {
+            "QPERC_12*PERCFRAC/2": 1,
+            "TENS2FREE_2/2": 1,
+            "QBASE_2B": -1,
+            "OFLOW_2B": -1
+          }
+        }
+      }
+    },
+    {
+      "model_id": 8,
+      "decisions": {
+        "RFERR": "multiplc_e",
+        "ARCH1": "tension1_1",
+        "ARCH2": "unlimfrc_2",
+        "QSURF": "arno_x_vic",
+        "QPERC": "perc_f2sat",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "Q_TDH": "rout_gamma",
+        "SNOWM": "temp_index"
+      },
+      "active_states": [
+        "TENS_1",
+        "FREE_1",
+        "WATR_2"
+      ],
+      "active_fluxes": [
+        "EFF_PPT",
+        "EVAP_1",
+        "TENS2FREE_1",
+        "QPERC_12",
+        "QINTF_1",
+        "OFLOW_1",
+        "QSURF",
+        "EVAP_2",
+        "QBASE_2",
+        "OFLOW_2"
+      ],
+      "topology": {
+        "upper": {
+          "TENS_1": {
+            "EFF_PPT": 1,
+            "QSURF": -1,
+            "EVAP_1": -1,
+            "TENS2FREE_1": -1
+          },
+          "FREE_1": {
+            "TENS2FREE_1": 1,
+            "QPERC_12": -1,
+            "QINTF_1": -1,
+            "OFLOW_1": -1
+          }
+        },
+        "lower": {
+          "WATR_2": {
+            "QPERC_12": 1,
+            "EVAP_2": -1,
+            "QBASE_2": -1,
+            "OFLOW_2": -1
+          }
+        }
+      }
+    },
+    {
+      "model_id": 14,
+      "decisions": {
+        "RFERR": "multiplc_e",
+        "ARCH1": "tension1_1",
+        "ARCH2": "unlimpow_2",
+        "QSURF": "arno_x_vic",
+        "QPERC": "perc_f2sat",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "Q_TDH": "rout_gamma",
+        "SNOWM": "temp_index"
+      },
+      "active_states": [
+        "TENS_1",
+        "FREE_1",
+        "WATR_2"
+      ],
+      "active_fluxes": [
+        "EFF_PPT",
+        "EVAP_1",
+        "TENS2FREE_1",
+        "QPERC_12",
+        "QINTF_1",
+        "OFLOW_1",
+        "QSURF",
+        "EVAP_2",
+        "QBASE_2",
+        "OFLOW_2"
+      ],
+      "topology": {
+        "upper": {
+          "TENS_1": {
+            "EFF_PPT": 1,
+            "QSURF": -1,
+            "EVAP_1": -1,
+            "TENS2FREE_1": -1
+          },
+          "FREE_1": {
+            "TENS2FREE_1": 1,
+            "QPERC_12": -1,
+            "QINTF_1": -1,
+            "OFLOW_1": -1
+          }
+        },
+        "lower": {
+          "WATR_2": {
+            "QPERC_12": 1,
+            "EVAP_2": -1,
+            "QBASE_2": -1,
+            "OFLOW_2": -1
+          }
+        }
+      }
+    },
+    {
+      "model_id": 164,
+      "decisions": {
+        "RFERR": "multiplc_e",
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "QSURF": "arno_x_vic",
+        "QPERC": "perc_lower",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "Q_TDH": "rout_gamma",
+        "SNOWM": "temp_index"
+      },
+      "active_states": [
+        "TENS_1",
+        "FREE_1",
+        "WATR_2"
+      ],
+      "active_fluxes": [
+        "EFF_PPT",
+        "EVAP_1",
+        "TENS2FREE_1",
+        "QPERC_12",
+        "QINTF_1",
+        "OFLOW_1",
+        "QSURF",
+        "EVAP_2",
+        "QBASE_2",
+        "OFLOW_2"
+      ],
+      "topology": {
+        "upper": {
+          "TENS_1": {
+            "EFF_PPT": 1,
+            "QSURF": -1,
+            "EVAP_1": -1,
+            "TENS2FREE_1": -1
+          },
+          "FREE_1": {
+            "TENS2FREE_1": 1,
+            "QPERC_12": -1,
+            "QINTF_1": -1,
+            "OFLOW_1": -1
+          }
+        },
+        "lower": {
+          "WATR_2": {
+            "QPERC_12": 1,
+            "EVAP_2": -1,
+            "QBASE_2": -1,
+            "OFLOW_2": -1
+          }
+        }
+      }
+    },
+    {
+      "model_id": 166,
+      "decisions": {
+        "RFERR": "multiplc_e",
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "QSURF": "arno_x_vic",
+        "QPERC": "perc_lower",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "Q_TDH": "rout_gamma",
+        "SNOWM": "temp_index"
+      },
+      "active_states": [
+        "TENS_1A",
+        "TENS_1B",
+        "FREE_1",
+        "WATR_2"
+      ],
+      "active_fluxes": [
+        "EFF_PPT",
+        "EVAP_1A",
+        "EVAP_1B",
+        "RCHR2EXCS",
+        "TENS2FREE_1",
+        "QPERC_12",
+        "QINTF_1",
+        "OFLOW_1",
+        "QSURF",
+        "EVAP_2",
+        "QBASE_2",
+        "OFLOW_2"
+      ],
+      "topology": {
+        "upper": {
+          "TENS_1A": {
+            "EFF_PPT": 1,
+            "QSURF": -1,
+            "EVAP_1A": -1,
+            "RCHR2EXCS": -1
+          },
+          "TENS_1B": {
+            "RCHR2EXCS": 1,
+            "EVAP_1B": -1,
+            "TENS2FREE_1": -1
+          },
+          "FREE_1": {
+            "TENS2FREE_1": 1,
+            "QPERC_12": -1,
+            "QINTF_1": -1,
+            "OFLOW_1": -1
+          }
+        },
+        "lower": {
+          "WATR_2": {
+            "QPERC_12": 1,
+            "EVAP_2": -1,
+            "QBASE_2": -1,
+            "OFLOW_2": -1
+          }
+        }
+      }
+    },
+    {
+      "model_id": 178,
+      "decisions": {
+        "RFERR": "multiplc_e",
+        "ARCH1": "tension2_1",
+        "ARCH2": "unlimfrc_2",
+        "QSURF": "prms_varnt",
+        "QPERC": "perc_lower",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "Q_TDH": "rout_gamma",
+        "SNOWM": "temp_index"
+      },
+      "active_states": [
+        "TENS_1A",
+        "TENS_1B",
+        "FREE_1",
+        "WATR_2"
+      ],
+      "active_fluxes": [
+        "EFF_PPT",
+        "EVAP_1A",
+        "EVAP_1B",
+        "RCHR2EXCS",
+        "TENS2FREE_1",
+        "QPERC_12",
+        "QINTF_1",
+        "OFLOW_1",
+        "QSURF",
+        "EVAP_2",
+        "QBASE_2",
+        "OFLOW_2"
+      ],
+      "topology": {
+        "upper": {
+          "TENS_1A": {
+            "EFF_PPT": 1,
+            "QSURF": -1,
+            "EVAP_1A": -1,
+            "RCHR2EXCS": -1
+          },
+          "TENS_1B": {
+            "RCHR2EXCS": 1,
+            "EVAP_1B": -1,
+            "TENS2FREE_1": -1
+          },
+          "FREE_1": {
+            "TENS2FREE_1": 1,
+            "QPERC_12": -1,
+            "QINTF_1": -1,
+            "OFLOW_1": -1
+          }
+        },
+        "lower": {
+          "WATR_2": {
+            "QPERC_12": 1,
+            "EVAP_2": -1,
+            "QBASE_2": -1,
+            "OFLOW_2": -1
+          }
+        }
+      }
+    },
+    {
+      "model_id": 188,
+      "decisions": {
+        "RFERR": "multiplc_e",
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "QSURF": "prms_varnt",
+        "QPERC": "perc_lower",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "Q_TDH": "rout_gamma",
+        "SNOWM": "temp_index"
+      },
+      "active_states": [
+        "TENS_1",
+        "FREE_1",
+        "WATR_2"
+      ],
+      "active_fluxes": [
+        "EFF_PPT",
+        "EVAP_1",
+        "TENS2FREE_1",
+        "QPERC_12",
+        "QINTF_1",
+        "OFLOW_1",
+        "QSURF",
+        "EVAP_2",
+        "QBASE_2",
+        "OFLOW_2"
+      ],
+      "topology": {
+        "upper": {
+          "TENS_1": {
+            "EFF_PPT": 1,
+            "QSURF": -1,
+            "EVAP_1": -1,
+            "TENS2FREE_1": -1
+          },
+          "FREE_1": {
+            "TENS2FREE_1": 1,
+            "QPERC_12": -1,
+            "QINTF_1": -1,
+            "OFLOW_1": -1
+          }
+        },
+        "lower": {
+          "WATR_2": {
+            "QPERC_12": 1,
+            "EVAP_2": -1,
+            "QBASE_2": -1,
+            "OFLOW_2": -1
+          }
+        }
+      }
+    },
+    {
+      "model_id": 212,
+      "decisions": {
+        "RFERR": "multiplc_e",
+        "ARCH1": "tension1_1",
+        "ARCH2": "fixedsiz_2",
+        "QSURF": "tmdl_param",
+        "QPERC": "perc_lower",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "Q_TDH": "rout_gamma",
+        "SNOWM": "temp_index"
+      },
+      "active_states": [
+        "TENS_1",
+        "FREE_1",
+        "WATR_2"
+      ],
+      "active_fluxes": [
+        "EFF_PPT",
+        "EVAP_1",
+        "TENS2FREE_1",
+        "QPERC_12",
+        "QINTF_1",
+        "OFLOW_1",
+        "QSURF",
+        "EVAP_2",
+        "QBASE_2",
+        "OFLOW_2"
+      ],
+      "topology": {
+        "upper": {
+          "TENS_1": {
+            "EFF_PPT": 1,
+            "QSURF": -1,
+            "EVAP_1": -1,
+            "TENS2FREE_1": -1
+          },
+          "FREE_1": {
+            "TENS2FREE_1": 1,
+            "QPERC_12": -1,
+            "QINTF_1": -1,
+            "OFLOW_1": -1
+          }
+        },
+        "lower": {
+          "WATR_2": {
+            "QPERC_12": 1,
+            "EVAP_2": -1,
+            "QBASE_2": -1,
+            "OFLOW_2": -1
+          }
+        }
+      }
+    },
+    {
+      "model_id": 214,
+      "decisions": {
+        "RFERR": "multiplc_e",
+        "ARCH1": "tension2_1",
+        "ARCH2": "fixedsiz_2",
+        "QSURF": "tmdl_param",
+        "QPERC": "perc_lower",
+        "ESOIL": "sequential",
+        "QINTF": "intflwnone",
+        "Q_TDH": "rout_gamma",
+        "SNOWM": "temp_index"
+      },
+      "active_states": [
+        "TENS_1A",
+        "TENS_1B",
+        "FREE_1",
+        "WATR_2"
+      ],
+      "active_fluxes": [
+        "EFF_PPT",
+        "EVAP_1A",
+        "EVAP_1B",
+        "RCHR2EXCS",
+        "TENS2FREE_1",
+        "QPERC_12",
+        "QINTF_1",
+        "OFLOW_1",
+        "QSURF",
+        "EVAP_2",
+        "QBASE_2",
+        "OFLOW_2"
+      ],
+      "topology": {
+        "upper": {
+          "TENS_1A": {
+            "EFF_PPT": 1,
+            "QSURF": -1,
+            "EVAP_1A": -1,
+            "RCHR2EXCS": -1
+          },
+          "TENS_1B": {
+            "RCHR2EXCS": 1,
+            "EVAP_1B": -1,
+            "TENS2FREE_1": -1
+          },
+          "FREE_1": {
+            "TENS2FREE_1": 1,
+            "QPERC_12": -1,
+            "QINTF_1": -1,
+            "OFLOW_1": -1
+          }
+        },
+        "lower": {
+          "WATR_2": {
+            "QPERC_12": 1,
+            "EVAP_2": -1,
+            "QBASE_2": -1,
+            "OFLOW_2": -1
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,2701 @@
+{
+  "compile": {
+    "seed_a": {
+      "passed": true,
+      "record_count": 1,
+      "records": [
+        {
+          "backend": "inductor",
+          "batch_size": 2,
+          "cold_compile_seconds": [
+            4.066889416018967
+          ],
+          "compile_attempts": 1,
+          "compile_successes": 1,
+          "dynamo_counters": {
+            "aot_autograd": {
+              "autograd_cache_hit": 1,
+              "ok": 1,
+              "total": 1
+            },
+            "inductor": {
+              "async_compile_cache_hit": 179,
+              "async_compile_cache_miss": 270,
+              "fxgraph_cache_hit": 1,
+              "triton_bundler_load_static_autotuner": 89
+            },
+            "stats": {
+              "calls_captured": 1887,
+              "unique_graphs": 1
+            }
+          },
+          "failures": [],
+          "fallbacks": 0,
+          "forward_unique_graphs": 1,
+          "fullgraph": true,
+          "graph_breaks": 0,
+          "graph_signature": {
+            "decisions": {
+              "ARCH1": "tension1_1",
+              "ARCH2": "tens2pll_2",
+              "ESOIL": "sequential",
+              "QINTF": "intflwnone",
+              "QPERC": "perc_f2sat",
+              "QSURF": "arno_x_vic",
+              "Q_TDH": "rout_gamma",
+              "RFERR": "multiplc_e",
+              "SNOWM": "temp_index"
+            },
+            "execution_mode": "coupled_rk2",
+            "n_substeps": 1,
+            "parameter_names": [
+              "RFERR_MLT",
+              "FRACTEN",
+              "MAXWATR_1",
+              "PERCFRAC",
+              "FPRIMQB",
+              "MAXWATR_2",
+              "QBRATE_2A",
+              "QBRATE_2B",
+              "PERCRTE",
+              "PERCEXP",
+              "AXV_BEXP",
+              "TIMEDELAY",
+              "MBASE",
+              "MFMAX",
+              "MFMIN",
+              "PXTEMP",
+              "OPG",
+              "LAPSE"
+            ],
+            "sequential_order": [
+              "coupled_rhs"
+            ],
+            "state_names": [
+              "TENS_1",
+              "FREE_1",
+              "TENS_2",
+              "FREE_2A",
+              "FREE_2B"
+            ],
+            "topology": [
+              [
+                "lower",
+                [
+                  [
+                    "FREE_2A",
+                    [
+                      [
+                        "OFLOW_2A",
+                        -1
+                      ],
+                      [
+                        "QBASE_2A",
+                        -1
+                      ],
+                      [
+                        "QPERC_12*PERCFRAC/2",
+                        1
+                      ],
+                      [
+                        "TENS2FREE_2/2",
+                        1
+                      ]
+                    ]
+                  ],
+                  [
+                    "FREE_2B",
+                    [
+                      [
+                        "OFLOW_2B",
+                        -1
+                      ],
+                      [
+                        "QBASE_2B",
+                        -1
+                      ],
+                      [
+                        "QPERC_12*PERCFRAC/2",
+                        1
+                      ],
+                      [
+                        "TENS2FREE_2/2",
+                        1
+                      ]
+                    ]
+                  ],
+                  [
+                    "TENS_2",
+                    [
+                      [
+                        "EVAP_2",
+                        -1
+                      ],
+                      [
+                        "QPERC_12*(1-PERCFRAC)",
+                        1
+                      ],
+                      [
+                        "TENS2FREE_2",
+                        -1
+                      ]
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "upper",
+                [
+                  [
+                    "FREE_1",
+                    [
+                      [
+                        "OFLOW_1",
+                        -1
+                      ],
+                      [
+                        "QINTF_1",
+                        -1
+                      ],
+                      [
+                        "QPERC_12",
+                        -1
+                      ],
+                      [
+                        "TENS2FREE_1",
+                        1
+                      ]
+                    ]
+                  ],
+                  [
+                    "TENS_1",
+                    [
+                      [
+                        "EFF_PPT",
+                        1
+                      ],
+                      [
+                        "EVAP_1",
+                        -1
+                      ],
+                      [
+                        "QSURF",
+                        -1
+                      ],
+                      [
+                        "TENS2FREE_1",
+                        -1
+                      ]
+                    ]
+                  ]
+                ]
+              ]
+            ]
+          },
+          "graph_signature_digest": "71c2d011de746521",
+          "model_id": 2,
+          "recompilations": 0
+        }
+      ]
+    },
+    "seed_a_repeat": {
+      "passed": true,
+      "record_count": 1,
+      "records": [
+        {
+          "backend": "inductor",
+          "batch_size": 2,
+          "cold_compile_seconds": [
+            0.0023337299935519695
+          ],
+          "compile_attempts": 1,
+          "compile_successes": 1,
+          "dynamo_counters": {},
+          "failures": [],
+          "fallbacks": 0,
+          "forward_unique_graphs": 0,
+          "fullgraph": true,
+          "graph_breaks": 0,
+          "graph_signature": {
+            "decisions": {
+              "ARCH1": "tension1_1",
+              "ARCH2": "tens2pll_2",
+              "ESOIL": "sequential",
+              "QINTF": "intflwnone",
+              "QPERC": "perc_f2sat",
+              "QSURF": "arno_x_vic",
+              "Q_TDH": "rout_gamma",
+              "RFERR": "multiplc_e",
+              "SNOWM": "temp_index"
+            },
+            "execution_mode": "coupled_rk2",
+            "n_substeps": 1,
+            "parameter_names": [
+              "RFERR_MLT",
+              "FRACTEN",
+              "MAXWATR_1",
+              "PERCFRAC",
+              "FPRIMQB",
+              "MAXWATR_2",
+              "QBRATE_2A",
+              "QBRATE_2B",
+              "PERCRTE",
+              "PERCEXP",
+              "AXV_BEXP",
+              "TIMEDELAY",
+              "MBASE",
+              "MFMAX",
+              "MFMIN",
+              "PXTEMP",
+              "OPG",
+              "LAPSE"
+            ],
+            "sequential_order": [
+              "coupled_rhs"
+            ],
+            "state_names": [
+              "TENS_1",
+              "FREE_1",
+              "TENS_2",
+              "FREE_2A",
+              "FREE_2B"
+            ],
+            "topology": [
+              [
+                "lower",
+                [
+                  [
+                    "FREE_2A",
+                    [
+                      [
+                        "OFLOW_2A",
+                        -1
+                      ],
+                      [
+                        "QBASE_2A",
+                        -1
+                      ],
+                      [
+                        "QPERC_12*PERCFRAC/2",
+                        1
+                      ],
+                      [
+                        "TENS2FREE_2/2",
+                        1
+                      ]
+                    ]
+                  ],
+                  [
+                    "FREE_2B",
+                    [
+                      [
+                        "OFLOW_2B",
+                        -1
+                      ],
+                      [
+                        "QBASE_2B",
+                        -1
+                      ],
+                      [
+                        "QPERC_12*PERCFRAC/2",
+                        1
+                      ],
+                      [
+                        "TENS2FREE_2/2",
+                        1
+                      ]
+                    ]
+                  ],
+                  [
+                    "TENS_2",
+                    [
+                      [
+                        "EVAP_2",
+                        -1
+                      ],
+                      [
+                        "QPERC_12*(1-PERCFRAC)",
+                        1
+                      ],
+                      [
+                        "TENS2FREE_2",
+                        -1
+                      ]
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "upper",
+                [
+                  [
+                    "FREE_1",
+                    [
+                      [
+                        "OFLOW_1",
+                        -1
+                      ],
+                      [
+                        "QINTF_1",
+                        -1
+                      ],
+                      [
+                        "QPERC_12",
+                        -1
+                      ],
+                      [
+                        "TENS2FREE_1",
+                        1
+                      ]
+                    ]
+                  ],
+                  [
+                    "TENS_1",
+                    [
+                      [
+                        "EFF_PPT",
+                        1
+                      ],
+                      [
+                        "EVAP_1",
+                        -1
+                      ],
+                      [
+                        "QSURF",
+                        -1
+                      ],
+                      [
+                        "TENS2FREE_1",
+                        -1
+                      ]
+                    ]
+                  ]
+                ]
+              ]
+            ]
+          },
+          "graph_signature_digest": "71c2d011de746521",
+          "model_id": 2,
+          "recompilations": 0
+        }
+      ]
+    },
+    "seed_b": {
+      "passed": true,
+      "record_count": 1,
+      "records": [
+        {
+          "backend": "inductor",
+          "batch_size": 2,
+          "cold_compile_seconds": [
+            0.0020756529993377626
+          ],
+          "compile_attempts": 1,
+          "compile_successes": 1,
+          "dynamo_counters": {},
+          "failures": [],
+          "fallbacks": 0,
+          "forward_unique_graphs": 0,
+          "fullgraph": true,
+          "graph_breaks": 0,
+          "graph_signature": {
+            "decisions": {
+              "ARCH1": "tension1_1",
+              "ARCH2": "tens2pll_2",
+              "ESOIL": "sequential",
+              "QINTF": "intflwnone",
+              "QPERC": "perc_f2sat",
+              "QSURF": "arno_x_vic",
+              "Q_TDH": "rout_gamma",
+              "RFERR": "multiplc_e",
+              "SNOWM": "temp_index"
+            },
+            "execution_mode": "coupled_rk2",
+            "n_substeps": 1,
+            "parameter_names": [
+              "RFERR_MLT",
+              "FRACTEN",
+              "MAXWATR_1",
+              "PERCFRAC",
+              "FPRIMQB",
+              "MAXWATR_2",
+              "QBRATE_2A",
+              "QBRATE_2B",
+              "PERCRTE",
+              "PERCEXP",
+              "AXV_BEXP",
+              "TIMEDELAY",
+              "MBASE",
+              "MFMAX",
+              "MFMIN",
+              "PXTEMP",
+              "OPG",
+              "LAPSE"
+            ],
+            "sequential_order": [
+              "coupled_rhs"
+            ],
+            "state_names": [
+              "TENS_1",
+              "FREE_1",
+              "TENS_2",
+              "FREE_2A",
+              "FREE_2B"
+            ],
+            "topology": [
+              [
+                "lower",
+                [
+                  [
+                    "FREE_2A",
+                    [
+                      [
+                        "OFLOW_2A",
+                        -1
+                      ],
+                      [
+                        "QBASE_2A",
+                        -1
+                      ],
+                      [
+                        "QPERC_12*PERCFRAC/2",
+                        1
+                      ],
+                      [
+                        "TENS2FREE_2/2",
+                        1
+                      ]
+                    ]
+                  ],
+                  [
+                    "FREE_2B",
+                    [
+                      [
+                        "OFLOW_2B",
+                        -1
+                      ],
+                      [
+                        "QBASE_2B",
+                        -1
+                      ],
+                      [
+                        "QPERC_12*PERCFRAC/2",
+                        1
+                      ],
+                      [
+                        "TENS2FREE_2/2",
+                        1
+                      ]
+                    ]
+                  ],
+                  [
+                    "TENS_2",
+                    [
+                      [
+                        "EVAP_2",
+                        -1
+                      ],
+                      [
+                        "QPERC_12*(1-PERCFRAC)",
+                        1
+                      ],
+                      [
+                        "TENS2FREE_2",
+                        -1
+                      ]
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "upper",
+                [
+                  [
+                    "FREE_1",
+                    [
+                      [
+                        "OFLOW_1",
+                        -1
+                      ],
+                      [
+                        "QINTF_1",
+                        -1
+                      ],
+                      [
+                        "QPERC_12",
+                        -1
+                      ],
+                      [
+                        "TENS2FREE_1",
+                        1
+                      ]
+                    ]
+                  ],
+                  [
+                    "TENS_1",
+                    [
+                      [
+                        "EFF_PPT",
+                        1
+                      ],
+                      [
+                        "EVAP_1",
+                        -1
+                      ],
+                      [
+                        "QSURF",
+                        -1
+                      ],
+                      [
+                        "TENS2FREE_1",
+                        -1
+                      ]
+                    ]
+                  ]
+                ]
+              ]
+            ]
+          },
+          "graph_signature_digest": "71c2d011de746521",
+          "model_id": 2,
+          "recompilations": 0
+        }
+      ]
+    }
+  },
+  "gate_decision": {
+    "campaign_started": false,
+    "different_seed_changes_search": true,
+    "formal_path_clear": true,
+    "passed": true,
+    "runner_connected": true,
+    "same_seed_reproducible": true
+  },
+  "path_audit": {
+    "formal_evaluator": "UnifiedEvaluator.score_batched",
+    "formal_kernel": "simulate_coupled_rk2_batched -> structure-specialized torch.vmap + torch.compile(fullgraph=True)",
+    "formal_run_uses_legacy_scalar_path": false,
+    "intended_algorithm": "SCE-UA",
+    "legacy_scalar_path": "UnifiedEvaluator.forward -> dfuse.simulate remains only for the backward-compatible scalar objective boundary",
+    "objective_protocol": "1 - mean(per-basin KGECOMP)",
+    "optimizer_contract": "SCEBaseline.run(model_id, forcing[basin,time,3], observed[basin,time], basin_ids, bounds, initial)",
+    "training_or_campaign_started": false
+  },
+  "protocol": {
+    "basin_ids": [
+      "USA_09447800",
+      "USA_14138900"
+    ],
+    "batch_size": 2,
+    "compile_backend": "inductor",
+    "compile_fullgraph": true,
+    "compile_step": true,
+    "cpu_interop_threads": 1,
+    "cpu_threads": 1,
+    "days": 8,
+    "device": "cuda",
+    "different_seed": 20260902,
+    "dtype": "torch.float64",
+    "forcing_start": "1987-01-01",
+    "max_evaluations": 24,
+    "model_id": 2,
+    "seed": 20260901
+  },
+  "resource": {
+    "cache": {
+      "bytes": 24548340,
+      "files": 823
+    },
+    "host_peak_rss_kb": 1268844
+  },
+  "rng": {
+    "different_seed_trajectory_differs": true,
+    "propagation": "SCEConfig.seed -> SCEBaseline.run -> generator.manual_seed(seed); no global RNG is used for candidate generation",
+    "same_seed_identical": true,
+    "source": "torch.Generator(device=cpu)"
+  },
+  "runs": {
+    "seed_a": {
+      "best_parameters": {
+        "AXV_BEXP": 0.3,
+        "BASERTE": 50.0,
+        "FPRIMQB": 0.5,
+        "FRACLOWZ": 0.5,
+        "FRACTEN": 0.5,
+        "FRCHZNE": 0.5,
+        "IFLWRTE": 500.0,
+        "LAPSE": -5.0,
+        "LOGLAMB": 7.5,
+        "MAXWATR_1": 100.0,
+        "MAXWATR_2": 1000.0,
+        "MBASE": 1.0,
+        "MFMAX": 4.2,
+        "MFMIN": 2.4,
+        "OPG": 0.5,
+        "PERCEXP": 5.0,
+        "PERCFRAC": 0.5,
+        "PERCRTE": 100.0,
+        "PXTEMP": 1.0,
+        "QBRATE_2A": 0.025,
+        "QBRATE_2B": 0.01,
+        "QB_POWR": 5.0,
+        "QB_PRMS": 0.01,
+        "RFERR_ADD": 0.0,
+        "RFERR_MLT": 1.0,
+        "RFH1_MEAN": 0.003,
+        "RFH2_SDEV": 0.361,
+        "RH1P_MEAN": 0.0,
+        "RH1P_SDEV": 0.4,
+        "RH2P_MEAN": 0.05,
+        "RH2P_SDEV": 0.7,
+        "RTFRAC1": 0.75,
+        "SACPEXP": 5.0,
+        "SACPMLT": 10.0,
+        "SAREAMAX": 0.25,
+        "TIMEDELAY": 0.9,
+        "TISHAPE": 3.0
+      },
+      "best_score": 196.38737405988257,
+      "config": {
+        "kstop": 3,
+        "max_evaluations": 24,
+        "n_complexes": 2,
+        "pcento": 0.0,
+        "population_size": 24
+      },
+      "elapsed_seconds": 6.123985208047088,
+      "evaluation_count": 24,
+      "execution": {
+        "basin_ids": [
+          "USA_09447800",
+          "USA_14138900"
+        ],
+        "batch_size": 2,
+        "compile_backend": "inductor",
+        "compile_fullgraph": true,
+        "compile_step": true,
+        "evaluator": "UnifiedEvaluator.score_batched",
+        "kernel": "simulate_coupled_rk2_batched",
+        "rng": "torch.Generator(device=cpu).manual_seed(config.seed)"
+      },
+      "method": "SCE-UA",
+      "model_id": 2,
+      "parameter_names": [
+        "RFERR_MLT",
+        "FRACTEN",
+        "MAXWATR_1",
+        "PERCFRAC",
+        "FPRIMQB",
+        "MAXWATR_2",
+        "QBRATE_2A",
+        "QBRATE_2B",
+        "PERCRTE",
+        "PERCEXP",
+        "AXV_BEXP",
+        "TIMEDELAY",
+        "MBASE",
+        "MFMAX",
+        "MFMIN",
+        "PXTEMP",
+        "OPG",
+        "LAPSE"
+      ],
+      "seed": 20260901,
+      "stop_reason": "max_evaluations",
+      "trajectory": [
+        {
+          "active_parameters": [
+            1.0,
+            0.5,
+            100.0,
+            0.5,
+            0.5,
+            1000.0,
+            0.025,
+            0.01,
+            100.0,
+            5.0,
+            0.3,
+            0.9,
+            1.0,
+            4.2,
+            2.4,
+            1.0,
+            0.5,
+            -5.0
+          ],
+          "evaluation": 1,
+          "operation": "initial_population",
+          "score": 196.38737405988257
+        },
+        {
+          "active_parameters": [
+            1.0004502420479175,
+            0.9331976311435602,
+            476.6476795120226,
+            0.6161411907376012,
+            0.3430118689440553,
+            1616.343801365536,
+            0.21588679711561448,
+            0.22290766921350316,
+            601.719080058891,
+            16.60382132597043,
+            2.9173180075986767,
+            2.523424146590766,
+            1.9936266184737594,
+            5.426048509400982,
+            4.935435807427193,
+            3.082147994919201,
+            0.2566167725814883,
+            -6.449567358434725
+          ],
+          "evaluation": 2,
+          "operation": "initial_population",
+          "score": 643.6507866685298
+        },
+        {
+          "active_parameters": [
+            1.0000375282344423,
+            0.304427972749466,
+            26.478164903093766,
+            0.05536346078688262,
+            0.4381992414355679,
+            794.4656551299394,
+            0.0881476040024963,
+            0.23235724241417113,
+            718.6621999516194,
+            18.86407897449809,
+            2.190827641479502,
+            0.502377869750836,
+            2.7127240743335013,
+            3.3060630471414605,
+            2.8180491832816585,
+            0.4974408080927566,
+            2.065893003941069,
+            -6.906580921706791
+          ],
+          "evaluation": 3,
+          "operation": "initial_population",
+          "score": 3644.8397745046395
+        },
+        {
+          "active_parameters": [
+            1.0002740653496895,
+            0.40234836721116646,
+            207.23076325854927,
+            0.5530513891783275,
+            0.2660919752896865,
+            3765.443073042838,
+            0.22527374351155394,
+            0.011170090098877872,
+            467.4108330676625,
+            12.208018908425677,
+            1.628683772350046,
+            2.4127249487331004,
+            0.16716733617280088,
+            5.351065758747498,
+            5.067478330402783,
+            2.8388213964448648,
+            0.8005989393527388,
+            -5.214852793966644
+          ],
+          "evaluation": 4,
+          "operation": "initial_population",
+          "score": 4219.487364516841
+        },
+        {
+          "active_parameters": [
+            1.0008543704122421,
+            0.35196347997502986,
+            403.1530912600339,
+            0.12317934915809992,
+            0.43993662842632775,
+            3632.827030835604,
+            0.20141201969012332,
+            0.16048622410728844,
+            573.8831284760913,
+            16.756639449372308,
+            2.852728538165727,
+            2.2526854946356982,
+            0.35256493787907683,
+            7.749272551192696,
+            2.9592205392036703,
+            2.1709797777794027,
+            0.9323843058819938,
+            -4.226784413563312
+          ],
+          "evaluation": 5,
+          "operation": "initial_population",
+          "score": 11816.737373741986
+        },
+        {
+          "active_parameters": [
+            1.0003965993365542,
+            0.1753885988514498,
+            82.83127946572472,
+            0.6584225012477032,
+            0.09266393208426449,
+            1625.0035901773208,
+            0.16827692298768396,
+            0.23145014034408545,
+            762.5040071030228,
+            9.112992110182446,
+            1.1530910069494251,
+            1.7869122165538132,
+            0.3487017003107261,
+            4.406855707629774,
+            2.4933486663986426,
+            0.8280670033685893,
+            2.1962015996529276,
+            -5.032675273598143
+          ],
+          "evaluation": 6,
+          "operation": "initial_population",
+          "score": 8318.532385222283
+        },
+        {
+          "active_parameters": [
+            1.0005802370538925,
+            0.4662655995137388,
+            155.2189199723991,
+            0.23931939219260745,
+            0.4934729114955459,
+            1581.0322468650966,
+            0.15146105124995446,
+            0.2035343916179762,
+            327.049763037043,
+            10.188885889111532,
+            1.4340774920579356,
+            0.20342186089017378,
+            1.6214071198027362,
+            7.1697249179572715,
+            1.4538891126287719,
+            4.126145891046646,
+            1.0479262576932358,
+            -6.622694332520798
+          ],
+          "evaluation": 7,
+          "operation": "initial_population",
+          "score": 6480.878162837563
+        },
+        {
+          "active_parameters": [
+            1.0004495104151645,
+            0.11808329129501309,
+            297.50622143925,
+            0.6813964515189033,
+            0.7758568647309659,
+            2321.412279308484,
+            0.04215255220252698,
+            0.16628438217466499,
+            852.2295761329543,
+            1.0003727562391367,
+            1.0322087715441732,
+            0.015042968934172703,
+            1.6912468323409104,
+            6.3355629702096445,
+            2.201281431666936,
+            3.958861201742966,
+            0.6462029785300283,
+            -4.058892534683061
+          ],
+          "evaluation": 8,
+          "operation": "initial_population",
+          "score": 4735.3026235916295
+        },
+        {
+          "active_parameters": [
+            1.0006800045302977,
+            0.2264209311587419,
+            392.52427632535944,
+            0.5544342847531049,
+            0.21540437396221923,
+            4618.036858489141,
+            0.0032341971503077687,
+            0.09107179812406374,
+            978.484856097656,
+            5.81234498810317,
+            1.9507701390268193,
+            1.809811157081412,
+            1.4641199951966297,
+            3.837395086280036,
+            5.3157226655624985,
+            4.772617617714774,
+            0.31208149615080366,
+            -6.918206747848572
+          ],
+          "evaluation": 9,
+          "operation": "initial_population",
+          "score": 8298.523858704335
+        },
+        {
+          "active_parameters": [
+            1.0003192224498,
+            0.5965830569626768,
+            345.0205169420647,
+            0.11022616598681866,
+            0.7494659643569384,
+            2767.606941383151,
+            0.17224901138898843,
+            0.10299495396377545,
+            932.3705340300081,
+            19.3912321075788,
+            2.5598505304550776,
+            0.2267978284915467,
+            2.466768777934102,
+            6.760159605123352,
+            3.1506521774118506,
+            1.7117611738913037,
+            1.0512236806329907,
+            -5.021862446068944
+          ],
+          "evaluation": 10,
+          "operation": "initial_population",
+          "score": 7000.572559853227
+        },
+        {
+          "active_parameters": [
+            1.000394443984691,
+            0.5733403584860022,
+            95.38422345805886,
+            0.7917848458767797,
+            0.7763321912224967,
+            4598.007357681158,
+            0.02164271875566473,
+            0.14414235163013722,
+            350.99146290680994,
+            4.544905177930102,
+            2.6470146453579257,
+            0.1085891370099865,
+            2.7619293853799647,
+            3.866475455813376,
+            1.225969589061437,
+            -0.7997474955812733,
+            0.8774798822523272,
+            -5.036076848353689
+          ],
+          "evaluation": 11,
+          "operation": "initial_population",
+          "score": 2710.9768367566794
+        },
+        {
+          "active_parameters": [
+            1.0003519110328503,
+            0.5410539408924895,
+            498.34848706492545,
+            0.7873708718424957,
+            0.6310811273231428,
+            1345.9648946318914,
+            0.08764805591286991,
+            0.0350116319420372,
+            277.15382426812766,
+            16.13604539857789,
+            1.8071526531228845,
+            0.792010413940213,
+            2.8170642552144196,
+            5.103911770506288,
+            2.137342667453056,
+            3.628489107416729,
+            2.2709238116297286,
+            -5.5922928640577965
+          ],
+          "evaluation": 12,
+          "operation": "initial_population",
+          "score": 863.9561346754524
+        },
+        {
+          "active_parameters": [
+            1.0003588921891378,
+            0.9118409330240766,
+            452.40439145283574,
+            0.27596378231139534,
+            0.7138913610082699,
+            2987.9588706910718,
+            0.115576033990606,
+            0.06515289502689453,
+            106.58489090364327,
+            12.200781715463771,
+            2.2237649268620063,
+            0.527656772523087,
+            1.4578181414299598,
+            5.6363681353887936,
+            3.9276464082641214,
+            2.3722372984838795,
+            1.823500577566065,
+            -6.3162304173648725
+          ],
+          "evaluation": 13,
+          "operation": "initial_population",
+          "score": 827.6475113498376
+        },
+        {
+          "active_parameters": [
+            1.000490302178562,
+            0.5028489672190499,
+            188.33590325925678,
+            0.11624556517138841,
+            0.29650999150131446,
+            2302.2702492039507,
+            0.17748161709271876,
+            0.208930340012226,
+            215.2124081072715,
+            6.455903250875082,
+            0.4761956027738088,
+            4.923489472569593,
+            0.1730688103522814,
+            5.486825578723568,
+            0.6383380548172884,
+            2.7070623750798273,
+            1.9027360239550188,
+            -6.8380638929854465
+          ],
+          "evaluation": 14,
+          "operation": "initial_population",
+          "score": 6568.6526525597765
+        },
+        {
+          "active_parameters": [
+            1.0006084422652781,
+            0.5016782849928813,
+            80.33450899082908,
+            0.809377488017085,
+            0.9181783523630508,
+            1045.9677441343379,
+            0.0890186081128668,
+            0.14886466523516373,
+            158.76563872245964,
+            15.300403889304517,
+            0.3474313333266622,
+            2.495164226606347,
+            0.00013920438862446982,
+            5.15432986804376,
+            2.174836711987296,
+            4.8362607563081434,
+            1.187546779216634,
+            -5.929805524671792
+          ],
+          "evaluation": 15,
+          "operation": "initial_population",
+          "score": 1830.1209839703495
+        },
+        {
+          "active_parameters": [
+            1.0003121440808573,
+            0.9106776552960237,
+            125.52253376293334,
+            0.7180456237803431,
+            0.5471062748078759,
+            1328.5627761685641,
+            0.21503375766514385,
+            0.21528720489418765,
+            373.6131243488321,
+            11.820083262867307,
+            0.36504825875980684,
+            1.17408334850737,
+            0.6514806039552519,
+            2.051916157888165,
+            2.2866073777183713,
+            -0.7593019288004732,
+            0.35830913123370167,
+            -5.536919893542947
+          ],
+          "evaluation": 16,
+          "operation": "initial_population",
+          "score": 768.5496972937914
+        },
+        {
+          "active_parameters": [
+            1.000365525685454,
+            0.7055711546567787,
+            239.21329123363344,
+            0.617723693166666,
+            0.09753379574539511,
+            1307.0603160098447,
+            0.20441910329578214,
+            0.2190020434390748,
+            907.7488241435896,
+            8.553261123025802,
+            0.5197095562451693,
+            0.6101826271745626,
+            2.594527528902877,
+            7.155878059558633,
+            4.703170114116238,
+            -0.7170365414557325,
+            2.4351393889164594,
+            -6.8622867831300205
+          ],
+          "evaluation": 17,
+          "operation": "initial_population",
+          "score": 3412.5183045386434
+        },
+        {
+          "active_parameters": [
+            1.0000505236334938,
+            0.7461798686208904,
+            268.93900877042597,
+            0.495442286747239,
+            0.9082731754063701,
+            3809.9909318815294,
+            0.17458384126128051,
+            0.06739231683317035,
+            754.3526085584085,
+            14.161008814182402,
+            0.40646095137600147,
+            3.991779040918872,
+            1.6810805959702901,
+            2.5011707064838475,
+            0.8785297057754495,
+            1.5225948088899584,
+            1.4814420673330404,
+            -6.536559831671849
+          ],
+          "evaluation": 18,
+          "operation": "initial_population",
+          "score": 5112.791280950869
+        },
+        {
+          "active_parameters": [
+            1.0008898370618968,
+            0.12883416908414896,
+            450.02665545714274,
+            0.4963334419852405,
+            0.6073578941662288,
+            3099.491392318067,
+            0.19840823164094187,
+            0.21141941547187598,
+            540.642901452055,
+            10.428954737815516,
+            2.841760729420087,
+            2.0379454689171523,
+            1.0694276169706385,
+            5.922091854596754,
+            0.7931680899645619,
+            4.196845784289372,
+            2.1962450477283726,
+            -6.891503443521609
+          ],
+          "evaluation": 19,
+          "operation": "initial_population",
+          "score": 14999.989972111136
+        },
+        {
+          "active_parameters": [
+            1.0009592426829255,
+            0.06038194854935593,
+            31.167522826731677,
+            0.7451304456773513,
+            0.1070085301057161,
+            2862.688142382974,
+            0.08440047174388579,
+            0.22692324873228484,
+            453.2066574310558,
+            2.3441274863217223,
+            1.6598524232862333,
+            3.3636715946382068,
+            2.16777132557307,
+            5.072985062141777,
+            3.4254214442982214,
+            3.9903035337007564,
+            0.8933248696985885,
+            -5.037239008758677
+          ],
+          "evaluation": 20,
+          "operation": "initial_population",
+          "score": 15489.319709348802
+        },
+        {
+          "active_parameters": [
+            1.0006293282855,
+            0.35195501870450124,
+            460.42085387574264,
+            0.30921218039046505,
+            0.729296712844121,
+            2173.649144825503,
+            0.19530483557524272,
+            0.09076651860764488,
+            329.829719721885,
+            1.3803632384103135,
+            2.826563738045066,
+            2.168954914785707,
+            2.814737111871562,
+            2.0994005524097923,
+            4.6905540825494185,
+            1.1189790849988088,
+            0.7616943774617096,
+            -6.3250700524663515
+          ],
+          "evaluation": 21,
+          "operation": "initial_population",
+          "score": 6867.920527941703
+        },
+        {
+          "active_parameters": [
+            1.0000949105047832,
+            0.7885206135935664,
+            424.60318888071293,
+            0.30077797772023984,
+            0.13472873372766084,
+            2079.536176330257,
+            0.18280298682914758,
+            0.006027223884000411,
+            949.8510897902678,
+            10.086321830838404,
+            1.9321745495243532,
+            4.506546575761675,
+            1.5819394352274103,
+            5.7194944193351684,
+            2.84540699382678,
+            -0.8266235222727567,
+            1.041628778570784,
+            -5.21744744102676
+          ],
+          "evaluation": 22,
+          "operation": "initial_population",
+          "score": 538.9177660126369
+        },
+        {
+          "active_parameters": [
+            1.0001852702021488,
+            0.3459929805614728,
+            483.5007885791268,
+            0.29154761525170353,
+            0.8246325462963895,
+            3981.9923729739376,
+            0.1324451297377318,
+            0.0874096112749775,
+            158.73330757997903,
+            18.976946421612073,
+            2.6204704306310522,
+            1.4930487906821208,
+            1.0982893440982786,
+            6.421372939164001,
+            5.572620354512962,
+            3.912014086324807,
+            1.3771390068061011,
+            -6.793932508513442
+          ],
+          "evaluation": 23,
+          "operation": "initial_population",
+          "score": 8840.042462703608
+        },
+        {
+          "active_parameters": [
+            1.0006423550032841,
+            0.6031350947812424,
+            80.04825726668469,
+            0.42698366918412006,
+            0.7840814878654966,
+            845.1413405137971,
+            0.2202877349368694,
+            0.19226475673801782,
+            309.0687403442556,
+            5.552268394465495,
+            1.6027966219215841,
+            1.910621147961651,
+            2.768698041756891,
+            6.140231153729599,
+            3.8534733179963747,
+            -0.7804862479428811,
+            0.07424769833375977,
+            -6.501959098309583
+          ],
+          "evaluation": 24,
+          "operation": "initial_population",
+          "score": 1885.5720883673523
+        }
+      ]
+    },
+    "seed_a_repeat": {
+      "best_parameters": {
+        "AXV_BEXP": 0.3,
+        "BASERTE": 50.0,
+        "FPRIMQB": 0.5,
+        "FRACLOWZ": 0.5,
+        "FRACTEN": 0.5,
+        "FRCHZNE": 0.5,
+        "IFLWRTE": 500.0,
+        "LAPSE": -5.0,
+        "LOGLAMB": 7.5,
+        "MAXWATR_1": 100.0,
+        "MAXWATR_2": 1000.0,
+        "MBASE": 1.0,
+        "MFMAX": 4.2,
+        "MFMIN": 2.4,
+        "OPG": 0.5,
+        "PERCEXP": 5.0,
+        "PERCFRAC": 0.5,
+        "PERCRTE": 100.0,
+        "PXTEMP": 1.0,
+        "QBRATE_2A": 0.025,
+        "QBRATE_2B": 0.01,
+        "QB_POWR": 5.0,
+        "QB_PRMS": 0.01,
+        "RFERR_ADD": 0.0,
+        "RFERR_MLT": 1.0,
+        "RFH1_MEAN": 0.003,
+        "RFH2_SDEV": 0.361,
+        "RH1P_MEAN": 0.0,
+        "RH1P_SDEV": 0.4,
+        "RH2P_MEAN": 0.05,
+        "RH2P_SDEV": 0.7,
+        "RTFRAC1": 0.75,
+        "SACPEXP": 5.0,
+        "SACPMLT": 10.0,
+        "SAREAMAX": 0.25,
+        "TIMEDELAY": 0.9,
+        "TISHAPE": 3.0
+      },
+      "best_score": 196.38737405988257,
+      "config": {
+        "kstop": 3,
+        "max_evaluations": 24,
+        "n_complexes": 2,
+        "pcento": 0.0,
+        "population_size": 24
+      },
+      "elapsed_seconds": 0.8495249230181798,
+      "evaluation_count": 24,
+      "execution": {
+        "basin_ids": [
+          "USA_09447800",
+          "USA_14138900"
+        ],
+        "batch_size": 2,
+        "compile_backend": "inductor",
+        "compile_fullgraph": true,
+        "compile_step": true,
+        "evaluator": "UnifiedEvaluator.score_batched",
+        "kernel": "simulate_coupled_rk2_batched",
+        "rng": "torch.Generator(device=cpu).manual_seed(config.seed)"
+      },
+      "method": "SCE-UA",
+      "model_id": 2,
+      "parameter_names": [
+        "RFERR_MLT",
+        "FRACTEN",
+        "MAXWATR_1",
+        "PERCFRAC",
+        "FPRIMQB",
+        "MAXWATR_2",
+        "QBRATE_2A",
+        "QBRATE_2B",
+        "PERCRTE",
+        "PERCEXP",
+        "AXV_BEXP",
+        "TIMEDELAY",
+        "MBASE",
+        "MFMAX",
+        "MFMIN",
+        "PXTEMP",
+        "OPG",
+        "LAPSE"
+      ],
+      "seed": 20260901,
+      "stop_reason": "max_evaluations",
+      "trajectory": [
+        {
+          "active_parameters": [
+            1.0,
+            0.5,
+            100.0,
+            0.5,
+            0.5,
+            1000.0,
+            0.025,
+            0.01,
+            100.0,
+            5.0,
+            0.3,
+            0.9,
+            1.0,
+            4.2,
+            2.4,
+            1.0,
+            0.5,
+            -5.0
+          ],
+          "evaluation": 1,
+          "operation": "initial_population",
+          "score": 196.38737405988257
+        },
+        {
+          "active_parameters": [
+            1.0004502420479175,
+            0.9331976311435602,
+            476.6476795120226,
+            0.6161411907376012,
+            0.3430118689440553,
+            1616.343801365536,
+            0.21588679711561448,
+            0.22290766921350316,
+            601.719080058891,
+            16.60382132597043,
+            2.9173180075986767,
+            2.523424146590766,
+            1.9936266184737594,
+            5.426048509400982,
+            4.935435807427193,
+            3.082147994919201,
+            0.2566167725814883,
+            -6.449567358434725
+          ],
+          "evaluation": 2,
+          "operation": "initial_population",
+          "score": 643.6507866685298
+        },
+        {
+          "active_parameters": [
+            1.0000375282344423,
+            0.304427972749466,
+            26.478164903093766,
+            0.05536346078688262,
+            0.4381992414355679,
+            794.4656551299394,
+            0.0881476040024963,
+            0.23235724241417113,
+            718.6621999516194,
+            18.86407897449809,
+            2.190827641479502,
+            0.502377869750836,
+            2.7127240743335013,
+            3.3060630471414605,
+            2.8180491832816585,
+            0.4974408080927566,
+            2.065893003941069,
+            -6.906580921706791
+          ],
+          "evaluation": 3,
+          "operation": "initial_population",
+          "score": 3644.8397745046395
+        },
+        {
+          "active_parameters": [
+            1.0002740653496895,
+            0.40234836721116646,
+            207.23076325854927,
+            0.5530513891783275,
+            0.2660919752896865,
+            3765.443073042838,
+            0.22527374351155394,
+            0.011170090098877872,
+            467.4108330676625,
+            12.208018908425677,
+            1.628683772350046,
+            2.4127249487331004,
+            0.16716733617280088,
+            5.351065758747498,
+            5.067478330402783,
+            2.8388213964448648,
+            0.8005989393527388,
+            -5.214852793966644
+          ],
+          "evaluation": 4,
+          "operation": "initial_population",
+          "score": 4219.487364516841
+        },
+        {
+          "active_parameters": [
+            1.0008543704122421,
+            0.35196347997502986,
+            403.1530912600339,
+            0.12317934915809992,
+            0.43993662842632775,
+            3632.827030835604,
+            0.20141201969012332,
+            0.16048622410728844,
+            573.8831284760913,
+            16.756639449372308,
+            2.852728538165727,
+            2.2526854946356982,
+            0.35256493787907683,
+            7.749272551192696,
+            2.9592205392036703,
+            2.1709797777794027,
+            0.9323843058819938,
+            -4.226784413563312
+          ],
+          "evaluation": 5,
+          "operation": "initial_population",
+          "score": 11816.737373741986
+        },
+        {
+          "active_parameters": [
+            1.0003965993365542,
+            0.1753885988514498,
+            82.83127946572472,
+            0.6584225012477032,
+            0.09266393208426449,
+            1625.0035901773208,
+            0.16827692298768396,
+            0.23145014034408545,
+            762.5040071030228,
+            9.112992110182446,
+            1.1530910069494251,
+            1.7869122165538132,
+            0.3487017003107261,
+            4.406855707629774,
+            2.4933486663986426,
+            0.8280670033685893,
+            2.1962015996529276,
+            -5.032675273598143
+          ],
+          "evaluation": 6,
+          "operation": "initial_population",
+          "score": 8318.532385222283
+        },
+        {
+          "active_parameters": [
+            1.0005802370538925,
+            0.4662655995137388,
+            155.2189199723991,
+            0.23931939219260745,
+            0.4934729114955459,
+            1581.0322468650966,
+            0.15146105124995446,
+            0.2035343916179762,
+            327.049763037043,
+            10.188885889111532,
+            1.4340774920579356,
+            0.20342186089017378,
+            1.6214071198027362,
+            7.1697249179572715,
+            1.4538891126287719,
+            4.126145891046646,
+            1.0479262576932358,
+            -6.622694332520798
+          ],
+          "evaluation": 7,
+          "operation": "initial_population",
+          "score": 6480.878162837563
+        },
+        {
+          "active_parameters": [
+            1.0004495104151645,
+            0.11808329129501309,
+            297.50622143925,
+            0.6813964515189033,
+            0.7758568647309659,
+            2321.412279308484,
+            0.04215255220252698,
+            0.16628438217466499,
+            852.2295761329543,
+            1.0003727562391367,
+            1.0322087715441732,
+            0.015042968934172703,
+            1.6912468323409104,
+            6.3355629702096445,
+            2.201281431666936,
+            3.958861201742966,
+            0.6462029785300283,
+            -4.058892534683061
+          ],
+          "evaluation": 8,
+          "operation": "initial_population",
+          "score": 4735.3026235916295
+        },
+        {
+          "active_parameters": [
+            1.0006800045302977,
+            0.2264209311587419,
+            392.52427632535944,
+            0.5544342847531049,
+            0.21540437396221923,
+            4618.036858489141,
+            0.0032341971503077687,
+            0.09107179812406374,
+            978.484856097656,
+            5.81234498810317,
+            1.9507701390268193,
+            1.809811157081412,
+            1.4641199951966297,
+            3.837395086280036,
+            5.3157226655624985,
+            4.772617617714774,
+            0.31208149615080366,
+            -6.918206747848572
+          ],
+          "evaluation": 9,
+          "operation": "initial_population",
+          "score": 8298.523858704335
+        },
+        {
+          "active_parameters": [
+            1.0003192224498,
+            0.5965830569626768,
+            345.0205169420647,
+            0.11022616598681866,
+            0.7494659643569384,
+            2767.606941383151,
+            0.17224901138898843,
+            0.10299495396377545,
+            932.3705340300081,
+            19.3912321075788,
+            2.5598505304550776,
+            0.2267978284915467,
+            2.466768777934102,
+            6.760159605123352,
+            3.1506521774118506,
+            1.7117611738913037,
+            1.0512236806329907,
+            -5.021862446068944
+          ],
+          "evaluation": 10,
+          "operation": "initial_population",
+          "score": 7000.572559853227
+        },
+        {
+          "active_parameters": [
+            1.000394443984691,
+            0.5733403584860022,
+            95.38422345805886,
+            0.7917848458767797,
+            0.7763321912224967,
+            4598.007357681158,
+            0.02164271875566473,
+            0.14414235163013722,
+            350.99146290680994,
+            4.544905177930102,
+            2.6470146453579257,
+            0.1085891370099865,
+            2.7619293853799647,
+            3.866475455813376,
+            1.225969589061437,
+            -0.7997474955812733,
+            0.8774798822523272,
+            -5.036076848353689
+          ],
+          "evaluation": 11,
+          "operation": "initial_population",
+          "score": 2710.9768367566794
+        },
+        {
+          "active_parameters": [
+            1.0003519110328503,
+            0.5410539408924895,
+            498.34848706492545,
+            0.7873708718424957,
+            0.6310811273231428,
+            1345.9648946318914,
+            0.08764805591286991,
+            0.0350116319420372,
+            277.15382426812766,
+            16.13604539857789,
+            1.8071526531228845,
+            0.792010413940213,
+            2.8170642552144196,
+            5.103911770506288,
+            2.137342667453056,
+            3.628489107416729,
+            2.2709238116297286,
+            -5.5922928640577965
+          ],
+          "evaluation": 12,
+          "operation": "initial_population",
+          "score": 863.9561346754524
+        },
+        {
+          "active_parameters": [
+            1.0003588921891378,
+            0.9118409330240766,
+            452.40439145283574,
+            0.27596378231139534,
+            0.7138913610082699,
+            2987.9588706910718,
+            0.115576033990606,
+            0.06515289502689453,
+            106.58489090364327,
+            12.200781715463771,
+            2.2237649268620063,
+            0.527656772523087,
+            1.4578181414299598,
+            5.6363681353887936,
+            3.9276464082641214,
+            2.3722372984838795,
+            1.823500577566065,
+            -6.3162304173648725
+          ],
+          "evaluation": 13,
+          "operation": "initial_population",
+          "score": 827.6475113498376
+        },
+        {
+          "active_parameters": [
+            1.000490302178562,
+            0.5028489672190499,
+            188.33590325925678,
+            0.11624556517138841,
+            0.29650999150131446,
+            2302.2702492039507,
+            0.17748161709271876,
+            0.208930340012226,
+            215.2124081072715,
+            6.455903250875082,
+            0.4761956027738088,
+            4.923489472569593,
+            0.1730688103522814,
+            5.486825578723568,
+            0.6383380548172884,
+            2.7070623750798273,
+            1.9027360239550188,
+            -6.8380638929854465
+          ],
+          "evaluation": 14,
+          "operation": "initial_population",
+          "score": 6568.6526525597765
+        },
+        {
+          "active_parameters": [
+            1.0006084422652781,
+            0.5016782849928813,
+            80.33450899082908,
+            0.809377488017085,
+            0.9181783523630508,
+            1045.9677441343379,
+            0.0890186081128668,
+            0.14886466523516373,
+            158.76563872245964,
+            15.300403889304517,
+            0.3474313333266622,
+            2.495164226606347,
+            0.00013920438862446982,
+            5.15432986804376,
+            2.174836711987296,
+            4.8362607563081434,
+            1.187546779216634,
+            -5.929805524671792
+          ],
+          "evaluation": 15,
+          "operation": "initial_population",
+          "score": 1830.1209839703495
+        },
+        {
+          "active_parameters": [
+            1.0003121440808573,
+            0.9106776552960237,
+            125.52253376293334,
+            0.7180456237803431,
+            0.5471062748078759,
+            1328.5627761685641,
+            0.21503375766514385,
+            0.21528720489418765,
+            373.6131243488321,
+            11.820083262867307,
+            0.36504825875980684,
+            1.17408334850737,
+            0.6514806039552519,
+            2.051916157888165,
+            2.2866073777183713,
+            -0.7593019288004732,
+            0.35830913123370167,
+            -5.536919893542947
+          ],
+          "evaluation": 16,
+          "operation": "initial_population",
+          "score": 768.5496972937914
+        },
+        {
+          "active_parameters": [
+            1.000365525685454,
+            0.7055711546567787,
+            239.21329123363344,
+            0.617723693166666,
+            0.09753379574539511,
+            1307.0603160098447,
+            0.20441910329578214,
+            0.2190020434390748,
+            907.7488241435896,
+            8.553261123025802,
+            0.5197095562451693,
+            0.6101826271745626,
+            2.594527528902877,
+            7.155878059558633,
+            4.703170114116238,
+            -0.7170365414557325,
+            2.4351393889164594,
+            -6.8622867831300205
+          ],
+          "evaluation": 17,
+          "operation": "initial_population",
+          "score": 3412.5183045386434
+        },
+        {
+          "active_parameters": [
+            1.0000505236334938,
+            0.7461798686208904,
+            268.93900877042597,
+            0.495442286747239,
+            0.9082731754063701,
+            3809.9909318815294,
+            0.17458384126128051,
+            0.06739231683317035,
+            754.3526085584085,
+            14.161008814182402,
+            0.40646095137600147,
+            3.991779040918872,
+            1.6810805959702901,
+            2.5011707064838475,
+            0.8785297057754495,
+            1.5225948088899584,
+            1.4814420673330404,
+            -6.536559831671849
+          ],
+          "evaluation": 18,
+          "operation": "initial_population",
+          "score": 5112.791280950869
+        },
+        {
+          "active_parameters": [
+            1.0008898370618968,
+            0.12883416908414896,
+            450.02665545714274,
+            0.4963334419852405,
+            0.6073578941662288,
+            3099.491392318067,
+            0.19840823164094187,
+            0.21141941547187598,
+            540.642901452055,
+            10.428954737815516,
+            2.841760729420087,
+            2.0379454689171523,
+            1.0694276169706385,
+            5.922091854596754,
+            0.7931680899645619,
+            4.196845784289372,
+            2.1962450477283726,
+            -6.891503443521609
+          ],
+          "evaluation": 19,
+          "operation": "initial_population",
+          "score": 14999.989972111136
+        },
+        {
+          "active_parameters": [
+            1.0009592426829255,
+            0.06038194854935593,
+            31.167522826731677,
+            0.7451304456773513,
+            0.1070085301057161,
+            2862.688142382974,
+            0.08440047174388579,
+            0.22692324873228484,
+            453.2066574310558,
+            2.3441274863217223,
+            1.6598524232862333,
+            3.3636715946382068,
+            2.16777132557307,
+            5.072985062141777,
+            3.4254214442982214,
+            3.9903035337007564,
+            0.8933248696985885,
+            -5.037239008758677
+          ],
+          "evaluation": 20,
+          "operation": "initial_population",
+          "score": 15489.319709348802
+        },
+        {
+          "active_parameters": [
+            1.0006293282855,
+            0.35195501870450124,
+            460.42085387574264,
+            0.30921218039046505,
+            0.729296712844121,
+            2173.649144825503,
+            0.19530483557524272,
+            0.09076651860764488,
+            329.829719721885,
+            1.3803632384103135,
+            2.826563738045066,
+            2.168954914785707,
+            2.814737111871562,
+            2.0994005524097923,
+            4.6905540825494185,
+            1.1189790849988088,
+            0.7616943774617096,
+            -6.3250700524663515
+          ],
+          "evaluation": 21,
+          "operation": "initial_population",
+          "score": 6867.920527941703
+        },
+        {
+          "active_parameters": [
+            1.0000949105047832,
+            0.7885206135935664,
+            424.60318888071293,
+            0.30077797772023984,
+            0.13472873372766084,
+            2079.536176330257,
+            0.18280298682914758,
+            0.006027223884000411,
+            949.8510897902678,
+            10.086321830838404,
+            1.9321745495243532,
+            4.506546575761675,
+            1.5819394352274103,
+            5.7194944193351684,
+            2.84540699382678,
+            -0.8266235222727567,
+            1.041628778570784,
+            -5.21744744102676
+          ],
+          "evaluation": 22,
+          "operation": "initial_population",
+          "score": 538.9177660126369
+        },
+        {
+          "active_parameters": [
+            1.0001852702021488,
+            0.3459929805614728,
+            483.5007885791268,
+            0.29154761525170353,
+            0.8246325462963895,
+            3981.9923729739376,
+            0.1324451297377318,
+            0.0874096112749775,
+            158.73330757997903,
+            18.976946421612073,
+            2.6204704306310522,
+            1.4930487906821208,
+            1.0982893440982786,
+            6.421372939164001,
+            5.572620354512962,
+            3.912014086324807,
+            1.3771390068061011,
+            -6.793932508513442
+          ],
+          "evaluation": 23,
+          "operation": "initial_population",
+          "score": 8840.042462703608
+        },
+        {
+          "active_parameters": [
+            1.0006423550032841,
+            0.6031350947812424,
+            80.04825726668469,
+            0.42698366918412006,
+            0.7840814878654966,
+            845.1413405137971,
+            0.2202877349368694,
+            0.19226475673801782,
+            309.0687403442556,
+            5.552268394465495,
+            1.6027966219215841,
+            1.910621147961651,
+            2.768698041756891,
+            6.140231153729599,
+            3.8534733179963747,
+            -0.7804862479428811,
+            0.07424769833375977,
+            -6.501959098309583
+          ],
+          "evaluation": 24,
+          "operation": "initial_population",
+          "score": 1885.5720883673523
+        }
+      ]
+    },
+    "seed_b": {
+      "best_parameters": {
+        "AXV_BEXP": 0.3,
+        "BASERTE": 50.0,
+        "FPRIMQB": 0.5,
+        "FRACLOWZ": 0.5,
+        "FRACTEN": 0.5,
+        "FRCHZNE": 0.5,
+        "IFLWRTE": 500.0,
+        "LAPSE": -5.0,
+        "LOGLAMB": 7.5,
+        "MAXWATR_1": 100.0,
+        "MAXWATR_2": 1000.0,
+        "MBASE": 1.0,
+        "MFMAX": 4.2,
+        "MFMIN": 2.4,
+        "OPG": 0.5,
+        "PERCEXP": 5.0,
+        "PERCFRAC": 0.5,
+        "PERCRTE": 100.0,
+        "PXTEMP": 1.0,
+        "QBRATE_2A": 0.025,
+        "QBRATE_2B": 0.01,
+        "QB_POWR": 5.0,
+        "QB_PRMS": 0.01,
+        "RFERR_ADD": 0.0,
+        "RFERR_MLT": 1.0,
+        "RFH1_MEAN": 0.003,
+        "RFH2_SDEV": 0.361,
+        "RH1P_MEAN": 0.0,
+        "RH1P_SDEV": 0.4,
+        "RH2P_MEAN": 0.05,
+        "RH2P_SDEV": 0.7,
+        "RTFRAC1": 0.75,
+        "SACPEXP": 5.0,
+        "SACPMLT": 10.0,
+        "SAREAMAX": 0.25,
+        "TIMEDELAY": 0.9,
+        "TISHAPE": 3.0
+      },
+      "best_score": 196.38737405988257,
+      "config": {
+        "kstop": 3,
+        "max_evaluations": 24,
+        "n_complexes": 2,
+        "pcento": 0.0,
+        "population_size": 24
+      },
+      "elapsed_seconds": 0.9098755849990994,
+      "evaluation_count": 24,
+      "execution": {
+        "basin_ids": [
+          "USA_09447800",
+          "USA_14138900"
+        ],
+        "batch_size": 2,
+        "compile_backend": "inductor",
+        "compile_fullgraph": true,
+        "compile_step": true,
+        "evaluator": "UnifiedEvaluator.score_batched",
+        "kernel": "simulate_coupled_rk2_batched",
+        "rng": "torch.Generator(device=cpu).manual_seed(config.seed)"
+      },
+      "method": "SCE-UA",
+      "model_id": 2,
+      "parameter_names": [
+        "RFERR_MLT",
+        "FRACTEN",
+        "MAXWATR_1",
+        "PERCFRAC",
+        "FPRIMQB",
+        "MAXWATR_2",
+        "QBRATE_2A",
+        "QBRATE_2B",
+        "PERCRTE",
+        "PERCEXP",
+        "AXV_BEXP",
+        "TIMEDELAY",
+        "MBASE",
+        "MFMAX",
+        "MFMIN",
+        "PXTEMP",
+        "OPG",
+        "LAPSE"
+      ],
+      "seed": 20260902,
+      "stop_reason": "max_evaluations",
+      "trajectory": [
+        {
+          "active_parameters": [
+            1.0,
+            0.5,
+            100.0,
+            0.5,
+            0.5,
+            1000.0,
+            0.025,
+            0.01,
+            100.0,
+            5.0,
+            0.3,
+            0.9,
+            1.0,
+            4.2,
+            2.4,
+            1.0,
+            0.5,
+            -5.0
+          ],
+          "evaluation": 1,
+          "operation": "initial_population",
+          "score": 196.38737405988257
+        },
+        {
+          "active_parameters": [
+            1.0009698662074884,
+            0.28685178012940604,
+            390.6314283579243,
+            0.2890406862739915,
+            0.4266332011359671,
+            4588.862534214196,
+            0.2311430895889714,
+            0.15304503680739875,
+            676.9139859390202,
+            14.376927084188093,
+            2.167185583885866,
+            3.7379404151293762,
+            0.14060971107263653,
+            5.855385945959751,
+            2.722709876238739,
+            0.34872294035646845,
+            1.0722368295977383,
+            -6.025282764337293
+          ],
+          "evaluation": 2,
+          "operation": "initial_population",
+          "score": 18152.9266943021
+        },
+        {
+          "active_parameters": [
+            1.000718023618788,
+            0.7404617171017945,
+            82.09945330649379,
+            0.482031878893907,
+            0.32354191944917493,
+            3805.5196673221153,
+            0.019452127426305702,
+            0.24005370672320836,
+            64.34231423445853,
+            12.886830332379043,
+            0.21314166298506365,
+            0.37815232825849393,
+            0.1810801570764098,
+            2.384420587960498,
+            4.3367772336209605,
+            3.7130662766011255,
+            1.5882036252494605,
+            -6.447190805253664
+          ],
+          "evaluation": 3,
+          "operation": "initial_population",
+          "score": 7601.457414159127
+        },
+        {
+          "active_parameters": [
+            1.0001917676372174,
+            0.5786128123778173,
+            60.05734430604534,
+            0.3339864242886164,
+            0.11238908611567704,
+            434.4448618928499,
+            0.07991792685022979,
+            0.12768435675351017,
+            84.47856193392766,
+            19.73597406526095,
+            0.6012531955073843,
+            3.9850699764391866,
+            0.5285416721401414,
+            3.2215903558120162,
+            5.776648460623073,
+            1.840612955216641,
+            2.013594045780604,
+            -4.68666926330063
+          ],
+          "evaluation": 4,
+          "operation": "initial_population",
+          "score": 872.1019300775522
+        },
+        {
+          "active_parameters": [
+            1.000944426362622,
+            0.16106755479238305,
+            26.46451956703933,
+            0.4343417364248039,
+            0.5979065217105215,
+            4405.315425681521,
+            0.018189495230655866,
+            0.047738852441986245,
+            122.69322403397555,
+            15.31102232907033,
+            2.9265019743186547,
+            3.9624578942571054,
+            2.1232916152722727,
+            2.8221785734792504,
+            5.407944542543515,
+            3.7008882983502858,
+            2.2339598248845394,
+            -4.679232544394585
+          ],
+          "evaluation": 5,
+          "operation": "initial_population",
+          "score": 5874.055983786821
+        },
+        {
+          "active_parameters": [
+            1.0009204648876517,
+            0.9444776010377384,
+            183.48201192722615,
+            0.7103172212780388,
+            0.4495817181515516,
+            4806.532991255641,
+            0.061407506227175675,
+            0.0989908881693321,
+            790.3828163696201,
+            2.3872943941496545,
+            2.9808273348434295,
+            0.2602898776659339,
+            2.8354461437675935,
+            5.714001572949954,
+            0.8091083589875577,
+            3.254211901515184,
+            1.534698835532029,
+            -4.777459190812498
+          ],
+          "evaluation": 6,
+          "operation": "initial_population",
+          "score": 854.6381688752392
+        },
+        {
+          "active_parameters": [
+            1.000929872374375,
+            0.4415367164219798,
+            424.20215752509637,
+            0.7767654409389406,
+            0.05580149214983672,
+            102.77583912295569,
+            0.21737527216733724,
+            0.12995940227131844,
+            602.1473962350725,
+            15.411574043722238,
+            1.92424384947815,
+            3.530087100138738,
+            1.2677236835222043,
+            6.841046383346403,
+            4.917940588284501,
+            4.596502899097513,
+            1.8164366925304036,
+            -6.914507587438274
+          ],
+          "evaluation": 7,
+          "operation": "initial_population",
+          "score": 334.40079438203264
+        },
+        {
+          "active_parameters": [
+            1.0005431730581995,
+            0.4481329089189368,
+            115.48904329942204,
+            0.44940659047359444,
+            0.271028621433165,
+            297.50664014013216,
+            0.24497285081781775,
+            0.045849398560997505,
+            924.8545126938708,
+            15.278087319095908,
+            0.08415171594521403,
+            1.6789818652373207,
+            1.9170422554384041,
+            3.186460260868635,
+            2.5537943671684067,
+            -0.4292650225591925,
+            1.1802985646260251,
+            -4.249763328151598
+          ],
+          "evaluation": 8,
+          "operation": "initial_population",
+          "score": 432.0832726015282
+        },
+        {
+          "active_parameters": [
+            1.0007188556597695,
+            0.4834216589153531,
+            392.40897581424304,
+            0.7662811524116444,
+            0.18974709819714675,
+            845.2275001894175,
+            0.08479809151767746,
+            0.08482207427191454,
+            938.2460075614932,
+            17.15183668028194,
+            0.7304444514568482,
+            3.8087371787394946,
+            2.3995691020089565,
+            7.1265697376313355,
+            5.449512586601679,
+            3.040543018428102,
+            1.5412128064811392,
+            -4.476919772467653
+          ],
+          "evaluation": 9,
+          "operation": "initial_population",
+          "score": 1645.2102010963872
+        },
+        {
+          "active_parameters": [
+            1.0000226968181025,
+            0.5469713894452408,
+            142.69776907382465,
+            0.6714241657145451,
+            0.45576415291328365,
+            4907.881969387501,
+            0.07555703948189757,
+            0.18043893353554408,
+            574.9218269330371,
+            5.857740410295377,
+            1.385885985723953,
+            2.7844954453180613,
+            0.3308373284796958,
+            2.9562302001323753,
+            3.0659158714874883,
+            3.993380648490919,
+            0.08519248490956727,
+            -6.229461485224457
+          ],
+          "evaluation": 10,
+          "operation": "initial_population",
+          "score": 9466.118632271158
+        },
+        {
+          "active_parameters": [
+            1.0001487862006468,
+            0.2645306079709662,
+            154.00656416071476,
+            0.4602276501938977,
+            0.33655937456451546,
+            4951.511882743342,
+            0.004493518392218012,
+            0.14451320299576534,
+            714.6154761938977,
+            16.795533116610876,
+            2.3300120486475078,
+            1.293034625374909,
+            0.7066221052380774,
+            7.9150234216263105,
+            1.4503343936478323,
+            1.529410329525223,
+            2.3507539347049824,
+            -6.195181286496176
+          ],
+          "evaluation": 11,
+          "operation": "initial_population",
+          "score": 9571.309921877011
+        },
+        {
+          "active_parameters": [
+            1.0008393729025071,
+            0.690401177070476,
+            443.5153614842964,
+            0.9404093044113935,
+            0.7064967361375962,
+            3098.880906906375,
+            0.12626152628175774,
+            0.19480234656643083,
+            537.1414468847964,
+            1.5590441459356557,
+            0.5969063115543316,
+            4.856620491071588,
+            1.9280834013540231,
+            4.051128254035871,
+            5.238231421619292,
+            4.085816696055577,
+            0.6260132796879883,
+            -5.026357716731546
+          ],
+          "evaluation": 12,
+          "operation": "initial_population",
+          "score": 5392.758354345737
+        },
+        {
+          "active_parameters": [
+            1.0007025065282464,
+            0.6885605454988795,
+            387.21393199942656,
+            0.8146723269747967,
+            0.6038545724479947,
+            1924.9750327858726,
+            0.16046056649817717,
+            0.22384568176693692,
+            81.7150851500908,
+            5.8372342235248755,
+            0.17501502650989303,
+            3.8629665945367497,
+            2.7885637166627952,
+            5.866938400126325,
+            5.580055769523671,
+            3.1272924309573256,
+            1.0635313246470814,
+            -6.860826939829428
+          ],
+          "evaluation": 13,
+          "operation": "initial_population",
+          "score": 3347.5286679255414
+        },
+        {
+          "active_parameters": [
+            1.0000534397463459,
+            0.9312949495863938,
+            428.4153633059642,
+            0.6551659307456336,
+            0.7141773444507318,
+            4339.023955397158,
+            0.07500600854566865,
+            0.15494036151812346,
+            130.50193279582732,
+            19.387639862224315,
+            1.8187272135571286,
+            1.3963109445270148,
+            2.9078644062466115,
+            3.3911626696427604,
+            2.3038272378791804,
+            2.414001829960391,
+            2.360524320459301,
+            -4.366012111287059
+          ],
+          "evaluation": 14,
+          "operation": "initial_population",
+          "score": 761.4406171580359
+        },
+        {
+          "active_parameters": [
+            1.0003771363269762,
+            0.6953259272196521,
+            219.59411885291868,
+            0.8988847338842362,
+            0.6118567447652073,
+            3251.699534821379,
+            0.19960385938119232,
+            0.2189578716508964,
+            671.0268835044471,
+            17.12139864932148,
+            1.4604727405961233,
+            4.599867114019138,
+            1.0926604618169327,
+            4.010036485835806,
+            3.466634475947154,
+            1.0783410838131164,
+            0.2767985682896276,
+            -6.407520435101763
+          ],
+          "evaluation": 15,
+          "operation": "initial_population",
+          "score": 5857.3961117431145
+        },
+        {
+          "active_parameters": [
+            1.000953673294082,
+            0.1818338883966351,
+            452.017927157416,
+            0.4242614345419664,
+            0.6861696235851147,
+            1698.465550994211,
+            0.16112383000542707,
+            0.2431993864436544,
+            612.154332342824,
+            1.4298107210081614,
+            1.855700779035453,
+            1.7549616367629761,
+            1.4627994271090754,
+            2.0740729572211696,
+            2.6283468164589276,
+            0.4644231580813831,
+            0.924833219082152,
+            -6.167316172489196
+          ],
+          "evaluation": 16,
+          "operation": "initial_population",
+          "score": 7718.781587943366
+        },
+        {
+          "active_parameters": [
+            1.0009165037021766,
+            0.25643001173319596,
+            361.02505058002697,
+            0.781355952710085,
+            0.8906101650737034,
+            84.67092837077561,
+            0.10740365856567784,
+            0.06563498086752013,
+            215.04548391025014,
+            18.492099207999072,
+            2.8515174425327663,
+            2.074028746694661,
+            1.1983991270578114,
+            3.9018324030401086,
+            5.978228359552258,
+            0.28095512395793976,
+            0.35836117542562274,
+            -5.3229251939391515
+          ],
+          "evaluation": 17,
+          "operation": "initial_population",
+          "score": 401.29502211225827
+        },
+        {
+          "active_parameters": [
+            1.0009044758347623,
+            0.21957172022167626,
+            445.9498484982954,
+            0.051012969874941694,
+            0.1507718635372433,
+            3833.559350193099,
+            0.16456903569691492,
+            0.011998446571831134,
+            320.232285810352,
+            16.671977496687187,
+            1.2910854191995278,
+            4.967457345019549,
+            2.5902178392315083,
+            3.4275749317675785,
+            0.8182194547168058,
+            0.6644106823113933,
+            2.2087025295709726,
+            -4.245988093890665
+          ],
+          "evaluation": 18,
+          "operation": "initial_population",
+          "score": 4068.1690826397767
+        },
+        {
+          "active_parameters": [
+            1.0006064100735348,
+            0.7080382659295957,
+            255.40012420176504,
+            0.23683760457138692,
+            0.48264244586440463,
+            1299.0181136135145,
+            0.16444170666138738,
+            0.2212529931315595,
+            438.2307463095783,
+            19.128014175293156,
+            2.74446649837951,
+            3.8919075399592726,
+            1.2452328491167162,
+            5.867692335340093,
+            4.763813846881178,
+            4.754253620294543,
+            2.318356519434485,
+            -4.270139452762514
+          ],
+          "evaluation": 19,
+          "operation": "initial_population",
+          "score": 2190.1870725419403
+        },
+        {
+          "active_parameters": [
+            1.0001844220790932,
+            0.4774558941606083,
+            150.41096664029203,
+            0.5186995470622748,
+            0.932067793691459,
+            3344.380977099456,
+            0.09042417017985704,
+            0.06841878533050667,
+            981.4883482028692,
+            9.025830090527315,
+            0.2828567734816606,
+            0.889042013774755,
+            0.33182002517774845,
+            4.207498077363511,
+            1.0132825401044432,
+            2.761153225342357,
+            2.203909333373222,
+            -4.419322720955318
+          ],
+          "evaluation": 20,
+          "operation": "initial_population",
+          "score": 3490.76181495925
+        },
+        {
+          "active_parameters": [
+            1.0001386914822994,
+            0.7346530191061306,
+            97.27280600690051,
+            0.5185314022209339,
+            0.8364327456086971,
+            2775.6888579591982,
+            0.17176215053373145,
+            0.09649802392309098,
+            643.0190464793246,
+            5.0789108335711255,
+            0.9098011487309803,
+            4.467014510841097,
+            2.581099864176147,
+            7.582996268192024,
+            5.358694173382341,
+            4.193576943795387,
+            0.26310892906640543,
+            -6.181822595221373
+          ],
+          "evaluation": 21,
+          "operation": "initial_population",
+          "score": 3843.249915916799
+        },
+        {
+          "active_parameters": [
+            1.0001780843903862,
+            0.548879350194338,
+            454.3413397709306,
+            0.545847917839447,
+            0.3584936433955053,
+            3305.470742626292,
+            0.13259641992870863,
+            0.12966460910069003,
+            799.2196468624068,
+            17.479044325545335,
+            0.19861803402074296,
+            3.687703973620037,
+            0.6316166840813136,
+            5.4004376214401955,
+            5.205674125761591,
+            2.75763332638042,
+            2.0943895997670996,
+            -5.330584997766476
+          ],
+          "evaluation": 22,
+          "operation": "initial_population",
+          "score": 7093.601568555948
+        },
+        {
+          "active_parameters": [
+            1.0002411248750518,
+            0.08648609343443191,
+            497.3617272289683,
+            0.8973640700756075,
+            0.7544620050162191,
+            2581.2810237925,
+            0.03400525934963896,
+            0.08847218426191551,
+            466.9343598831706,
+            8.107990783713024,
+            2.301142101228854,
+            0.661988877494358,
+            0.480561521399258,
+            6.520584605335691,
+            2.9866734129044596,
+            4.011999434280152,
+            0.5144643996983095,
+            -5.863944968668398
+          ],
+          "evaluation": 23,
+          "operation": "initial_population",
+          "score": 1655.7170013817995
+        },
+        {
+          "active_parameters": [
+            1.0009669058337947,
+            0.1485181632700444,
+            58.24432315403204,
+            0.34257837480799136,
+            0.5558467589114711,
+            3556.228285305449,
+            0.04690527695659262,
+            0.2223071952563866,
+            627.9212622014446,
+            12.226638802199696,
+            0.965321010359672,
+            1.8265974117961723,
+            2.5118398756624645,
+            7.727217879057236,
+            5.216030089761034,
+            4.752982269848141,
+            1.5945984274244038,
+            -6.9797636596067045
+          ],
+          "evaluation": 24,
+          "operation": "initial_population",
+          "score": 10271.633587004293
+        }
+      ]
+    }
+  },
+  "schema_version": "formal-torch-sce-seed-readiness-v1",
+  "source": {
+    "batched": "/home/jingxin/orca/workspaces/dmg-research/autofuse/dfuse/batched.py",
+    "batched_sha256": "2a536aef8ab3e536765428a6c152f441f5066776da244c82bb69a67f2b529160",
+    "evaluator": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/evaluator.py",
+    "evaluator_sha256": "a060319a824bd9ce821e27596b52db70f2e93701bf7fd7908ddc3593da6f92f2",
+    "metrics": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/metrics.py",
+    "metrics_sha256": "435f50669992e6a2bdb71001457717f05c154599e177ea65692384e2ffda066b",
+    "sce": "/home/jingxin/orca/workspaces/dmg-research/autofuse/project/autofuse/sce.py",
+    "sce_sha256": "4861036ec66c75eb4d21876ad4f4d270995f270208bd7a5db7cfe8fd9b6c2959"
+  },
+  "status": "passed"
+}
