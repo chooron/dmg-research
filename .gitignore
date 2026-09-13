@@ -154,3 +154,10 @@ reports/
 **/reports/
 **/report/**
 **/reports/**
+
+# Shapefile caches
+*.shp
+*.shx
+*.dbf
+*.cpg
+*.prj
