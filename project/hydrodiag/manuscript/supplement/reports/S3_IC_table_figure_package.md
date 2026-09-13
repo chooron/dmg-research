@@ -1,1 +1,0 @@
-Table S3.1 formal XAJ family: XAJ D=15 P=90 stdev=.05 generations=300; XAJ_CN D=17 P=102 stdev=.05 generations=300; XAJ_TGD D=18 P=108 stdev=.05 generations=300; 3 seeds x 3 starts; evaluations/start=P x generations. Figure S3.1 uses population result points and labels stdev/generation panels as unavailable. Figure S3.2 uses exact trace checkpoints and provisional TGD coverage.

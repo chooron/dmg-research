@@ -1,1 +1,0 @@
-The authoritative dPL tree exists under results/dpl_camels_531_lite_v2 with seeds 42, 123 and 2026. Basin and protocol alignment are in the machine-readable results. Exact objective implementation identity is not claimed without numerical equivalence evidence.

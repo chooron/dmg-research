@@ -1,1 +1,0 @@
-Restart dispersion is computed over available seed x start records. Budget saturation uses only exact generations present in remote trace.json. The descriptive last-quarter threshold is 0.01 KGE and is not the production stopping rule. Test KGE and physical parameters are absent from the remote result schema; TGD incomplete coverage must remain provisional.

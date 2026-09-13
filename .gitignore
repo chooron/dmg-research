@@ -140,3 +140,17 @@ project/hydrodiag/manuscript/results/**/epoch100_partitions/
 project/hydrodiag/manuscript/results/**/*.zip
 project/hydrodiag/manuscript/supplement/**/*.zip
 project/hydrodiag/manuscript/supplement/_backup_*/
+
+# --- Global rules: ignore all .md files under any manuscript/ directory across all projects ---
+**/manuscript/**/*.md
+**/manuscript/*.md
+manuscript/**/*.md
+manuscript/*.md
+
+# --- Global rules: ignore all report and reports directories across all projects ---
+report/
+reports/
+**/report/
+**/reports/
+**/report/**
+**/reports/**

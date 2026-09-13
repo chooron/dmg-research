@@ -1,3 +1,0 @@
-# Figure S1 caption draft
-
-**Figure S1. Raw model–basin ΔKGE landscape.** Each cell shows `ΔKGE = KGE_dPL − KGE_IC` for one of 36 canonical model structures and one of 531 CAMELS-US basins. Rows use the same canonical model order as Figure 1; columns use an outcome-independent west-to-east longitude order. The diverging color scale is centered at zero and symmetrically clipped at the absolute 98th percentile for visual readability; all 19,116 unmodified values are retained in `R1_model_basin_delta_kge.csv`. This heatmap is descriptive and does not imply estimator suitability, spatial significance, or model selection.

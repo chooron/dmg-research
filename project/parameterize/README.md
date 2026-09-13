@@ -1,51 +1,46 @@
 # Parameterize Project README
 
-This directory contains the paper-facing workflow for learning HBV model
-parameters from static basin attributes. It is intended to help reviewers and
-editors quickly locate the experiment code, analysis pipeline, and manuscript
-artifacts used for the parameter-learning study.
+This directory contains the scientific workflow and paper-facing artifacts for learning hydrological model (HBV) parameters from static catchment attributes across 531 CAMELS basins.
 
 Project archive DOI: `10.5281/zenodo.20389200`.
 
-## Scientific Purpose
+---
 
-The project studies whether catchment attributes can be used to infer stable,
-interpretable, and uncertainty-aware HBV parameters. The emphasis is not only on
-streamflow prediction accuracy, but also on the reproducibility of learned
-parameter values and attribute-parameter relationships across random seeds,
-training losses, and model formulations.
+## 1. Scientific Objective
 
-The main study uses the CAMELS-US 531-basin subset and a static-attribute neural
-parameterizer coupled to an HBV-style differentiable hydrologic model. Neural
-outputs are bounded with a sigmoid activation and mapped into HBV parameter
-ranges before hydrologic simulation.
+The core objective is investigating whether catchment physical attributes can be used to infer **stable, interpretable, and uncertainty-aware HBV parameters**. Beyond streamflow predictive skill, the emphasis is placed on:
+- **Reproducibility of learned parameters** across random seeds and loss functions.
+- **Physical plausibility and consistency** of learned attribute-parameter relationships.
+- **Uncertainty quantification** through distributional versus deterministic formulations.
 
-## Main Model Variants
+The study is conducted over the **CAMELS-US 531-basin dataset** using static catchment attributes coupled to a differentiable lumped hydrological model (HBV). Neural outputs are bounded via sigmoid activations and linearly mapped to physically reasonable parameter intervals.
 
-The paper workflow compares three parameter-learning formulations, implemented
-through `paper_variants.py` and the modules under `implements/`.
+---
 
-| Variant | Neural model | Purpose |
+## 2. Model Formulations (Three Paper Variants)
+
+Implemented through `paper_variants.py` and modules in `implements/`:
+
+| Variant | Neural Model | Description & Purpose |
 | --- | --- | --- |
-| `deterministic` | `DeterministicParamModel` | Predicts one bounded HBV parameter vector per basin. |
-| `mc_dropout` | `McMlpModel` | Uses dropout sampling at evaluation time as an approximate uncertainty proxy. |
-| `distributional` | `DistributionalParamModel` | Predicts a parameter distribution and supports distribution-aware training. |
+| `deterministic` | `DeterministicParamModel` | Point-estimate baseline: predicts one bounded parameter vector per basin. |
+| `mc_dropout` | `McMlpModel` | Test-time Monte Carlo dropout sampling as an approximate uncertainty proxy. |
+| `distributional` | `DistributionalParamModel` | Predicts full parameter distributions and supports distribution-aware training. |
 
-The common paper configuration is `conf/config_param_paper.yaml`. By default it
-uses:
+Canonical configuration: `conf/config_param_paper.yaml`
+- **Training Period**: `1989-01-01` to `1998-12-31`
+- **Testing Period**: `1999-01-01` to `2009-12-31`
+- **Neural Inputs**: 35 static catchment attributes
+- **Physical Inputs**: Daily precipitation ($P$), mean temperature ($T$), potential evapotranspiration ($PET$)
+- **Output Path Pattern**: `outputs/{variant}-531/{loss}/seed_{seed}/`
 
-- training period: 1989-01-01 to 1998-12-31
-- testing period: 1999-01-01 to 2009-12-31
-- static basin attributes as neural-network inputs
-- HBV physical model inputs: precipitation, mean temperature, and PET
-- output directory pattern:
-  `outputs/{variant}-531/{loss}/seed_{seed}/`
+---
 
-## Reproducibility Entry Points
+## 3. Reproducibility & Execution Entry Points
 
-Run commands from the repository root unless noted otherwise.
+Run all commands from the repository root:
 
-Train or evaluate one run:
+### Single Model Training / Evaluation
 
 ```bash
 uv run python project/parameterize/train_param_paper.py \
@@ -58,7 +53,7 @@ uv run python project/parameterize/train_param_paper.py \
   --gpu-id 0
 ```
 
-Run the scripted multi-seed, multi-loss batches:
+### Multi-Seed / Multi-Loss Batch Execution
 
 ```bash
 bash project/parameterize/scripts/run_param_paper_deterministic.sh
@@ -66,102 +61,66 @@ bash project/parameterize/scripts/run_param_paper_mc_dropout.sh
 bash project/parameterize/scripts/run_param_paper_distributional.sh
 ```
 
-The batch scripts default to seeds `111 222 333 444 555` and losses
-`HybridNseBatchLoss`, `NseBatchLoss`, and `LogNseBatchLoss`. They accept
-environment overrides such as `DEVICE`, `GPU_ID`, `SEEDS`, `LOSSES`, `EPOCHS`,
-`MC_SAMPLES`, and `MAX_PARALLEL`.
+Default seeds: `111, 222, 333, 444, 555`  
+Default losses: `HybridNseBatchLoss`, `NseBatchLoss`, `LogNseBatchLoss`
 
-## Analysis Pipeline
+---
 
-The primary stability-analysis entry point is:
+## 4. Stability & Relationship Analysis Pipeline
+
+The primary multi-run stability and attribute-parameter relationship analysis entry point:
 
 ```bash
 uv run python project/parameterize/analysis/run_all.py
 ```
 
-This pipeline reads trained runs under `project/parameterize/outputs/` and writes
-analysis products to:
+Outputs are written to `outputs/analysis/stability_stats/`. Key analyses evaluated:
+1. **Predictive Performance**: Benchmark KGE / NSE metrics across variants and losses.
+2. **Parameter Stability**: Cross-seed and cross-loss variability of inferred parameters.
+3. **Correlation Structure**: Reproducibility of attribute-parameter Spearman correlation matrices.
+4. **Dominant Relationships**: Statistical robustness and identifiability of learned physical rules.
 
-```text
-project/parameterize/outputs/analysis/stability_stats/
+---
+
+## 5. Directory Structure & Organization
+
+```
+project/parameterize/
+├── README.md                # Project architecture and reproducibility guide
+├── train_param_paper.py     # Main training and evaluation CLI
+├── paper_variants.py        # Model variant dispatch and validation
+├── publication_figures.py   # Publication figure generation entry point
+├── conf/                    # YAML configuration files for experiments
+├── implements/              # Parameter networks, trainers, losses, and HBV physical models
+├── scripts/                 # Automated bash batch runners for the 3 paper variants
+├── analysis/                # Multi-run stability and relationship analysis pipeline
+├── manuscript/              # Manuscript assets, figure scripts, captions, and tables
+│   ├── paper/               # Merged full paper drafts (manu_wrr.md, manu_revised.md)
+│   ├── analysis_pipeline/   # Integrated pipeline generating publication artifacts
+│   ├── plots/               # Figure generation scripts and shared styling
+│   ├── figures/             # Output figure files (main and appendix)
+│   ├── captions/            # Main text and appendix figure caption drafts
+│   └── tables/              # Main and appendix LaTeX/markdown tables
+├── report/                  # Archived procedural reports, QC assessments, and notes (gitignored)
+│   ├── qc_and_synthesis/    # Quality-control audits, progress summaries, collinearity checks
+│   ├── extends/             # Extended diagnostic and sensitivity summaries
+│   └── writing_notes/       # Draft notes for results and discussion sections
+├── outputs/                 # Trained model checkpoints and analysis products (gitignored)
+├── tests/                   # Integration and regression test suite
+└── example/                 # Minimal standalone demonstration scripts
 ```
 
-It produces inventory tables, predictive metric summaries, parameter stability
-statistics, cross-loss stability statistics, attribute-parameter correlation
-matrices, relationship-stability summaries, and markdown reports. See
-`analysis/README.md` for the step-by-step script inventory.
+> **Note on Version Control**:
+> - Core production code, configurations, tests, and plotting scripts are tracked in Git.
+> - All `.md` documents under `manuscript/` (paper drafts, caption files, tables) and procedural reports in `report/` are gitignored to maintain a clean codebase and protect drafting privacy.
+> - Large experimental outputs, model checkpoints, and caches in `outputs/` are gitignored.
 
-The core questions addressed by the analysis are:
+---
 
-- Which formulation gives acceptable predictive performance?
-- Are inferred parameters stable across random seeds?
-- Are inferred parameters stable across training losses?
-- Are attribute-parameter correlation structures reproducible?
-- Which learned relationships are robust enough to support manuscript claims?
+## 6. Testing
 
-## Manuscript Artifacts
-
-The manuscript-oriented materials are under `manuscript/`.
-
-Important subdirectories include:
-
-- `manuscript/analysis_pipeline/`: integrated analysis modules used to build
-  figure-ready tables and reports.
-- `manuscript/plots/`: publication figure scripts and shared plotting utilities.
-- `manuscript/figures/`: generated main and appendix figures.
-- `manuscript/reports/`: quality-control notes, figure role summaries, and
-  supporting interpretation reports.
-- `manuscript/captions/`: figure caption drafts and attribute abbreviations.
-
-To regenerate the manuscript analysis pipeline:
+Verify project integrity and regression tests:
 
 ```bash
-uv run python project/parameterize/manuscript/analysis_pipeline/run_all.py
+PYTHONPATH=. .venv/bin/pytest project/parameterize/tests/
 ```
-
-To regenerate the publication-style figure suite:
-
-```bash
-uv run python project/parameterize/publication_figures.py --all
-```
-
-The generated figure manifest is recorded in `manuscript/manifest.json`.
-
-## Directory Guide
-
-| Path | Role |
-| --- | --- |
-| `conf/` | YAML configurations for paper and test runs. |
-| `implements/` | Parameter models, trainers, losses, HBV static model, and DPL assembly. |
-| `scripts/` | Batch runners for the three paper variants. |
-| `analysis/` | General multi-run stability and relationship-analysis pipeline. |
-| `manuscript/` | Manuscript-specific analysis, plots, captions, reports, and figures. |
-| `outputs/` | Trained run outputs and derived analysis products. |
-| `tests/` | Regression tests for configs, dispatch, trainers, analyses, and plotting pipelines. |
-| `example/` | Small integration examples for parameter models and physical-model wiring. |
-
-## Reviewer Notes
-
-- The deterministic model is a point-estimate baseline; it does not provide
-  intrinsic parameter intervals.
-- MC-dropout uncertainty should be interpreted as an approximate stochastic
-  proxy, not as a calibrated posterior.
-- Distributional outputs are bounded parameter samples on the normalized search
-  scale before conversion to HBV physical parameter ranges.
-- Reported stability metrics evaluate reproducibility of learned relationships;
-  they should not be read as direct proof of hydrologic causality or unique
-  parameter identifiability.
-- Some generated outputs and figures can be large. The main code path can be
-  inspected through the entry points listed above even when full trained outputs
-  are stored separately or archived.
-
-## Quick File Checklist
-
-For a fast editorial or review pass, start with:
-
-1. `train_param_paper.py` - main training and evaluation entry point.
-2. `conf/config_param_paper.yaml` - canonical paper configuration.
-3. `paper_variants.py` - variant normalization and validation logic.
-4. `analysis/run_all.py` and `analysis/README.md` - stability-analysis pipeline.
-5. `publication_figures.py` - manuscript figure generation entry point.
-6. `manuscript/manifest.json` - generated figure and report manifest.

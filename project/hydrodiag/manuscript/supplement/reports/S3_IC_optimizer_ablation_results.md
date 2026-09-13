@@ -1,1 +1,0 @@
-Stage 2 population evidence is real and is stored under outputs/ic_ablation/large_scale_screening/v1. Stdev and generation output roots contain no result files. The formal Stage 3 controller rule is P=6D, stdev 0.05 and 300 generations for XAJ/XAJ_CN/XAJ_TGD; this is code-verified and not a completed sequential empirical selection chain.
