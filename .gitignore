@@ -121,6 +121,9 @@ MARRMoT/
 !.env.template
 # --- Scoped negation (after *.csv): canonical pipeline index/registry CSVs are tracked ---
 !project/benchmark/docs/*.csv
+# --- Canonical FUSE structure specification catalogs ---
+!project/autofuse/dfuse/specs/*.json
+!dfuse/specs/*.json
 r3_runlogs/
 tools/
 backup/
@@ -161,3 +164,16 @@ reports/
 *.dbf
 *.cpg
 *.prj
+
+# --- Vendor / Upstream references ---
+vendor/
+**/vendor/
+
+# --- WSL / Windows metadata streams ---
+*.Zone.Identifier
+*:Zone.Identifier
+*Zone.Identifier*
+
+# --- Auto-FUSE / runtime cache ---
+.cache/
+**/.cache/

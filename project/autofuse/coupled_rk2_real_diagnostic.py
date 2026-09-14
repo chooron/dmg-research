@@ -53,7 +53,7 @@ from project.autofuse.reference_oracle import run_reference
 
 ROOT = Path(__file__).resolve().parents[2]
 DOCS = ROOT / "project/autofuse/docs"
-CATALOGUE = ROOT / "dfuse/specs/structures_78.json"
+CATALOGUE = ROOT / "dfuse/specs/structures_78.json" if (ROOT / "dfuse/specs/structures_78.json").is_file() else ROOT / "project/autofuse/dfuse/specs/structures_78.json"
 DEFAULT_SELECTION_CATCHMENTS = DOCS / "s4_diagnostic_catchments.json"
 DEFAULT_SELECTION_STRUCTURES = DOCS / "s4_diagnostic_structures.json"
 DEFAULT_MANIFEST = DOCS / "landscape_12catchment_manifest.json"

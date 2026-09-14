@@ -30,7 +30,10 @@ TEMPLATE_ROOT = PAPER_ROOT / "01_FUSEscripts/fuse_template"
 SETTINGS_ROOT = TEMPLATE_ROOT / "settings"
 DECISION_ROOT = SETTINGS_ROOT / "fuse_zDecisions"
 
-_PARAMETER_CATALOG = json.loads((ROOT / "dfuse/specs/parameter_catalog.json").read_text())["parameters"]
+_catalog_path = ROOT / "dfuse/specs/parameter_catalog.json"
+if not _catalog_path.is_file():
+    _catalog_path = ROOT / "project/autofuse/dfuse/specs/parameter_catalog.json"
+_PARAMETER_CATALOG = json.loads(_catalog_path.read_text())["parameters"]
 _PARAMETER_DEFAULTS = {item["name"]: float(item["default"]) for item in _PARAMETER_CATALOG}
 
 _REFERENCE_STATE_VARS = {

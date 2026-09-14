@@ -37,7 +37,7 @@ from dfuse.spec import PARAMETER_NAMES, STATE_NAMES, enumerate_structures
 
 ROOT = Path(__file__).resolve().parents[2]
 DOCS = ROOT / "project/autofuse/docs"
-CATALOGUE = ROOT / "dfuse/specs/structures_78.json"
+CATALOGUE = ROOT / "dfuse/specs/structures_78.json" if (ROOT / "dfuse/specs/structures_78.json").is_file() else ROOT / "project/autofuse/dfuse/specs/structures_78.json"
 MANIFEST = DOCS / "landscape_12catchment_manifest.json"
 INPUT_INDEX = DOCS / "landscape_inputs/index.json"
 CALIBRATION = DOCS / "reference_calibration_12x78.json"
@@ -157,7 +157,14 @@ def _load_frozen_inputs() -> tuple[dict[str, Any], dict[str, dict[str, np.ndarra
         row = input_rows.get(basin_id)
         if row is None:
             raise RuntimeError(f"prepared input is missing {basin_id}")
-        path = ROOT / row["path"] if not Path(row["path"]).is_absolute() else Path(row["path"])
+        recorded_path = Path(row["path"])
+        path = ROOT / recorded_path if not recorded_path.is_absolute() else recorded_path
+        # The frozen index was produced in another checkout and stores absolute paths.
+        # Preserve its byte-level SHA contract while resolving a missing relocated file locally.
+        if not path.is_file():
+            local_path = INPUT_INDEX.parent / recorded_path.name
+            if local_path.is_file():
+                path = local_path
         if not path.is_file() or _sha256(path) != row["sha256"]:
             raise RuntimeError(f"prepared input hash mismatch for {basin_id}: {path}")
         with np.load(path, allow_pickle=False) as archive:

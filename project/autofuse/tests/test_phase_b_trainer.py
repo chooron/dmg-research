@@ -1,9 +1,11 @@
 """Comprehensive Phase B unit and integration tests for SharedDPLTrainer and Samplers."""
 from __future__ import annotations
 
+import copy
 from datetime import date, timedelta
 from pathlib import Path
 import tempfile
+import pytest
 import numpy as np
 import torch
 
@@ -420,3 +422,123 @@ def test_phase_b1_trainer_fail_fast_on_non_finite_loss():
     import pytest
     with pytest.raises(RuntimeError, match="Non-finite loss"):
         trainer.train_step()
+
+@pytest.mark.skipif(not torch.cuda.is_available(), reason="strict resume gate requires CUDA")
+def test_strict_gpu_checkpoint_resume_matches_uninterrupted_run(tmp_path):
+    dates = [date(1987, 1, 1) + timedelta(days=i) for i in range(20)]
+    mock_data = {
+        f"b{i}": {
+            "ppt": np.full(20, 5.0 + i, dtype=np.float64),
+            "pet": np.full(20, 2.0, dtype=np.float64),
+            "temp": np.full(20, 10.0 + i, dtype=np.float64),
+            "q_obs": (np.sin(np.arange(20) + i) * 2.0 + 3.0).astype(np.float64),
+            "attributes": np.full(35, i, dtype=np.float64),
+            "epsilon": 0.05,
+        }
+        for i in range(3)
+    }
+    time_config = TimeWindowConfig(total_days=8, warmup_days=4, scored_days=4, calibration_end=date(1987, 1, 20))
+    config = {
+        "batch_size": 2,
+        "basin_ids": ["b0", "b1", "b2"],
+        "structures": [2, 8, 190],
+        "lr": 1e-3,
+        "device": "cuda",
+        "dtype": "float64",
+    }
+    torch.manual_seed(20260901)
+    torch.cuda.manual_seed_all(20260901)
+    seed_model = StructureConditionedParameterizer(DPLConfig(attribute_dim=35, hidden_dim=16)).to(device="cuda", dtype=torch.float64)
+
+    def make_trainer():
+        loader = StochasticTimeWindowLoader(mock_data, dates, time_config, seed=20260902, device="cuda", dtype=torch.float64)
+        structures = ShuffledStructureSampler(config["structures"], seed=20260903)
+        basins = GlobalBasinSampler(config["basin_ids"], batch_size=2, seed=20260904)
+        return SharedDPLTrainer(
+            config,
+            model=copy.deepcopy(seed_model),
+            structure_sampler=structures,
+            basin_sampler=basins,
+            loader=loader,
+            compile_step=False,
+        )
+
+    def assert_tree_equal(left, right):
+        if isinstance(left, torch.Tensor):
+            torch.testing.assert_close(left.detach().cpu(), right.detach().cpu(), rtol=0, atol=0)
+        elif isinstance(left, dict):
+            assert left.keys() == right.keys()
+            for key in left:
+                assert_tree_equal(left[key], right[key])
+        elif isinstance(left, (list, tuple)):
+            assert len(left) == len(right)
+            for left_item, right_item in zip(left, right):
+                assert_tree_equal(left_item, right_item)
+        else:
+            assert left == right
+
+    def run_one(trainer):
+        structure_probe = ShuffledStructureSampler(config["structures"], seed=0)
+        structure_probe.load_state_dict(trainer.structure_sampler.state_dict())
+        expected_structure = structure_probe.next_structure()
+        basin_probe = GlobalBasinSampler(config["basin_ids"], batch_size=2, seed=0)
+        basin_probe.load_state_dict(trainer.basin_sampler.state_dict())
+        expected_basins = basin_probe.next_batch()
+        loader_probe = StochasticTimeWindowLoader(mock_data, dates, time_config, seed=0, device="cuda", dtype=torch.float64)
+        loader_probe.load_state_dict(trainer.loader.state_dict())
+        expected_windows = loader_probe.sample_batch(expected_basins).start_indices
+        output = trainer.train_step()
+        assert output["model_id"] == expected_structure
+        return {
+            "model_id": output["model_id"],
+            "loss": output["loss"],
+            "basins": expected_basins,
+            "windows": expected_windows,
+            "global_step": trainer.global_step,
+            "structure_state": copy.deepcopy(trainer.structure_sampler.state_dict()),
+            "basin_state": copy.deepcopy(trainer.basin_sampler.state_dict()),
+            "loader_state": copy.deepcopy(trainer.loader.state_dict()),
+            "model_state": copy.deepcopy(trainer.model.state_dict()),
+            "optimizer_state": copy.deepcopy(trainer.optimizer.state_dict()),
+        }
+
+    reference = make_trainer()
+    reference_records = [run_one(reference) for _ in range(4)]
+    split = make_trainer()
+    split_records = [run_one(split) for _ in range(2)]
+    checkpoint = tmp_path / "strict_resume.pt"
+    split.save_checkpoint(checkpoint)
+    payload = torch.load(checkpoint, map_location="cpu", weights_only=False)
+    metadata = payload["checkpoint_metadata"]
+    assert {
+        "checkpoint_metadata",
+        "global_step",
+        "model_state_dict",
+        "optimizer_state_dict",
+        "scheduler_state_dict",
+        "structure_sampler_state",
+        "basin_sampler_state",
+        "loader_state",
+        "torch_rng_state",
+        "cuda_rng_state",
+        "diagnostics",
+    }.issubset(payload)
+    assert metadata["solver"] == "coupled_rk2"
+    assert metadata["optimizer"] == "Adam"
+    assert metadata["structure_ids"] == config["structures"]
+    assert metadata["parameter_names"] == list(PARAMETER_NAMES)
+    del split
+    resumed = make_trainer()
+    resumed.load_checkpoint(checkpoint)
+    split_records.extend(run_one(resumed) for _ in range(2))
+
+    assert [record["model_id"] for record in reference_records] == [record["model_id"] for record in split_records]
+    assert [record["basins"] for record in reference_records] == [record["basins"] for record in split_records]
+    assert [record["windows"] for record in reference_records] == [record["windows"] for record in split_records]
+    for reference_record, resumed_record in zip(reference_records, split_records):
+        assert reference_record["global_step"] == resumed_record["global_step"]
+        assert abs(reference_record["loss"] - resumed_record["loss"]) <= 1e-12
+        for key in ("structure_state", "basin_state", "loader_state", "model_state", "optimizer_state"):
+            assert_tree_equal(reference_record[key], resumed_record[key])
+        assert np.isfinite(reference_record["loss"]) and np.isfinite(resumed_record["loss"])
+    torch.cuda.empty_cache()

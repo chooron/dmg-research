@@ -135,7 +135,10 @@ class Phase0Orchestrator:
 
         # Registry discovery
         reg_cfg = config.get("registry", {})
-        reg_path = self.repo_root / reg_cfg.get("path", "dfuse/specs/structures_78.json")
+        reg_rel = reg_cfg.get("path", "dfuse/specs/structures_78.json")
+        reg_path = self.repo_root / reg_rel
+        if not reg_path.is_file():
+            reg_path = self.repo_root / "project/autofuse" / reg_rel
         self.registry_name = reg_cfg.get("name", "structures_78")
         self.registry_path = reg_path
         if reg_path.is_file():
@@ -187,11 +190,12 @@ class Phase0Orchestrator:
             gpu_name = torch.cuda.get_device_name(0)
             gpu_vram_mb = torch.cuda.get_device_properties(0).total_memory / (1024 * 1024)
 
+        dfuse_base = self.repo_root / "project/autofuse/dfuse" if (self.repo_root / "project/autofuse/dfuse").is_dir() else self.repo_root / "dfuse"
         kernel_hashes = {
-            "kernel.py": _compute_sha256(self.repo_root / "dfuse/kernel.py"),
-            "runtime.py": _compute_sha256(self.repo_root / "dfuse/runtime.py"),
-            "batched.py": _compute_sha256(self.repo_root / "dfuse/batched.py"),
-            "structures_78.json": _compute_sha256(self.repo_root / "dfuse/specs/structures_78.json"),
+            "kernel.py": _compute_sha256(dfuse_base / "kernel.py"),
+            "runtime.py": _compute_sha256(dfuse_base / "runtime.py"),
+            "batched.py": _compute_sha256(dfuse_base / "batched.py"),
+            "structures_78.json": _compute_sha256(dfuse_base / "specs/structures_78.json"),
         }
 
         provenance = {

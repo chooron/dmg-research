@@ -329,6 +329,15 @@ class SharedDPLTrainer(BaseTrainer):
         ckpt_path = Path(path)
         ckpt_path.parent.mkdir(parents=True, exist_ok=True)
         payload = {
+            "checkpoint_metadata": {
+                "schema_version": "autofuse-shared-dpl-checkpoint-v2",
+                "trainer": type(self).__name__,
+                "solver": "coupled_rk2",
+                "optimizer": type(self.optimizer).__name__,
+                "config": dict(self.config),
+                "structure_ids": list(self.structure_sampler.structures),
+                "parameter_names": list(PARAMETER_NAMES),
+            },
             "global_step": self.global_step,
             "model_state_dict": self.model.state_dict(),
             "optimizer_state_dict": self.optimizer.state_dict(),
@@ -354,6 +363,20 @@ class SharedDPLTrainer(BaseTrainer):
         """Exact deterministic restoration from checkpoint."""
         ckpt_path = Path(path)
         payload = torch.load(ckpt_path, map_location=self.device, weights_only=False)
+        metadata = payload.get("checkpoint_metadata")
+        if metadata is not None:
+            if metadata.get("schema_version") != "autofuse-shared-dpl-checkpoint-v2":
+                raise ValueError("unsupported shared-dPL checkpoint schema")
+            if metadata.get("trainer") != type(self).__name__ or metadata.get("solver") != "coupled_rk2":
+                raise ValueError("checkpoint trainer/solver identity mismatch")
+            if metadata.get("optimizer") != type(self.optimizer).__name__:
+                raise ValueError("checkpoint optimizer identity mismatch")
+            if metadata.get("config") != dict(self.config):
+                raise ValueError("checkpoint config identity mismatch")
+            if tuple(metadata.get("structure_ids", ())) != tuple(self.structure_sampler.structures):
+                raise ValueError("checkpoint structure catalogue mismatch")
+            if tuple(metadata.get("parameter_names", ())) != tuple(PARAMETER_NAMES):
+                raise ValueError("checkpoint parameter catalogue mismatch")
 
         self.global_step = int(payload["global_step"])
         self.model.load_state_dict(payload["model_state_dict"])

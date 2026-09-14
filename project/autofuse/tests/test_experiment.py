@@ -3,7 +3,7 @@ from dfuse.spec import default_parameters, get_structure
 import torch
 
 from project.autofuse.evaluator import UnifiedEvaluator
-from project.autofuse.metrics import kgecomp, kgecomp_batched
+from project.autofuse.metrics import kge, kgecomp, kgecomp_batched
 from project.autofuse.protocol import ExperimentProtocol
 from project.autofuse.sce import SCEBaseline, SCEConfig
 from project.autofuse.dpl import StructureConditionedParameterizer
@@ -30,6 +30,46 @@ def test_batched_kgecomp_scores_each_basin_independently():
     batched = kgecomp_batched(flow, observed)
     expected = torch.stack([kgecomp(flow[index], observed[index]) for index in range(2)])
     torch.testing.assert_close(batched, expected)
+
+
+def test_kge_and_kgecomp_perfect_non_degenerate_flow_are_one():
+    flow = torch.tensor([1.0, 2.0, 3.0, 4.0], dtype=torch.float64)
+    for metric in (kge, kgecomp):
+        score = metric(flow, flow)
+        assert torch.isfinite(score)
+        torch.testing.assert_close(score, torch.tensor(1.0, dtype=torch.float64), atol=1e-12, rtol=0)
+    batched_score = kgecomp_batched(flow.unsqueeze(0), flow.unsqueeze(0))[0]
+    torch.testing.assert_close(batched_score, torch.tensor(1.0, dtype=torch.float64), atol=1e-12, rtol=0)
+
+
+def test_kgecomp_matches_scalar_for_random_non_degenerate_sequences():
+    generator = torch.Generator().manual_seed(20260901)
+    sim = torch.rand((3, 16), generator=generator, dtype=torch.float64) + 0.5
+    obs = torch.rand((3, 16), generator=generator, dtype=torch.float64) + 0.5
+    batched = kgecomp_batched(sim, obs, epsilon=0.05)
+    scalar = torch.stack([kgecomp(sim[index], obs[index], epsilon=0.05) for index in range(3)])
+    torch.testing.assert_close(batched, scalar, atol=1e-12, rtol=1e-12)
+
+
+def test_kge_metrics_fp64_boundary_forward_and_backward_are_finite():
+    cases = (
+        torch.tensor([1.0, 1.0 + 1e-14, 1.0 - 1e-14, 1.0 + 2e-14], dtype=torch.float64),
+        torch.ones(4, dtype=torch.float64),
+        torch.tensor([1.0, 1.0 + 1e-12, 1.0 - 1e-12, 1.0 + 2e-12], dtype=torch.float64),
+    )
+    for values in cases:
+        for metric in (kge, kgecomp):
+            sim = values.clone().requires_grad_()
+            score = metric(sim, sim)
+            assert torch.isfinite(score)
+            score.backward()
+            assert torch.isfinite(sim.grad).all()
+        sim_batch = values.unsqueeze(0).clone().requires_grad_()
+        score_batch = kgecomp_batched(sim_batch, sim_batch).sum()
+        assert torch.isfinite(score_batch)
+        score_batch.backward()
+        assert torch.isfinite(sim_batch.grad).all()
+
 
 def test_sce_and_evaluator_share_dfuse_forward():
     forcing = torch.tensor([[5.0, 2.0, 10.0], [4.0, 2.0, 9.0]], dtype=torch.float64)

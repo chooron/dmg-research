@@ -12,6 +12,14 @@ def _tensor(value: object) -> Tensor:
     return torch.as_tensor(value, dtype=torch.get_default_dtype())
 
 
+def _safe_sqrt(value: Tensor) -> Tensor:
+    """Square root that is exact at zero and has finite zero gradients."""
+    nonnegative = value.clamp_min(0.0)
+    positive = nonnegative > 0
+    sqrt_input = torch.where(positive, nonnegative, torch.ones_like(nonnegative))
+    return torch.where(positive, torch.sqrt(sqrt_input), torch.zeros_like(nonnegative))
+
+
 def kge(sim: object, obs: object) -> Tensor:
     """Kling-Gupta efficiency using sample standard deviation (R ``sd``)."""
     simulated, observed = _tensor(sim), _tensor(obs)
@@ -29,7 +37,8 @@ def kge(sim: object, obs: object) -> Tensor:
     correlation = covariance / denominator
     alpha = sim_std / obs_std.clamp_min(torch.finfo(simulated.dtype).eps)
     beta = sim_v.sum() / obs_v.sum().clamp_min(torch.finfo(simulated.dtype).eps)
-    return 1.0 - torch.sqrt((correlation - 1.0) ** 2 + (beta - 1.0) ** 2 + (alpha - 1.0) ** 2)
+    kge_dist_sq = (correlation - 1.0) ** 2 + (beta - 1.0) ** 2 + (alpha - 1.0) ** 2
+    return 1.0 - _safe_sqrt(kge_dist_sq)
 
 
 
@@ -48,7 +57,7 @@ def kgecomp_batched(sim: object, obs: object, *, epsilon: float | Tensor | None 
         right_mean = right_safe.sum(dim=-1) / count
         left_centered = torch.where(valid, left - left_mean.unsqueeze(-1), torch.zeros_like(left))
         right_centered = torch.where(valid, right - right_mean.unsqueeze(-1), torch.zeros_like(right))
-        eps_dtype = torch.finfo(left.dtype).eps
+        eps_dtype = max(torch.finfo(left.dtype).eps, 1e-12)
         left_std = torch.sqrt(((left_centered * left_centered).sum(dim=-1) / (count - 1.0)).clamp_min(eps_dtype))
         right_std = torch.sqrt(((right_centered * right_centered).sum(dim=-1) / (count - 1.0)).clamp_min(eps_dtype))
         covariance = (left_centered * right_centered).sum(dim=-1) / (count - 1.0)
@@ -56,8 +65,8 @@ def kgecomp_batched(sim: object, obs: object, *, epsilon: float | Tensor | None 
         correlation = covariance / denominator
         alpha = left_std / right_std.clamp_min(eps_dtype)
         beta = left_safe.sum(dim=-1) / right_safe.sum(dim=-1).clamp_min(eps_dtype)
-        kge_dist_sq = ((correlation - 1.0) ** 2 + (beta - 1.0) ** 2 + (alpha - 1.0) ** 2).clamp_min(eps_dtype)
-        value = 1.0 - torch.sqrt(kge_dist_sq)
+        kge_dist_sq = (correlation - 1.0) ** 2 + (beta - 1.0) ** 2 + (alpha - 1.0) ** 2
+        value = 1.0 - _safe_sqrt(kge_dist_sq)
         nan_val = torch.full_like(value, float("nan"))
         return torch.where(count_raw >= 2, value, nan_val)
     if epsilon is None:
